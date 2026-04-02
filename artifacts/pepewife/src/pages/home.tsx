@@ -346,7 +346,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className="flex justify-center">
-              <img src="/tokenomics-girl.png" alt="PEPEWIFE Tokenomics" className="w-full max-w-lg object-contain drop-shadow-2xl float-animation" />
+              <img src="/tokenomics-girl.png" alt="PEPEWIFE Tokenomics" className="w-full max-w-lg object-contain drop-shadow-2xl" />
             </div>
             <div className="space-y-6">
               <div>
