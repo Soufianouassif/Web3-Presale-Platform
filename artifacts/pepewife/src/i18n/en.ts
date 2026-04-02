@@ -34,7 +34,7 @@ const en = {
   },
 
   partners: {
-    title: "🏆 AS SEEN IN (trust us bro) 🏆",
+    title: "🏆 FEATURED IN 🏆",
   },
 
   presale: {

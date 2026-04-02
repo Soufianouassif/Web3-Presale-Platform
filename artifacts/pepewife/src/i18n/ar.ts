@@ -36,7 +36,7 @@ const ar: Translations = {
   },
 
   partners: {
-    title: "🏆 كما شوهد في (ثق بنا يا صديق) 🏆",
+    title: "🏆 FEATURED IN 🏆",
   },
 
   presale: {

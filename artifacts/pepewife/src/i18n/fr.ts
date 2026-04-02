@@ -36,7 +36,7 @@ const fr: Translations = {
   },
 
   partners: {
-    title: "🏆 VU DANS (fais-nous confiance) 🏆",
+    title: "🏆 FEATURED IN 🏆",
   },
 
   presale: {
