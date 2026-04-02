@@ -349,15 +349,9 @@ export default function Home() {
               <img src="/tokenomics-girl.png" alt="PEPEWIFE Tokenomics" className="w-full max-w-lg object-contain drop-shadow-2xl float-animation" />
             </div>
             <div className="space-y-6">
-              <div className="h-[260px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={tokenomicsData} cx="50%" cy="50%" innerRadius={65} outerRadius={105} paddingAngle={4} dataKey="value" stroke="#1a1a2e" strokeWidth={2} label={({ value }) => `${value}%`}>
-                      {tokenomicsData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                    </Pie>
-                    <Tooltip contentStyle={{ borderRadius: "12px", border: "3px solid #1a1a2e", background: "#fff", color: "#1a1a2e", boxShadow: "4px 4px 0px #1a1a2e", fontFamily: "Bangers, cursive", letterSpacing: "0.05em" }} />
-                  </PieChart>
-                </ResponsiveContainer>
+              <div>
+                <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-3">Tokenomics 📊</h2>
+                <p className="text-lg text-[#1a1a2e]/60 font-bold">Total Supply: <span className="font-display text-2xl text-[#4CAF50]">1,000,000,000 PWIFE</span> 🐸</p>
               </div>
               <div className="space-y-2">
                 {tokenomicsData.map((item, idx) => (
