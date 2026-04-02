@@ -349,10 +349,6 @@ export default function Home() {
               <img src="/tokenomics-girl.png" alt="PEPEWIFE Tokenomics" className="w-full max-w-lg object-contain drop-shadow-2xl float-animation" />
             </div>
             <div className="space-y-6">
-              <div>
-                <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-3">Tokenomics 📊</h2>
-                <p className="text-lg text-[#1a1a2e]/60 font-bold">Total Supply: <span className="font-display text-2xl text-[#4CAF50]">1,000,000,000 PWIFE</span> 🐸</p>
-              </div>
               <div className="h-[260px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
