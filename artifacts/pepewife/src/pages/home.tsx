@@ -40,7 +40,7 @@ export default function Home() {
   }, []);
 
   const [, navigate] = useLocation();
-  const handleConnect = () => { setIsConnected(true); navigate("/dashboard"); };
+  const handleConnect = () => { navigate("/connect"); };
   const scrollTo = (id: string) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setIsMenuOpen(false); };
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
