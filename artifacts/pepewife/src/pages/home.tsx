@@ -4,15 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { SiCoinmarketcap, SiBinance, SiSolana, SiTether } from "react-icons/si";
+import { useLocation } from "wouter";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-  const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 14, minutes: 0, seconds: 0 });
   const [currency, setCurrency] = useState<"SOL" | "USDT">("SOL");
   const [copied, setCopied] = useState(false);
@@ -41,7 +39,8 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleConnect = () => { setIsConnected(true); setIsDashboardOpen(true); };
+  const [, navigate] = useLocation();
+  const handleConnect = () => { setIsConnected(true); navigate("/dashboard"); };
   const scrollTo = (id: string) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setIsMenuOpen(false); };
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
@@ -67,7 +66,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-2">
               {isConnected ? (
-                <button onClick={() => setIsDashboardOpen(true)} className="flex items-center gap-1.5 bg-[#4CAF50]/10 border-2 border-[#4CAF50] text-[#4CAF50] rounded-xl px-3 h-9 font-display text-sm tracking-wide whitespace-nowrap shadow-[2px_2px_0px_#2E7D32]">
+                <button onClick={() => navigate("/dashboard")} className="flex items-center gap-1.5 bg-[#4CAF50]/10 border-2 border-[#4CAF50] text-[#4CAF50] rounded-xl px-3 h-9 font-display text-sm tracking-wide whitespace-nowrap shadow-[2px_2px_0px_#2E7D32]">
                   <Wallet className="h-3.5 w-3.5 shrink-0" /> {walletAddress}
                 </button>
               ) : (
@@ -473,62 +472,6 @@ export default function Home() {
         </div>
       </footer>
 
-      <Dialog open={isDashboardOpen} onOpenChange={setIsDashboardOpen}>
-        <DialogContent className="max-w-2xl rounded-3xl p-0 overflow-hidden meme-card">
-          <div className="zigzag-border" />
-          <div className="p-6">
-            <DialogHeader className="mb-6">
-              <DialogTitle className="text-3xl font-display text-[#1a1a2e] tracking-wider">🎮 Investor Dashboard</DialogTitle>
-              <DialogDescription>
-                Connected: <span className="font-mono bg-[#FF4D9D]/10 text-[#FF4D9D] px-2 py-1 rounded font-bold border border-[#FF4D9D]">{walletAddress}</span> 🟢
-              </DialogDescription>
-            </DialogHeader>
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6 bg-[#FFFDE7] p-1 rounded-xl border-2 border-[#FFD54F]">
-                {["overview", "transactions", "claim"].map(t => (
-                  <TabsTrigger key={t} value={t} className="rounded-lg font-display text-lg capitalize tracking-wide">{t}</TabsTrigger>
-                ))}
-              </TabsList>
-              <TabsContent value="overview" className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="meme-card bg-[#E8F5E9] rounded-2xl p-5 border-[#4CAF50] shadow-[4px_4px_0px_#2E7D32]">
-                    <div className="text-xs font-display text-[#4CAF50] mb-1 tracking-wider">💰 BALANCE</div>
-                    <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">250,000 <span className="text-sm text-[#1a1a2e]/40">PWIFE</span></div>
-                  </div>
-                  <div className="meme-card bg-[#FCE4EC] rounded-2xl p-5 border-[#FF4D9D] shadow-[4px_4px_0px_#C2185B]">
-                    <div className="text-xs font-display text-[#FF4D9D] mb-1 tracking-wider">🎁 CLAIMABLE</div>
-                    <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">0 <span className="text-sm text-[#1a1a2e]/40">PWIFE</span></div>
-                  </div>
-                </div>
-                <div className="meme-card bg-[#FFFDE7] rounded-2xl p-5 flex justify-between border-[#FFD54F] shadow-[4px_4px_0px_#F9A825]">
-                  <div><div className="text-xs font-display text-[#1a1a2e]/40 tracking-wider mb-0.5">📊 STATUS</div><div className="text-xl font-display text-[#1a1a2e] tracking-wider">Stage 1</div></div>
-                  <div className="text-right"><div className="text-xs font-display text-[#1a1a2e]/40 tracking-wider mb-0.5">💰 RAISED</div><div className="text-xl font-display text-[#4CAF50] tracking-wider">$1,247,500</div></div>
-                </div>
-              </TabsContent>
-              <TabsContent value="transactions">
-                <div className="meme-card bg-white rounded-2xl overflow-hidden">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-[#FFFDE7] border-b-2 border-[#1a1a2e]"><tr>{["Date","Amount","PWIFE","Status"].map(h => <th key={h} className="px-5 py-3 font-display text-[#1a1a2e]/50 text-xs tracking-wider">{h}</th>)}</tr></thead>
-                    <tbody className="divide-y-2 divide-[#1a1a2e]/10">
-                      {[{ d: "Today, 14:30", a: "2.5 SOL", p: "125,000" }, { d: "Yesterday", a: "2.5 SOL", p: "125,000" }].map(tx => (
-                        <tr key={tx.d}><td className="px-5 py-3 text-[#1a1a2e]/70 font-bold">{tx.d}</td><td className="px-5 py-3 text-[#1a1a2e]/70 font-bold">{tx.a}</td><td className="px-5 py-3 font-display text-[#4CAF50] tracking-wider">{tx.p}</td><td className="px-5 py-3"><span className="sticker bg-[#4CAF50] text-white text-[10px]">✅ Success</span></td></tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </TabsContent>
-              <TabsContent value="claim">
-                <div className="meme-card bg-[#FFFDE7] rounded-2xl text-center py-10 px-6 border-[#FFD54F] shadow-[4px_4px_0px_#F9A825]">
-                  <div className="text-5xl mb-5">🔒</div>
-                  <h3 className="text-3xl font-display mb-2 text-[#1a1a2e] tracking-wider">Claiming Locked Ser</h3>
-                  <p className="text-[#1a1a2e]/50 text-sm font-bold mb-6 max-w-md mx-auto">Patience young degen. Claim your PWIFE after presale ends and TGE occurs. WAGMI 🤝</p>
-                  <button disabled className="btn-meme h-10 px-6 rounded-xl bg-gray-200 text-gray-400 font-display tracking-wider cursor-not-allowed">🔒 Claim Tokens (soon™)</button>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
