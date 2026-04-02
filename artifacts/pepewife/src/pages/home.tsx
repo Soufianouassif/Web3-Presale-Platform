@@ -172,7 +172,7 @@ export default function Home() {
                 <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiCoinmarketcap size={24} /> CoinMarketCap</div>
                 <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiSolana size={24} /> Solana</div>
                 <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiBinance size={24} /> Binance</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">CoinGecko</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">Orcal</div>
                 <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">Raydium</div>
               </div>
             ))}
