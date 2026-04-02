@@ -170,9 +170,9 @@ export default function Home() {
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex space-x-12 items-center shrink-0">
                 <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiCoinmarketcap size={24} /> CoinMarketCap</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">🦎 CoinGecko</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><img src="/icons/coingecko.svg" alt="" className="w-6 h-6 opacity-40" /> CoinGecko</div>
                 <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiSolana size={24} /> Solana</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><Activity size={24} /> Raydium</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><img src="/icons/raydium.svg" alt="" className="w-6 h-6 opacity-40" /> Raydium</div>
                 <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiBinance size={24} /> Binance</div>
               </div>
             ))}
