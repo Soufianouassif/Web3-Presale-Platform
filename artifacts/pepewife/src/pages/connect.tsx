@@ -30,7 +30,7 @@ const wallets = [
     color: "#F0B90B",
     shadow: "#C99A00",
     bg: "bg-[#FFFDE7]",
-    iconSrc: "/wallet-binance.jpg",
+    iconSrc: "/wallet-binance.png",
     url: "https://www.binance.com/en/web3wallet",
   },
   {
