@@ -52,6 +52,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2 cursor-pointer wiggle-hover" onClick={() => scrollTo('hero')}>
+              <img src="/logo.png" alt="PEPEWIFE" className="w-9 h-9 rounded-full border-2 border-[#1a1a2e]" />
               <span className="font-display text-3xl text-[#1a1a2e] tracking-wider" style={{ textShadow: "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
               <span className="sticker bg-[#FF4D9D] text-white" style={{ transform: "rotate(3deg)" }}>$PWIFE</span>
             </div>
@@ -415,7 +416,7 @@ export default function Home() {
             ].map((post, i) => (
               <div key={i} className="meme-card bg-white rounded-2xl p-5">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full border-2 border-[#1a1a2e] bg-[#FF4D9D]/10 flex items-center justify-center font-display text-[#FF4D9D] text-sm">PW</div>
+                  <img src="/logo.png" alt="PW" className="w-10 h-10 rounded-full border-2 border-[#1a1a2e]" />
                   <div>
                     <div className="font-display text-[#1a1a2e] text-sm tracking-wider">PEPEWIFE 🐸</div>
                     <div className="text-xs text-[#1a1a2e]/40 font-bold">@PepeWifeCoin</div>
@@ -451,7 +452,10 @@ export default function Home() {
       <footer className="py-10 px-4 border-t-4 border-[#1a1a2e]" style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #311B92 100%)" }}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
-            <div className="font-display text-3xl text-white tracking-wider" style={{ textShadow: "2px 2px 0px #FF4D9D" }}>PEPEWIFE 🐸</div>
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="PEPEWIFE" className="w-12 h-12 rounded-full border-3 border-white/30" />
+              <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: "2px 2px 0px #FF4D9D" }}>PEPEWIFE</span>
+            </div>
             <p className="text-white/40 text-sm font-bold">The Lady Of Memes — Solana — WAGMI 💎</p>
           </div>
           <div className="flex gap-5">
