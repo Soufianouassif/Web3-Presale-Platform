@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Twitter, Send, Wallet, ArrowRight, Activity, Copy, Check, Zap, Users, Star, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { SiCoinmarketcap, SiBinance, SiSolana, SiTether } from "react-icons/si";
+
+const SectionBg = ({ src, children, id, className = "", pos = "center" }: { src: string; children: React.ReactNode; id?: string; className?: string; pos?: string }) => (
+  <section id={id} className={`relative overflow-hidden ${className}`} style={{ backgroundImage: `url('${src}')`, backgroundSize: "cover", backgroundPosition: pos, backgroundRepeat: "no-repeat" }}>
+    <div className="relative z-10">{children}</div>
+  </section>
+);
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,11 +27,11 @@ export default function Home() {
   const presaleFilled = 85;
 
   const tokenomicsData = [
-    { name: "Presale", value: 40, color: "hsl(122, 39%, 49%)" },
-    { name: "Liquidity", value: 20, color: "hsl(330, 100%, 65%)" },
-    { name: "Team & Advisors", value: 15, color: "hsl(43, 100%, 65%)" },
-    { name: "Marketing", value: 15, color: "hsl(206, 100%, 65%)" },
-    { name: "Reserve", value: 10, color: "hsl(270, 100%, 65%)" },
+    { name: "Presale", value: 40, color: "#4CAF50" },
+    { name: "Liquidity", value: 20, color: "#FF4D9D" },
+    { name: "Team & Advisors", value: 15, color: "#FFD54F" },
+    { name: "Marketing", value: 15, color: "#42A5F5" },
+    { name: "Reserve", value: 10, color: "#AB47BC" },
   ];
 
   useEffect(() => {
@@ -41,695 +47,472 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleConnect = () => {
-    setIsConnected(true);
-    setIsDashboardOpen(true);
-  };
+  const handleConnect = () => { setIsConnected(true); setIsDashboardOpen(true); };
+  const scrollTo = (id: string) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setIsMenuOpen(false); };
+  const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-    setIsMenuOpen(false);
-  };
-
-  const handleCopy = () => {
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const glass = "bg-black/30 backdrop-blur-xl border border-white/15 shadow-2xl";
+  const glassDark = "bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl";
 
   return (
-    <div className="min-h-screen font-sans bg-[#f6fdf6]">
+    <div className="min-h-screen font-sans">
 
-      {/* ── NAVIGATION ── */}
-      <nav className="fixed top-0 w-full z-50 bg-white/85 backdrop-blur-md border-b border-white/20 shadow-sm">
+      {/* NAV */}
+      <nav className="fixed top-0 w-full z-50 bg-black/40 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+          <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollTo('hero')}>
-              <span className="font-display font-bold text-2xl text-primary tracking-tight">PEPEWIFE</span>
-              <span className="bg-secondary/10 text-secondary px-2 py-0.5 rounded-full text-xs font-bold">$PWIFE</span>
+              <span className="font-display font-bold text-2xl text-white tracking-tight">PEPEWIFE</span>
+              <span className="bg-[#FF4D9D]/30 text-[#FF4D9D] px-2 py-0.5 rounded-full text-xs font-bold border border-[#FF4D9D]/30">$PWIFE</span>
             </div>
-
-            <div className="hidden md:flex items-center space-x-8">
-              <button onClick={() => scrollTo('presale')} className="text-foreground hover:text-primary font-medium transition-colors">Presale</button>
-              <button onClick={() => scrollTo('why')} className="text-foreground hover:text-primary font-medium transition-colors">Why Buy</button>
-              <button onClick={() => scrollTo('tokenomics')} className="text-foreground hover:text-primary font-medium transition-colors">Tokenomics</button>
-              <button onClick={() => scrollTo('roadmap')} className="text-foreground hover:text-primary font-medium transition-colors">Roadmap</button>
+            <div className="hidden md:flex items-center space-x-6">
+              {["presale","why","tokenomics","roadmap"].map(s => (
+                <button key={s} onClick={() => scrollTo(s)} className="text-white/80 hover:text-white font-medium transition-colors capitalize text-sm">{s === "why" ? "Why Buy" : s}</button>
+              ))}
               {isConnected ? (
-                <Button variant="outline" onClick={() => setIsDashboardOpen(true)} className="border-primary text-primary hover:bg-primary/5">
-                  <Wallet className="mr-2 h-4 w-4" /> {walletAddress}
+                <Button variant="outline" onClick={() => setIsDashboardOpen(true)} className="border-white/20 text-white bg-white/10 hover:bg-white/20 text-sm h-9">
+                  <Wallet className="mr-1.5 h-3.5 w-3.5" /> {walletAddress}
                 </Button>
               ) : (
-                <Button onClick={handleConnect} className="bg-primary hover:bg-primary/90 text-white btn-primary-glow rounded-full px-6">
+                <Button onClick={handleConnect} className="bg-gradient-to-r from-[#4CAF50] to-[#FF4D9D] text-white rounded-full px-5 h-9 text-sm font-bold border-0 hover:opacity-90">
                   Connect Wallet
                 </Button>
               )}
             </div>
-
             <div className="md:hidden">
-              <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white">
+                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </div>
           </div>
         </div>
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-b absolute w-full left-0 top-20 shadow-lg">
-            <div className="px-4 pt-2 pb-6 space-y-4 flex flex-col">
-              <button onClick={() => scrollTo('presale')} className="text-left py-2 font-medium">Presale</button>
-              <button onClick={() => scrollTo('why')} className="text-left py-2 font-medium">Why Buy</button>
-              <button onClick={() => scrollTo('tokenomics')} className="text-left py-2 font-medium">Tokenomics</button>
-              <button onClick={() => scrollTo('roadmap')} className="text-left py-2 font-medium">Roadmap</button>
-              {isConnected ? (
-                <Button variant="outline" onClick={() => setIsDashboardOpen(true)} className="w-full mt-2">
-                  <Wallet className="mr-2 h-4 w-4" /> {walletAddress}
-                </Button>
-              ) : (
-                <Button onClick={handleConnect} className="w-full mt-2 btn-primary-glow">Connect Wallet</Button>
-              )}
+          <div className="md:hidden bg-black/80 backdrop-blur-xl border-t border-white/10">
+            <div className="px-4 pt-2 pb-4 space-y-3 flex flex-col">
+              {["presale","why","tokenomics","roadmap"].map(s => (
+                <button key={s} onClick={() => scrollTo(s)} className="text-left py-1.5 font-medium text-white/80 capitalize">{s === "why" ? "Why Buy" : s}</button>
+              ))}
+              <Button onClick={handleConnect} className="w-full mt-2 bg-gradient-to-r from-[#4CAF50] to-[#FF4D9D] text-white rounded-full font-bold border-0">Connect Wallet</Button>
             </div>
           </div>
         )}
       </nav>
 
-      {/* ── HERO ── */}
-      <section
-        id="hero"
-        className="pt-32 pb-24 lg:pt-44 lg:pb-32 px-4 relative overflow-hidden min-h-[90vh] flex items-center"
-        style={{
-          backgroundImage: "url('/pepewife-bg.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center top",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-white/25 to-[#f6fdf6]/90 pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto relative z-10 w-full">
-          {/* FOMO badge */}
-          <div className="flex justify-center lg:justify-start mb-6">
-            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm text-secondary border border-secondary/30 rounded-full px-5 py-2 font-bold text-sm shadow-md animate-pulse">
+      {/* HERO */}
+      <SectionBg src="/pepewife-bg.png" id="hero" className="flex items-center" pos="right center">
+        <div className="pt-24 pb-20 px-4 w-full">
+          <div className="max-w-7xl mx-auto">
+            <div className="inline-flex items-center gap-2 bg-[#FF4D9D]/20 backdrop-blur-sm text-white border border-[#FF4D9D]/30 rounded-full px-4 py-1.5 font-bold text-sm mb-6 animate-pulse">
               🔥 Stage 1 — 85% Sold Out — Hurry!
             </div>
-          </div>
-
-          <div className="max-w-3xl">
-            <h1
-              className="text-5xl lg:text-7xl font-display font-extrabold leading-tight mb-6"
-              style={{ color: "#1a3a1a", textShadow: "0 2px 12px rgba(255,255,255,0.9)" }}
-            >
-              Be Early...<br />Or{" "}
-              <span style={{ color: "#FF4D9D", textShadow: "0 2px 12px rgba(255,255,255,0.9)" }}>Cry Later 😭</span>
+            <h1 className="text-5xl lg:text-7xl font-display font-extrabold leading-tight mb-6 text-white" style={{ textShadow: "0 4px 20px rgba(0,0,0,0.5)" }}>
+              Be Early...<br />Or <span className="text-[#FF4D9D]">Cry Later 😭</span>
             </h1>
-            <p
-              className="text-xl lg:text-2xl mb-10 max-w-2xl font-medium"
-              style={{ color: "#1a3a1a", textShadow: "0 1px 6px rgba(255,255,255,0.8)" }}
-            >
-              PEPE built the meme. SHE builds the future. <br className="hidden sm:block" />
-              Join the most fashionable and fierce presale on Solana.
+            <p className="text-xl lg:text-2xl mb-8 max-w-2xl font-medium text-white/90" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.4)" }}>
+              PEPE built the meme. SHE builds the future.<br className="hidden sm:block" />
+              Join the most fashionable presale on Solana.
             </p>
-
-            {/* Mini stats row */}
-            <div className="flex flex-wrap gap-4 mb-10">
-              {[
-                { label: "Total Raised", value: "$1,247,500" },
-                { label: "Holders", value: "8,420+" },
-                { label: "Stage Price", value: "$0.0002" },
-              ].map((s) => (
-                <div key={s.label} className="bg-white/80 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white shadow-md">
-                  <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{s.label}</div>
-                  <div className="text-xl font-display font-extrabold text-foreground">{s.value}</div>
+            <div className="flex flex-wrap gap-3 mb-8">
+              {[{ l: "Total Raised", v: "$1,247,500" }, { l: "Holders", v: "8,420+" }, { l: "Stage Price", v: "$0.0002" }].map(s => (
+                <div key={s.l} className={`${glass} rounded-2xl px-5 py-3`}>
+                  <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider">{s.l}</div>
+                  <div className="text-lg font-display font-extrabold text-white">{s.v}</div>
                 </div>
               ))}
             </div>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" onClick={() => scrollTo('presale')}
-                className="sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-full h-14 px-10 text-lg btn-primary-glow font-bold shadow-xl">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button size="lg" onClick={() => scrollTo('presale')} className="sm:w-auto bg-gradient-to-r from-[#4CAF50] to-[#2E7D32] text-white rounded-full h-14 px-10 text-lg font-bold shadow-[0_4px_20px_rgba(76,175,80,0.5)] hover:shadow-[0_6px_30px_rgba(76,175,80,0.6)] hover:-translate-y-0.5 transition-all border-0">
                 🚀 Buy PWIFE Now
               </Button>
-              <Button size="lg" variant="outline"
-                className="sm:w-auto rounded-full h-14 px-8 text-lg border-2 bg-white/80 backdrop-blur-sm hover:bg-white font-semibold shadow-md">
+              <Button size="lg" variant="outline" className="sm:w-auto rounded-full h-14 px-8 text-lg border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 font-semibold">
                 Join Community <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
           </div>
         </div>
-      </section>
+      </SectionBg>
 
-      {/* ── PARTNERS TICKER ── */}
-      <section className="py-10 border-y border-black/5 bg-white/60 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-5">
-          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">As Featured In & Partners</p>
+      {/* PARTNERS */}
+      <section className="py-8 bg-black/90 border-y border-white/10">
+        <div className="max-w-7xl mx-auto px-4 text-center mb-4">
+          <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">As Featured In & Partners</p>
         </div>
         <div className="ticker-wrap">
           <div className="ticker-content space-x-16 items-center">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex space-x-16 items-center shrink-0">
-                <div className="flex items-center gap-2 font-display font-bold text-xl text-gray-400"><SiCoinmarketcap size={28} /> CoinMarketCap</div>
-                <div className="flex items-center gap-2 font-display font-bold text-xl text-gray-400">🦎 CoinGecko</div>
-                <div className="flex items-center gap-2 font-display font-bold text-xl text-gray-400"><SiSolana size={28} /> Solana</div>
-                <div className="flex items-center gap-2 font-display font-bold text-xl text-gray-400"><Activity size={28} /> Raydium</div>
-                <div className="flex items-center gap-2 font-display font-bold text-xl text-gray-400"><SiBinance size={28} /> Binance News</div>
+                <div className="flex items-center gap-2 font-display font-bold text-lg text-white/30"><SiCoinmarketcap size={24} /> CoinMarketCap</div>
+                <div className="flex items-center gap-2 font-display font-bold text-lg text-white/30">🦎 CoinGecko</div>
+                <div className="flex items-center gap-2 font-display font-bold text-lg text-white/30"><SiSolana size={24} /> Solana</div>
+                <div className="flex items-center gap-2 font-display font-bold text-lg text-white/30"><Activity size={24} /> Raydium</div>
+                <div className="flex items-center gap-2 font-display font-bold text-lg text-white/30"><SiBinance size={24} /> Binance</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── PRESALE BOX + REFERRAL ── */}
-      <section id="presale" className="py-20 px-4 relative z-20" style={{ backgroundImage: "url('/bg-presale.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+      {/* PRESALE + REFERRAL */}
+      <SectionBg src="/bg-presale.png" id="presale" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
-            <span className="inline-block bg-secondary/10 text-secondary border border-secondary/20 rounded-full px-4 py-1 text-sm font-bold mb-4">⚡ Live Now</span>
-            <h2 className="text-4xl font-display font-extrabold mb-2">Stage 1 Presale</h2>
-            <p className="text-muted-foreground">Price rises after stage ends — don't miss out!</p>
+            <span className="inline-block bg-[#FF4D9D]/20 text-[#FF4D9D] border border-[#FF4D9D]/30 rounded-full px-4 py-1 text-sm font-bold mb-4 backdrop-blur-sm">⚡ Live Now</span>
+            <h2 className="text-4xl font-display font-extrabold mb-2 text-white" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>Stage 1 Presale</h2>
+            <p className="text-white/70">Price rises after stage ends — don't miss out!</p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 items-start">
-          {/* ── LEFT: Presale Card ── */}
-          <Card className="border-2 border-primary/20 shadow-2xl bg-white rounded-3xl overflow-hidden relative">
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-secondary to-accent" />
-
-            <CardContent className="p-8 space-y-7">
-
-              {/* Countdown */}
-              <div>
-                <p className="text-xs font-bold text-center text-muted-foreground uppercase tracking-widest mb-3">⏳ Stage Ends In</p>
-                <div className="grid grid-cols-4 gap-2">
-                  {[
-                    { val: timeLeft.days, label: "Days" },
-                    { val: timeLeft.hours.toString().padStart(2, "0"), label: "Hours" },
-                    { val: timeLeft.minutes.toString().padStart(2, "0"), label: "Mins" },
-                    { val: timeLeft.seconds.toString().padStart(2, "0"), label: "Secs" },
-                  ].map((t) => (
-                    <div key={t.label} className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/15 rounded-2xl py-3 text-center">
-                      <div className="text-3xl font-display font-extrabold text-foreground">{t.val}</div>
-                      <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-0.5">{t.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Progress */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm font-semibold">
-                  <span className="text-primary">127,500,000 Sold</span>
-                  <span className="text-muted-foreground">Goal: 150,000,000 PWIFE</span>
-                </div>
-                <div className="relative">
-                  <Progress value={presaleFilled} className="h-4 rounded-full" />
-                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-extrabold text-white drop-shadow">{presaleFilled}%</span>
-                </div>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>1 SOL = 50,000 PWIFE</span>
-                  <span>1 USDT = 5,000 PWIFE</span>
-                </div>
-              </div>
-
-              {/* Price display */}
-              <div className="flex gap-3">
-                <div className="flex-1 bg-primary/5 border border-primary/15 rounded-2xl p-3 text-center">
-                  <div className="text-xs font-bold text-muted-foreground uppercase">Stage Price</div>
-                  <div className="text-lg font-display font-extrabold text-primary">$0.0002</div>
-                </div>
-                <div className="flex-1 bg-secondary/5 border border-secondary/15 rounded-2xl p-3 text-center">
-                  <div className="text-xs font-bold text-muted-foreground uppercase">Next Stage</div>
-                  <div className="text-lg font-display font-extrabold text-secondary">$0.0004</div>
-                </div>
-                <div className="flex-1 bg-accent/10 border border-accent/20 rounded-2xl p-3 text-center">
-                  <div className="text-xs font-bold text-muted-foreground uppercase">Listing</div>
-                  <div className="text-lg font-display font-extrabold" style={{ color: "#b8860b" }}>$0.001</div>
-                </div>
-              </div>
-
-              {/* Currency selector */}
-              <div>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Pay With</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setCurrency("SOL")}
-                    className={`flex items-center justify-center gap-2 rounded-2xl h-12 font-bold text-base border-2 transition-all ${
-                      currency === "SOL"
-                        ? "bg-[#14F195]/10 border-[#14F195] text-[#0a9060]"
-                        : "bg-gray-50 border-gray-200 text-muted-foreground hover:border-gray-300"
-                    }`}
-                  >
-                    <SiSolana className={currency === "SOL" ? "text-[#14F195]" : "text-gray-400"} size={18} />
-                    SOL
-                    {currency === "SOL" && <span className="ml-1 text-xs bg-[#14F195]/20 text-[#0a9060] px-1.5 py-0.5 rounded-full">✓</span>}
-                  </button>
-                  <button
-                    onClick={() => setCurrency("USDT")}
-                    className={`flex items-center justify-center gap-2 rounded-2xl h-12 font-bold text-base border-2 transition-all ${
-                      currency === "USDT"
-                        ? "bg-[#26A17B]/10 border-[#26A17B] text-[#1a7a5e]"
-                        : "bg-gray-50 border-gray-200 text-muted-foreground hover:border-gray-300"
-                    }`}
-                  >
-                    <SiTether className={currency === "USDT" ? "text-[#26A17B]" : "text-gray-400"} size={18} />
-                    USDT
-                    {currency === "USDT" && <span className="ml-1 text-xs bg-[#26A17B]/20 text-[#1a7a5e] px-1.5 py-0.5 rounded-full">✓</span>}
-                  </button>
-                </div>
-              </div>
-
-              {/* Amount input */}
-              <div className="space-y-3">
-                <div className="relative">
-                  <Input
-                    type="number"
-                    placeholder={`Amount in ${currency}`}
-                    className="h-14 pl-4 pr-24 text-lg rounded-2xl bg-white border-2 font-semibold"
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-xl font-bold text-sm">
-                    {currency === "SOL"
-                      ? <SiSolana className="text-[#14F195]" size={16} />
-                      : <SiTether className="text-[#26A17B]" size={16} />
-                    }
-                    {currency}
+            {/* Presale Card */}
+            <div className={`${glass} rounded-3xl overflow-hidden`}>
+              <div className="h-1 bg-gradient-to-r from-[#4CAF50] via-[#FF4D9D] to-[#FFD54F]" />
+              <div className="p-7 space-y-6">
+                <div>
+                  <p className="text-[10px] font-bold text-center text-white/50 uppercase tracking-[0.2em] mb-3">⏳ Stage Ends In</p>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[{ val: timeLeft.days, label: "Days" }, { val: timeLeft.hours.toString().padStart(2, "0"), label: "Hrs" }, { val: timeLeft.minutes.toString().padStart(2, "0"), label: "Min" }, { val: timeLeft.seconds.toString().padStart(2, "0"), label: "Sec" }].map(t => (
+                      <div key={t.label} className="bg-white/10 border border-white/10 rounded-xl py-2.5 text-center">
+                        <div className="text-2xl font-display font-extrabold text-white">{t.val}</div>
+                        <div className="text-[10px] font-bold text-white/40 uppercase tracking-wider">{t.label}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="bg-primary/5 border border-primary/15 rounded-xl px-4 py-3 flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground font-medium">You receive</span>
-                  <span className="font-display font-extrabold text-primary text-lg">~ 0 PWIFE</span>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs font-semibold">
+                    <span className="text-[#4CAF50]">127.5M Sold</span>
+                    <span className="text-white/50">Goal: 150M PWIFE</span>
+                  </div>
+                  <div className="relative">
+                    <Progress value={presaleFilled} className="h-3 rounded-full" />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-extrabold text-white drop-shadow">{presaleFilled}%</span>
+                  </div>
                 </div>
 
-                <Button
-                  onClick={handleConnect}
-                  className="w-full h-14 text-lg rounded-2xl font-extrabold shadow-lg"
-                  style={{
-                    background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)",
-                    boxShadow: "0 4px 24px rgba(76,175,80,0.35), 0 0 0 0 transparent",
-                  }}
-                >
-                  🚀 Buy PWIFE Now
-                </Button>
+                <div className="grid grid-cols-3 gap-2">
+                  {[{ l: "Stage", v: "$0.0002", c: "text-[#4CAF50]" }, { l: "Next", v: "$0.0004", c: "text-[#FF4D9D]" }, { l: "Listing", v: "$0.001", c: "text-[#FFD54F]" }].map(p => (
+                    <div key={p.l} className="bg-white/5 border border-white/10 rounded-xl p-2.5 text-center">
+                      <div className="text-[10px] font-bold text-white/40 uppercase">{p.l}</div>
+                      <div className={`text-base font-display font-extrabold ${p.c}`}>{p.v}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div>
+                  <p className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] mb-2">Pay With</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(["SOL", "USDT"] as const).map(c => (
+                      <button key={c} onClick={() => setCurrency(c)}
+                        className={`flex items-center justify-center gap-2 rounded-xl h-11 font-bold text-sm border transition-all ${currency === c ? (c === "SOL" ? "bg-[#14F195]/20 border-[#14F195]/50 text-[#14F195]" : "bg-[#26A17B]/20 border-[#26A17B]/50 text-[#26A17B]") : "bg-white/5 border-white/10 text-white/50 hover:border-white/20"}`}>
+                        {c === "SOL" ? <SiSolana size={16} /> : <SiTether size={16} />} {c}
+                        {currency === c && <span className="text-[10px] ml-0.5">✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  <div className="relative">
+                    <Input type="number" placeholder={`Amount in ${currency}`} className="h-12 pl-4 pr-20 text-base rounded-xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold" />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-lg font-bold text-xs text-white/70">
+                      {currency === "SOL" ? <SiSolana size={14} className="text-[#14F195]" /> : <SiTether size={14} className="text-[#26A17B]" />} {currency}
+                    </div>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 flex justify-between items-center">
+                    <span className="text-xs text-white/40 font-medium">You receive</span>
+                    <span className="font-display font-extrabold text-[#4CAF50] text-base">~ 0 PWIFE</span>
+                  </div>
+                  <Button onClick={handleConnect} className="w-full h-12 text-base rounded-xl font-extrabold border-0 shadow-[0_4px_20px_rgba(76,175,80,0.4)]" style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)" }}>
+                    🚀 Buy PWIFE Now
+                  </Button>
+                </div>
+                <p className="text-center text-[10px] text-white/30">Tokens distributed at TGE.</p>
               </div>
-
-              <p className="text-center text-xs text-muted-foreground">
-                Tokens distributed at TGE. No wallet needed to reserve.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* ── RIGHT: Referral Card ── */}
-          <div className="flex flex-col gap-6">
-            {/* Referral heading */}
-            <div>
-              <span className="inline-block bg-secondary/10 text-secondary rounded-full px-4 py-1 text-sm font-bold mb-3">🎁 Referral Program</span>
-              <h3 className="text-3xl font-display font-extrabold mb-1">Earn by Sharing</h3>
-              <p className="text-muted-foreground">Share your link and earn <strong className="text-secondary">5% rewards</strong> for every friend who joins.</p>
             </div>
 
-            <Card className="rounded-3xl border border-secondary/20 shadow-xl bg-white overflow-hidden">
-              <div className="h-1.5 bg-gradient-to-r from-primary via-secondary to-accent w-full" />
-              <CardContent className="p-6 space-y-6">
+            {/* Referral */}
+            <div className="flex flex-col gap-5">
+              <div>
+                <span className="inline-block bg-[#FF4D9D]/20 text-[#FF4D9D] rounded-full px-3 py-1 text-xs font-bold mb-2 border border-[#FF4D9D]/20">🎁 Referral</span>
+                <h3 className="text-3xl font-display font-extrabold text-white mb-1" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>Earn by Sharing</h3>
+                <p className="text-white/60 text-sm">Share your link and earn <strong className="text-[#FF4D9D]">5% rewards</strong> per friend.</p>
+              </div>
 
-                {/* Referral link */}
-                <div>
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Your Referral Link</p>
-                  <div className="flex gap-2">
-                    <Input
-                      readOnly
-                      value="https://pepewife.io/ref/7xKp4mNr"
-                      className="h-12 rounded-2xl bg-gray-50 border-2 font-mono text-sm"
-                    />
-                    <Button onClick={handleCopy} className={`h-12 px-4 rounded-2xl font-bold shrink-0 transition-all ${copied ? "bg-green-500 text-white" : "bg-primary text-white btn-primary-glow"}`}>
-                      {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
-                    </Button>
+              <div className={`${glass} rounded-2xl overflow-hidden`}>
+                <div className="h-1 bg-gradient-to-r from-[#4CAF50] via-[#FF4D9D] to-[#FFD54F]" />
+                <div className="p-5 space-y-5">
+                  <div>
+                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2">Your Referral Link</p>
+                    <div className="flex gap-2">
+                      <Input readOnly value="https://pepewife.io/ref/7xKp4mNr" className="h-10 rounded-xl bg-white/10 border-white/15 font-mono text-xs text-white/70" />
+                      <Button onClick={handleCopy} className={`h-10 px-3 rounded-xl font-bold shrink-0 border-0 ${copied ? "bg-green-500" : "bg-gradient-to-r from-[#4CAF50] to-[#2E7D32]"} text-white`}>
+                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                    {copied && <p className="text-[10px] text-green-400 font-bold mt-1">✓ Copied!</p>}
                   </div>
-                  {copied && <p className="text-xs text-green-600 font-bold mt-1.5">✓ Copied to clipboard!</p>}
+                  <div className="grid grid-cols-3 gap-2">
+                    {[{ l: "Referred", v: "0", c: "text-[#4CAF50]" }, { l: "Pending", v: "0 PWIFE", c: "text-[#FF4D9D]" }, { l: "Rate", v: "5%", c: "text-[#FFD54F]" }].map(s => (
+                      <div key={s.l} className="bg-white/5 rounded-xl p-2.5 text-center border border-white/5">
+                        <div className={`text-lg font-display font-extrabold ${s.c}`}>{s.v}</div>
+                        <div className="text-[10px] font-bold text-white/40 uppercase mt-0.5">{s.l}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { label: "Friends Referred", value: "0", color: "text-primary" },
-                    { label: "Pending Rewards", value: "0 PWIFE", color: "text-secondary" },
-                    { label: "Reward Rate", value: "5%", color: "text-yellow-600" },
-                  ].map((s) => (
-                    <div key={s.label} className="bg-gray-50 rounded-2xl p-3 text-center border border-black/5">
-                      <div className={`text-xl font-display font-extrabold ${s.color}`}>{s.value}</div>
-                      <div className="text-xs font-bold text-muted-foreground uppercase tracking-wide mt-1 leading-tight">{s.label}</div>
+              <div className={`${glass} rounded-2xl p-5`}>
+                <h4 className="font-display font-bold text-sm text-white mb-3">🏆 Top Referrers</h4>
+                <div className="space-y-1.5">
+                  {[{ r: "🥇", a: "9mRk...2xNw", p: "71,000" }, { r: "🥈", a: "4pQj...8vBc", p: "49,000" }, { r: "🥉", a: "7tLx...5kMp", p: "33,500" }].map(x => (
+                    <div key={x.a} className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2">
+                      <span className="text-sm">{x.r}</span>
+                      <span className="font-mono text-xs text-white/50 flex-1">{x.a}</span>
+                      <span className="text-[10px] font-bold text-[#4CAF50]">{x.p} PWIFE</span>
                     </div>
                   ))}
                 </div>
-
-                <div className="bg-secondary/5 border border-secondary/20 rounded-2xl p-4 text-sm text-muted-foreground leading-relaxed">
-                  💅 <strong className="text-foreground">How it works:</strong> Share your link. When a friend buys using it, you earn <strong className="text-secondary">5% of their purchase</strong> in PWIFE — paid at TGE.
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Bonus info card */}
-            <Card className="rounded-3xl border border-primary/15 shadow-md bg-gradient-to-br from-primary/5 to-accent/5 overflow-hidden">
-              <CardContent className="p-6">
-                <h4 className="font-display font-bold text-lg mb-3">🏆 Top Referrer Leaderboard</h4>
-                <div className="space-y-2">
-                  {[
-                    { rank: "🥇", addr: "9mRk...2xNw", refs: "142 refs", reward: "71,000 PWIFE" },
-                    { rank: "🥈", addr: "4pQj...8vBc", refs: "98 refs", reward: "49,000 PWIFE" },
-                    { rank: "🥉", addr: "7tLx...5kMp", refs: "67 refs", reward: "33,500 PWIFE" },
-                  ].map((r) => (
-                    <div key={r.addr} className="flex items-center gap-3 bg-white/60 rounded-xl px-3 py-2">
-                      <span className="text-lg">{r.rank}</span>
-                      <span className="font-mono text-sm text-muted-foreground flex-1">{r.addr}</span>
-                      <span className="text-xs font-bold text-primary">{r.reward}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
-
-          </div>{/* end grid */}
         </div>
-      </section>
+      </SectionBg>
 
-      {/* ── WHY BUY PWIFE ── */}
-      <section id="why" className="py-24 px-4 relative" style={{ backgroundImage: "url('/bg-why.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+      {/* WHY BUY */}
+      <SectionBg src="/bg-why.png" id="why" className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <span className="inline-block bg-accent/20 text-yellow-700 rounded-full px-4 py-1 text-sm font-bold mb-4">💡 Why PWIFE?</span>
-            <h2 className="text-4xl md:text-5xl font-display font-extrabold mb-4">Why Buy PWIFE?</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Because every meme needs a queen. And every queen needs early believers.</p>
+            <span className="inline-block bg-[#FFD54F]/20 text-[#FFD54F] rounded-full px-4 py-1 text-sm font-bold mb-4 border border-[#FFD54F]/30 backdrop-blur-sm">💡 Why PWIFE?</span>
+            <h2 className="text-4xl md:text-5xl font-display font-extrabold mb-4 text-white" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>Why Buy PWIFE?</h2>
+            <p className="text-lg text-white/70 max-w-2xl mx-auto">Because every meme needs a queen. And every queen needs early believers.</p>
           </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
-              {
-                icon: <TrendingUp className="h-7 w-7" />,
-                color: "from-primary/15 to-primary/5",
-                border: "border-primary/20",
-                iconColor: "text-primary",
-                title: "Early Entry Advantage",
-                desc: "Stage 1 price is 5× lower than the listing price. The earlier you enter, the bigger the potential upside.",
-              },
-              {
-                icon: <Users className="h-7 w-7" />,
-                color: "from-secondary/15 to-secondary/5",
-                border: "border-secondary/20",
-                iconColor: "text-secondary",
-                title: "Community Driven",
-                desc: "8,000+ holders and growing. Decisions are made by the community, for the community. Your voice matters.",
-              },
-              {
-                icon: <Zap className="h-7 w-7" />,
-                color: "from-accent/20 to-accent/5",
-                border: "border-accent/20",
-                iconColor: "text-yellow-600",
-                title: "Future Utilities",
-                desc: "Staking rewards, governance voting, exclusive NFT drops, and a PWIFE ecosystem all on the roadmap.",
-              },
-              {
-                icon: <Star className="h-7 w-7" />,
-                color: "from-purple-100 to-purple-50",
-                border: "border-purple-200",
-                iconColor: "text-purple-500",
-                title: "Meme Power 💅",
-                desc: "Strong branding + viral meme energy = unstoppable momentum. The internet loves a queen with bags.",
-              },
-            ].map((card) => (
-              <Card key={card.title} className={`rounded-3xl border-2 ${card.border} shadow-md hover:shadow-xl hover:-translate-y-1 transition-all bg-gradient-to-br ${card.color}`}>
-                <CardContent className="p-7">
-                  <div className={`w-14 h-14 rounded-2xl bg-white flex items-center justify-center mb-5 shadow-sm ${card.iconColor}`}>
-                    {card.icon}
-                  </div>
-                  <h3 className="font-display font-bold text-xl mb-3">{card.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{card.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── HOW TO BUY ── */}
-      <section id="how" className="py-24 px-4 relative" style={{ backgroundImage: "url('/bg-howtobuy.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-sm font-bold mb-4">🛒 Simple Steps</span>
-            <h2 className="text-4xl md:text-5xl font-display font-extrabold mb-4">How to Buy PWIFE</h2>
-            <p className="text-xl text-muted-foreground">No experience needed. If you can use an app, you can buy PWIFE.</p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
-            {[
-              { step: "01", emoji: "👛", title: "Connect Wallet", desc: "Use Phantom, Solflare, or any Solana wallet." },
-              { step: "02", emoji: "💱", title: "Choose Currency", desc: "Pick SOL or USDT — whatever you have." },
-              { step: "03", emoji: "✏️", title: "Enter Amount", desc: "Type how much you want to invest." },
-              { step: "04", emoji: "🚀", title: "Click Buy", desc: "Confirm the transaction in your wallet." },
-              { step: "05", emoji: "🎉", title: "Receive Tokens", desc: "PWIFE lands in your wallet at TGE." },
-            ].map((s, i) => (
-              <div key={s.step} className="relative flex flex-col items-center text-center">
-                {i < 4 && (
-                  <div className="hidden lg:block absolute top-10 left-[calc(50%+2rem)] right-0 h-0.5 bg-gradient-to-r from-primary/30 to-transparent z-0" />
-                )}
-                <Card className="w-full rounded-3xl border border-black/5 shadow-md bg-white hover:shadow-lg hover:-translate-y-1 transition-all z-10">
-                  <CardContent className="p-6">
-                    <div className="text-4xl mb-3">{s.emoji}</div>
-                    <div className="text-xs font-extrabold text-primary uppercase tracking-wider mb-2">Step {s.step}</div>
-                    <h3 className="font-display font-bold text-lg mb-2">{s.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
-                  </CardContent>
-                </Card>
+              { icon: <TrendingUp className="h-6 w-6" />, c: "#4CAF50", title: "Early Entry Advantage", desc: "Stage 1 price is 5x lower than listing. The earlier you enter, the bigger the upside." },
+              { icon: <Users className="h-6 w-6" />, c: "#FF4D9D", title: "Community Driven", desc: "8,000+ holders and growing. Decisions made by the community, for the community." },
+              { icon: <Zap className="h-6 w-6" />, c: "#FFD54F", title: "Future Utilities", desc: "Staking rewards, governance, exclusive NFT drops, and the PWIFE ecosystem." },
+              { icon: <Star className="h-6 w-6" />, c: "#AB47BC", title: "Meme Power 💅", desc: "Strong branding + viral meme energy = unstoppable momentum." },
+            ].map(card => (
+              <div key={card.title} className={`${glass} rounded-2xl p-6 hover:-translate-y-1 transition-transform`}>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: `${card.c}30`, color: card.c }}>
+                  {card.icon}
+                </div>
+                <h3 className="font-display font-bold text-lg mb-2 text-white">{card.title}</h3>
+                <p className="text-white/60 text-sm leading-relaxed">{card.desc}</p>
               </div>
             ))}
           </div>
+        </div>
+      </SectionBg>
 
+      {/* HOW TO BUY */}
+      <SectionBg src="/bg-howtobuy.png" id="how" className="py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <span className="inline-block bg-[#4CAF50]/20 text-[#4CAF50] rounded-full px-4 py-1 text-sm font-bold mb-4 border border-[#4CAF50]/30 backdrop-blur-sm">🛒 Simple Steps</span>
+            <h2 className="text-4xl md:text-5xl font-display font-extrabold mb-4 text-white" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>How to Buy PWIFE</h2>
+            <p className="text-lg text-white/70">No experience needed. If you can use an app, you can buy PWIFE.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {[
+              { s: "01", e: "👛", t: "Connect Wallet", d: "Use Phantom, Solflare, or any Solana wallet." },
+              { s: "02", e: "💱", t: "Choose Currency", d: "Pick SOL or USDT." },
+              { s: "03", e: "✏️", t: "Enter Amount", d: "Type how much you want." },
+              { s: "04", e: "🚀", t: "Click Buy", d: "Confirm in your wallet." },
+              { s: "05", e: "🎉", t: "Receive Tokens", d: "PWIFE at TGE." },
+            ].map(step => (
+              <div key={step.s} className={`${glass} rounded-2xl p-5 text-center hover:-translate-y-1 transition-transform`}>
+                <div className="text-3xl mb-2">{step.e}</div>
+                <div className="text-[10px] font-extrabold text-[#4CAF50] uppercase tracking-wider mb-1">Step {step.s}</div>
+                <h3 className="font-display font-bold text-base mb-1.5 text-white">{step.t}</h3>
+                <p className="text-white/50 text-xs leading-relaxed">{step.d}</p>
+              </div>
+            ))}
+          </div>
           <div className="text-center mt-10">
-            <Button size="lg" onClick={() => scrollTo('presale')}
-              className="bg-primary hover:bg-primary/90 text-white rounded-full h-14 px-10 text-lg btn-primary-glow font-bold shadow-lg">
+            <Button size="lg" onClick={() => scrollTo('presale')} className="bg-gradient-to-r from-[#4CAF50] to-[#2E7D32] text-white rounded-full h-14 px-10 text-lg font-bold shadow-[0_4px_20px_rgba(76,175,80,0.5)] border-0 hover:-translate-y-0.5 transition-all">
               I'm Ready — Buy Now 🐸
             </Button>
           </div>
         </div>
-      </section>
+      </SectionBg>
 
-      {/* ── TOKENOMICS ── */}
-      <section id="tokenomics" className="py-24 px-4 relative" style={{ backgroundImage: "url('/bg-tokenomics.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+      {/* TOKENOMICS */}
+      <SectionBg src="/bg-tokenomics.png" id="tokenomics" className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-display font-bold mb-4">Tokenomics</h2>
-            <p className="text-xl text-muted-foreground">Total Supply: <strong className="text-foreground">1,000,000,000 PWIFE</strong></p>
+          <div className="text-center mb-14">
+            <h2 className="text-4xl md:text-5xl font-display font-bold mb-4 text-white" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>Tokenomics</h2>
+            <p className="text-lg text-white/70">Total Supply: <strong className="text-white">1,000,000,000 PWIFE</strong></p>
           </div>
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="h-[400px] w-full">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div className="h-[350px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={tokenomicsData} cx="50%" cy="50%" innerRadius={100} outerRadius={140} paddingAngle={5} dataKey="value" stroke="none">
-                    {tokenomicsData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
+                  <Pie data={tokenomicsData} cx="50%" cy="50%" innerRadius={90} outerRadius={130} paddingAngle={4} dataKey="value" stroke="none">
+                    {tokenomicsData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
                   </Pie>
-                  <Tooltip contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)" }} />
+                  <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(0,0,0,0.7)", color: "#fff", backdropFilter: "blur(10px)" }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {tokenomicsData.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-black/5 hover:shadow-md transition-shadow">
-                  <div className="w-4 h-4 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                  <div className="flex-1 font-semibold text-lg">{item.name}</div>
-                  <div className="font-display font-bold text-xl">{item.value}%</div>
+                <div key={idx} className={`${glass} flex items-center gap-3 p-4 rounded-xl hover:-translate-y-0.5 transition-transform`}>
+                  <div className="w-3.5 h-3.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                  <div className="flex-1 font-semibold text-white">{item.name}</div>
+                  <div className="font-display font-bold text-lg text-white">{item.value}%</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
-      </section>
+      </SectionBg>
 
-      {/* ── ROADMAP ── */}
-      <section id="roadmap" className="py-24 px-4 relative" style={{ backgroundImage: "url('/bg-roadmap.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+      {/* ROADMAP */}
+      <SectionBg src="/bg-roadmap.png" id="roadmap" className="py-24 px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-display font-bold text-center mb-16">The Road to the Moon 🚀</h2>
-          <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-1 before:bg-gradient-to-b before:from-primary before:via-secondary before:to-muted">
+          <h2 className="text-4xl md:text-5xl font-display font-bold text-center mb-16 text-white" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>The Road to the Moon 🚀</h2>
+          <div className="space-y-6">
             {[
               { phase: "Phase 1", title: "Foundation", desc: "Website launch, community building, presale kick-off", active: true },
               { phase: "Phase 2", title: "Growth", desc: "CEX listings, influencer partnerships, 10K holders", active: false },
-              { phase: "Phase 3", title: "Launch", desc: "Token generation event, DEX listing on Raydium, CMC/CoinGecko listing", active: false },
-              { phase: "Phase 4", title: "Expansion", desc: "Tier-1 CEX listing, NFT collection, PWIFE ecosystem", active: false },
+              { phase: "Phase 3", title: "Launch", desc: "Token generation event, DEX listing on Raydium, CMC/CoinGecko", active: false },
+              { phase: "Phase 4", title: "Expansion", desc: "Tier-1 CEX, NFT collection, PWIFE ecosystem", active: false },
             ].map((step, i) => (
-              <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-white shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-md z-10 ${step.active ? "bg-primary" : "bg-gray-300"}`}>
-                  <div className={`w-3 h-3 rounded-full ${step.active ? "bg-white" : "bg-transparent"}`} />
+              <div key={i} className={`${step.active ? glass : glassDark} rounded-2xl p-6 ${step.active ? "border-[#4CAF50]/30 ring-1 ring-[#4CAF50]/20" : ""} hover:-translate-y-0.5 transition-transform`}>
+                <div className="flex items-center gap-4">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${step.active ? "bg-[#4CAF50]" : "bg-white/10"}`}>
+                    <span className="text-sm font-bold text-white">{i + 1}</span>
+                  </div>
+                  <div>
+                    <div className={`text-xs font-bold uppercase tracking-wider mb-0.5 ${step.active ? "text-[#4CAF50]" : "text-white/40"}`}>{step.phase}</div>
+                    <h3 className="text-lg font-display font-bold text-white">{step.title}</h3>
+                    <p className="text-white/50 text-sm">{step.desc}</p>
+                  </div>
                 </div>
-                <Card className={`w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] rounded-2xl transition-transform hover:-translate-y-1 ${step.active ? "border-primary ring-1 ring-primary/20 shadow-lg" : "border-black/5 shadow-sm"}`}>
-                  <CardContent className="p-6">
-                    <div className={`text-sm font-bold uppercase tracking-wider mb-2 ${step.active ? "text-primary" : "text-muted-foreground"}`}>{step.phase}</div>
-                    <h3 className="text-xl font-display font-bold mb-2">{step.title}</h3>
-                    <p className="text-muted-foreground">{step.desc}</p>
-                  </CardContent>
-                </Card>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </SectionBg>
 
-      {/* ── SOCIAL FEED ── */}
-      <section className="py-24 px-4 relative" style={{ backgroundImage: "url('/bg-community.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+      {/* SOCIAL FEED */}
+      <SectionBg src="/bg-community.png" className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-display font-bold text-center mb-12">Latest Updates 📢</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <h2 className="text-4xl font-display font-bold text-center mb-12 text-white" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>Latest Updates 📢</h2>
+          <div className="grid md:grid-cols-3 gap-5">
             {[
               { text: "PEPEWIFE presale is live! 🎉 Stage 1 just launched. Get in early before price doubles.", time: "2h ago", likes: "🔥 892" },
               { text: "We just hit 50% sold in 48 hours! The Lady of Memes is taking over 👑", time: "1d ago", likes: "💚 1,247" },
               { text: "Raydium listing confirmed for TGE. Your bags are safe. 😏 WAGMI.", time: "2d ago", likes: "🚀 2,103" },
             ].map((post, i) => (
-              <Card key={i} className="rounded-3xl border border-black/5 shadow-md bg-white hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center font-bold text-secondary">PW</div>
-                    <div>
-                      <div className="font-bold">PEPEWIFE</div>
-                      <div className="text-sm text-muted-foreground">@PepeWifeCoin</div>
-                    </div>
-                    <Twitter className="ml-auto text-[#1DA1F2] h-5 w-5" />
+              <div key={i} className={`${glass} rounded-2xl p-5 hover:-translate-y-1 transition-transform`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-full bg-[#FF4D9D]/20 flex items-center justify-center font-bold text-[#FF4D9D] text-xs">PW</div>
+                  <div>
+                    <div className="font-bold text-white text-sm">PEPEWIFE</div>
+                    <div className="text-xs text-white/40">@PepeWifeCoin</div>
                   </div>
-                  <p className="text-base mb-6 leading-relaxed">{post.text}</p>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground font-medium">
-                    <span>{post.time}</span>
-                    <span>{post.likes} likes</span>
-                  </div>
-                </CardContent>
-              </Card>
+                  <Twitter className="ml-auto text-[#1DA1F2] h-4 w-4" />
+                </div>
+                <p className="text-sm mb-4 leading-relaxed text-white/80">{post.text}</p>
+                <div className="flex items-center justify-between text-xs text-white/40 font-medium">
+                  <span>{post.time}</span>
+                  <span>{post.likes}</span>
+                </div>
+              </div>
             ))}
           </div>
         </div>
-      </section>
+      </SectionBg>
 
-      {/* ── RISK WARNING ── */}
-      <section className="py-12 px-4">
+      {/* RISK */}
+      <section className="py-10 px-4 bg-black/90">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 md:p-8">
-            <h3 className="text-xl font-bold text-yellow-800 mb-3">⚠️ Risk Warning</h3>
-            <p className="text-yellow-700 leading-relaxed">
-              Cryptocurrency investments are highly volatile and carry significant risk. This is not financial advice. Always Do Your Own Research (DYOR). Only invest what you can afford to lose. Past performance is not indicative of future results. Meme coins are particularly risky.
+          <div className="bg-[#FFD54F]/10 border border-[#FFD54F]/20 rounded-2xl p-6 backdrop-blur-xl">
+            <h3 className="text-base font-bold text-[#FFD54F] mb-2">⚠️ Risk Warning</h3>
+            <p className="text-white/50 text-sm leading-relaxed">
+              Cryptocurrency investments are highly volatile and carry significant risk. This is not financial advice. DYOR. Only invest what you can afford to lose. Meme coins are particularly risky.
             </p>
           </div>
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer className="bg-white border-t py-12 px-4">
+      {/* FOOTER */}
+      <footer className="bg-black/95 border-t border-white/10 py-10 px-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
-            <div className="font-display font-bold text-2xl text-primary tracking-tight mb-1">PEPEWIFE</div>
-            <p className="text-muted-foreground text-sm">The Lady Of Memes — Solana</p>
+            <div className="font-display font-bold text-xl text-white tracking-tight mb-0.5">PEPEWIFE</div>
+            <p className="text-white/40 text-xs">The Lady Of Memes — Solana</p>
           </div>
-          <div className="flex gap-6">
-            <a href="#" className="text-muted-foreground hover:text-primary font-medium transition-colors">Whitepaper</a>
-            <button onClick={() => scrollTo('roadmap')} className="text-muted-foreground hover:text-primary font-medium transition-colors">Roadmap</button>
-            <a href="#" className="text-muted-foreground hover:text-primary font-medium transition-colors">FAQ</a>
+          <div className="flex gap-5">
+            {["Whitepaper", "Roadmap", "FAQ"].map(link => (
+              <button key={link} onClick={() => link === "Roadmap" ? scrollTo("roadmap") : undefined} className="text-white/40 hover:text-white font-medium text-sm transition-colors">{link}</button>
+            ))}
           </div>
-          <div className="flex gap-4">
-            <Button variant="ghost" size="icon" className="rounded-full hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2]">
-              <Twitter className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-full hover:bg-[#0088cc]/10 hover:text-[#0088cc]">
-              <Send className="h-5 w-5" />
-            </Button>
+          <div className="flex gap-3">
+            <Button variant="ghost" size="icon" className="rounded-full text-white/40 hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10"><Twitter className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="rounded-full text-white/40 hover:text-[#0088cc] hover:bg-[#0088cc]/10"><Send className="h-4 w-4" /></Button>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto mt-10 pt-6 border-t text-center text-sm text-muted-foreground">
+        <div className="max-w-7xl mx-auto mt-8 pt-5 border-t border-white/5 text-center text-xs text-white/20">
           © 2025 PEPEWIFE. All rights reserved. Not financial advice.
         </div>
       </footer>
 
-      {/* ── DASHBOARD MODAL ── */}
+      {/* DASHBOARD */}
       <Dialog open={isDashboardOpen} onOpenChange={setIsDashboardOpen}>
-        <DialogContent className="max-w-2xl rounded-3xl p-0 overflow-hidden bg-white/95 backdrop-blur-xl border-white shadow-2xl">
-          <div className="h-2 bg-gradient-to-r from-primary to-secondary w-full" />
+        <DialogContent className="max-w-2xl rounded-3xl p-0 overflow-hidden bg-black/90 backdrop-blur-xl border-white/10 shadow-2xl">
+          <div className="h-1 bg-gradient-to-r from-[#4CAF50] to-[#FF4D9D] w-full" />
           <div className="p-6">
             <DialogHeader className="mb-6">
-              <DialogTitle className="text-2xl font-display font-bold">Investor Dashboard</DialogTitle>
+              <DialogTitle className="text-2xl font-display font-bold text-white">Investor Dashboard</DialogTitle>
               <DialogDescription>
-                Connected: <span className="font-mono bg-secondary/10 text-secondary px-2 py-1 rounded font-bold">{walletAddress}</span>
+                Connected: <span className="font-mono bg-[#FF4D9D]/15 text-[#FF4D9D] px-2 py-1 rounded font-bold">{walletAddress}</span>
               </DialogDescription>
             </DialogHeader>
-
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6 bg-gray-100 p-1 rounded-xl">
-                <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Overview</TabsTrigger>
-                <TabsTrigger value="transactions" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Transactions</TabsTrigger>
-                <TabsTrigger value="claim" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Claim</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 mb-6 bg-white/5 p-1 rounded-xl border border-white/10">
+                {["overview", "transactions", "claim"].map(t => (
+                  <TabsTrigger key={t} value={t} className="rounded-lg data-[state=active]:bg-white/10 data-[state=active]:text-white text-white/50 capitalize">{t}</TabsTrigger>
+                ))}
               </TabsList>
-
               <TabsContent value="overview" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <Card className="rounded-2xl border-none shadow-sm bg-primary/5">
-                    <CardContent className="p-6">
-                      <div className="text-sm font-bold text-primary mb-1 uppercase tracking-wider">Your Balance</div>
-                      <div className="text-3xl font-display font-bold">250,000 <span className="text-lg text-muted-foreground">PWIFE</span></div>
-                    </CardContent>
-                  </Card>
-                  <Card className="rounded-2xl border-none shadow-sm bg-secondary/5">
-                    <CardContent className="p-6">
-                      <div className="text-sm font-bold text-secondary mb-1 uppercase tracking-wider">Claimable</div>
-                      <div className="text-3xl font-display font-bold">0 <span className="text-lg text-muted-foreground">PWIFE</span></div>
-                    </CardContent>
-                  </Card>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-[#4CAF50]/10 border border-[#4CAF50]/20 rounded-2xl p-5">
+                    <div className="text-xs font-bold text-[#4CAF50] mb-1 uppercase tracking-wider">Balance</div>
+                    <div className="text-2xl font-display font-bold text-white">250,000 <span className="text-sm text-white/50">PWIFE</span></div>
+                  </div>
+                  <div className="bg-[#FF4D9D]/10 border border-[#FF4D9D]/20 rounded-2xl p-5">
+                    <div className="text-xs font-bold text-[#FF4D9D] mb-1 uppercase tracking-wider">Claimable</div>
+                    <div className="text-2xl font-display font-bold text-white">0 <span className="text-sm text-white/50">PWIFE</span></div>
+                  </div>
                 </div>
-                <Card className="rounded-2xl border-black/5 shadow-sm">
-                  <CardContent className="p-6 flex justify-between items-center">
-                    <div>
-                      <div className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Presale Status</div>
-                      <div className="text-xl font-bold">Stage 1</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Total Raised</div>
-                      <div className="text-xl font-bold text-primary">$1,247,500</div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex justify-between">
+                  <div><div className="text-xs font-bold text-white/40 uppercase mb-0.5">Status</div><div className="text-lg font-bold text-white">Stage 1</div></div>
+                  <div className="text-right"><div className="text-xs font-bold text-white/40 uppercase mb-0.5">Raised</div><div className="text-lg font-bold text-[#4CAF50]">$1,247,500</div></div>
+                </div>
               </TabsContent>
-
               <TabsContent value="transactions">
-                <Card className="rounded-2xl border-black/5 shadow-sm overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead className="bg-gray-50 border-b">
-                        <tr>
-                          <th className="px-6 py-4 font-bold text-muted-foreground">Date</th>
-                          <th className="px-6 py-4 font-bold text-muted-foreground">Amount</th>
-                          <th className="px-6 py-4 font-bold text-muted-foreground">PWIFE</th>
-                          <th className="px-6 py-4 font-bold text-muted-foreground">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        <tr className="bg-white">
-                          <td className="px-6 py-4 font-medium">Today, 14:30</td>
-                          <td className="px-6 py-4">2.5 SOL</td>
-                          <td className="px-6 py-4 font-bold text-primary">125,000</td>
-                          <td className="px-6 py-4"><span className="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-1 rounded-md">Success</span></td>
-                        </tr>
-                        <tr className="bg-white">
-                          <td className="px-6 py-4 font-medium">Yesterday</td>
-                          <td className="px-6 py-4">2.5 SOL</td>
-                          <td className="px-6 py-4 font-bold text-primary">125,000</td>
-                          <td className="px-6 py-4"><span className="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-1 rounded-md">Success</span></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </Card>
+                <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-white/5 border-b border-white/10"><tr>{["Date","Amount","PWIFE","Status"].map(h => <th key={h} className="px-5 py-3 font-bold text-white/40 text-xs">{h}</th>)}</tr></thead>
+                    <tbody className="divide-y divide-white/5">
+                      {[{ d: "Today, 14:30", a: "2.5 SOL", p: "125,000" }, { d: "Yesterday", a: "2.5 SOL", p: "125,000" }].map(tx => (
+                        <tr key={tx.d}><td className="px-5 py-3 text-white/70">{tx.d}</td><td className="px-5 py-3 text-white/70">{tx.a}</td><td className="px-5 py-3 font-bold text-[#4CAF50]">{tx.p}</td><td className="px-5 py-3"><span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded">Success</span></td></tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </TabsContent>
-
               <TabsContent value="claim">
-                <Card className="rounded-2xl border-black/5 shadow-sm text-center py-12 px-6">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span className="text-3xl">🔒</span>
-                  </div>
-                  <h3 className="text-2xl font-display font-bold mb-2">Claiming is Locked</h3>
-                  <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                    You can claim your PWIFE tokens after the presale ends and the Token Generation Event (TGE) occurs.
-                  </p>
-                  <Button disabled className="h-12 px-8 rounded-xl font-bold bg-gray-200 text-gray-500">
-                    Claim Tokens
-                  </Button>
-                </Card>
+                <div className="bg-white/5 border border-white/10 rounded-2xl text-center py-10 px-6">
+                  <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-5"><span className="text-2xl">🔒</span></div>
+                  <h3 className="text-xl font-display font-bold mb-2 text-white">Claiming Locked</h3>
+                  <p className="text-white/50 text-sm mb-6 max-w-md mx-auto">Claim your PWIFE after presale ends and TGE occurs.</p>
+                  <Button disabled className="h-10 px-6 rounded-xl font-bold bg-white/5 text-white/30 border border-white/10">Claim Tokens</Button>
+                </div>
               </TabsContent>
             </Tabs>
           </div>
