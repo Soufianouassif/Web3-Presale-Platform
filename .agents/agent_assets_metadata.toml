@@ -12,3 +12,39 @@ id = "FoxqBgfdhrViayDjmxlg-"
 uri = "file://artifacts/pepewife/public/pepewife-bg.png"
 type = "image"
 title = "female pepe rocket solana network background"
+
+[[generated]]
+id = "ZfYkah5EQtGsWlKMZ0sd_"
+uri = "file://artifacts/pepewife/public/bg-presale.png"
+type = "image"
+title = "presale section background"
+
+[[generated]]
+id = "uBCQ4cBeB1G8ynxqG_S78"
+uri = "file://artifacts/pepewife/public/bg-why.png"
+type = "image"
+title = "why section background"
+
+[[generated]]
+id = "dhpxmP9VhylZDsR1HjdEU"
+uri = "file://artifacts/pepewife/public/bg-howtobuy.png"
+type = "image"
+title = "howtobuy section background"
+
+[[generated]]
+id = "ASaVwZoJEW2vtWT7ZOL5L"
+uri = "file://artifacts/pepewife/public/bg-tokenomics.png"
+type = "image"
+title = "tokenomics section background"
+
+[[generated]]
+id = "ZlMtxrYETD0KXxrXs58bV"
+uri = "file://artifacts/pepewife/public/bg-roadmap.png"
+type = "image"
+title = "roadmap section background"
+
+[[generated]]
+id = "Eus9rYV1-OmRh5CaQ4h5U"
+uri = "file://artifacts/pepewife/public/bg-community.png"
+type = "image"
+title = "community section background"

@@ -197,7 +197,8 @@ export default function Home() {
       </section>
 
       {/* ── PRESALE BOX + REFERRAL ── */}
-      <section id="presale" className="py-20 px-4 relative z-20">
+      <section id="presale" className="py-20 px-4 relative z-20" style={{ backgroundImage: "url('/bg-presale.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div className="absolute inset-0 bg-white/75 backdrop-blur-[2px] pointer-events-none" />
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
             <span className="inline-block bg-secondary/10 text-secondary border border-secondary/20 rounded-full px-4 py-1 text-sm font-bold mb-4">⚡ Live Now</span>
@@ -408,7 +409,8 @@ export default function Home() {
       </section>
 
       {/* ── WHY BUY PWIFE ── */}
-      <section id="why" className="py-24 px-4 bg-white/60">
+      <section id="why" className="py-24 px-4 relative" style={{ backgroundImage: "url('/bg-why.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div className="absolute inset-0 bg-white/78 pointer-events-none" />
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <span className="inline-block bg-accent/20 text-yellow-700 rounded-full px-4 py-1 text-sm font-bold mb-4">💡 Why PWIFE?</span>
@@ -466,7 +468,8 @@ export default function Home() {
       </section>
 
       {/* ── HOW TO BUY ── */}
-      <section id="how" className="py-24 px-4">
+      <section id="how" className="py-24 px-4 relative" style={{ backgroundImage: "url('/bg-howtobuy.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div className="absolute inset-0 bg-white/80 pointer-events-none" />
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <span className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-sm font-bold mb-4">🛒 Simple Steps</span>
@@ -508,7 +511,8 @@ export default function Home() {
       </section>
 
       {/* ── TOKENOMICS ── */}
-      <section id="tokenomics" className="py-24 px-4 bg-white/60">
+      <section id="tokenomics" className="py-24 px-4 relative" style={{ backgroundImage: "url('/bg-tokenomics.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div className="absolute inset-0 bg-white/80 pointer-events-none" />
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-display font-bold mb-4">Tokenomics</h2>
@@ -541,7 +545,8 @@ export default function Home() {
       </section>
 
       {/* ── ROADMAP ── */}
-      <section id="roadmap" className="py-24 px-4">
+      <section id="roadmap" className="py-24 px-4 relative" style={{ backgroundImage: "url('/bg-roadmap.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div className="absolute inset-0 bg-white/80 pointer-events-none" />
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-display font-bold text-center mb-16">The Road to the Moon 🚀</h2>
           <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-1 before:bg-gradient-to-b before:from-primary before:via-secondary before:to-muted">
@@ -569,7 +574,8 @@ export default function Home() {
       </section>
 
       {/* ── SOCIAL FEED ── */}
-      <section className="py-24 px-4 bg-white/60">
+      <section className="py-24 px-4 relative" style={{ backgroundImage: "url('/bg-community.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div className="absolute inset-0 bg-white/78 pointer-events-none" />
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-display font-bold text-center mb-12">Latest Updates 📢</h2>
           <div className="grid md:grid-cols-3 gap-6">
