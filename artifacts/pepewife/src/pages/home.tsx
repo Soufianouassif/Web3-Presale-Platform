@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Twitter, Send, Wallet, ArrowRight, Activity, Copy, Check, ChevronRight, ShieldCheck } from "lucide-react";
+import { Menu, X, Twitter, Send, Wallet, ArrowRight, Copy, Check, ChevronRight, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
@@ -22,11 +22,12 @@ export default function Home() {
   const presaleFilled = 0;
 
   const tokenomicsData = [
-    { name: t.tokenomics.presale, value: 40, color: "#4CAF50" },
-    { name: t.tokenomics.liquidity, value: 20, color: "#FF4D9D" },
-    { name: t.tokenomics.teamAdvisors, value: 15, color: "#FFD54F" },
-    { name: t.tokenomics.marketing, value: 15, color: "#42A5F5" },
-    { name: t.tokenomics.reserve, value: 10, color: "#AB47BC" },
+    { name: t.tokenomics.community, value: 40, color: "#4CAF50" },
+    { name: t.tokenomics.presale, value: 20, color: "#FF4D9D" },
+    { name: t.tokenomics.liquidity, value: 15, color: "#FFD54F" },
+    { name: t.tokenomics.marketing, value: 10, color: "#42A5F5" },
+    { name: t.tokenomics.ecosystem, value: 10, color: "#AB47BC" },
+    { name: t.tokenomics.team, value: 5, color: "#FF9800" },
   ];
 
   useEffect(() => {
@@ -384,7 +385,7 @@ export default function Home() {
                     <div className="w-5 h-5 rounded-full shrink-0 border-2 border-[#1a1a2e]" style={{ backgroundColor: item.color }} />
                     <div className="flex-1">
                       <div className="font-display text-[#1a1a2e] text-sm tracking-wider">{item.name}</div>
-                      <div className="text-xs text-[#1a1a2e]/40 font-bold">{item.value * 10}M PWIFE</div>
+                      <div className="text-xs text-[#1a1a2e]/40 font-bold">{(item.value * 10).toLocaleString()}M PWIFE</div>
                     </div>
                     <div className="font-display text-2xl text-[#1a1a2e] tracking-wider">{item.value}%</div>
                   </div>
@@ -409,6 +410,7 @@ export default function Home() {
               { phase: t.roadmap.phase2, title: t.roadmap.phase2Title, desc: t.roadmap.phase2Desc, active: false, img: "/roadmap-phase2.png", color: "#FF4D9D", meme: t.roadmap.phase2Meme },
               { phase: t.roadmap.phase3, title: t.roadmap.phase3Title, desc: t.roadmap.phase3Desc, active: false, img: "/roadmap-phase3.png", color: "#42A5F5", meme: t.roadmap.phase3Meme },
               { phase: t.roadmap.phase4, title: t.roadmap.phase4Title, desc: t.roadmap.phase4Desc, active: false, img: "/roadmap-phase4.png", color: "#AB47BC", meme: t.roadmap.phase4Meme },
+              { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: "/roadmap-phase4.png", color: "#FF9800", meme: t.roadmap.phase5Meme },
             ].map((step, i) => (
               <div key={i} className={`meme-card flex flex-col md:flex-row items-center gap-6 p-6 rounded-3xl bg-white ${step.active ? `border-[#4CAF50] ${isRTL ? "shadow-[-6px_6px_0px_#2E7D32]" : "shadow-[6px_6px_0px_#2E7D32]"}` : ""}`}>
                 <img src={step.img} alt={step.title} className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
