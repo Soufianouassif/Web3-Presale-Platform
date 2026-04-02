@@ -99,6 +99,8 @@ const ar: Translations = {
     symbol: "الرمز",
     totalSupply: "العرض الإجمالي",
     contractBadge: "موثق وشفاف",
+    contractAddress: "عنوان العقد",
+    comingSoon: "قريباً — سيتم نشره عند الإطلاق",
   },
 
   howTo: {

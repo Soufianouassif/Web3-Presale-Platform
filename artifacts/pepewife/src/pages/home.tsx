@@ -381,6 +381,22 @@ export default function Home() {
                   </div>
                 </div>
 
+                <div className="mt-4 bg-white/5 rounded-2xl p-4 border border-white/10">
+                  <div className="text-[10px] text-white/40 font-bold uppercase mb-2">{t.security.contractAddress}</div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 bg-white/5 rounded-xl px-4 py-2.5 border border-white/10 font-mono text-sm text-white/30 tracking-wide overflow-hidden text-ellipsis whitespace-nowrap">
+                      {t.security.comingSoon}
+                    </div>
+                    <button
+                      disabled
+                      className="shrink-0 bg-white/10 hover:bg-white/20 rounded-xl p-2.5 border border-white/10 text-white/30 cursor-not-allowed transition-colors"
+                      title={t.security.comingSoon}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
                 <div className="mt-4 text-center">
                   <span className="inline-flex items-center gap-2 bg-[#4CAF50]/20 text-[#4CAF50] font-display text-xs px-4 py-1.5 rounded-full border border-[#4CAF50]/30 tracking-wider">
                     <ShieldCheck className="h-3.5 w-3.5" /> {t.security.contractBadge}

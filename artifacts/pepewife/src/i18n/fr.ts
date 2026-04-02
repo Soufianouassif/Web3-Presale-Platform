@@ -99,6 +99,8 @@ const fr: Translations = {
     symbol: "Symbole",
     totalSupply: "Offre Totale",
     contractBadge: "Vérifié & Transparent",
+    contractAddress: "Adresse du Contrat",
+    comingSoon: "Bientôt — Sera publié au lancement",
   },
 
   howTo: {

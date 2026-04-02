@@ -97,6 +97,8 @@ const en = {
     symbol: "Symbol",
     totalSupply: "Total Supply",
     contractBadge: "Verified & Transparent",
+    contractAddress: "Contract Address",
+    comingSoon: "Coming Soon — Will be published at launch",
   },
 
   howTo: {
