@@ -7,6 +7,7 @@ import { SiSolana, SiTether } from "react-icons/si";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/i18n/context";
 import LanguageSwitcher from "@/components/language-switcher";
+import SEOHead from "@/components/seo-head";
 
 export default function Dashboard() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,6 +44,12 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen font-sans overflow-x-hidden" style={{ background: "linear-gradient(180deg, #FFFDE7 0%, #E8F5E9 30%, #FFF9C4 60%, #F3E5F5 100%)", backgroundAttachment: "fixed" }}>
+      <SEOHead
+        title="Investor Dashboard – PEPEWIFE Presale"
+        description="Track your PEPEWIFE presale investment, referral rewards, and token allocation. View presale stages and claim your $PWIFE tokens."
+        path="/dashboard"
+        noindex
+      />
 
       <nav className="fixed top-0 w-full z-50 border-b-4 border-[#1a1a2e]" style={{ background: "linear-gradient(90deg, #FFFDE7, #E8F5E9)" }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">

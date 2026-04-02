@@ -2,6 +2,7 @@ import { useLocation } from "wouter";
 import { ArrowLeft, Twitter, Send } from "lucide-react";
 import { useLanguage } from "@/i18n/context";
 import LanguageSwitcher from "@/components/language-switcher";
+import SEOHead from "@/components/seo-head";
 
 const sectionImages: Record<number, { src: string; alt: string }> = {
   5: { src: "/wp-token-details.png", alt: "Token Details" },
@@ -72,6 +73,11 @@ export default function Whitepaper() {
 
   return (
     <div className="min-h-screen font-sans">
+      <SEOHead
+        title="PEPEWIFE Whitepaper – Tokenomics, Roadmap & Vision"
+        description="Read the official PEPEWIFE whitepaper. Learn about $PWIFE tokenomics, roadmap, security commitments, staking, Tap-to-Earn, and the Solana meme token vision."
+        path="/whitepaper"
+      />
       <nav className="fixed top-0 w-full z-50 border-b-4 border-[#1a1a2e]" style={{ background: "linear-gradient(90deg, #FFFDE7, #E8F5E9)" }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16">
@@ -95,7 +101,7 @@ export default function Whitepaper() {
         <div className="relative overflow-hidden">
           <img
             src="/whitepaper-cover.png"
-            alt="PEPEWIFE Whitepaper"
+            alt="PEPEWIFE Whitepaper cover – The Lady of Memes, Solana meme token documentation"
             className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover opacity-80"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#1a1a2e]" />
@@ -117,7 +123,8 @@ export default function Whitepaper() {
                 <div className="mb-6 rounded-2xl overflow-hidden border-4 border-[#1a1a2e] shadow-lg">
                   <img
                     src={sectionImages[i].src}
-                    alt={sectionImages[i].alt}
+                    alt={`PEPEWIFE whitepaper – ${sectionImages[i].alt}`}
+                    loading="lazy"
                     className="w-full h-[200px] sm:h-[280px] object-cover"
                   />
                 </div>

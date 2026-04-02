@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /connect
+Disallow: /connecting
+Disallow: /dashboard
+
+Sitemap: https://pepewife.io/sitemap.xml

@@ -124,4 +124,5 @@ React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
   - Language persisted in `localStorage` key `pepewife-lang`
 - **Pages**: Home (`/`), Connect (`/connect`), Connecting (`/connecting`), Dashboard (`/dashboard`), Whitepaper (`/whitepaper`), Risk Disclaimer (`/risk-disclaimer`), Terms of Use (`/terms`)
 - **About link** in navbar navigates to Whitepaper page; footer on all pages links to Whitepaper, Risk Disclaimer, Terms of Use
+- **SEO**: `SEOHead` component (`src/components/seo-head.tsx`) on all pages — sets title, meta description, canonical URL, OG/Twitter tags; `noindex` on connect/dashboard; `index.html` has base OG/Twitter/JSON-LD; `robots.txt` and `sitemap.xml` in public; whitepaper section images use `loading="lazy"`; all images have descriptive alt text; HTML `lang` and `dir` attributes set dynamically via i18n context
 - **All data is static/mocked** — no backend integration

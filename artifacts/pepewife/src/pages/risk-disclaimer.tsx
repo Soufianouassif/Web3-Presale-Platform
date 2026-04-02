@@ -2,6 +2,7 @@ import { useLocation } from "wouter";
 import { ArrowLeft, Twitter, Send } from "lucide-react";
 import { useLanguage } from "@/i18n/context";
 import LanguageSwitcher from "@/components/language-switcher";
+import SEOHead from "@/components/seo-head";
 
 export default function RiskDisclaimer() {
   const [, navigate] = useLocation();
@@ -10,6 +11,11 @@ export default function RiskDisclaimer() {
 
   return (
     <div className="min-h-screen font-sans">
+      <SEOHead
+        title="PEPEWIFE – Risk Disclaimer"
+        description="Important risk disclaimer for PEPEWIFE ($PWIFE). Understand the risks associated with cryptocurrency investments and meme tokens before participating."
+        path="/risk-disclaimer"
+      />
       <nav className="fixed top-0 w-full z-50 border-b-4 border-[#1a1a2e]" style={{ background: "linear-gradient(90deg, #FFFDE7, #E8F5E9)" }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16">

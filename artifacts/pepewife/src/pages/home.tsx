@@ -8,6 +8,7 @@ import { useLocation } from "wouter";
 import { useLanguage } from "@/i18n/context";
 import LanguageSwitcher from "@/components/language-switcher";
 import TwitterFeed from "@/components/twitter-feed";
+import SEOHead from "@/components/seo-head";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -58,6 +59,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen font-sans overflow-x-hidden">
+      <SEOHead
+        title="PEPEWIFE ($PWIFE) – The Lady of Memes | Solana Meme Coin Presale"
+        description="Join the PEPEWIFE presale on Solana. Community-first meme token with staking, Tap-to-Earn, locked liquidity, and revoked mint authority. 100T total supply."
+        path="/"
+      />
 
       <nav className="fixed top-0 w-full z-50 border-b-4 border-[#1a1a2e]" style={{ background: "linear-gradient(90deg, #FFFDE7, #E8F5E9)" }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
@@ -447,7 +453,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className={`flex justify-center ${isRTL ? "md:order-last" : ""}`}>
-              <img src="/tokenomics-girl.png" alt="PEPEWIFE Tokenomics" className={`w-full max-w-lg object-contain drop-shadow-2xl ${isRTL ? "scale-x-[-1]" : ""}`} />
+              <img src="/tokenomics-girl.png" alt="PEPEWIFE tokenomics distribution chart showing 100 trillion PWIFE total supply" loading="lazy" className={`w-full max-w-lg object-contain drop-shadow-2xl ${isRTL ? "scale-x-[-1]" : ""}`} />
             </div>
             <div className={`space-y-6 ${isRTL ? "md:order-first text-start" : ""}`}>
               <div>
@@ -488,7 +494,7 @@ export default function Home() {
               { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: "/roadmap-phase4.png", color: "#FF9800", meme: t.roadmap.phase5Meme },
             ].map((step, i) => (
               <div key={i} className={`meme-card flex flex-col md:flex-row items-center gap-6 p-6 rounded-3xl bg-white ${step.active ? `border-[#4CAF50] ${isRTL ? "shadow-[-6px_6px_0px_#2E7D32]" : "shadow-[6px_6px_0px_#2E7D32]"}` : ""}`}>
-                <img src={step.img} alt={step.title} className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
+                <img src={step.img} alt={`PEPEWIFE roadmap ${step.title}`} loading="lazy" className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
                 <div className="flex-1 text-center md:text-start">
                   <div className="flex items-center gap-2 justify-center md:justify-start mb-1">
                     <span className="sticker text-white text-xs" style={{ backgroundColor: step.color, transform: "rotate(-1deg)" }}>{step.phase}</span>

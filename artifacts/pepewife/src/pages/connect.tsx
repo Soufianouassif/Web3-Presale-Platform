@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { ArrowLeft, ExternalLink, Shield, Wifi, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/i18n/context";
 import LanguageSwitcher from "@/components/language-switcher";
+import SEOHead from "@/components/seo-head";
 
 const wallets = [
   {
@@ -63,6 +64,12 @@ export default function ConnectPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#E8F5E9] via-[#FCE4EC] to-[#FFFDE7] relative overflow-hidden">
+      <SEOHead
+        title="Connect Wallet – PEPEWIFE Presale"
+        description="Connect your Solana wallet to participate in the PEPEWIFE presale. Supports Phantom, MetaMask, Binance Wallet, and Trust Wallet."
+        path="/connect"
+        noindex
+      />
       <div className="absolute inset-0 pattern-dots opacity-30 pointer-events-none" />
       <div aria-hidden="true" className="absolute top-10 left-10 text-6xl opacity-20 animate-bounce" style={{ animationDuration: "3s" }}>🐸</div>
       <div aria-hidden="true" className="absolute top-20 right-16 text-5xl opacity-20 animate-bounce" style={{ animationDuration: "4s", animationDelay: "1s" }}>👛</div>

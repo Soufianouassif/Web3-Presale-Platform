@@ -97,7 +97,7 @@ export default function TwitterFeed({ username }: TwitterFeedProps) {
             <div className="rounded-xl overflow-hidden mb-3 border-2 border-[#1a1a2e]/10">
               <img
                 src={post.img}
-                alt="meme"
+                alt={`PEPEWIFE meme post ${i + 1}`}
                 className="w-full h-[200px] object-cover"
                 loading="lazy"
               />
