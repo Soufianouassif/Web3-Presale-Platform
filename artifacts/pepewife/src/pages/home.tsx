@@ -417,7 +417,7 @@ export default function Home() {
       <div className="zigzag-border" />
 
       <section className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #FFF9C4, #F3E5F5)" }}>
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-5xl font-display text-center mb-4 text-[#1a1a2e] comic-shadow tracking-wider">{t.social.title}</h2>
           <div className="flex items-center justify-center gap-2 mb-10">
             <Twitter className="h-5 w-5 text-[#1DA1F2]" />
@@ -430,9 +430,7 @@ export default function Home() {
               @ThePepeWife
             </a>
           </div>
-          <div className="meme-card bg-white rounded-2xl p-4 sm:p-6">
-            <TwitterFeed username="ThePepeWife" tweetCount={5} />
-          </div>
+          <TwitterFeed username="ThePepeWife" tweetCount={5} />
         </div>
       </section>
 
