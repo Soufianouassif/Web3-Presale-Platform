@@ -430,7 +430,7 @@ export default function Home() {
               @ThePepeWife
             </a>
           </div>
-          <TwitterFeed username="ThePepeWife" tweetCount={5} />
+          <TwitterFeed username="ThePepeWife" />
         </div>
       </section>
 
