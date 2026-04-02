@@ -377,7 +377,7 @@ export default function Home() {
             <div className={`space-y-6 ${isRTL ? "md:order-first text-start" : ""}`}>
               <div>
                 <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-3">{t.tokenomics.title}</h2>
-                <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.tokenomics.totalSupply} <span className="font-display text-2xl text-[#4CAF50]">1,000,000,000 PWIFE</span> 🐸</p>
+                <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.tokenomics.totalSupply} <span className="font-display text-2xl text-[#4CAF50]">100,000,000,000,000 PWIFE (100T)</span> 🐸</p>
               </div>
               <div className="space-y-2">
                 {tokenomicsData.map((item, idx) => (
@@ -385,7 +385,7 @@ export default function Home() {
                     <div className="w-5 h-5 rounded-full shrink-0 border-2 border-[#1a1a2e]" style={{ backgroundColor: item.color }} />
                     <div className="flex-1">
                       <div className="font-display text-[#1a1a2e] text-sm tracking-wider">{item.name}</div>
-                      <div className="text-xs text-[#1a1a2e]/40 font-bold">{(item.value * 10).toLocaleString()}M PWIFE</div>
+                      <div className="text-xs text-[#1a1a2e]/40 font-bold">{item.value}T PWIFE</div>
                     </div>
                     <div className="font-display text-2xl text-[#1a1a2e] tracking-wider">{item.value}%</div>
                   </div>
