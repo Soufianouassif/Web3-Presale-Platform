@@ -154,7 +154,7 @@ const en = {
     tagline: "The Lady Of Memes — Solana — WAGMI 💎",
     whitepaper: "📄 Whitepaper",
     riskDisclaimer: "⚠️ Risk Disclaimer",
-    terms: "📋 Terms of Use",
+    terms: "📋 Privacy Policy",
     roadmap: "🗺️ Roadmap",
     faq: "❓ FAQ",
     copyright: "© 2025 PEPEWIFE. All rights reserved. NFA. DYOR. WAGMI. 🐸",

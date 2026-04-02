@@ -156,7 +156,7 @@ const ar: Translations = {
     tagline: "سيدة الميمز — سولانا — WAGMI 💎",
     whitepaper: "📄 الورقة البيضاء",
     riskDisclaimer: "⚠️ تحذير المخاطر",
-    terms: "📋 سياسة الاستخدام",
+    terms: "📋 سياسة الخصوصية",
     roadmap: "🗺️ خارطة الطريق",
     faq: "❓ الأسئلة الشائعة",
     copyright: "© 2025 PEPEWIFE. جميع الحقوق محفوظة. NFA. DYOR. WAGMI. 🐸",

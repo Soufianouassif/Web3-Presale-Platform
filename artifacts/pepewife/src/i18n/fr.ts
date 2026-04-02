@@ -156,7 +156,7 @@ const fr: Translations = {
     tagline: "La Dame des Mèmes — Solana — WAGMI 💎",
     whitepaper: "📄 Livre Blanc",
     riskDisclaimer: "⚠️ Avertissement Risques",
-    terms: "📋 Conditions d'Utilisation",
+    terms: "📋 Politique de Confidentialité",
     roadmap: "🗺️ Feuille de Route",
     faq: "❓ FAQ",
     copyright: "© 2025 PEPEWIFE. Tous droits réservés. NFA. DYOR. WAGMI. 🐸",
