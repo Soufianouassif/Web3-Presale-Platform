@@ -94,3 +94,20 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
+
+### `artifacts/pepewife` (`@workspace/pepewife`)
+
+React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
+
+- **Stack**: React 19, Vite, Tailwind CSS 4, Recharts, react-icons, lucide-react, shadcn/ui
+- **Design**: Clean, simple layout. Only the Hero section has a background image (`pepewife-bg.png`). All other sections use white/light gray backgrounds.
+- **Color palette**: Primary green `#4CAF50`, Secondary pink `#FF4D9D`, Accent yellow `#FFD54F`, Dark text `#1a1a2e`
+- **Fonts**: Display: Space Grotesk, Body: Inter
+- **Sections**: Hero (bg image), Partners ticker, Presale + Referral (2-column), Why Buy (4 cards), How to Buy (5 steps), Tokenomics (mascot image + pie chart + legend), Roadmap (4 phases with unique character images), Social Feed, Risk Warning, Footer, Investor Dashboard (dialog)
+- **Images in public/**:
+  - `pepewife-bg.png` — Hero background (female Pepe on rocket, Solana network)
+  - `tokenomics-mascot.png` — Chibi Pepe wife on gold coins (transparent bg)
+  - `roadmap-phase1.png` to `roadmap-phase4.png` — Unique character illustrations per phase
+  - `bg-presale.png`, `bg-why.png`, `bg-howtobuy.png`, `bg-tokenomics.png`, `bg-roadmap.png`, `bg-community.png` — Legacy section backgrounds (no longer used)
+- **State variables**: `currency` (SOL/USDT), `copied` (boolean), `timeLeft` (countdown), `isConnected`, `isDashboardOpen`, `isMenuOpen`
+- **All data is static/mocked** — no backend integration

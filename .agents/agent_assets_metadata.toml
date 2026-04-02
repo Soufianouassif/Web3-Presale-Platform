@@ -48,3 +48,33 @@ id = "Eus9rYV1-OmRh5CaQ4h5U"
 uri = "file://artifacts/pepewife/public/bg-community.png"
 type = "image"
 title = "bg-community.png section bg"
+
+[[generated]]
+id = "kjwBR98ruB1rckE0BItM1"
+uri = "file://artifacts/pepewife/public/tokenomics-mascot.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "NvftmDr-ixzznBQuwp5x-"
+uri = "file://artifacts/pepewife/public/roadmap-phase1.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "eB0kbTdgsqqZwk73Ys2j3"
+uri = "file://artifacts/pepewife/public/roadmap-phase2.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "b0XJS_w1jTRnhvS3W_L84"
+uri = "file://artifacts/pepewife/public/roadmap-phase3.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "cbPvrZGku7r6DivuzGyLP"
+uri = "file://artifacts/pepewife/public/roadmap-phase4.png"
+type = "image"
+title = "generated_image"
