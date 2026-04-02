@@ -310,25 +310,84 @@ export default function Home() {
       <div className="zigzag-border" />
 
       <section id="why" className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #F3E5F5, #FFFDE7)" }}>
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
             <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-4 text-lg inline-block" style={{ transform: "rotate(1deg)" }}>{t.whyBuy.banner}</div>
             <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-4">{t.whyBuy.title}</h2>
             <p className="text-lg text-[#1a1a2e]/60 max-w-2xl mx-auto font-bold">{t.whyBuy.subtitle}</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[
-              { emoji: "📈", c: "#4CAF50", title: t.whyBuy.card1Title, desc: t.whyBuy.card1Desc },
-              { emoji: "🫂", c: "#FF4D9D", title: t.whyBuy.card2Title, desc: t.whyBuy.card2Desc },
-              { emoji: "⚡", c: "#FFD54F", title: t.whyBuy.card3Title, desc: t.whyBuy.card3Desc },
-              { emoji: "🧠", c: "#AB47BC", title: t.whyBuy.card4Title, desc: t.whyBuy.card4Desc },
-            ].map(card => (
-              <div key={card.title} className="meme-card bg-white rounded-2xl p-6 cursor-pointer">
-                <div className="text-4xl mb-3">{card.emoji}</div>
-                <h3 className="font-display text-xl mb-2 text-[#1a1a2e] tracking-wider" style={{ color: card.c }}>{card.title}</h3>
-                <p className="text-[#1a1a2e]/60 text-sm font-bold leading-relaxed">{card.desc}</p>
+          <div className="grid lg:grid-cols-2 gap-8">
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                { emoji: "📈", c: "#4CAF50", title: t.whyBuy.card1Title, desc: t.whyBuy.card1Desc },
+                { emoji: "🫂", c: "#FF4D9D", title: t.whyBuy.card2Title, desc: t.whyBuy.card2Desc },
+                { emoji: "⚡", c: "#FFD54F", title: t.whyBuy.card3Title, desc: t.whyBuy.card3Desc },
+                { emoji: "🧠", c: "#AB47BC", title: t.whyBuy.card4Title, desc: t.whyBuy.card4Desc },
+              ].map(card => (
+                <div key={card.title} className="meme-card bg-white rounded-2xl p-6 cursor-pointer">
+                  <div className="text-4xl mb-3">{card.emoji}</div>
+                  <h3 className="font-display text-xl mb-2 text-[#1a1a2e] tracking-wider" style={{ color: card.c }}>{card.title}</h3>
+                  <p className="text-[#1a1a2e]/60 text-sm font-bold leading-relaxed">{card.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="meme-card bg-gradient-to-br from-[#1a1a2e] to-[#311B92] rounded-3xl p-8 text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#4CAF50]/10 rounded-full blur-3xl" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#FF4D9D]/10 rounded-full blur-3xl" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-2">
+                  <ShieldCheck className="h-8 w-8 text-[#4CAF50]" />
+                  <h3 className="font-display text-2xl tracking-wider">{t.security.title}</h3>
+                </div>
+                <p className="text-white/50 text-sm font-bold mb-6">{t.security.subtitle}</p>
+
+                <div className="space-y-4 mb-6">
+                  {[
+                    { icon: "🔒", title: t.security.liquidityLock, desc: t.security.liquidityLockDesc, color: "#4CAF50", duration: "12M" },
+                    { icon: "⏳", title: t.security.teamVesting, desc: t.security.teamVestingDesc, color: "#FF9800", duration: "12M" },
+                    { icon: "🚫", title: t.security.freezeDisabled, desc: t.security.freezeDisabledDesc, color: "#FF4D9D", duration: "∞" },
+                    { icon: "🛡️", title: t.security.mintRevoked, desc: t.security.mintRevokedDesc, color: "#42A5F5", duration: "∞" },
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-3 bg-white/5 rounded-2xl p-3 backdrop-blur-sm border border-white/10">
+                      <div className="text-2xl shrink-0">{item.icon}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-display text-sm tracking-wider" style={{ color: item.color }}>{item.title}</span>
+                          <span className="text-[10px] font-display bg-white/10 px-2 py-0.5 rounded-full text-white/60">{item.duration}</span>
+                        </div>
+                        <p className="text-white/40 text-xs font-bold leading-relaxed mt-0.5">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
+                    <div className="text-[10px] text-white/40 font-bold uppercase">{t.security.network}</div>
+                    <div className="font-display text-[#AB47BC] tracking-wider text-sm">Solana (SPL)</div>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
+                    <div className="text-[10px] text-white/40 font-bold uppercase">{t.security.symbol}</div>
+                    <div className="font-display text-[#FF4D9D] tracking-wider text-sm">$PWIFE</div>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
+                    <div className="text-[10px] text-white/40 font-bold uppercase">{t.security.tokenName}</div>
+                    <div className="font-display text-[#FFD54F] tracking-wider text-sm">PEPEWIFE</div>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
+                    <div className="text-[10px] text-white/40 font-bold uppercase">{t.security.totalSupply}</div>
+                    <div className="font-display text-[#4CAF50] tracking-wider text-sm">100T</div>
+                  </div>
+                </div>
+
+                <div className="mt-4 text-center">
+                  <span className="inline-flex items-center gap-2 bg-[#4CAF50]/20 text-[#4CAF50] font-display text-xs px-4 py-1.5 rounded-full border border-[#4CAF50]/30 tracking-wider">
+                    <ShieldCheck className="h-3.5 w-3.5" /> {t.security.contractBadge}
+                  </span>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>

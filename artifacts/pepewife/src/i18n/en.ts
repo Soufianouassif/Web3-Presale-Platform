@@ -81,6 +81,24 @@ const en = {
     card4Desc: "Strong branding + viral meme energy = unstoppable degen momentum 🚀",
   },
 
+  security: {
+    title: "Token & Contract Security 🔐",
+    subtitle: "Built on trust, transparency, and verifiable commitments.",
+    liquidityLock: "Liquidity Locked",
+    liquidityLockDesc: "Launch liquidity locked for 12 months with verifiable proof published on-chain.",
+    teamVesting: "Team Tokens Vested",
+    teamVestingDesc: "Team allocation subject to 12-month vesting schedule to prevent sell pressure.",
+    freezeDisabled: "Freeze Authority Disabled",
+    freezeDisabledDesc: "No external control over user wallets. Your tokens are fully yours.",
+    mintRevoked: "Mint Authority Revoked",
+    mintRevokedDesc: "No new tokens can ever be created after launch. Fixed supply forever.",
+    network: "Network",
+    tokenName: "Token Name",
+    symbol: "Symbol",
+    totalSupply: "Total Supply",
+    contractBadge: "Verified & Transparent",
+  },
+
   howTo: {
     banner: "🛒 EVEN UR GRANDMA CAN DO IT",
     title: "How to Ape In 🐵",

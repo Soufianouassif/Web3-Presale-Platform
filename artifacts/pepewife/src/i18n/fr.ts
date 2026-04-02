@@ -83,6 +83,24 @@ const fr: Translations = {
     card4Desc: "Branding fort + énergie mème virale = momentum degen inarrêtable 🚀",
   },
 
+  security: {
+    title: "Sécurité Token & Contrat 🔐",
+    subtitle: "Construit sur la confiance, la transparence et des engagements vérifiables.",
+    liquidityLock: "Liquidité Verrouillée",
+    liquidityLockDesc: "Liquidité de lancement verrouillée pendant 12 mois avec preuve vérifiable on-chain.",
+    teamVesting: "Tokens Équipe Acquis Progressivement",
+    teamVestingDesc: "Allocation équipe soumise à un calendrier d'acquisition de 12 mois pour éviter la pression de vente.",
+    freezeDisabled: "Autorité de Gel Désactivée",
+    freezeDisabledDesc: "Aucun contrôle externe sur les portefeuilles utilisateurs. Vos tokens sont entièrement les vôtres.",
+    mintRevoked: "Autorité de Mint Révoquée",
+    mintRevokedDesc: "Aucun nouveau token ne peut être créé après le lancement. Offre fixe pour toujours.",
+    network: "Réseau",
+    tokenName: "Nom du Token",
+    symbol: "Symbole",
+    totalSupply: "Offre Totale",
+    contractBadge: "Vérifié & Transparent",
+  },
+
   howTo: {
     banner: "🛒 MÊME TA GRAND-MÈRE PEUT LE FAIRE",
     title: "Comment Acheter 🐵",
