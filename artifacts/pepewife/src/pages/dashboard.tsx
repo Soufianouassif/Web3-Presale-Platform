@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Twitter, Send, Wallet, Copy, Check, ChevronDown, Shield } from "lucide-react";
+import { Menu, X, Twitter, Send, Wallet, Copy, Check, ChevronDown, Shield, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,8 @@ export default function Dashboard() {
   const [buyAmount, setBuyAmount] = useState("");
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
-  const { status, shortAddress, address, disconnect } = useWallet();
+  const { status, shortAddress, address, network, disconnect } = useWallet();
+  const [walletCopied, setWalletCopied] = useState(false);
 
   const walletAddress = shortAddress || "7xKp...4mNr";
   const fullWallet = address || "7xKp4mNrQ9vB...kL2xNw";
@@ -86,9 +87,45 @@ export default function Dashboard() {
                   <ChevronDown className="h-3 w-3" />
                 </button>
                 {showDropdown && (
-                  <div className="absolute end-0 top-full mt-2 w-56 meme-card bg-white rounded-xl p-3 space-y-2 z-50">
+                  <div className="absolute end-0 top-full mt-2 w-72 meme-card bg-white rounded-xl p-3 space-y-2 z-50">
                     <div className="text-xs font-display text-[#1a1a2e]/40 tracking-wider">{t.nav.wallet}</div>
-                    <div className="font-mono text-xs text-[#1a1a2e] bg-[#FFFDE7] rounded-lg px-2 py-1.5 border border-[#FFD54F]">{fullWallet}</div>
+                    <div className="bg-[#FFFDE7] rounded-lg px-3 py-2 border border-[#FFD54F]">
+                      <div className="font-mono text-xs text-[#1a1a2e] truncate mb-1.5">{walletAddress}</div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            if (address) {
+                              navigator.clipboard.writeText(address);
+                              setWalletCopied(true);
+                              setTimeout(() => setWalletCopied(false), 2000);
+                            }
+                          }}
+                          className="flex items-center gap-1 text-[10px] font-display tracking-wider text-[#42A5F5] hover:text-[#1565C0] transition-colors"
+                        >
+                          {walletCopied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                          {walletCopied ? t.nav.copied : t.nav.copyAddress}
+                        </button>
+                        <span className="text-[#1a1a2e]/10">|</span>
+                        <a
+                          href={network === "solana"
+                            ? `https://solscan.io/account/${address}`
+                            : `https://etherscan.io/address/${address}`
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-[10px] font-display tracking-wider text-[#AB47BC] hover:text-[#7B1FA2] transition-colors"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          {t.nav.viewExplorer}
+                        </a>
+                      </div>
+                      <div className="mt-1.5 flex items-center gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50]" />
+                        <span className="text-[9px] font-display tracking-wider text-[#1a1a2e]/40">
+                          {network === "solana" ? "Solana Mainnet" : "Ethereum Mainnet"}
+                        </span>
+                      </div>
+                    </div>
                     <button onClick={() => navigate("/")} className="w-full text-start text-sm font-display text-[#1a1a2e] hover:text-[#FF4D9D] tracking-wide py-1">🏠 {t.nav.backToHome}</button>
                     <button onClick={async () => { await disconnect(); navigate("/"); }} className="w-full text-start text-sm font-display text-red-500 tracking-wide py-1">🔌 {t.nav.disconnect}</button>
                   </div>
