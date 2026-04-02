@@ -109,80 +109,41 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section id="hero" className="pt-32 pb-20 lg:pt-40 lg:pb-28 px-4 relative overflow-hidden" style={{ background: "linear-gradient(180deg, #b8e4ff 0%, #c9f0c0 60%, #e8f9e8 100%)" }}>
-
-        {/* SVG cartoon background */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          {/* Ground strip */}
-          <ellipse cx="50%" cy="102%" rx="70%" ry="18%" fill="#a8e6a3" opacity="0.5" />
-
-          {/* Cloud 1 — large left */}
-          <g opacity="0.9" style={{ animation: "cloudDrift1 40s linear infinite" }}>
-            <ellipse cx="12%" cy="18%" rx="9%" ry="4.5%" fill="white" />
-            <ellipse cx="17%" cy="16%" rx="7%" ry="5%" fill="white" />
-            <ellipse cx="22%" cy="18%" rx="9%" ry="4.5%" fill="white" />
-            <ellipse cx="17%" cy="20%" rx="11%" ry="3.5%" fill="white" />
-          </g>
-
-          {/* Cloud 2 — top center */}
-          <g opacity="0.85" style={{ animation: "cloudDrift2 55s linear infinite" }}>
-            <ellipse cx="50%" cy="10%" rx="7%" ry="4%" fill="white" />
-            <ellipse cx="55%" cy="8%" rx="6%" ry="4.5%" fill="white" />
-            <ellipse cx="60%" cy="10%" rx="7%" ry="4%" fill="white" />
-            <ellipse cx="55%" cy="12%" rx="9%" ry="3%" fill="white" />
-          </g>
-
-          {/* Cloud 3 — right */}
-          <g opacity="0.8" style={{ animation: "cloudDrift3 48s linear infinite" }}>
-            <ellipse cx="82%" cy="22%" rx="8%" ry="4%" fill="white" />
-            <ellipse cx="87%" cy="20%" rx="6%" ry="4.5%" fill="white" />
-            <ellipse cx="92%" cy="22%" rx="7%" ry="4%" fill="white" />
-            <ellipse cx="87%" cy="24.5%" rx="10%" ry="3%" fill="white" />
-          </g>
-
-          {/* Small cloud — bottom right faint */}
-          <g opacity="0.45">
-            <ellipse cx="74%" cy="82%" rx="6%" ry="3%" fill="white" />
-            <ellipse cx="78%" cy="80%" rx="5%" ry="3.5%" fill="white" />
-            <ellipse cx="83%" cy="82%" rx="6%" ry="3%" fill="white" />
-            <ellipse cx="78%" cy="84.5%" rx="8%" ry="2.5%" fill="white" />
-          </g>
-
-          {/* Rocket icon — top right floating */}
-          <text x="88%" y="15%" fontSize="2.8%" textAnchor="middle" opacity="0.45" style={{ animation: "floatIcon 7s ease-in-out infinite" }}>🚀</text>
-
-          {/* Moon icon */}
-          <text x="6%" y="30%" fontSize="2.4%" textAnchor="middle" opacity="0.4" style={{ animation: "floatIcon 9s ease-in-out infinite", animationDelay: "-3s" }}>🌙</text>
-
-          {/* Diamond icon */}
-          <text x="75%" y="70%" fontSize="2%" textAnchor="middle" opacity="0.3" style={{ animation: "floatIcon 8s ease-in-out infinite", animationDelay: "-5s" }}>💎</text>
-
-          {/* Whale icon */}
-          <text x="20%" y="78%" fontSize="2.2%" textAnchor="middle" opacity="0.3" style={{ animation: "floatIcon 11s ease-in-out infinite", animationDelay: "-2s" }}>🐋</text>
-
-          {/* Star sparkles */}
-          <circle cx="35%" cy="12%" r="0.4%" fill="#FFD54F" opacity="0.6" />
-          <circle cx="65%" cy="20%" r="0.3%" fill="#FF4D9D" opacity="0.5" />
-          <circle cx="90%" cy="40%" r="0.35%" fill="#4CAF50" opacity="0.4" />
-          <circle cx="10%" cy="60%" r="0.3%" fill="#FFD54F" opacity="0.5" />
-        </svg>
+      <section
+        id="hero"
+        className="pt-32 pb-20 lg:pt-40 lg:pb-28 px-4 relative overflow-hidden"
+        style={{
+          backgroundImage: "url('/pepewife-bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        {/* Subtle overlay to ensure text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-white/20 to-white/50 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 relative z-10">
           <div className="flex-1 text-center lg:text-left">
-            <div className="inline-block bg-secondary/15 text-secondary border border-secondary/30 rounded-full px-4 py-1.5 mb-6 font-semibold text-sm shadow-sm">
+            <div className="inline-block bg-white/80 backdrop-blur-sm text-secondary border border-secondary/30 rounded-full px-4 py-1.5 mb-6 font-semibold text-sm shadow-sm">
               🔥 The Lady of Memes is here
             </div>
-            <h1 className="text-5xl lg:text-7xl font-display font-extrabold leading-tight mb-6" style={{ color: "#1a3a1a", textShadow: "0 2px 0 rgba(255,255,255,0.6)" }}>
-              Be Early... Or <span style={{ color: "#4CAF50", WebkitTextStroke: "1px rgba(0,80,0,0.15)" }}>Cry Later</span>
+            <h1
+              className="text-5xl lg:text-7xl font-display font-extrabold leading-tight mb-6"
+              style={{ color: "#1a3a1a", textShadow: "0 2px 8px rgba(255,255,255,0.8), 0 1px 0 rgba(255,255,255,0.9)" }}
+            >
+              Be Early... Or <span style={{ color: "#4CAF50", textShadow: "0 2px 8px rgba(255,255,255,0.9)" }}>Cry Later</span>
             </h1>
-            <p className="text-xl mb-8 max-w-2xl mx-auto lg:mx-0" style={{ color: "#2d4a2d" }}>
+            <p
+              className="text-xl mb-8 max-w-2xl mx-auto lg:mx-0 font-medium"
+              style={{ color: "#1a3a1a", textShadow: "0 1px 4px rgba(255,255,255,0.8)" }}
+            >
               PEPE built the meme. SHE builds the future. Join the most fashionable and fierce community on Solana.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <Button size="lg" onClick={() => scrollTo('presale')} className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-full h-14 px-8 text-lg btn-primary-glow font-bold" data-testid="button-buy-hero">
+              <Button size="lg" onClick={() => scrollTo('presale')} className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-full h-14 px-8 text-lg btn-primary-glow font-bold shadow-lg" data-testid="button-buy-hero">
                 Buy PWIFE Now
               </Button>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-full h-14 px-8 text-lg border-2 bg-white/70 hover:bg-white font-semibold" data-testid="button-join-community">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-full h-14 px-8 text-lg border-2 bg-white/80 backdrop-blur-sm hover:bg-white font-semibold shadow-md" data-testid="button-join-community">
                 Join Community <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
