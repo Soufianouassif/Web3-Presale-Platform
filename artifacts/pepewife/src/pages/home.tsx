@@ -422,16 +422,16 @@ export default function Home() {
           <div className="flex items-center justify-center gap-2 mb-10">
             <Twitter className="h-5 w-5 text-[#1DA1F2]" />
             <a
-              href="https://twitter.com/PepeWifeCoin"
+              href="https://twitter.com/ThePepeWife"
               target="_blank"
               rel="noopener noreferrer"
               className="font-display text-[#1DA1F2] text-lg tracking-wide hover:underline"
             >
-              @PepeWifeCoin
+              @ThePepeWife
             </a>
           </div>
           <div className="meme-card bg-white rounded-2xl p-4 sm:p-6">
-            <TwitterFeed username="PepeWifeCoin" tweetCount={5} />
+            <TwitterFeed username="ThePepeWife" tweetCount={5} />
           </div>
         </div>
       </section>
