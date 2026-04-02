@@ -337,28 +337,33 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-display font-bold mb-4 text-[#1a1a2e]">Tokenomics</h2>
             <p className="text-lg text-gray-500">Total Supply: <strong className="text-[#1a1a2e]">1,000,000,000 PWIFE</strong></p>
           </div>
-          <div className="grid md:grid-cols-3 gap-10 items-center">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="flex justify-center">
-              <img src="/tokenomics-mascot.png" alt="PEPEWIFE Tokenomics" className="w-64 h-64 object-contain drop-shadow-2xl float-animation" />
+              <img src="/tokenomics-girl.png" alt="PEPEWIFE Tokenomics" className="w-full max-w-md object-contain drop-shadow-2xl float-animation" />
             </div>
-            <div className="h-[320px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={tokenomicsData} cx="50%" cy="50%" innerRadius={80} outerRadius={120} paddingAngle={4} dataKey="value" stroke="none">
-                    {tokenomicsData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #eee", background: "#fff", color: "#1a1a2e" }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="space-y-3">
-              {tokenomicsData.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-3.5 rounded-xl bg-gray-50 border border-gray-100 hover:shadow-md transition-shadow">
-                  <div className="w-3.5 h-3.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                  <div className="flex-1 font-semibold text-[#1a1a2e] text-sm">{item.name}</div>
-                  <div className="font-display font-bold text-lg text-[#1a1a2e]">{item.value}%</div>
-                </div>
-              ))}
+            <div className="space-y-6">
+              <div className="h-[280px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={tokenomicsData} cx="50%" cy="50%" innerRadius={70} outerRadius={110} paddingAngle={4} dataKey="value" stroke="none" label={({ name, value }) => `${value}%`}>
+                      {tokenomicsData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                    </Pie>
+                    <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #eee", background: "#fff", color: "#1a1a2e" }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="space-y-2.5">
+                {tokenomicsData.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-md transition-shadow">
+                    <div className="w-4 h-4 rounded-full shrink-0 shadow-sm" style={{ backgroundColor: item.color }} />
+                    <div className="flex-1">
+                      <div className="font-semibold text-[#1a1a2e] text-sm">{item.name}</div>
+                      <div className="text-xs text-gray-400">{item.value * 10}M PWIFE</div>
+                    </div>
+                    <div className="font-display font-bold text-xl text-[#1a1a2e]">{item.value}%</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
