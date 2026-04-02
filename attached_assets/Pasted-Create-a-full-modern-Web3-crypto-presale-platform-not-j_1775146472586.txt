@@ -1,0 +1,114 @@
+Create a full modern Web3 crypto presale platform (not just a landing page) for a Solana meme coin project called "PEPEWIFE – The Lady Of Memes".
+
+STYLE:
+- Meme style but clean and professional Web3 design
+- Slightly feminine aesthetic (pink accents) mixed with strong crypto vibe
+- Use bold outlines, flat design, and playful but not childish visuals
+- Cartoon Pepe-inspired female character (blonde, cute, slightly sarcastic expression)
+- Soft gradient backgrounds with clouds and subtle crypto icons (rocket, moon, whale)
+
+COLOR PALETTE:
+- Primary: Pepe Green (#4CAF50 or similar)
+- Secondary: Pink (#FF4D9D)
+- Accent: Yellow (#FFD54F)
+- Background: soft sky gradient or light green
+- Cards: light beige or white with soft shadows
+- Buttons: green with hover glow effect
+
+LAYOUT:
+Create a full website with multiple sections and a user dashboard.
+
+━━━━━━━━━━━━━━━━━━
+1. HERO SECTION
+━━━━━━━━━━━━━━━━━━
+- Big headline: "Be Early... Or Cry Later"
+- Subheadline: "PEPE built the meme. SHE builds the future."
+- CTA button: "Buy PWIFE Now"
+- Secondary button: "Join Community"
+- Right side: Female Pepe character illustration
+- Background: sky with clouds + floating crypto icons
+
+━━━━━━━━━━━━━━━━━━
+2. PRESALE SECTION
+━━━━━━━━━━━━━━━━━━
+- Buy box with:
+  - Input field (amount)
+  - Select currency (SOL)
+  - "Connect Wallet" button
+  - "Buy Now" button
+- Progress bar showing % sold
+- Countdown timer (Stage ends in ...)
+- Price display per stage
+- FOMO text: "Early holders win the most"
+
+━━━━━━━━━━━━━━━━━━
+3. USER DASHBOARD (IMPORTANT)
+━━━━━━━━━━━━━━━━━━
+- Clean dashboard UI after wallet connect:
+  - Wallet address (shortened)
+  - Tokens purchased
+  - Claimable tokens
+  - Current stage
+  - Total raised
+- Tabs:
+  - Overview
+  - Transactions
+  - Claim tokens
+- Modern card-based layout
+
+━━━━━━━━━━━━━━━━━━
+4. TOKENOMICS (VISUAL CARD ONLY)
+━━━━━━━━━━━━━━━━━━
+- Replace numbers with visual placeholder (image style)
+- Clean modern card with "View Details" button
+
+━━━━━━━━━━━━━━━━━━
+5. ROADMAP SECTION
+━━━━━━━━━━━━━━━━━━
+- Timeline style with phases:
+  - Phase 1: Foundation
+  - Phase 2: Growth
+  - Phase 3: Launch
+  - Phase 4: Expansion
+- Each phase in a styled card
+
+━━━━━━━━━━━━━━━━━━
+6. RISK WARNING SECTION
+━━━━━━━━━━━━━━━━━━
+- Clean warning box:
+  - Title: "Risk Warning"
+  - Text: Crypto is volatile. Always DYOR.
+- Styled with yellow/red accent
+
+━━━━━━━━━━━━━━━━━━
+7. SOCIAL FEED SECTION
+━━━━━━━━━━━━━━━━━━
+- Show latest updates (X / Telegram style cards)
+- Include engagement icons (likes, comments)
+- Title: "Latest Updates"
+
+━━━━━━━━━━━━━━━━━━
+8. PARTNERS / FEATURED IN
+━━━━━━━━━━━━━━━━━━
+- Horizontal scrolling ticker
+- Logos: CoinMarketCap, CoinGecko, Solana, Raydium
+- Smooth infinite animation
+
+━━━━━━━━━━━━━━━━━━
+9. FOOTER
+━━━━━━━━━━━━━━━━━━
+- Links: Whitepaper, Roadmap, Risk Warning
+- Social icons (X, Telegram)
+- Copyright
+
+━━━━━━━━━━━━━━━━━━
+EXTRA FEATURES
+━━━━━━━━━━━━━━━━━━
+- Smooth animations (hover, fade, glow)
+- Mobile responsive
+- Web3 modern typography (bold headlines, clean body text)
+- FOMO elements (countdown, progress, scarcity)
+- Clean spacing and premium feel
+
+GOAL:
+Create a high-converting crypto presale platform that feels like a real Web3 project, not a simple landing page.
