@@ -1,17 +1,13 @@
 import { useState, useEffect } from "react";
-
-const loadingTexts = [
-  "Loading the memes... 🐸",
-  "Warming up the rocket... 🚀",
-  "Calling PEPEWIFE... 👰",
-  "Summoning the degens... 💎",
-  "WAGMI loading... 🤝",
-];
+import { useLanguage } from "@/i18n/context";
 
 export default function LoadingPage({ onComplete }: { onComplete: () => void }) {
+  const { t } = useLanguage();
   const [progress, setProgress] = useState(0);
   const [textIndex, setTextIndex] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
+
+  const loadingTexts = [t.loading.text1, t.loading.text2, t.loading.text3, t.loading.text4, t.loading.text5];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -33,7 +29,7 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
       setTextIndex((prev) => (prev + 1) % loadingTexts.length);
     }, 800);
     return () => clearInterval(interval);
-  }, []);
+  }, [loadingTexts.length]);
 
   return (
     <div
@@ -90,7 +86,7 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
             </div>
           </div>
           <div className="flex justify-between mt-1.5">
-            <span className="text-xs font-display text-[#1a1a2e]/50 tracking-wider">LOADING...</span>
+            <span className="text-xs font-display text-[#1a1a2e]/50 tracking-wider">{t.loading.loading}</span>
             <span className="text-xs font-display text-[#FF4D9D] tracking-wider">{progress}%</span>
           </div>
         </div>

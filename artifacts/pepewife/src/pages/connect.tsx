@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { ArrowLeft, ExternalLink, Shield, Wifi, ChevronRight } from "lucide-react";
+import { useLanguage } from "@/i18n/context";
+import LanguageSwitcher from "@/components/language-switcher";
 
 const wallets = [
   {
     id: "phantom",
     name: "Phantom",
-    desc: "The friendly Solana wallet",
+    descKey: "phantomDesc" as const,
     color: "#AB47BC",
     shadow: "#7B1FA2",
     bg: "bg-[#F3E5F5]",
@@ -16,7 +18,7 @@ const wallets = [
   {
     id: "metamask",
     name: "MetaMask",
-    desc: "The crypto wallet for DeFi",
+    descKey: "metamaskDesc" as const,
     color: "#E2761B",
     shadow: "#C65D0A",
     bg: "bg-[#FFF3E0]",
@@ -26,7 +28,7 @@ const wallets = [
   {
     id: "binance",
     name: "Binance Wallet",
-    desc: "Binance Chain wallet",
+    descKey: "binanceDesc" as const,
     color: "#F0B90B",
     shadow: "#C99A00",
     bg: "bg-[#FFFDE7]",
@@ -36,7 +38,7 @@ const wallets = [
   {
     id: "trust",
     name: "Trust Wallet",
-    desc: "The most trusted wallet",
+    descKey: "trustDesc" as const,
     color: "#3375BB",
     shadow: "#1A5A9E",
     bg: "bg-[#E3F2FD]",
@@ -47,6 +49,7 @@ const wallets = [
 
 export default function ConnectPage() {
   const [, navigate] = useLocation();
+  const { t } = useLanguage();
   const [connecting, setConnecting] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
 
@@ -67,22 +70,28 @@ export default function ConnectPage() {
       <div aria-hidden="true" className="absolute bottom-10 right-10 text-6xl opacity-20 animate-bounce" style={{ animationDuration: "4.5s", animationDelay: "2s" }}>🚀</div>
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-10">
-        <button
-          onClick={() => navigate("/")}
-          className="absolute top-5 left-5 sm:top-8 sm:left-8 flex items-center gap-2 font-display text-[#1a1a2e] tracking-wider bg-white/80 backdrop-blur rounded-xl px-4 py-2 border-2 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e] hover:shadow-[4px_4px_0px_#1a1a2e] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all"
-        >
-          <ArrowLeft className="h-4 w-4" /> BACK
-        </button>
+        <div className="absolute top-5 start-5 sm:top-8 sm:start-8 flex items-center gap-2">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 font-display text-[#1a1a2e] tracking-wider bg-white/80 backdrop-blur rounded-xl px-4 py-2 border-2 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e] hover:shadow-[4px_4px_0px_#1a1a2e] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all"
+          >
+            <ArrowLeft className="h-4 w-4" /> {t.connect.back}
+          </button>
+        </div>
+
+        <div className="absolute top-5 end-5 sm:top-8 sm:end-8">
+          <LanguageSwitcher />
+        </div>
 
         <div className="w-full max-w-lg">
           <div className="text-center mb-8">
             <img src="/logo.png" alt="PEPEWIFE" className="w-16 h-16 mx-auto mb-4 rounded-full border-3 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e]" />
-            <div className="sticker bg-[#4CAF50] text-white text-sm inline-block mb-3" style={{ transform: "rotate(-2deg)" }}>🔌 STEP 1</div>
+            <div className="sticker bg-[#4CAF50] text-white text-sm inline-block mb-3" style={{ transform: "rotate(-2deg)" }}>{t.connect.step1}</div>
             <h1 className="text-4xl sm:text-5xl font-display text-[#1a1a2e] tracking-wider comic-shadow">
-              Connect Wallet 👛
+              {t.connect.title}
             </h1>
             <p className="text-[#1a1a2e]/60 font-bold mt-2 max-w-sm mx-auto">
-              Choose your weapon ser. Pick a wallet to enter the PEPEWIFE presale. LFG! 🚀
+              {t.connect.subtitle}
             </p>
           </div>
 
@@ -115,14 +124,14 @@ export default function ConnectPage() {
                   <div className={`shrink-0 rounded-xl overflow-hidden transition-transform duration-200 ${hovered === w.id ? "scale-110 rotate-[-3deg]" : ""}`}>
                     <img src={w.iconSrc} alt={w.name} className="w-10 h-10 rounded-xl" />
                   </div>
-                  <div className="flex-1 text-left">
+                  <div className="flex-1 text-start">
                     <div className="font-display text-lg text-[#1a1a2e] tracking-wider flex items-center gap-2">
                       {w.name}
                       {w.id === "phantom" && (
-                        <span className="sticker bg-[#4CAF50] text-white text-[10px] px-2 py-0.5" style={{ transform: "rotate(-1deg)" }}>RECOMMENDED</span>
+                        <span className="sticker bg-[#4CAF50] text-white text-[10px] px-2 py-0.5" style={{ transform: "rotate(-1deg)" }}>{t.connect.recommended}</span>
                       )}
                     </div>
-                    <div className="text-xs text-[#1a1a2e]/50 font-bold">{w.desc}</div>
+                    <div className="text-xs text-[#1a1a2e]/50 font-bold">{t.connect[w.descKey]}</div>
                   </div>
                   <div className="shrink-0">
                     {connecting === w.id ? (
@@ -142,9 +151,9 @@ export default function ConnectPage() {
                 <div className="flex items-start gap-3">
                   <Shield className="h-5 w-5 text-[#b8860b] mt-0.5 shrink-0" />
                   <div>
-                    <div className="font-display text-sm text-[#b8860b] tracking-wider mb-1">SAFU ZONE 🛡️</div>
+                    <div className="font-display text-sm text-[#b8860b] tracking-wider mb-1">{t.connect.safuTitle}</div>
                     <p className="text-xs text-[#1a1a2e]/50 font-bold leading-relaxed">
-                      We never access your private keys or seed phrase. This connection only allows viewing your public address. NFA. DYOR.
+                      {t.connect.safuText}
                     </p>
                   </div>
                 </div>
@@ -154,16 +163,16 @@ export default function ConnectPage() {
 
           <div className="mt-6 text-center space-y-3">
             <p className="text-xs text-[#1a1a2e]/40 font-bold">
-              Don't have a wallet? <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" className="text-[#AB47BC] font-display tracking-wide hover:underline inline-flex items-center gap-1">Get Phantom <ExternalLink className="h-3 w-3" /></a>
+              {t.connect.noWallet} <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" className="text-[#AB47BC] font-display tracking-wide hover:underline inline-flex items-center gap-1">{t.connect.getPhantom} <ExternalLink className="h-3 w-3" /></a>
             </p>
 
             <div className="flex items-center justify-center gap-4 text-[#1a1a2e]/30">
               <div className="flex items-center gap-1 text-xs font-bold">
-                <Wifi className="h-3 w-3" /> Solana Mainnet
+                <Wifi className="h-3 w-3" /> {t.connect.solanaMainnet}
               </div>
               <div className="w-1 h-1 rounded-full bg-[#1a1a2e]/20" />
               <div className="flex items-center gap-1 text-xs font-bold">
-                <Shield className="h-3 w-3" /> Secure Connection
+                <Shield className="h-3 w-3" /> {t.connect.secureConnection}
               </div>
             </div>
           </div>

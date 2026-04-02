@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import ConnectPage from "@/pages/connect";
 import ConnectingPage from "@/pages/connecting";
 import LoadingPage from "@/components/loading-page";
+import { LanguageProvider } from "@/i18n/context";
 
 const queryClient = new QueryClient();
 
@@ -29,13 +30,15 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        {loading && <LoadingPage onComplete={() => setLoading(false)} />}
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          {loading && <LoadingPage onComplete={() => setLoading(false)} />}
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+          <Toaster />
+        </TooltipProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

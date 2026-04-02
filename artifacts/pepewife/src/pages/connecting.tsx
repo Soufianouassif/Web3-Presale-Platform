@@ -1,21 +1,23 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { CheckCircle, Shield, Zap } from "lucide-react";
-
-const steps = [
-  { text: "Connecting to wallet...", emoji: "🔌", color: "#AB47BC" },
-  { text: "Verifying address...", emoji: "🔍", color: "#42A5F5" },
-  { text: "Securing connection...", emoji: "🛡️", color: "#FFD54F" },
-  { text: "Loading your dashboard...", emoji: "📊", color: "#FF4D9D" },
-  { text: "Welcome aboard, degen!", emoji: "🚀", color: "#4CAF50" },
-];
+import { useLanguage } from "@/i18n/context";
 
 export default function ConnectingPage() {
   const [, navigate] = useLocation();
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  const steps = [
+    { text: t.connecting.step1, emoji: "🔌", color: "#AB47BC" },
+    { text: t.connecting.step2, emoji: "🔍", color: "#42A5F5" },
+    { text: t.connecting.step3, emoji: "🛡️", color: "#FFD54F" },
+    { text: t.connecting.step4, emoji: "📊", color: "#FF4D9D" },
+    { text: t.connecting.step5, emoji: "🚀", color: "#4CAF50" },
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -42,7 +44,7 @@ export default function ConnectingPage() {
         setTimeout(() => navigate("/dashboard"), 600);
       }, 1200);
     }
-  }, [progress, showSuccess, navigate]);
+  }, [progress, showSuccess, navigate, steps.length]);
 
   const walletAddress = "7xKp...4mNr";
 
@@ -60,9 +62,7 @@ export default function ConnectingPage() {
         <div className="relative mb-8">
           {!showSuccess ? (
             <div className="w-24 h-24 sm:w-28 sm:h-28 relative">
-              <div
-                className="absolute inset-0 rounded-full border-4 border-[#4CAF50]/20"
-              />
+              <div className="absolute inset-0 rounded-full border-4 border-[#4CAF50]/20" />
               <div
                 className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#4CAF50] border-r-[#FF4D9D]"
                 style={{ animation: "spin 1s linear infinite" }}
@@ -81,19 +81,19 @@ export default function ConnectingPage() {
         {!showSuccess ? (
           <>
             <h2 className="text-3xl sm:text-4xl font-display text-white tracking-wider comic-shadow mb-2">
-              Connecting... 🔌
+              {t.connecting.title}
             </h2>
             <div className="sticker bg-[#AB47BC] text-white text-xs px-3 py-1 mb-6" style={{ transform: "rotate(-1deg)" }}>
-              SECURING YOUR BAG
+              {t.connecting.securingBag}
             </div>
           </>
         ) : (
           <>
             <h2 className="text-3xl sm:text-4xl font-display text-[#4CAF50] tracking-wider comic-shadow mb-2">
-              Connected! ✅
+              {t.connecting.connected}
             </h2>
             <div className="sticker bg-[#4CAF50] text-white text-xs px-3 py-1 mb-6" style={{ transform: "rotate(-1deg)" }}>
-              WAGMI SER 🤝
+              {t.connecting.wagmi}
             </div>
           </>
         )}
@@ -127,7 +127,7 @@ export default function ConnectingPage() {
                   {step.text}
                 </span>
                 {i < currentStep && (
-                  <span className="text-xs text-[#4CAF50] ml-auto">✓</span>
+                  <span className="text-xs text-[#4CAF50] ms-auto">✓</span>
                 )}
               </div>
             ))}
@@ -144,7 +144,7 @@ export default function ConnectingPage() {
           </div>
           <div className="flex justify-between mt-1.5">
             <span className="text-[10px] font-display text-white/30 tracking-wider">
-              {progress < 100 ? steps[currentStep].text : "Complete!"}
+              {progress < 100 ? steps[currentStep].text : t.connecting.complete}
             </span>
             <span className="text-[10px] font-display text-[#FF4D9D] tracking-wider">{Math.min(Math.round(progress), 100)}%</span>
           </div>
@@ -154,18 +154,18 @@ export default function ConnectingPage() {
           <div className="meme-card bg-[#4CAF50]/10 rounded-2xl p-4 w-full mb-4 border-[#4CAF50]/30" style={{ animation: "fadeInUp 0.5s ease-out" }}>
             <div className="flex items-center gap-3">
               <Shield className="w-5 h-5 text-[#4CAF50] shrink-0" />
-              <div className="text-left">
-                <div className="text-xs font-display text-[#4CAF50] tracking-wider">WALLET CONNECTED</div>
+              <div className="text-start">
+                <div className="text-xs font-display text-[#4CAF50] tracking-wider">{t.connecting.walletConnected}</div>
                 <div className="text-sm font-mono text-white/60">{walletAddress}</div>
               </div>
-              <Zap className="w-5 h-5 text-[#FFD54F] shrink-0 ml-auto" />
+              <Zap className="w-5 h-5 text-[#FFD54F] shrink-0 ms-auto" />
             </div>
           </div>
         )}
 
         <div className="flex items-center gap-2 text-white/20 text-xs font-bold">
           <Shield className="w-3 h-3" />
-          <span>Encrypted connection via Solana</span>
+          <span>{t.connecting.encrypted}</span>
         </div>
       </div>
     </div>

@@ -356,3 +356,57 @@
   50% { transform: translateX(2.5%); }
   100% { transform: translateX(0); }
 }
+
+[dir="rtl"] .ticker-content {
+  animation-direction: reverse;
+}
+
+[dir="rtl"] .speech-bubble::after {
+  left: auto;
+  right: 30px;
+}
+[dir="rtl"] .speech-bubble::before {
+  left: auto;
+  right: 33px;
+}
+
+[dir="rtl"] .meme-card {
+  box-shadow: -6px 6px 0px #1a1a2e;
+}
+[dir="rtl"] .meme-card:hover {
+  transform: translate(3px, -3px);
+  box-shadow: -9px 9px 0px #1a1a2e;
+}
+
+[dir="rtl"] .btn-meme {
+  box-shadow: -4px 4px 0px #1a1a2e;
+}
+[dir="rtl"] .btn-meme:hover {
+  transform: translate(2px, -2px);
+  box-shadow: -6px 6px 0px #1a1a2e;
+}
+[dir="rtl"] .btn-meme:active {
+  transform: translate(-2px, 2px);
+  box-shadow: -2px 2px 0px #1a1a2e;
+}
+
+[dir="rtl"] .meme-border {
+  box-shadow: -4px 4px 0px #1a1a2e;
+}
+[dir="rtl"] .meme-border-green {
+  box-shadow: -4px 4px 0px #2E7D32;
+}
+[dir="rtl"] .meme-border-pink {
+  box-shadow: -4px 4px 0px #C2185B;
+}
+[dir="rtl"] .meme-border-yellow {
+  box-shadow: -4px 4px 0px #F9A825;
+}
+
+[dir="rtl"] .sticker {
+  box-shadow: -2px 2px 0px #1a1a2e;
+}
+
+[dir="rtl"] .comic-shadow {
+  text-shadow: -3px 3px 0px rgba(0,0,0,0.15);
+}

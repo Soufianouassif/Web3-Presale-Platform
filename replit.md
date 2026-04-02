@@ -113,4 +113,11 @@ React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
 - **Images in public/**: `pepewife-bg.png` (hero bg), `logo.png` (navbar/footer), `tokenomics-girl.png` (female Pepe in private jet), `roadmap-phase1.png` to `roadmap-phase4.png` (unique per phase)
 - **State variables**: `currency` (SOL/USDT), `copied`, `timeLeft` (countdown), `isConnected`, `isMenuOpen`
 - **Presale state**: All data zeroed out for pre-launch (prices $0.0000, stages LOCKED, no purchases/transactions)
+- **i18n System**: Full internationalization supporting English, Arabic (RTL), and French
+  - Translation files: `src/i18n/en.ts`, `ar.ts`, `fr.ts` — structured as nested objects typed against `Translations`
+  - Context: `src/i18n/context.tsx` — `LanguageProvider` wraps app, `useLanguage()` hook returns `{ t, lang, setLang, dir }`
+  - Language switcher: `src/components/language-switcher.tsx` — globe icon dropdown in all navbars
+  - RTL: Arabic sets `dir="rtl"` on `<html>`, CSS rules in `index.css` flip box-shadows, speech bubble tails, ticker direction
+  - All pages use Tailwind logical properties (`start`/`end`, `ms`/`me`, `ps`/`pe`, `text-start`) for RTL-safe layout
+  - Language persisted in `localStorage` key `pepewife-lang`
 - **All data is static/mocked** — no backend integration
