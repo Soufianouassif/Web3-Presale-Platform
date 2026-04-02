@@ -7,6 +7,7 @@ import { SiCoinmarketcap, SiBinance, SiSolana, SiTether } from "react-icons/si";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/i18n/context";
 import LanguageSwitcher from "@/components/language-switcher";
+import TwitterFeed from "@/components/twitter-feed";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -416,30 +417,21 @@ export default function Home() {
       <div className="zigzag-border" />
 
       <section className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #FFF9C4, #F3E5F5)" }}>
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl font-display text-center mb-12 text-[#1a1a2e] comic-shadow tracking-wider">{t.social.title}</h2>
-          <div className="grid md:grid-cols-3 gap-5">
-            {[
-              { text: t.social.post1, time: t.social.post1Time, likes: t.social.post1Likes },
-              { text: t.social.post2, time: t.social.post2Time, likes: t.social.post2Likes },
-              { text: t.social.post3, time: t.social.post3Time, likes: t.social.post3Likes },
-            ].map((post, i) => (
-              <div key={i} className="meme-card bg-white rounded-2xl p-5">
-                <div className="flex items-center gap-3 mb-3">
-                  <img src="/logo.png" alt="PW" className="w-10 h-10 rounded-full border-2 border-[#1a1a2e]" />
-                  <div>
-                    <div className="font-display text-[#1a1a2e] text-sm tracking-wider">PEPEWIFE 🐸</div>
-                    <div className="text-xs text-[#1a1a2e]/40 font-bold">@PepeWifeCoin</div>
-                  </div>
-                  <Twitter className="ms-auto text-[#1DA1F2] h-5 w-5" />
-                </div>
-                <p className="text-sm mb-4 leading-relaxed text-[#1a1a2e]/70 font-bold">{post.text}</p>
-                <div className="flex items-center justify-between text-xs font-display text-[#1a1a2e]/40 tracking-wide">
-                  <span>{post.time}</span>
-                  <span>{post.likes}</span>
-                </div>
-              </div>
-            ))}
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-5xl font-display text-center mb-4 text-[#1a1a2e] comic-shadow tracking-wider">{t.social.title}</h2>
+          <div className="flex items-center justify-center gap-2 mb-10">
+            <Twitter className="h-5 w-5 text-[#1DA1F2]" />
+            <a
+              href="https://twitter.com/PepeWifeCoin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-display text-[#1DA1F2] text-lg tracking-wide hover:underline"
+            >
+              @PepeWifeCoin
+            </a>
+          </div>
+          <div className="meme-card bg-white rounded-2xl p-4 sm:p-6">
+            <TwitterFeed username="PepeWifeCoin" tweetCount={5} />
           </div>
         </div>
       </section>
