@@ -110,21 +110,21 @@ export default function Home() {
 
       <section id="hero" className="relative overflow-hidden" style={{ backgroundImage: "url('/pepewife-bg.png')", backgroundSize: "cover", backgroundPosition: isRTL ? "left center" : "right center", backgroundRepeat: "no-repeat" }}>
         <div className="pt-28 pb-24 px-4">
-          <div className={`max-w-7xl mx-auto ${isRTL ? "md:me-auto md:ms-0" : ""}`}>
-            <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-6 animate-pulse text-base" style={{ transform: isRTL ? "rotate(2deg)" : "rotate(-2deg)" }}>
-              {t.hero.banner}
+          <div className="max-w-7xl mx-auto" dir="ltr">
+            <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-6 animate-pulse text-base" style={{ transform: "rotate(-2deg)" }}>
+              {"🔥 STAGE 1 — PRESALE COMING SOON — NGMI IF U MISS THIS!!"}
             </div>
             <h1 className="text-5xl lg:text-8xl font-display leading-tight mb-6 text-[#1a1a2e] comic-shadow tracking-wider max-w-3xl">
-              {t.hero.titleLine1}<br /><span className="text-[#FF4D9D]" style={{ textShadow: isRTL ? "-3px 3px 0px #1a1a2e" : "3px 3px 0px #1a1a2e" }}>{t.hero.titleLine2}</span>
+              {"Be Early..."}<br /><span className="text-[#FF4D9D]" style={{ textShadow: "3px 3px 0px #1a1a2e" }}>{"Or Cry Later 😭"}</span>
             </h1>
             <div className="speech-bubble inline-block p-4 mb-8 max-w-xl">
               <p className="text-lg lg:text-xl font-bold text-[#1a1a2e]">
-                {t.hero.subtitle1}<br />
-                <span className="text-[#FF4D9D]">{t.hero.subtitle2}</span>
+                {"PEPE built the meme. SHE builds the future. 💅"}<br />
+                <span className="text-[#FF4D9D]">{"Join the most BASED presale on Solana. LFG! 🚀"}</span>
               </p>
             </div>
             <div className="flex flex-wrap gap-3 mb-8">
-              {[{ l: t.hero.totalRaised, v: "$0" }, { l: t.hero.diamondHands, v: "0" }, { l: t.hero.stagePrice, v: "$0.0000" }].map(s => (
+              {[{ l: "💰 Total Raised", v: "$0" }, { l: "👥 Diamond Hands", v: "0" }, { l: "💎 Stage Price", v: "$0.0000" }].map(s => (
                 <div key={s.l} className="meme-card bg-white rounded-2xl px-5 py-3">
                   <div className="text-xs font-display text-gray-500 tracking-wide">{s.l}</div>
                   <div className="text-xl font-display text-[#1a1a2e] tracking-wider">{s.v}</div>
@@ -133,10 +133,10 @@ export default function Home() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <button onClick={() => scrollTo('presale')} className="btn-meme bg-[#4CAF50] text-white rounded-2xl h-14 px-10 text-2xl font-display tracking-wider" style={{ animation: "pulse-glow 2s infinite" }}>
-                {t.hero.apeInNow}
+                {"🚀 APE IN NOW"}
               </button>
               <button className="btn-meme bg-white text-[#1a1a2e] rounded-2xl h-14 px-8 text-2xl font-display tracking-wider">
-                {t.hero.joinTheFam} <ArrowRight className="ms-2 h-5 w-5 inline" />
+                {"🐸 Join The Fam"} <ArrowRight className="ml-2 h-5 w-5 inline" />
               </button>
             </div>
           </div>
