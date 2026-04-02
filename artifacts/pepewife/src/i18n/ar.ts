@@ -18,6 +18,8 @@ const ar: Translations = {
     wallet: "المحفظة",
     backToHome: "العودة للرئيسية",
     disconnect: "قطع الاتصال",
+    audit: "تدقيق",
+    auditPending: "لم يتم التحقق بعد",
   },
 
   hero: {

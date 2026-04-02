@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Twitter, Send, Wallet, ArrowRight, Activity, Copy, Check, ChevronRight } from "lucide-react";
+import { Menu, X, Twitter, Send, Wallet, ArrowRight, Activity, Copy, Check, ChevronRight, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
@@ -73,6 +73,15 @@ export default function Home() {
                     <span>{s.icon}</span> <span>{s.label}</span>
                   </button>
                 ))}
+                <div className="relative group">
+                  <button className="flex items-center gap-1.5 font-display text-base text-[#FF9800] tracking-wide wiggle-hover whitespace-nowrap border-2 border-[#FF9800] rounded-full px-3 py-1 bg-[#FF9800]/10 hover:bg-[#FF9800]/20 transition-colors">
+                    <ShieldCheck className="h-4 w-4 animate-pulse" />
+                    <span>{t.nav.audit}</span>
+                  </button>
+                  <div className="absolute top-full mt-2 start-1/2 -translate-x-1/2 bg-[#1a1a2e] text-white text-xs font-display px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none tracking-wide">
+                    {t.nav.auditPending}
+                  </div>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -102,6 +111,11 @@ export default function Home() {
                   <span>{s.icon}</span> <span>{s.label}</span>
                 </button>
               ))}
+              <div className="flex items-center gap-2 py-2 text-[#FF9800]">
+                <ShieldCheck className="h-5 w-5 animate-pulse" />
+                <span className="font-display text-lg tracking-wide">{t.nav.audit}</span>
+                <span className="text-xs font-display bg-[#FF9800]/15 border border-[#FF9800] text-[#FF9800] px-2 py-0.5 rounded-full">{t.nav.auditPending}</span>
+              </div>
               <button onClick={handleConnect} className="sm:hidden flex items-center justify-center gap-2 w-full mt-2 bg-[#4CAF50] text-white rounded-xl py-3 font-display text-lg border-2 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e]">
                 <span>🔌</span> <span>{t.nav.connectWallet}</span>
               </button>

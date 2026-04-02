@@ -16,6 +16,8 @@ const en = {
     wallet: "WALLET",
     backToHome: "Back to Home",
     disconnect: "Disconnect",
+    audit: "Audit",
+    auditPending: "Pending Verification",
   },
 
   hero: {

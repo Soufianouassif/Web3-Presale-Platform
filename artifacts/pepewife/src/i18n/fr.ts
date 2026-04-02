@@ -18,6 +18,8 @@ const fr: Translations = {
     wallet: "PORTEFEUILLE",
     backToHome: "Retour à l'accueil",
     disconnect: "Déconnecter",
+    audit: "Audit",
+    auditPending: "Vérification en attente",
   },
 
   hero: {
