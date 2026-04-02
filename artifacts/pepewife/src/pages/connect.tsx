@@ -10,7 +10,7 @@ const wallets = [
     color: "#AB47BC",
     shadow: "#7B1FA2",
     bg: "bg-[#F3E5F5]",
-    iconSrc: "/wallet-phantom.svg",
+    iconSrc: "/wallet-phantom.png",
     url: "https://phantom.app",
   },
   {
