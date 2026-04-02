@@ -118,6 +118,8 @@ React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
   - Context: `src/i18n/context.tsx` — `LanguageProvider` wraps app, `useLanguage()` hook returns `{ t, lang, setLang, dir }`
   - Language switcher: `src/components/language-switcher.tsx` — globe icon dropdown in all navbars
   - RTL: Arabic sets `dir="rtl"` on `<html>`, CSS rules in `index.css` flip box-shadows, speech bubble tails, ticker direction
+  - RTL layout fixes: hero background flips position, tokenomics grid swaps order (`md:order-first`/`md:order-last`), roadmap card images reorder, text shadows and box shadows flip x-offset via `isRTL` conditional
   - All pages use Tailwind logical properties (`start`/`end`, `ms`/`me`, `ps`/`pe`, `text-start`) for RTL-safe layout
+  - Dashboard also uses `isRTL` for inline `boxShadow` flipping on stat cards and presale stage cards
   - Language persisted in `localStorage` key `pepewife-lang`
 - **All data is static/mocked** — no backend integration

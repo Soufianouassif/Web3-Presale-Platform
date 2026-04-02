@@ -15,7 +15,8 @@ export default function Dashboard() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [currency, setCurrency] = useState<"SOL" | "USDT">("SOL");
   const [buyAmount, setBuyAmount] = useState("");
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
+  const isRTL = dir === "rtl";
 
   const walletAddress = "7xKp...4mNr";
   const fullWallet = "7xKp4mNrQ9vB...kL2xNw";
@@ -49,7 +50,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-4 lg:gap-8">
               <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer wiggle-hover shrink-0" onClick={() => navigate("/")}>
                 <img src="/logo.png" alt="PEPEWIFE" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
-                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
+                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
                 <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e] whitespace-nowrap" style={{ transform: "rotate(3deg)" }}>$PWIFE</span>
               </div>
               <div className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-5">
@@ -143,7 +144,7 @@ export default function Dashboard() {
                       { label: t.dashboard.totalInvested, value: "$0.00", sub: "0 SOL", color: "#b8860b", shadow: "#8B6914", bg: "bg-[#FFFDE7]" },
                       { label: t.dashboard.bonusEarned, value: "0%", sub: "—", color: "#4CAF50", shadow: "#2E7D32", bg: "bg-[#E8F5E9]" },
                     ].map(card => (
-                      <div key={card.label} className={`meme-card ${card.bg} rounded-2xl p-4 sm:p-5`} style={{ borderColor: card.color, boxShadow: `4px 4px 0px ${card.shadow}` }}>
+                      <div key={card.label} className={`meme-card ${card.bg} rounded-2xl p-4 sm:p-5`} style={{ borderColor: card.color, boxShadow: `${isRTL ? "-4px" : "4px"} 4px 0px ${card.shadow}` }}>
                         <div className="text-xs font-display tracking-wider mb-1" style={{ color: card.color }}>{card.label}</div>
                         <div className="text-2xl sm:text-3xl font-display text-[#1a1a2e] tracking-wider">{card.value}</div>
                         <div className="text-xs text-[#1a1a2e]/40 font-bold">{card.sub}</div>
@@ -221,7 +222,7 @@ export default function Dashboard() {
                         <h3 className="font-display text-xl text-[#1a1a2e] tracking-wider mb-4">{t.dashboard.presaleStages}</h3>
                         <div className="space-y-3">
                           {presaleStages.map((s) => (
-                            <div key={s.stage} className={`rounded-2xl p-4 border-3 transition-all ${s.status === "active" ? "" : s.status === "sold-out" ? "border-[#1a1a2e]/15 bg-[#E8F5E9]/50" : "border-[#1a1a2e]/10 bg-[#FFFDE7]/30"}`} style={s.status === "active" ? { borderColor: s.color, boxShadow: `4px 4px 0px ${s.shadow}` } : {}}>
+                            <div key={s.stage} className={`rounded-2xl p-4 border-3 transition-all ${s.status === "active" ? "" : s.status === "sold-out" ? "border-[#1a1a2e]/15 bg-[#E8F5E9]/50" : "border-[#1a1a2e]/10 bg-[#FFFDE7]/30"}`} style={s.status === "active" ? { borderColor: s.color, boxShadow: `${isRTL ? "-4px" : "4px"} 4px 0px ${s.shadow}` } : {}}>
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
                                   <span className="text-lg">{s.emoji}</span>
@@ -462,7 +463,7 @@ export default function Dashboard() {
           <div className="text-center md:text-start">
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="PEPEWIFE" className="w-12 h-12 rounded-full border-3 border-white/30" />
-              <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: "2px 2px 0px #FF4D9D" }}>PEPEWIFE</span>
+              <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPEWIFE</span>
             </div>
             <p className="text-white/40 text-sm font-bold">{t.footer.tagline}</p>
           </div>

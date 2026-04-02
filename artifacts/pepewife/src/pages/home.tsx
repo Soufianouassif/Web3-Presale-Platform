@@ -14,7 +14,8 @@ export default function Home() {
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 14, minutes: 0, seconds: 0 });
   const [currency, setCurrency] = useState<"SOL" | "USDT">("SOL");
   const [copied, setCopied] = useState(false);
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
+  const isRTL = dir === "rtl";
 
   const walletAddress = "7xKp...4mNr";
   const presaleFilled = 0;
@@ -61,7 +62,7 @@ export default function Home() {
             <div className="flex items-center gap-4 lg:gap-8">
               <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer wiggle-hover shrink-0" onClick={() => scrollTo('hero')}>
                 <img src="/logo.png" alt="PEPEWIFE" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
-                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
+                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
                 <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e] whitespace-nowrap" style={{ transform: "rotate(3deg)" }}>$PWIFE</span>
               </div>
               <div className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-5">
@@ -107,14 +108,14 @@ export default function Home() {
         )}
       </nav>
 
-      <section id="hero" className="relative overflow-hidden" style={{ backgroundImage: "url('/pepewife-bg.png')", backgroundSize: "cover", backgroundPosition: "right center", backgroundRepeat: "no-repeat" }}>
+      <section id="hero" className="relative overflow-hidden" style={{ backgroundImage: "url('/pepewife-bg.png')", backgroundSize: "cover", backgroundPosition: isRTL ? "left center" : "right center", backgroundRepeat: "no-repeat" }}>
         <div className="pt-28 pb-24 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-6 animate-pulse text-base" style={{ transform: "rotate(-2deg)" }}>
+          <div className={`max-w-7xl mx-auto ${isRTL ? "md:me-auto md:ms-0" : ""}`}>
+            <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-6 animate-pulse text-base" style={{ transform: isRTL ? "rotate(2deg)" : "rotate(-2deg)" }}>
               {t.hero.banner}
             </div>
-            <h1 className="text-5xl lg:text-8xl font-display leading-tight mb-6 text-[#1a1a2e] comic-shadow tracking-wider">
-              {t.hero.titleLine1}<br /><span className="text-[#FF4D9D]" style={{ textShadow: "3px 3px 0px #1a1a2e" }}>{t.hero.titleLine2}</span>
+            <h1 className="text-5xl lg:text-8xl font-display leading-tight mb-6 text-[#1a1a2e] comic-shadow tracking-wider max-w-3xl">
+              {t.hero.titleLine1}<br /><span className="text-[#FF4D9D]" style={{ textShadow: isRTL ? "-3px 3px 0px #1a1a2e" : "3px 3px 0px #1a1a2e" }}>{t.hero.titleLine2}</span>
             </h1>
             <div className="speech-bubble inline-block p-4 mb-8 max-w-xl">
               <p className="text-lg lg:text-xl font-bold text-[#1a1a2e]">
@@ -353,10 +354,10 @@ export default function Home() {
       <section id="tokenomics" className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #FFFDE7, #FCE4EC)" }}>
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className="flex justify-center">
-              <img src="/tokenomics-girl.png" alt="PEPEWIFE Tokenomics" className="w-full max-w-lg object-contain drop-shadow-2xl" />
+            <div className={`flex justify-center ${isRTL ? "md:order-last" : ""}`}>
+              <img src="/tokenomics-girl.png" alt="PEPEWIFE Tokenomics" className={`w-full max-w-lg object-contain drop-shadow-2xl ${isRTL ? "scale-x-[-1]" : ""}`} />
             </div>
-            <div className="space-y-6">
+            <div className={`space-y-6 ${isRTL ? "md:order-first text-start" : ""}`}>
               <div>
                 <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-3">{t.tokenomics.title}</h2>
                 <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.tokenomics.totalSupply} <span className="font-display text-2xl text-[#4CAF50]">1,000,000,000 PWIFE</span> 🐸</p>
@@ -393,8 +394,8 @@ export default function Home() {
               { phase: t.roadmap.phase3, title: t.roadmap.phase3Title, desc: t.roadmap.phase3Desc, active: false, img: "/roadmap-phase3.png", color: "#42A5F5", meme: t.roadmap.phase3Meme },
               { phase: t.roadmap.phase4, title: t.roadmap.phase4Title, desc: t.roadmap.phase4Desc, active: false, img: "/roadmap-phase4.png", color: "#AB47BC", meme: t.roadmap.phase4Meme },
             ].map((step, i) => (
-              <div key={i} className={`meme-card flex flex-col md:flex-row items-center gap-6 p-6 rounded-3xl bg-white ${step.active ? "border-[#4CAF50] shadow-[6px_6px_0px_#2E7D32]" : ""}`}>
-                <img src={step.img} alt={step.title} className="w-28 h-28 object-contain shrink-0 drop-shadow-lg" />
+              <div key={i} className={`meme-card flex flex-col md:flex-row items-center gap-6 p-6 rounded-3xl bg-white ${step.active ? `border-[#4CAF50] ${isRTL ? "shadow-[-6px_6px_0px_#2E7D32]" : "shadow-[6px_6px_0px_#2E7D32]"}` : ""}`}>
+                <img src={step.img} alt={step.title} className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
                 <div className="flex-1 text-center md:text-start">
                   <div className="flex items-center gap-2 justify-center md:justify-start mb-1">
                     <span className="sticker text-white text-xs" style={{ backgroundColor: step.color, transform: "rotate(-1deg)" }}>{step.phase}</span>
@@ -462,7 +463,7 @@ export default function Home() {
           <div className="text-center md:text-start">
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="PEPEWIFE" className="w-12 h-12 rounded-full border-3 border-white/30" />
-              <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: "2px 2px 0px #FF4D9D" }}>PEPEWIFE</span>
+              <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPEWIFE</span>
             </div>
             <p className="text-white/40 text-sm font-bold">{t.footer.tagline}</p>
           </div>
