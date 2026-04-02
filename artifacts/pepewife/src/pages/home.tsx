@@ -148,12 +148,6 @@ export default function Home() {
               </Button>
             </div>
           </div>
-          <div className="flex-1 relative">
-            <div className="relative w-full max-w-lg mx-auto aspect-square float-animation">
-              <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl" />
-              <img src="/pepewife-hero.png" alt="Pepewife Hero" className="relative z-10 w-full h-full object-contain drop-shadow-2xl" />
-            </div>
-          </div>
         </div>
       </section>
 
