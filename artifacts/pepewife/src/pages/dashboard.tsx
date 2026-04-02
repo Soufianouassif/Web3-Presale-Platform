@@ -11,12 +11,26 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [copied, setCopied] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [currency, setCurrency] = useState<"SOL" | "USDT">("SOL");
+  const [buyAmount, setBuyAmount] = useState("");
 
   const walletAddress = "7xKp...4mNr";
   const fullWallet = "7xKp4mNrQ9vB...kL2xNw";
   const [, navigate] = useLocation();
 
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
+
+  const presaleStages = [
+    { stage: 1, name: "Early Bird", price: "$0.0001", tokens: "250M", sold: 100, total: "$500K", status: "sold-out" as const, color: "#4CAF50", shadow: "#2E7D32", emoji: "✅" },
+    { stage: 2, name: "Community", price: "$0.0002", tokens: "250M", sold: 85, total: "$1M", status: "active" as const, color: "#FF4D9D", shadow: "#C2185B", emoji: "🔥" },
+    { stage: 3, name: "Growth", price: "$0.0004", tokens: "250M", sold: 0, total: "$2M", status: "upcoming" as const, color: "#42A5F5", shadow: "#1565C0", emoji: "🔜" },
+    { stage: 4, name: "Final", price: "$0.0008", tokens: "250M", sold: 0, total: "$4M", status: "upcoming" as const, color: "#AB47BC", shadow: "#7B1FA2", emoji: "🚀" },
+  ];
+
+  const activeStage = presaleStages.find(s => s.status === "active")!;
+  const solPrice = 20;
+  const tokenPrice = 0.0002;
+  const calculatedTokens = buyAmount ? Math.floor((currency === "SOL" ? parseFloat(buyAmount) * solPrice : parseFloat(buyAmount)) / tokenPrice) : 0;
 
   const tabs = [
     { id: "overview", label: "Overview", icon: "📊" },
@@ -136,24 +150,118 @@ export default function Dashboard() {
                     ))}
                   </div>
 
-                  <div className="meme-card bg-white rounded-2xl p-5">
-                    <h3 className="font-display text-xl text-[#1a1a2e] tracking-wider mb-4">📈 Presale Progress</h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between text-sm font-bold">
-                        <span className="text-[#4CAF50] font-display tracking-wide">🐸 127.5M Sold</span>
-                        <span className="text-[#1a1a2e]/40 font-display tracking-wide">Goal: 150M PWIFE</span>
-                      </div>
-                      <div className="relative">
-                        <Progress value={85} className="h-5 rounded-full border-2 border-[#1a1a2e]" />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-display text-white drop-shadow tracking-wide">85%</span>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 mt-3">
-                        {[{ l: "🟢 NOW", v: "$0.0002", c: "text-[#4CAF50]", bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]" }, { l: "⬆️ NEXT", v: "$0.0004", c: "text-[#FF4D9D]", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]" }, { l: "🚀 LIST", v: "$0.001", c: "text-[#b8860b]", bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]" }].map(p => (
-                          <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-2.5 text-center`}>
-                            <div className="text-[10px] font-display tracking-wider text-[#1a1a2e]/50">{p.l}</div>
-                            <div className={`text-lg font-display ${p.c} tracking-wider`}>{p.v}</div>
+                  <div className="grid lg:grid-cols-2 gap-6">
+                    <div className="meme-card bg-white rounded-3xl overflow-hidden">
+                      <div className="zigzag-border" />
+                      <div className="p-5 sm:p-6 space-y-5">
+                        <div className="text-center">
+                          <div className="sticker bg-[#FF4D9D] text-white text-sm inline-block mb-2" style={{ transform: "rotate(-1deg)" }}>⚡ STAGE 2 LIVE — DON'T MISS IT</div>
+                          <h3 className="text-2xl sm:text-3xl font-display text-[#1a1a2e] tracking-wider comic-shadow">Buy $PWIFE 🛒</h3>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm font-bold">
+                            <span className="text-[#FF4D9D] font-display tracking-wide">🔥 Stage 2: 212.5M Sold</span>
+                            <span className="text-[#1a1a2e]/40 font-display tracking-wide">Goal: 250M</span>
                           </div>
-                        ))}
+                          <div className="relative">
+                            <Progress value={85} className="h-4 rounded-full border-2 border-[#1a1a2e]" />
+                            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-display text-white drop-shadow tracking-wide">85%</span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { l: "🟢 NOW", v: activeStage.price, bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" },
+                            { l: "⬆️ NEXT", v: "$0.0004", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" },
+                            { l: "🚀 LIST", v: "$0.001", bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" },
+                          ].map(p => (
+                            <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-2 text-center`}>
+                              <div className="text-[10px] font-display tracking-wider text-[#1a1a2e]/50">{p.l}</div>
+                              <div className={`text-lg font-display ${p.tc} tracking-wider`}>{p.v}</div>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div>
+                          <p className="text-xs font-display text-[#1a1a2e]/40 tracking-wider mb-2">💸 PAY WITH</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {(["SOL", "USDT"] as const).map(c => (
+                              <button key={c} onClick={() => setCurrency(c)}
+                                className={`flex items-center justify-center gap-2 rounded-xl h-10 font-display text-lg tracking-wide border-2 transition-all ${currency === c ? (c === "SOL" ? "bg-[#14F195]/15 border-[#14F195] text-[#0a9060] shadow-[3px_3px_0px_#0a9060]" : "bg-[#26A17B]/15 border-[#26A17B] text-[#1a7a5e] shadow-[3px_3px_0px_#1a7a5e]") : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
+                                {c === "SOL" ? <SiSolana size={14} /> : <SiTether size={14} />} {c}
+                                {currency === c && <span className="text-xs">✓</span>}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="relative">
+                            <Input type="number" placeholder={`Amount in ${currency}`} value={buyAmount} onChange={e => setBuyAmount(e.target.value)} className="h-12 pl-4 pr-20 text-base rounded-xl border-2 border-[#1a1a2e] font-bold" />
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-[#FFFDE7] px-2.5 py-1 rounded-lg font-display text-sm text-[#1a1a2e] border border-[#FFD54F]">
+                              {currency === "SOL" ? <SiSolana size={14} className="text-[#14F195]" /> : <SiTether size={14} className="text-[#26A17B]" />} {currency}
+                            </div>
+                          </div>
+                          <div className="bg-[#E8F5E9] border-2 border-[#4CAF50]/30 rounded-xl px-3 py-2.5 flex justify-between items-center">
+                            <span className="text-xs text-[#1a1a2e]/50 font-bold">You get 🤑</span>
+                            <span className="font-display text-[#4CAF50] text-lg tracking-wider">~ {calculatedTokens.toLocaleString()} PWIFE</span>
+                          </div>
+                          <button className="btn-meme w-full h-13 text-xl rounded-xl font-display tracking-wider text-white" style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)", animation: "pulse-glow 2s infinite" }}>
+                            🚀 BUY $PWIFE NOW
+                          </button>
+                        </div>
+                        <p className="text-center text-xs text-[#1a1a2e]/40 font-bold">Tokens distributed at TGE. NFA. DYOR. WAGMI. 🐸</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="meme-card bg-white rounded-2xl p-5">
+                        <h3 className="font-display text-xl text-[#1a1a2e] tracking-wider mb-4">🗺️ Presale Stages</h3>
+                        <div className="space-y-3">
+                          {presaleStages.map((s, i) => (
+                            <div key={s.stage} className={`rounded-2xl p-4 border-3 transition-all ${s.status === "active" ? "border-[" + s.color + "] bg-white shadow-[4px_4px_0px_" + s.shadow + "]" : s.status === "sold-out" ? "border-[#1a1a2e]/15 bg-[#E8F5E9]/50" : "border-[#1a1a2e]/10 bg-[#FFFDE7]/30"}`} style={s.status === "active" ? { borderColor: s.color, boxShadow: `4px 4px 0px ${s.shadow}` } : {}}>
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-lg">{s.emoji}</span>
+                                  <div>
+                                    <div className="font-display text-sm tracking-wider" style={{ color: s.color }}>STAGE {s.stage} — {s.name.toUpperCase()}</div>
+                                    <div className="text-xs text-[#1a1a2e]/40 font-bold">{s.tokens} PWIFE • {s.total} raised</div>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="font-display text-lg tracking-wider" style={{ color: s.color }}>{s.price}</div>
+                                  <span className={`inline-block text-[10px] font-display tracking-wider px-2 py-0.5 rounded-full border ${s.status === "active" ? "bg-[#FF4D9D]/10 border-[#FF4D9D] text-[#FF4D9D]" : s.status === "sold-out" ? "bg-[#4CAF50]/10 border-[#4CAF50] text-[#4CAF50]" : "bg-[#1a1a2e]/5 border-[#1a1a2e]/20 text-[#1a1a2e]/40"}`}>
+                                    {s.status === "active" ? "🔴 LIVE" : s.status === "sold-out" ? "✅ SOLD OUT" : "🔒 LOCKED"}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="h-2.5 rounded-full bg-[#1a1a2e]/10 overflow-hidden border border-[#1a1a2e]/15">
+                                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${s.sold}%`, backgroundColor: s.color }} />
+                              </div>
+                              <div className="flex justify-between mt-1">
+                                <span className="text-[10px] font-display tracking-wider" style={{ color: s.color }}>{s.sold}% sold</span>
+                                <span className="text-[10px] text-[#1a1a2e]/30 font-bold">{s.tokens} PWIFE</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="meme-card bg-[#FFFDE7] rounded-2xl p-4 border-[#FFD54F] shadow-[3px_3px_0px_#F9A825]">
+                        <div className="flex items-center gap-3">
+                          <div className="text-3xl">📊</div>
+                          <div className="flex-1">
+                            <div className="font-display text-sm text-[#b8860b] tracking-wider">TOTAL PRESALE PROGRESS</div>
+                            <div className="h-3 rounded-full bg-[#1a1a2e]/10 overflow-hidden mt-1 border border-[#1a1a2e]/15">
+                              <div className="h-full rounded-full bg-gradient-to-r from-[#4CAF50] via-[#FF4D9D] to-[#42A5F5]" style={{ width: "46%" }} />
+                            </div>
+                            <div className="flex justify-between mt-1">
+                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">462.5M / 1B PWIFE</span>
+                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">46%</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
