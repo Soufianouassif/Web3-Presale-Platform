@@ -122,4 +122,6 @@ React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
   - All pages use Tailwind logical properties (`start`/`end`, `ms`/`me`, `ps`/`pe`, `text-start`) for RTL-safe layout
   - Dashboard also uses `isRTL` for inline `boxShadow` flipping on stat cards and presale stage cards
   - Language persisted in `localStorage` key `pepewife-lang`
+- **Pages**: Home (`/`), Connect (`/connect`), Connecting (`/connecting`), Dashboard (`/dashboard`), Whitepaper (`/whitepaper`), Risk Disclaimer (`/risk-disclaimer`), Terms of Use (`/terms`)
+- **About link** in navbar navigates to Whitepaper page; footer on all pages links to Whitepaper, Risk Disclaimer, Terms of Use
 - **All data is static/mocked** — no backend integration

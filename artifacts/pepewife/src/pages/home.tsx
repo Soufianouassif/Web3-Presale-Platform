@@ -51,6 +51,7 @@ export default function Home() {
     { id: "why", label: t.nav.whyBuy, icon: "🤔" },
     { id: "tokenomics", label: t.nav.tokenomics, icon: "📊" },
     { id: "roadmap", label: t.nav.roadmap, icon: "🗺️" },
+    { id: "about", label: t.nav.about, icon: "ℹ️", isPage: true },
   ];
 
   return (
@@ -67,7 +68,7 @@ export default function Home() {
               </div>
               <div className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-5">
                 {navLinks.map(s => (
-                  <button key={s.id} onClick={() => scrollTo(s.id)} className="flex items-center gap-1 font-display text-base text-[#1a1a2e] hover:text-[#FF4D9D] transition-colors tracking-wide wiggle-hover whitespace-nowrap">
+                  <button key={s.id} onClick={() => s.isPage ? navigate("/whitepaper") : scrollTo(s.id)} className="flex items-center gap-1 font-display text-base text-[#1a1a2e] hover:text-[#FF4D9D] transition-colors tracking-wide wiggle-hover whitespace-nowrap">
                     <span>{s.icon}</span> <span>{s.label}</span>
                   </button>
                 ))}
@@ -96,7 +97,7 @@ export default function Home() {
           <div className="md:hidden border-t-3 border-[#1a1a2e]" style={{ background: "#FFFDE7" }}>
             <div className="px-4 pt-2 pb-4 space-y-2 flex flex-col">
               {navLinks.map(s => (
-                <button key={s.id} onClick={() => scrollTo(s.id)} className="flex items-center gap-2 text-start py-2 font-display text-lg text-[#1a1a2e] tracking-wide">
+                <button key={s.id} onClick={() => s.isPage ? navigate("/whitepaper") : scrollTo(s.id)} className="flex items-center gap-2 text-start py-2 font-display text-lg text-[#1a1a2e] tracking-wide">
                   <span>{s.icon}</span> <span>{s.label}</span>
                 </button>
               ))}
@@ -467,10 +468,10 @@ export default function Home() {
             </div>
             <p className="text-white/40 text-sm font-bold">{t.footer.tagline}</p>
           </div>
-          <div className="flex gap-5">
-            {[t.footer.whitepaper, t.footer.roadmap, t.footer.faq].map((link, i) => (
-              <button key={`footer-${i}`} onClick={() => link === t.footer.roadmap ? scrollTo("roadmap") : undefined} className="text-white/50 hover:text-[#FFD54F] font-display text-lg tracking-wide transition-colors">{link}</button>
-            ))}
+          <div className="flex flex-wrap gap-4">
+            <button onClick={() => navigate("/whitepaper")} className="text-white/50 hover:text-[#FFD54F] font-display text-lg tracking-wide transition-colors">{t.footer.whitepaper}</button>
+            <button onClick={() => navigate("/risk-disclaimer")} className="text-white/50 hover:text-[#FFD54F] font-display text-lg tracking-wide transition-colors">{t.footer.riskDisclaimer}</button>
+            <button onClick={() => navigate("/terms")} className="text-white/50 hover:text-[#FFD54F] font-display text-lg tracking-wide transition-colors">{t.footer.terms}</button>
           </div>
           <div className="flex gap-3">
             <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#1DA1F2] hover:bg-white/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>

@@ -8,6 +8,9 @@ import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import ConnectPage from "@/pages/connect";
 import ConnectingPage from "@/pages/connecting";
+import Whitepaper from "@/pages/whitepaper";
+import RiskDisclaimer from "@/pages/risk-disclaimer";
+import Terms from "@/pages/terms";
 import LoadingPage from "@/components/loading-page";
 import { LanguageProvider } from "@/i18n/context";
 
@@ -20,6 +23,9 @@ function Router() {
       <Route path="/connect" component={ConnectPage} />
       <Route path="/connecting" component={ConnectingPage} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/whitepaper" component={Whitepaper} />
+      <Route path="/risk-disclaimer" component={RiskDisclaimer} />
+      <Route path="/terms" component={Terms} />
       <Route component={NotFound} />
     </Switch>
   );
