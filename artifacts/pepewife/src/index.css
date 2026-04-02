@@ -320,6 +320,17 @@
   66% { transform: translateY(-6px) rotate(-3deg); }
 }
 
+@keyframes slideStripes {
+  0% { background-position: 0 0; }
+  100% { background-position: 24px 0; }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(12deg); }
+  25% { transform: rotate(16deg); }
+  75% { transform: rotate(8deg); }
+}
+
 @keyframes cloudDrift1 {
   0% { transform: translateX(0); }
   50% { transform: translateX(3%); }
