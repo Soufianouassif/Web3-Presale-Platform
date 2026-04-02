@@ -57,7 +57,7 @@ export default function Home() {
                 <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
                 <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e] whitespace-nowrap" style={{ transform: "rotate(3deg)" }}>$PWIFE</span>
               </div>
-              <div className="hidden lg:flex items-center gap-4 xl:gap-5">
+              <div className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-5">
                 {[{ id: "presale", label: "Presale", icon: "🛒" }, { id: "why", label: "Why Buy", icon: "🤔" }, { id: "tokenomics", label: "Tokenomics", icon: "📊" }, { id: "roadmap", label: "Roadmap", icon: "🗺️" }].map(s => (
                   <button key={s.id} onClick={() => scrollTo(s.id)} className="flex items-center gap-1 font-display text-base text-[#1a1a2e] hover:text-[#FF4D9D] transition-colors tracking-wide wiggle-hover whitespace-nowrap">
                     <span>{s.icon}</span> <span>{s.label}</span>
@@ -75,7 +75,7 @@ export default function Home() {
                   <span>🔌</span> <span>Connect Wallet</span>
                 </button>
               )}
-              <div className="lg:hidden">
+              <div className="md:hidden">
                 <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)} className="h-9 w-9">
                   {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </Button>
@@ -84,7 +84,7 @@ export default function Home() {
           </div>
         </div>
         {isMenuOpen && (
-          <div className="lg:hidden border-t-3 border-[#1a1a2e]" style={{ background: "#FFFDE7" }}>
+          <div className="md:hidden border-t-3 border-[#1a1a2e]" style={{ background: "#FFFDE7" }}>
             <div className="px-4 pt-2 pb-4 space-y-2 flex flex-col">
               {[{ id: "presale", label: "Presale", icon: "🛒" }, { id: "why", label: "Why Buy", icon: "🤔" }, { id: "tokenomics", label: "Tokenomics", icon: "📊" }, { id: "roadmap", label: "Roadmap", icon: "🗺️" }].map(s => (
                 <button key={s.id} onClick={() => scrollTo(s.id)} className="flex items-center gap-2 text-left py-2 font-display text-lg text-[#1a1a2e] tracking-wide">
