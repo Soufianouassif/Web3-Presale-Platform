@@ -20,7 +20,7 @@ const wallets = [
     color: "#E2761B",
     shadow: "#C65D0A",
     bg: "bg-[#FFF3E0]",
-    iconSrc: "/wallet-metamask.svg",
+    iconSrc: "/wallet-metamask.png",
     url: "https://metamask.io",
   },
   {
