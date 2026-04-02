@@ -4,6 +4,7 @@ import { useLanguage } from "@/i18n/context";
 import LanguageSwitcher from "@/components/language-switcher";
 
 const sectionImages: Record<number, { src: string; alt: string }> = {
+  5: { src: "/wp-token-details.png", alt: "Token Details" },
   6: { src: "/wp-tokenomics.png", alt: "Tokenomics" },
   9: { src: "/wp-utility.png", alt: "Token Utility" },
   11: { src: "/wp-roadmap.png", alt: "Roadmap" },

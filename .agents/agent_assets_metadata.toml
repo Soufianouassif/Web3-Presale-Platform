@@ -94,7 +94,7 @@ title = "whitepaper cover pepe couple"
 id = "eFNP1s5DgWfJcJGl2400y"
 uri = "file://artifacts/pepewife/public/wp-tokenomics.png"
 type = "image"
-title = "tokenomics pepe couple"
+title = "tokenomics pie chart pepe"
 
 [[generated]]
 id = "UIWc0G-7j6n7xzqiKaMlW"
@@ -113,6 +113,12 @@ id = "sGeKOu229OVtoIG3iJq4f"
 uri = "file://artifacts/pepewife/public/wp-utility.png"
 type = "image"
 title = "utility pepe couple tap earn"
+
+[[generated]]
+id = "lPDLZ1wSLtOWlt09n6Fr8"
+uri = "file://artifacts/pepewife/public/wp-token-details.png"
+type = "image"
+title = "token details pepe couple"
 
 [[outputs]]
 id = "enG-yn5f3oQ2SCQFxzrS0"
