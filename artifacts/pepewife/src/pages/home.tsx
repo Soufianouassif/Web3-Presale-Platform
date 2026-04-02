@@ -196,15 +196,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── PRESALE BOX ── */}
+      {/* ── PRESALE BOX + REFERRAL ── */}
       <section id="presale" className="py-20 px-4 relative z-20">
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
             <span className="inline-block bg-secondary/10 text-secondary border border-secondary/20 rounded-full px-4 py-1 text-sm font-bold mb-4">⚡ Live Now</span>
             <h2 className="text-4xl font-display font-extrabold mb-2">Stage 1 Presale</h2>
             <p className="text-muted-foreground">Price rises after stage ends — don't miss out!</p>
           </div>
 
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
+          {/* ── LEFT: Presale Card ── */}
           <Card className="border-2 border-primary/20 shadow-2xl bg-white rounded-3xl overflow-hidden relative">
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-secondary to-accent" />
 
@@ -330,6 +332,78 @@ export default function Home() {
               </p>
             </CardContent>
           </Card>
+
+          {/* ── RIGHT: Referral Card ── */}
+          <div className="flex flex-col gap-6">
+            {/* Referral heading */}
+            <div>
+              <span className="inline-block bg-secondary/10 text-secondary rounded-full px-4 py-1 text-sm font-bold mb-3">🎁 Referral Program</span>
+              <h3 className="text-3xl font-display font-extrabold mb-1">Earn by Sharing</h3>
+              <p className="text-muted-foreground">Share your link and earn <strong className="text-secondary">5% rewards</strong> for every friend who joins.</p>
+            </div>
+
+            <Card className="rounded-3xl border border-secondary/20 shadow-xl bg-white overflow-hidden">
+              <div className="h-1.5 bg-gradient-to-r from-primary via-secondary to-accent w-full" />
+              <CardContent className="p-6 space-y-6">
+
+                {/* Referral link */}
+                <div>
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Your Referral Link</p>
+                  <div className="flex gap-2">
+                    <Input
+                      readOnly
+                      value="https://pepewife.io/ref/7xKp4mNr"
+                      className="h-12 rounded-2xl bg-gray-50 border-2 font-mono text-sm"
+                    />
+                    <Button onClick={handleCopy} className={`h-12 px-4 rounded-2xl font-bold shrink-0 transition-all ${copied ? "bg-green-500 text-white" : "bg-primary text-white btn-primary-glow"}`}>
+                      {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
+                    </Button>
+                  </div>
+                  {copied && <p className="text-xs text-green-600 font-bold mt-1.5">✓ Copied to clipboard!</p>}
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { label: "Friends Referred", value: "0", color: "text-primary" },
+                    { label: "Pending Rewards", value: "0 PWIFE", color: "text-secondary" },
+                    { label: "Reward Rate", value: "5%", color: "text-yellow-600" },
+                  ].map((s) => (
+                    <div key={s.label} className="bg-gray-50 rounded-2xl p-3 text-center border border-black/5">
+                      <div className={`text-xl font-display font-extrabold ${s.color}`}>{s.value}</div>
+                      <div className="text-xs font-bold text-muted-foreground uppercase tracking-wide mt-1 leading-tight">{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="bg-secondary/5 border border-secondary/20 rounded-2xl p-4 text-sm text-muted-foreground leading-relaxed">
+                  💅 <strong className="text-foreground">How it works:</strong> Share your link. When a friend buys using it, you earn <strong className="text-secondary">5% of their purchase</strong> in PWIFE — paid at TGE.
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Bonus info card */}
+            <Card className="rounded-3xl border border-primary/15 shadow-md bg-gradient-to-br from-primary/5 to-accent/5 overflow-hidden">
+              <CardContent className="p-6">
+                <h4 className="font-display font-bold text-lg mb-3">🏆 Top Referrer Leaderboard</h4>
+                <div className="space-y-2">
+                  {[
+                    { rank: "🥇", addr: "9mRk...2xNw", refs: "142 refs", reward: "71,000 PWIFE" },
+                    { rank: "🥈", addr: "4pQj...8vBc", refs: "98 refs", reward: "49,000 PWIFE" },
+                    { rank: "🥉", addr: "7tLx...5kMp", refs: "67 refs", reward: "33,500 PWIFE" },
+                  ].map((r) => (
+                    <div key={r.addr} className="flex items-center gap-3 bg-white/60 rounded-xl px-3 py-2">
+                      <span className="text-lg">{r.rank}</span>
+                      <span className="font-mono text-sm text-muted-foreground flex-1">{r.addr}</span>
+                      <span className="text-xs font-bold text-primary">{r.reward}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          </div>{/* end grid */}
         </div>
       </section>
 
@@ -491,57 +565,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ── REFERRAL ── */}
-      <section id="referral" className="py-24 px-4 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
-        <div className="max-w-3xl mx-auto text-center">
-          <span className="inline-block bg-secondary/10 text-secondary rounded-full px-4 py-1 text-sm font-bold mb-5">🎁 Referral Program</span>
-          <h2 className="text-4xl md:text-5xl font-display font-extrabold mb-4">Earn by Sharing</h2>
-          <p className="text-xl text-muted-foreground mb-10">
-            Share your unique link and earn rewards for every friend who joins the PWIFE presale.
-          </p>
-
-          <Card className="rounded-3xl border border-secondary/20 shadow-xl bg-white overflow-hidden">
-            <div className="h-1.5 bg-gradient-to-r from-primary via-secondary to-accent w-full" />
-            <CardContent className="p-8 space-y-8">
-
-              {/* Referral link input */}
-              <div>
-                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3 text-left">Your Referral Link</p>
-                <div className="flex gap-2">
-                  <Input
-                    readOnly
-                    value="https://pepewife.io/ref/7xKp4mNr"
-                    className="h-12 rounded-2xl bg-gray-50 border-2 font-mono text-sm"
-                  />
-                  <Button onClick={handleCopy} className={`h-12 px-5 rounded-2xl font-bold shrink-0 transition-all ${copied ? "bg-green-500 text-white" : "bg-primary text-white btn-primary-glow"}`}>
-                    {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
-                  </Button>
-                </div>
-                {copied && <p className="text-xs text-green-600 font-bold mt-2 text-left">✓ Copied to clipboard!</p>}
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-4">
-                {[
-                  { label: "Friends Referred", value: "0", color: "text-primary" },
-                  { label: "Pending Rewards", value: "0 PWIFE", color: "text-secondary" },
-                  { label: "Reward Rate", value: "5%", color: "text-yellow-600" },
-                ].map((s) => (
-                  <div key={s.label} className="bg-gray-50 rounded-2xl p-4 text-center border border-black/5">
-                    <div className={`text-2xl font-display font-extrabold ${s.color}`}>{s.value}</div>
-                    <div className="text-xs font-bold text-muted-foreground uppercase tracking-wide mt-1">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="bg-secondary/5 border border-secondary/20 rounded-2xl p-4 text-sm text-muted-foreground leading-relaxed">
-                💅 <strong className="text-foreground">How it works:</strong> Share your link. When a friend buys PWIFE using it, you earn <strong className="text-secondary">5% of their purchase</strong> in PWIFE tokens — paid at TGE. The more you share, the more you earn.
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </section>
 
