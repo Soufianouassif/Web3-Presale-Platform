@@ -36,7 +36,7 @@ const ar: Translations = {
   },
 
   partners: {
-    title: "🏆 FEATURED IN 🏆",
+    title: "🏆 EcoSystem Partners 🏆",
   },
 
   presale: {

@@ -34,7 +34,7 @@ const en = {
   },
 
   partners: {
-    title: "🏆 FEATURED IN 🏆",
+    title: "🏆 EcoSystem Partners 🏆",
   },
 
   presale: {
