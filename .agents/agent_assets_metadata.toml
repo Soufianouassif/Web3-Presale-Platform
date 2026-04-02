@@ -84,6 +84,36 @@ uri = "file://artifacts/pepewife/public/tokenomics-girl.png"
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "ejocUlxSJa69bNFnTK30U"
+uri = "file://artifacts/pepewife/public/whitepaper-cover.png"
+type = "image"
+title = "whitepaper cover"
+
+[[generated]]
+id = "eFNP1s5DgWfJcJGl2400y"
+uri = "file://artifacts/pepewife/public/wp-tokenomics.png"
+type = "image"
+title = "whitepaper tokenomics"
+
+[[generated]]
+id = "UIWc0G-7j6n7xzqiKaMlW"
+uri = "file://artifacts/pepewife/public/wp-security.png"
+type = "image"
+title = "whitepaper security"
+
+[[generated]]
+id = "7mRFAKSNUahejFD97Adh3"
+uri = "file://artifacts/pepewife/public/wp-roadmap.png"
+type = "image"
+title = "whitepaper roadmap"
+
+[[generated]]
+id = "sGeKOu229OVtoIG3iJq4f"
+uri = "file://artifacts/pepewife/public/wp-utility.png"
+type = "image"
+title = "whitepaper utility"
+
 [[outputs]]
 id = "enG-yn5f3oQ2SCQFxzrS0"
 uri = "file://PEPEWIFE-GUIDE.md"

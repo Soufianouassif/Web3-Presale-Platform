@@ -3,10 +3,71 @@ import { ArrowLeft, Twitter, Send } from "lucide-react";
 import { useLanguage } from "@/i18n/context";
 import LanguageSwitcher from "@/components/language-switcher";
 
+const sectionImages: Record<number, { src: string; alt: string }> = {
+  6: { src: "/wp-tokenomics.png", alt: "Tokenomics" },
+  9: { src: "/wp-utility.png", alt: "Token Utility" },
+  11: { src: "/wp-roadmap.png", alt: "Roadmap" },
+  12: { src: "/wp-security.png", alt: "Security" },
+};
+
+const sectionIcons: Record<number, string> = {
+  0: "📌",
+  1: "📖",
+  2: "🎯",
+  3: "⚡",
+  4: "💎",
+  5: "🪙",
+  6: "📊",
+  7: "🔐",
+  8: "💧",
+  9: "🛠️",
+  10: "🏛️",
+  11: "🗺️",
+  12: "🛡️",
+  13: "⚠️",
+  14: "🏁",
+};
+
+const sectionColors: Record<number, string> = {
+  0: "#4CAF50",
+  1: "#FF4D9D",
+  2: "#42A5F5",
+  3: "#AB47BC",
+  4: "#FFD54F",
+  5: "#4CAF50",
+  6: "#FF4D9D",
+  7: "#42A5F5",
+  8: "#AB47BC",
+  9: "#4CAF50",
+  10: "#FFD54F",
+  11: "#FF4D9D",
+  12: "#42A5F5",
+  13: "#AB47BC",
+  14: "#4CAF50",
+};
+
 export default function Whitepaper() {
   const [, navigate] = useLocation();
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
+
+  const sections = [
+    { title: t.whitepaper.s1Title, content: t.whitepaper.s1Text },
+    { title: t.whitepaper.s2Title, content: t.whitepaper.s2Text },
+    { title: t.whitepaper.s3Title, content: t.whitepaper.s3Text },
+    { title: t.whitepaper.s4Title, content: t.whitepaper.s4Text },
+    { title: t.whitepaper.s5Title, content: t.whitepaper.s5Text },
+    { title: t.whitepaper.s6Title, content: t.whitepaper.s6Text },
+    { title: t.whitepaper.s7Title, content: t.whitepaper.s7Text },
+    { title: t.whitepaper.s8Title, content: t.whitepaper.s8Text },
+    { title: t.whitepaper.s9Title, content: t.whitepaper.s9Text },
+    { title: t.whitepaper.s10Title, content: t.whitepaper.s10Text },
+    { title: t.whitepaper.s11Title, content: t.whitepaper.s11Text },
+    { title: t.whitepaper.s12Title, content: t.whitepaper.s12Text },
+    { title: t.whitepaper.s13Title, content: t.whitepaper.s13Text },
+    { title: t.whitepaper.s14Title, content: t.whitepaper.s14Text },
+    { title: t.whitepaper.s15Title, content: t.whitepaper.s15Text },
+  ];
 
   return (
     <div className="min-h-screen font-sans">
@@ -29,29 +90,47 @@ export default function Whitepaper() {
         </div>
       </nav>
 
-      <div className="pt-24 pb-20 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #FFFDE7, #E8F5E9)" }}>
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="sticker bg-[#4CAF50] text-white mb-4 text-lg inline-block" style={{ transform: "rotate(-1deg)" }}>📄</div>
-            <h1 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-3">{t.whitepaper.title}</h1>
-            <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.whitepaper.subtitle}</p>
+      <div className="pt-16" style={{ background: "linear-gradient(180deg, #1a1a2e 0%, #311B92 50%, #1a1a2e 100%)" }}>
+        <div className="relative overflow-hidden">
+          <img
+            src="/whitepaper-cover.png"
+            alt="PEPEWIFE Whitepaper"
+            className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover opacity-80"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#1a1a2e]" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+            <div className="sticker bg-[#4CAF50] text-white mb-4 text-2xl inline-block" style={{ transform: "rotate(-2deg)" }}>📄</div>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-display text-white tracking-wider mb-3" style={{ textShadow: "3px 3px 0px #FF4D9D, -1px -1px 0px #4CAF50" }}>
+              {t.whitepaper.title}
+            </h1>
+            <p className="text-lg sm:text-xl text-white/70 font-bold max-w-2xl">{t.whitepaper.subtitle}</p>
           </div>
+        </div>
+      </div>
 
-          <div className="space-y-6">
-            {[
-              { title: t.whitepaper.s1Title, content: t.whitepaper.s1Text },
-              { title: t.whitepaper.s2Title, content: t.whitepaper.s2Text },
-              { title: t.whitepaper.s3Title, content: t.whitepaper.s3Text },
-              { title: t.whitepaper.s4Title, content: t.whitepaper.s4Text },
-              { title: t.whitepaper.s5Title, content: t.whitepaper.s5Text },
-              { title: t.whitepaper.s6Title, content: t.whitepaper.s6Text },
-            ].map((section, i) => (
-              <div key={i} className="meme-card bg-white rounded-2xl p-6">
-                <h2 className="font-display text-2xl text-[#1a1a2e] tracking-wider mb-3">{section.title}</h2>
-                <p className="text-[#1a1a2e]/70 font-bold leading-relaxed whitespace-pre-line">{section.content}</p>
+      <div className="py-16 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #1a1a2e, #FFFDE7 15%, #E8F5E9 85%, #1a1a2e)" }}>
+        <div className="max-w-4xl mx-auto space-y-8">
+          {sections.map((section, i) => (
+            <div key={i}>
+              {sectionImages[i] && (
+                <div className="mb-6 rounded-2xl overflow-hidden border-4 border-[#1a1a2e] shadow-lg">
+                  <img
+                    src={sectionImages[i].src}
+                    alt={sectionImages[i].alt}
+                    className="w-full h-[200px] sm:h-[280px] object-cover"
+                  />
+                </div>
+              )}
+              <div className="meme-card bg-white rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1.5" style={{ background: sectionColors[i] || "#4CAF50" }} />
+                <div className="flex items-start gap-3 mb-4">
+                  <span className="text-3xl shrink-0">{sectionIcons[i] || "📌"}</span>
+                  <h2 className="font-display text-2xl sm:text-3xl text-[#1a1a2e] tracking-wider">{section.title}</h2>
+                </div>
+                <p className="text-[#1a1a2e]/70 font-bold leading-relaxed whitespace-pre-line text-base sm:text-lg">{section.content}</p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
