@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import ConnectPage from "@/pages/connect";
+import ConnectingPage from "@/pages/connecting";
 import LoadingPage from "@/components/loading-page";
 
 const queryClient = new QueryClient();
@@ -16,6 +17,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/connect" component={ConnectPage} />
+      <Route path="/connecting" component={ConnectingPage} />
       <Route path="/dashboard" component={Dashboard} />
       <Route component={NotFound} />
     </Switch>

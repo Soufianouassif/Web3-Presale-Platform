@@ -105,8 +105,9 @@ React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
 - **Color Palette**: Green `#4CAF50`, Pink `#FF4D9D`, Yellow `#FFD54F`, Purple `#AB47BC`, Blue `#42A5F5`, Dark `#1a1a2e`
 - **Fonts**: Display = `Bangers` (meme headers), Body = `Comic Neue`, Fallback = `Space Grotesk`
 - **CSS Utilities**: `.meme-card`, `.meme-border`, `.btn-meme`, `.sticker`, `.speech-bubble`, `.zigzag-border`, `.rainbow-text`, `.wiggle-hover`, `.comic-shadow`, `.pattern-dots`, `.float-animation`
-- **Pages/Routes**: `/` (Home), `/connect` (Connect Wallet), `/dashboard` (Investor Dashboard)
-- **Connect Wallet Page**: Supports Phantom (recommended), MetaMask, Binance Wallet, Trust Wallet — each with branded icon, hover/focus states, loading spinner on click, then redirect to dashboard
+- **Pages/Routes**: `/` (Home), `/connect` (Connect Wallet), `/connecting` (Wallet Connecting Animation), `/dashboard` (Investor Dashboard)
+- **Connect Wallet Page**: Supports Phantom (recommended), MetaMask, Binance Wallet, Trust Wallet — each with branded icon, hover/focus states, loading spinner on click, then redirect to `/connecting`
+- **Connecting Page**: Dark-themed full-screen overlay with 5-step animated progress (Connecting → Verifying → Securing → Loading → Welcome), spinning logo, rainbow progress bar, success checkmark, wallet address confirmation card, then auto-redirects to dashboard
 - **Sections**: Hero (background image), Partners ticker, Presale + Referral (2-column), Why Buy (4 cards), How to Buy (5 steps), Tokenomics (image left + details right, no chart), Roadmap (4 phases with images), Social Feed (3 posts), Risk Warning, Footer
 - **Dashboard**: Full-page route with 5 tabs (Overview, My Purchases, Claim, Referrals, Transactions), sidebar nav on desktop, horizontal scroll tabs on mobile
 - **Images in public/**: `pepewife-bg.png` (hero bg), `logo.png` (navbar/footer), `tokenomics-girl.png` (female Pepe in private jet), `roadmap-phase1.png` to `roadmap-phase4.png` (unique per phase)

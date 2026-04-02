@@ -54,8 +54,8 @@ export default function ConnectPage() {
     setConnecting(walletId);
     setTimeout(() => {
       setConnecting(null);
-      navigate("/dashboard");
-    }, 1500);
+      navigate("/connecting");
+    }, 1000);
   };
 
   return (
