@@ -1,114 +1,108 @@
-import { useState, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Twitter, ExternalLink } from "lucide-react";
 import { useLanguage } from "@/i18n/context";
-
-interface Tweet {
-  text: string;
-  time: string;
-  name: string;
-  handle: string;
-  avatar: string;
-  likes: string;
-  url: string;
-}
 
 interface TwitterFeedProps {
   username: string;
 }
 
+const memeImages = [
+  "/meme-posts/meme1.png",
+  "/meme-posts/meme2.png",
+  "/meme-posts/meme3.png",
+  "/meme-posts/meme4.png",
+  "/meme-posts/meme5.png",
+  "/meme-posts/meme6.png",
+  "/meme-posts/meme7.png",
+  "/meme-posts/meme8.png",
+  "/meme-posts/meme9.png",
+  "/meme-posts/meme10.png",
+];
+
 export default function TwitterFeed({ username }: TwitterFeedProps) {
-  const [tweets, setTweets] = useState<Tweet[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [hasTweets, setHasTweets] = useState(false);
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchTweets = async () => {
-      try {
-        const res = await fetch(`/api/twitter/timeline/${username}`);
-        if (!res.ok) throw new Error("Failed");
-        const data = await res.json();
-        if (!cancelled) {
-          if (data.tweets && data.tweets.length > 0) {
-            setTweets(data.tweets);
-            setHasTweets(true);
-          }
-        }
-      } catch {
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    fetchTweets();
-    return () => { cancelled = true; };
-  }, [username]);
-
-  const fallbackPosts = [
-    { text: t.social.post1, time: t.social.post1Time, likes: t.social.post1Likes },
-    { text: t.social.post2, time: t.social.post2Time, likes: t.social.post2Likes },
-    { text: t.social.post3, time: t.social.post3Time, likes: t.social.post3Likes },
+  const posts = [
+    { text: t.social.post1, time: t.social.post1Time, likes: t.social.post1Likes, img: memeImages[0] },
+    { text: t.social.post2, time: t.social.post2Time, likes: t.social.post2Likes, img: memeImages[1] },
+    { text: t.social.post3, time: t.social.post3Time, likes: t.social.post3Likes, img: memeImages[2] },
+    { text: t.social.post4, time: t.social.post4Time, likes: t.social.post4Likes, img: memeImages[3] },
+    { text: t.social.post5, time: t.social.post5Time, likes: t.social.post5Likes, img: memeImages[4] },
+    { text: t.social.post6, time: t.social.post6Time, likes: t.social.post6Likes, img: memeImages[5] },
+    { text: t.social.post7, time: t.social.post7Time, likes: t.social.post7Likes, img: memeImages[6] },
+    { text: t.social.post8, time: t.social.post8Time, likes: t.social.post8Likes, img: memeImages[7] },
+    { text: t.social.post9, time: t.social.post9Time, likes: t.social.post9Likes, img: memeImages[8] },
+    { text: t.social.post10, time: t.social.post10Time, likes: t.social.post10Likes, img: memeImages[9] },
   ];
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 gap-4">
-        <div className="w-12 h-12 rounded-full bg-[#1DA1F2]/10 flex items-center justify-center animate-pulse">
-          <Twitter className="h-6 w-6 text-[#1DA1F2]" />
-        </div>
-        <p className="text-sm font-bold text-[#1a1a2e]/40 font-display tracking-wide">
-          Loading tweets...
-        </p>
-      </div>
-    );
-  }
+  const allPosts = [...posts, ...posts];
 
-  const displayPosts = hasTweets
-    ? tweets.map((tw) => ({
-        text: tw.text,
-        time: tw.time,
-        likes: tw.likes ? `❤️ ${tw.likes}` : "",
-        avatar: tw.avatar,
-        name: tw.name,
-        handle: tw.handle,
-        url: tw.url,
-      }))
-    : fallbackPosts.map((p) => ({
-        text: p.text,
-        time: p.time,
-        likes: p.likes,
-        avatar: "",
-        name: "PEPEWIFE 🐸",
-        handle: `@${username}`,
-        url: `https://x.com/${username}`,
-      }));
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    let animationId: number;
+    let scrollSpeed = 1;
+
+    const animate = () => {
+      if (!isPaused && el) {
+        el.scrollLeft += dir === "rtl" ? -scrollSpeed : scrollSpeed;
+
+        const halfWidth = el.scrollWidth / 2;
+        if (dir === "rtl") {
+          if (Math.abs(el.scrollLeft) >= halfWidth) {
+            el.scrollLeft = 0;
+          }
+        } else {
+          if (el.scrollLeft >= halfWidth) {
+            el.scrollLeft = 0;
+          }
+        }
+      }
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animationId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationId);
+  }, [isPaused, dir]);
 
   return (
     <div>
-      <div className="grid md:grid-cols-3 gap-5">
-        {displayPosts.map((post, i) => (
+      <div
+        ref={scrollRef}
+        className="flex gap-5 overflow-x-hidden py-2"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={() => setIsPaused(true)}
+        onTouchEnd={() => setIsPaused(false)}
+      >
+        {allPosts.map((post, i) => (
           <a
             key={i}
-            href={post.url}
+            href={`https://x.com/${username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="meme-card bg-white rounded-2xl p-5 block hover:scale-[1.02] transition-transform"
+            className="meme-card bg-white rounded-2xl p-5 flex-shrink-0 w-[320px] block hover:scale-[1.03] transition-transform"
           >
             <div className="flex items-center gap-3 mb-3">
-              {post.avatar ? (
-                <img src={post.avatar} alt="" className="w-10 h-10 rounded-full border-2 border-[#1a1a2e]" />
-              ) : (
-                <img src="/logo.png" alt="PW" className="w-10 h-10 rounded-full border-2 border-[#1a1a2e]" />
-              )}
+              <img src="/logo.png" alt="PW" className="w-10 h-10 rounded-full border-2 border-[#1a1a2e]" />
               <div>
-                <div className="font-display text-[#1a1a2e] text-sm tracking-wider">{post.name}</div>
-                <div className="text-xs text-[#1a1a2e]/40 font-bold">{post.handle}</div>
+                <div className="font-display text-[#1a1a2e] text-sm tracking-wider">PEPEWIFE 🐸</div>
+                <div className="text-xs text-[#1a1a2e]/40 font-bold">@{username}</div>
               </div>
               <Twitter className="ms-auto text-[#1DA1F2] h-5 w-5" />
             </div>
-            <p className="text-sm mb-4 leading-relaxed text-[#1a1a2e]/70 font-bold">{post.text}</p>
+            <div className="rounded-xl overflow-hidden mb-3 border-2 border-[#1a1a2e]/10">
+              <img
+                src={post.img}
+                alt="meme"
+                className="w-full h-[200px] object-cover"
+                loading="lazy"
+              />
+            </div>
+            <p className="text-sm mb-3 leading-relaxed text-[#1a1a2e]/70 font-bold line-clamp-3">{post.text}</p>
             <div className="flex items-center justify-between text-xs font-display text-[#1a1a2e]/40 tracking-wide">
               <span>{post.time}</span>
               <span>{post.likes}</span>
@@ -116,7 +110,7 @@ export default function TwitterFeed({ username }: TwitterFeedProps) {
           </a>
         ))}
       </div>
-      <div className="flex justify-center mt-6">
+      <div className="flex justify-center mt-8">
         <a
           href={`https://x.com/${username}`}
           target="_blank"
