@@ -49,41 +49,47 @@ export default function Home() {
     <div className="min-h-screen font-sans overflow-x-hidden">
 
       <nav className="fixed top-0 w-full z-50 border-b-4 border-[#1a1a2e]" style={{ background: "linear-gradient(90deg, #FFFDE7, #E8F5E9)" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2 cursor-pointer wiggle-hover" onClick={() => scrollTo('hero')}>
-              <img src="/logo.png" alt="PEPEWIFE" className="w-9 h-9 rounded-full border-2 border-[#1a1a2e]" />
-              <span className="font-display text-3xl text-[#1a1a2e] tracking-wider" style={{ textShadow: "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
-              <span className="sticker bg-[#FF4D9D] text-white" style={{ transform: "rotate(3deg)" }}>$PWIFE</span>
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer wiggle-hover shrink-0" onClick={() => scrollTo('hero')}>
+              <img src="/logo.png" alt="PEPEWIFE" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
+              <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
+              <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e] whitespace-nowrap" style={{ transform: "rotate(3deg)" }}>$PWIFE</span>
             </div>
-            <div className="hidden md:flex items-center space-x-6">
-              {[{ id: "presale", label: "🛒 Presale" }, { id: "why", label: "🤔 Why Buy" }, { id: "tokenomics", label: "📊 Tokenomics" }, { id: "roadmap", label: "🗺️ Roadmap" }].map(s => (
-                <button key={s.id} onClick={() => scrollTo(s.id)} className="font-display text-lg text-[#1a1a2e] hover:text-[#FF4D9D] transition-colors tracking-wide wiggle-hover">{s.label}</button>
+            <div className="hidden lg:flex items-center gap-4 xl:gap-6">
+              {[{ id: "presale", label: "Presale", icon: "🛒" }, { id: "why", label: "Why Buy", icon: "🤔" }, { id: "tokenomics", label: "Tokenomics", icon: "📊" }, { id: "roadmap", label: "Roadmap", icon: "🗺️" }].map(s => (
+                <button key={s.id} onClick={() => scrollTo(s.id)} className="flex items-center gap-1 font-display text-base text-[#1a1a2e] hover:text-[#FF4D9D] transition-colors tracking-wide wiggle-hover whitespace-nowrap">
+                  <span>{s.icon}</span> <span>{s.label}</span>
+                </button>
               ))}
               {isConnected ? (
-                <Button variant="outline" onClick={() => setIsDashboardOpen(true)} className="btn-meme border-[#4CAF50] text-[#4CAF50] bg-[#4CAF50]/10 text-sm h-9 font-display">
-                  <Wallet className="mr-1.5 h-3.5 w-3.5" /> {walletAddress}
-                </Button>
+                <button onClick={() => setIsDashboardOpen(true)} className="flex items-center gap-1.5 bg-[#4CAF50]/10 border-2 border-[#4CAF50] text-[#4CAF50] rounded-xl px-3 h-9 font-display text-sm tracking-wide whitespace-nowrap shadow-[2px_2px_0px_#2E7D32]">
+                  <Wallet className="h-3.5 w-3.5 shrink-0" /> {walletAddress}
+                </button>
               ) : (
-                <button onClick={handleConnect} className="btn-meme bg-[#4CAF50] text-white rounded-xl px-6 h-10 font-display text-lg tracking-wide">
-                  🔌 Connect Wallet
+                <button onClick={handleConnect} className="flex items-center gap-1.5 bg-[#4CAF50] text-white rounded-xl px-4 h-9 font-display text-base tracking-wide whitespace-nowrap border-2 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e] hover:shadow-[4px_4px_0px_#1a1a2e] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all">
+                  <span>🔌</span> <span>Connect Wallet</span>
                 </button>
               )}
             </div>
-            <div className="md:hidden">
-              <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <div className="lg:hidden">
+              <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)} className="h-9 w-9">
                 {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </div>
           </div>
         </div>
         {isMenuOpen && (
-          <div className="md:hidden border-t-3 border-[#1a1a2e]" style={{ background: "#FFFDE7" }}>
-            <div className="px-4 pt-2 pb-4 space-y-3 flex flex-col">
-              {[{ id: "presale", label: "🛒 Presale" }, { id: "why", label: "🤔 Why Buy" }, { id: "tokenomics", label: "📊 Tokenomics" }, { id: "roadmap", label: "🗺️ Roadmap" }].map(s => (
-                <button key={s.id} onClick={() => scrollTo(s.id)} className="text-left py-1.5 font-display text-xl text-[#1a1a2e] tracking-wide">{s.label}</button>
+          <div className="lg:hidden border-t-3 border-[#1a1a2e]" style={{ background: "#FFFDE7" }}>
+            <div className="px-4 pt-2 pb-4 space-y-2 flex flex-col">
+              {[{ id: "presale", label: "Presale", icon: "🛒" }, { id: "why", label: "Why Buy", icon: "🤔" }, { id: "tokenomics", label: "Tokenomics", icon: "📊" }, { id: "roadmap", label: "Roadmap", icon: "🗺️" }].map(s => (
+                <button key={s.id} onClick={() => scrollTo(s.id)} className="flex items-center gap-2 text-left py-2 font-display text-lg text-[#1a1a2e] tracking-wide">
+                  <span>{s.icon}</span> <span>{s.label}</span>
+                </button>
               ))}
-              <button onClick={handleConnect} className="btn-meme w-full mt-2 bg-[#4CAF50] text-white rounded-xl py-3 font-display text-xl">🔌 Connect Wallet</button>
+              <button onClick={handleConnect} className="flex items-center justify-center gap-2 w-full mt-2 bg-[#4CAF50] text-white rounded-xl py-3 font-display text-lg border-2 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e]">
+                <span>🔌</span> <span>Connect Wallet</span>
+              </button>
             </div>
           </div>
         )}
