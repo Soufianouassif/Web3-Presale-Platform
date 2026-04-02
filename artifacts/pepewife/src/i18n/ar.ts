@@ -293,7 +293,24 @@ const ar: Translations = {
     noWallet: "ليس لديك محفظة؟",
     getPhantom: "احصل على Phantom",
     solanaMainnet: "شبكة سولانا الرئيسية",
+    ethMainnet: "شبكة إيثريوم الرئيسية",
     secureConnection: "اتصال آمن",
+    installed: "مُثبّتة",
+    notInstalled: "غير مُثبّتة",
+    install: "تثبيت",
+    networkSolana: "شبكة سولانا",
+    networkEthereum: "شبكة إيثريوم",
+    alreadyConnected: "متصل بالفعل",
+    connectingTo: "جارٍ الاتصال...",
+    errorNotInstalled: "المحفظة غير مثبتة. يرجى تثبيتها أولاً.",
+    errorRejected: "تم رفض الاتصال. يرجى المحاولة مرة أخرى.",
+    errorWrongNetwork: "شبكة خاطئة. يرجى التبديل إلى شبكة إيثريوم الرئيسية.",
+    errorFailed: "فشل الاتصال. يرجى المحاولة مرة أخرى.",
+    errorUnknown: "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    connectedAs: "متصل بـ",
+    disconnect: "قطع الاتصال",
+    switchWallet: "تبديل المحفظة",
+    connectedWallet: "متصلة",
   },
 
   connecting: {
@@ -309,6 +326,7 @@ const ar: Translations = {
     walletConnected: "المحفظة متصلة",
     complete: "اكتمل!",
     encrypted: "اتصال مشفر عبر سولانا",
+    encryptedEth: "اتصال آمن عبر إيثريوم",
   },
 
   loading: {

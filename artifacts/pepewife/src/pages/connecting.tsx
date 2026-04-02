@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { CheckCircle, Shield, Zap } from "lucide-react";
 import { useLanguage } from "@/i18n/context";
+import { useWallet } from "@/contexts/wallet-context";
 
 export default function ConnectingPage() {
   const [, navigate] = useLocation();
   const { t } = useLanguage();
+  const { status, shortAddress, network } = useWallet();
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
@@ -18,6 +20,13 @@ export default function ConnectingPage() {
     { text: t.connecting.step4, emoji: "📊", color: "#FF4D9D" },
     { text: t.connecting.step5, emoji: "🚀", color: "#4CAF50" },
   ];
+
+  useEffect(() => {
+    if (status !== "connected") {
+      navigate("/connect");
+      return;
+    }
+  }, [status, navigate]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -46,7 +55,8 @@ export default function ConnectingPage() {
     }
   }, [progress, showSuccess, navigate, steps.length]);
 
-  const walletAddress = "7xKp...4mNr";
+  const displayAddress = shortAddress || "7xKp...4mNr";
+  const encryptedText = network === "ethereum" ? t.connecting.encryptedEth : t.connecting.encrypted;
 
   return (
     <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#1a1a2e] transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"}`}>
@@ -156,7 +166,7 @@ export default function ConnectingPage() {
               <Shield className="w-5 h-5 text-[#4CAF50] shrink-0" />
               <div className="text-start">
                 <div className="text-xs font-display text-[#4CAF50] tracking-wider">{t.connecting.walletConnected}</div>
-                <div className="text-sm font-mono text-white/60">{walletAddress}</div>
+                <div className="text-sm font-mono text-white/60">{displayAddress}</div>
               </div>
               <Zap className="w-5 h-5 text-[#FFD54F] shrink-0 ms-auto" />
             </div>
@@ -165,7 +175,7 @@ export default function ConnectingPage() {
 
         <div className="flex items-center gap-2 text-white/20 text-xs font-bold">
           <Shield className="w-3 h-3" />
-          <span>{t.connecting.encrypted}</span>
+          <span>{encryptedText}</span>
         </div>
       </div>
     </div>

@@ -125,4 +125,13 @@ React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
 - **Pages**: Home (`/`), Connect (`/connect`), Connecting (`/connecting`), Dashboard (`/dashboard`), Whitepaper (`/whitepaper`), Risk Disclaimer (`/risk-disclaimer`), Terms of Use (`/terms`)
 - **About link** in navbar navigates to Whitepaper page; footer on all pages links to Whitepaper, Risk Disclaimer, Terms of Use
 - **SEO**: `SEOHead` component (`src/components/seo-head.tsx`) on all pages — sets title, meta description, canonical URL, OG/Twitter tags; `noindex` on connect/dashboard; `index.html` has base OG/Twitter/JSON-LD; `robots.txt` and `sitemap.xml` in public; whitepaper section images use `loading="lazy"`; all images have descriptive alt text; HTML `lang` and `dir` attributes set dynamically via i18n context
+- **Wallet System**: Real wallet detection and connection for Solana (Phantom) and Ethereum (MetaMask, Binance Wallet, Trust Wallet)
+  - `src/lib/wallet.ts` — provider detection, connection, disconnection utilities; strict provider selection (no permissive fallback)
+  - `src/contexts/wallet-context.tsx` — React context with `WalletProvider` wrapping app; `useWallet()` hook returns `{ status, walletType, network, address, shortAddress, error, installedWallets, connect, disconnect }`
+  - Wallet detection shows installed/not-installed badges on connect page
+  - Connection mutex prevents concurrent connection attempts
+  - localStorage persistence with provider verification on boot (re-validates with actual wallet before restoring connected state)
+  - Provider event listeners for account changes, disconnects, chain switches
+  - Dashboard route guard: redirects to /connect if wallet not connected
+  - Error handling: USER_REJECTED, WRONG_NETWORK, NOT_INSTALLED, CONNECTION_FAILED with i18n error messages
 - **All data is static/mocked** — no backend integration

@@ -291,7 +291,24 @@ const en = {
     noWallet: "Don't have a wallet?",
     getPhantom: "Get Phantom",
     solanaMainnet: "Solana Mainnet",
+    ethMainnet: "Ethereum Mainnet",
     secureConnection: "Secure Connection",
+    installed: "INSTALLED",
+    notInstalled: "NOT INSTALLED",
+    install: "INSTALL",
+    networkSolana: "Solana Network",
+    networkEthereum: "Ethereum Network",
+    alreadyConnected: "Already connected",
+    connectingTo: "Connecting...",
+    errorNotInstalled: "Wallet not installed. Please install it first.",
+    errorRejected: "Connection rejected. Please try again.",
+    errorWrongNetwork: "Wrong network. Please switch to Ethereum Mainnet.",
+    errorFailed: "Connection failed. Please try again.",
+    errorUnknown: "Something went wrong. Please try again.",
+    connectedAs: "Connected as",
+    disconnect: "Disconnect",
+    switchWallet: "Switch Wallet",
+    connectedWallet: "CONNECTED",
   },
 
   connecting: {
@@ -307,6 +324,7 @@ const en = {
     walletConnected: "WALLET CONNECTED",
     complete: "Complete!",
     encrypted: "Encrypted connection via Solana",
+    encryptedEth: "Secure connection via Ethereum",
   },
 
   loading: {

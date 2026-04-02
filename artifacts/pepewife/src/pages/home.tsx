@@ -6,20 +6,21 @@ import { Input } from "@/components/ui/input";
 import { SiCoinmarketcap, SiBinance, SiSolana, SiTether } from "react-icons/si";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/i18n/context";
+import { useWallet } from "@/contexts/wallet-context";
 import LanguageSwitcher from "@/components/language-switcher";
 import TwitterFeed from "@/components/twitter-feed";
 import SEOHead from "@/components/seo-head";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 14, minutes: 0, seconds: 0 });
   const [currency, setCurrency] = useState<"SOL" | "USDT">("SOL");
   const [copied, setCopied] = useState(false);
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
-
-  const walletAddress = "7xKp...4mNr";
+  const { status, shortAddress } = useWallet();
+  const isConnected = status === "connected";
+  const walletAddress = shortAddress || "7xKp...4mNr";
   const presaleFilled = 0;
 
   const tokenomicsData = [

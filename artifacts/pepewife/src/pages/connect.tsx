@@ -1,65 +1,121 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, ExternalLink, Shield, Wifi, ChevronRight } from "lucide-react";
+import { ArrowLeft, ExternalLink, Shield, Wifi, ChevronRight, Download, CheckCircle, AlertTriangle, X } from "lucide-react";
 import { useLanguage } from "@/i18n/context";
+import { useWallet } from "@/contexts/wallet-context";
 import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
+import { getWalletNetwork, getInstallUrl, type WalletType } from "@/lib/wallet";
 
-const wallets = [
+const wallets: {
+  id: WalletType;
+  name: string;
+  descKey: "phantomDesc" | "metamaskDesc" | "binanceDesc" | "trustDesc";
+  color: string;
+  shadow: string;
+  bg: string;
+  iconSrc: string;
+  network: "solana" | "ethereum";
+}[] = [
   {
     id: "phantom",
     name: "Phantom",
-    descKey: "phantomDesc" as const,
+    descKey: "phantomDesc",
     color: "#AB47BC",
     shadow: "#7B1FA2",
     bg: "bg-[#F3E5F5]",
     iconSrc: "/wallet-phantom.png",
-    url: "https://phantom.app",
+    network: "solana",
   },
   {
     id: "metamask",
     name: "MetaMask",
-    descKey: "metamaskDesc" as const,
+    descKey: "metamaskDesc",
     color: "#E2761B",
     shadow: "#C65D0A",
     bg: "bg-[#FFF3E0]",
     iconSrc: "/wallet-metamask.png",
-    url: "https://metamask.io",
+    network: "ethereum",
   },
   {
     id: "binance",
     name: "Binance Wallet",
-    descKey: "binanceDesc" as const,
+    descKey: "binanceDesc",
     color: "#F0B90B",
     shadow: "#C99A00",
     bg: "bg-[#FFFDE7]",
     iconSrc: "/wallet-binance.png",
-    url: "https://www.binance.com/en/web3wallet",
+    network: "ethereum",
   },
   {
     id: "trust",
     name: "Trust Wallet",
-    descKey: "trustDesc" as const,
+    descKey: "trustDesc",
     color: "#3375BB",
     shadow: "#1A5A9E",
     bg: "bg-[#E3F2FD]",
     iconSrc: "/wallet-trust.svg",
-    url: "https://trustwallet.com",
+    network: "ethereum",
   },
 ];
+
+function getErrorMessage(error: string, t: ReturnType<typeof useLanguage>["t"]): string {
+  if (error.includes("NOT_INSTALLED")) return t.connect.errorNotInstalled;
+  if (error === "USER_REJECTED") return t.connect.errorRejected;
+  if (error === "WRONG_NETWORK") return t.connect.errorWrongNetwork;
+  if (error === "CONNECTION_FAILED") return t.connect.errorFailed;
+  return t.connect.errorUnknown;
+}
 
 export default function ConnectPage() {
   const [, navigate] = useLocation();
   const { t } = useLanguage();
-  const [connecting, setConnecting] = useState<string | null>(null);
+  const { status, walletType: connectedWallet, shortAddress, address, error, installedWallets, connect, disconnect, refreshDetection } = useWallet();
+  const [connectingId, setConnectingId] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
+  const [showError, setShowError] = useState(false);
 
-  const handleConnect = (walletId: string) => {
-    setConnecting(walletId);
-    setTimeout(() => {
-      setConnecting(null);
+  useEffect(() => {
+    refreshDetection();
+  }, [refreshDetection]);
+
+  useEffect(() => {
+    if (error) {
+      setShowError(true);
+      setConnectingId(null);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (status === "connected" && connectingId) {
       navigate("/connecting");
-    }, 1000);
+    }
+  }, [status, connectingId, navigate]);
+
+  const handleConnect = async (walletId: WalletType) => {
+    if (status === "connected" && connectedWallet === walletId) {
+      navigate("/dashboard");
+      return;
+    }
+
+    const isInstalled = installedWallets[walletId];
+    if (!isInstalled) {
+      window.open(getInstallUrl(walletId), "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    setShowError(false);
+    setConnectingId(walletId);
+    const success = await connect(walletId);
+    if (!success) {
+      setConnectingId(null);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    await disconnect();
+    setConnectingId(null);
+    setShowError(false);
   };
 
   return (
@@ -91,11 +147,41 @@ export default function ConnectPage() {
         </div>
 
         <div className="w-full max-w-lg">
+          {status === "connected" && address && (
+            <div className="mb-4 meme-card bg-[#4CAF50]/10 rounded-2xl p-4 border-[#4CAF50]/30 backdrop-blur">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-[#4CAF50] shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-display text-[#4CAF50] tracking-wider">{t.connect.connectedAs}</div>
+                  <div className="text-sm font-mono text-[#1a1a2e]/70 truncate">{shortAddress}</div>
+                </div>
+                <button
+                  onClick={handleDisconnect}
+                  className="shrink-0 text-xs font-display text-red-500 hover:text-red-700 tracking-wider px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 transition-all"
+                >
+                  {t.connect.disconnect}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {showError && error && (
+            <div className="mb-4 meme-card bg-red-50 rounded-2xl p-4 border-red-200 backdrop-blur">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
+                <p className="flex-1 text-sm text-red-600 font-bold">{getErrorMessage(error, t)}</p>
+                <button onClick={() => setShowError(false)} className="shrink-0 text-red-400 hover:text-red-600">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="text-center mb-8">
             <img src="/logo.png" alt="PEPEWIFE" className="w-16 h-16 mx-auto mb-4 rounded-full border-3 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e]" />
             <div className="sticker bg-[#4CAF50] text-white text-sm inline-block mb-3" style={{ transform: "rotate(-2deg)" }}>{t.connect.step1}</div>
             <h1 className="text-4xl sm:text-5xl font-display text-[#1a1a2e] tracking-wider comic-shadow">
-              {t.connect.title}
+              {status === "connected" ? t.connect.switchWallet : t.connect.title}
             </h1>
             <p className="text-[#1a1a2e]/60 font-bold mt-2 max-w-sm mx-auto">
               {t.connect.subtitle}
@@ -105,52 +191,78 @@ export default function ConnectPage() {
           <div className="meme-card bg-white/90 backdrop-blur rounded-3xl overflow-hidden">
             <div className="zigzag-border" />
             <div className="p-5 sm:p-6 space-y-3">
-              {wallets.map((w) => (
-                <button
-                  key={w.id}
-                  disabled={connecting !== null}
-                  aria-label={`Connect with ${w.name}`}
-                  onClick={() => handleConnect(w.id)}
-                  onMouseEnter={() => setHovered(w.id)}
-                  onMouseLeave={() => setHovered(null)}
-                  onFocus={() => setHovered(w.id)}
-                  onBlur={() => setHovered(null)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-2xl border-3 transition-all duration-200 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
-                    connecting === w.id
-                      ? `${w.bg} scale-[0.98]`
-                      : hovered === w.id
-                      ? `${w.bg} translate-x-[-2px] translate-y-[-2px]`
-                      : "bg-white border-[#1a1a2e]/10 shadow-[2px_2px_0px_#1a1a2e20] hover:shadow-[4px_4px_0px_#1a1a2e30]"
-                  }`}
-                  style={{
-                    ...(connecting === w.id || hovered === w.id
-                      ? { borderColor: w.color, boxShadow: `4px 4px 0px ${w.shadow}`, ["--tw-ring-color" as string]: w.color }
-                      : {}),
-                  }}
-                >
-                  <div className={`shrink-0 rounded-xl overflow-hidden transition-transform duration-200 ${hovered === w.id ? "scale-110 rotate-[-3deg]" : ""}`}>
-                    <img src={w.iconSrc} alt={w.name} className="w-10 h-10 rounded-xl" />
-                  </div>
-                  <div className="flex-1 text-start">
-                    <div className="font-display text-lg text-[#1a1a2e] tracking-wider flex items-center gap-2">
-                      {w.name}
-                      {w.id === "phantom" && (
-                        <span className="sticker bg-[#4CAF50] text-white text-[10px] px-2 py-0.5" style={{ transform: "rotate(-1deg)" }}>{t.connect.recommended}</span>
+              {wallets.map((w) => {
+                const isInstalled = installedWallets[w.id];
+                const isConnecting = connectingId === w.id && status === "connecting";
+                const isThisConnected = status === "connected" && connectedWallet === w.id;
+                const networkLabel = w.network === "solana" ? t.connect.networkSolana : t.connect.networkEthereum;
+
+                return (
+                  <button
+                    key={w.id}
+                    disabled={isConnecting || (connectingId !== null && connectingId !== w.id)}
+                    aria-label={`Connect with ${w.name}`}
+                    onClick={() => handleConnect(w.id)}
+                    onMouseEnter={() => setHovered(w.id)}
+                    onMouseLeave={() => setHovered(null)}
+                    onFocus={() => setHovered(w.id)}
+                    onBlur={() => setHovered(null)}
+                    className={`w-full flex items-center gap-4 p-4 rounded-2xl border-3 transition-all duration-200 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+                      isThisConnected
+                        ? `${w.bg} border-[#4CAF50]`
+                        : isConnecting
+                        ? `${w.bg} scale-[0.98]`
+                        : hovered === w.id
+                        ? `${w.bg} translate-x-[-2px] translate-y-[-2px]`
+                        : "bg-white border-[#1a1a2e]/10 shadow-[2px_2px_0px_#1a1a2e20] hover:shadow-[4px_4px_0px_#1a1a2e30]"
+                    }`}
+                    style={{
+                      ...(isThisConnected
+                        ? { borderColor: "#4CAF50", boxShadow: "4px 4px 0px #2E7D32" }
+                        : isConnecting || hovered === w.id
+                        ? { borderColor: w.color, boxShadow: `4px 4px 0px ${w.shadow}`, ["--tw-ring-color" as string]: w.color }
+                        : {}),
+                    }}
+                  >
+                    <div className={`shrink-0 rounded-xl overflow-hidden transition-transform duration-200 ${hovered === w.id ? "scale-110 rotate-[-3deg]" : ""}`}>
+                      <img src={w.iconSrc} alt={w.name} className="w-10 h-10 rounded-xl" />
+                    </div>
+                    <div className="flex-1 text-start min-w-0">
+                      <div className="font-display text-lg text-[#1a1a2e] tracking-wider flex items-center gap-2 flex-wrap">
+                        {w.name}
+                        {w.id === "phantom" && !isThisConnected && (
+                          <span className="sticker bg-[#4CAF50] text-white text-[10px] px-2 py-0.5" style={{ transform: "rotate(-1deg)" }}>{t.connect.recommended}</span>
+                        )}
+                        {isThisConnected && (
+                          <span className="sticker bg-[#4CAF50] text-white text-[10px] px-2 py-0.5" style={{ transform: "rotate(-1deg)" }}>{t.connect.connectedWallet}</span>
+                        )}
+                      </div>
+                      <div className="text-xs text-[#1a1a2e]/50 font-bold flex items-center gap-2 flex-wrap">
+                        <span>{t.connect[w.descKey]}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#1a1a2e]/5">{networkLabel}</span>
+                      </div>
+                    </div>
+                    <div className="shrink-0 flex flex-col items-center gap-1">
+                      {isConnecting ? (
+                        <div role="status" aria-label="Connecting">
+                          <div className="w-6 h-6 border-3 border-t-transparent rounded-full animate-spin" style={{ borderColor: w.color, borderTopColor: "transparent" }} />
+                        </div>
+                      ) : isThisConnected ? (
+                        <CheckCircle className="h-5 w-5 text-[#4CAF50]" />
+                      ) : !isInstalled ? (
+                        <Download className="h-5 w-5 text-[#FF4D9D]" />
+                      ) : (
+                        <ChevronRight className="h-5 w-5 text-[#1a1a2e]/30 group-hover:text-[#1a1a2e]/60 transition-colors" />
+                      )}
+                      {!isConnecting && !isThisConnected && (
+                        <span className={`text-[9px] font-display tracking-wider ${isInstalled ? "text-[#4CAF50]" : "text-[#FF4D9D]"}`}>
+                          {isInstalled ? t.connect.installed : t.connect.install}
+                        </span>
                       )}
                     </div>
-                    <div className="text-xs text-[#1a1a2e]/50 font-bold">{t.connect[w.descKey]}</div>
-                  </div>
-                  <div className="shrink-0">
-                    {connecting === w.id ? (
-                      <div role="status" aria-label="Connecting">
-                        <div className="w-6 h-6 border-3 border-t-transparent rounded-full animate-spin" style={{ borderColor: w.color, borderTopColor: "transparent" }} />
-                      </div>
-                    ) : (
-                      <ChevronRight className="h-5 w-5 text-[#1a1a2e]/30 group-hover:text-[#1a1a2e]/60 transition-colors" />
-                    )}
-                  </div>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="px-5 sm:px-6 pb-5 sm:pb-6">
@@ -176,6 +288,10 @@ export default function ConnectPage() {
             <div className="flex items-center justify-center gap-4 text-[#1a1a2e]/30">
               <div className="flex items-center gap-1 text-xs font-bold">
                 <Wifi className="h-3 w-3" /> {t.connect.solanaMainnet}
+              </div>
+              <div className="w-1 h-1 rounded-full bg-[#1a1a2e]/20" />
+              <div className="flex items-center gap-1 text-xs font-bold">
+                <Wifi className="h-3 w-3" /> {t.connect.ethMainnet}
               </div>
               <div className="w-1 h-1 rounded-full bg-[#1a1a2e]/20" />
               <div className="flex items-center gap-1 text-xs font-bold">

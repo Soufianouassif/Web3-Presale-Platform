@@ -13,6 +13,7 @@ import RiskDisclaimer from "@/pages/risk-disclaimer";
 import Terms from "@/pages/terms";
 import LoadingPage from "@/components/loading-page";
 import { LanguageProvider } from "@/i18n/context";
+import { WalletProvider } from "@/contexts/wallet-context";
 
 const queryClient = new QueryClient();
 
@@ -37,13 +38,15 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <TooltipProvider>
-          {loading && <LoadingPage onComplete={() => setLoading(false)} />}
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
-          <Toaster />
-        </TooltipProvider>
+        <WalletProvider>
+          <TooltipProvider>
+            {loading && <LoadingPage onComplete={() => setLoading(false)} />}
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+            <Toaster />
+          </TooltipProvider>
+        </WalletProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );

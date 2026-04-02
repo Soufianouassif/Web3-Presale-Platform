@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X, Twitter, Send, Wallet, Copy, Check, ChevronDown, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -8,6 +8,7 @@ import { useLocation } from "wouter";
 import { useLanguage } from "@/i18n/context";
 import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
+import { useWallet } from "@/contexts/wallet-context";
 
 export default function Dashboard() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,10 +19,17 @@ export default function Dashboard() {
   const [buyAmount, setBuyAmount] = useState("");
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
+  const { status, shortAddress, address, disconnect } = useWallet();
 
-  const walletAddress = "7xKp...4mNr";
-  const fullWallet = "7xKp4mNrQ9vB...kL2xNw";
+  const walletAddress = shortAddress || "7xKp...4mNr";
+  const fullWallet = address || "7xKp4mNrQ9vB...kL2xNw";
   const [, navigate] = useLocation();
+
+  useEffect(() => {
+    if (status === "disconnected" || status === "error") {
+      navigate("/connect");
+    }
+  }, [status, navigate]);
 
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
@@ -82,7 +90,7 @@ export default function Dashboard() {
                     <div className="text-xs font-display text-[#1a1a2e]/40 tracking-wider">{t.nav.wallet}</div>
                     <div className="font-mono text-xs text-[#1a1a2e] bg-[#FFFDE7] rounded-lg px-2 py-1.5 border border-[#FFD54F]">{fullWallet}</div>
                     <button onClick={() => navigate("/")} className="w-full text-start text-sm font-display text-[#1a1a2e] hover:text-[#FF4D9D] tracking-wide py-1">🏠 {t.nav.backToHome}</button>
-                    <button className="w-full text-start text-sm font-display text-red-500 tracking-wide py-1">🔌 {t.nav.disconnect}</button>
+                    <button onClick={async () => { await disconnect(); navigate("/"); }} className="w-full text-start text-sm font-display text-red-500 tracking-wide py-1">🔌 {t.nav.disconnect}</button>
                   </div>
                 )}
               </div>
