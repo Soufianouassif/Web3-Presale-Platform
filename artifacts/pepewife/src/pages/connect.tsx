@@ -10,15 +10,7 @@ const wallets = [
     color: "#AB47BC",
     shadow: "#7B1FA2",
     bg: "bg-[#F3E5F5]",
-    icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10">
-        <defs><linearGradient id="phantom-g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#534BB1"/><stop offset="100%" stopColor="#551BF9"/></linearGradient></defs>
-        <rect width="128" height="128" rx="26" fill="url(#phantom-g)"/>
-        <path d="M110.5 64.2c0-25.4-20.6-46-46-46S18.5 38.8 18.5 64.2c0 .7 0 1.3.1 2 1.2-22.3 19.6-40 42-40 23.3 0 42.2 19.3 42 43.2 0 7.2-3.5 13.5-8.8 17.5h10.6c3.9-5.5 6.1-12.2 6.1-19.5v-3.2z" fill="white" opacity=".9"/>
-        <circle cx="44" cy="62" r="6" fill="white"/>
-        <circle cx="72" cy="62" r="6" fill="white"/>
-      </svg>
-    ),
+    iconSrc: "/wallet-phantom.svg",
     url: "https://phantom.app",
   },
   {
@@ -28,20 +20,7 @@ const wallets = [
     color: "#E2761B",
     shadow: "#C65D0A",
     bg: "bg-[#FFF3E0]",
-    icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10">
-        <rect width="128" height="128" rx="26" fill="#F6851B"/>
-        <path d="M100 38L72 50l5 12 23-24z" fill="#E4761B" stroke="#E4761B"/>
-        <path d="M28 38l28 12-5 12L28 38z" fill="#E4761B" stroke="#E4761B"/>
-        <path d="M88 78l-8 18 17 5 5-17H88z" fill="#E4761B" stroke="#E4761B"/>
-        <path d="M26 84l5 17 17-5-8-18H26z" fill="#E4761B" stroke="#E4761B"/>
-        <path d="M49 58l-5 10 22 1-1-23-16 12z" fill="#E4761B" stroke="#E4761B"/>
-        <path d="M79 58l-16-12-1 23 22-1-5-10z" fill="#E4761B" stroke="#E4761B"/>
-        <path d="M48 96l13-7-11-8-2 15z" fill="#E4761B" stroke="#E4761B"/>
-        <path d="M67 89l13 7-2-15-11 8z" fill="#E4761B" stroke="#E4761B"/>
-        <path d="M44 68l22 1 22-1-5-10H49l-5 10z" fill="white" opacity=".3"/>
-      </svg>
-    ),
+    iconSrc: "/wallet-metamask.svg",
     url: "https://metamask.io",
   },
   {
@@ -51,12 +30,7 @@ const wallets = [
     color: "#F0B90B",
     shadow: "#C99A00",
     bg: "bg-[#FFFDE7]",
-    icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10">
-        <rect width="128" height="128" rx="26" fill="#F0B90B"/>
-        <path d="M64 28L50 42l14 14 14-14L64 28zM36 50L22 64l14 14 14-14L36 50zM92 50L78 64l14 14 14-14L92 50zM64 72L50 86l14 14 14-14L64 72z" fill="white"/>
-      </svg>
-    ),
+    iconSrc: "/wallet-binance.svg",
     url: "https://www.binance.com/en/web3wallet",
   },
   {
@@ -66,13 +40,7 @@ const wallets = [
     color: "#3375BB",
     shadow: "#1A5A9E",
     bg: "bg-[#E3F2FD]",
-    icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10">
-        <rect width="128" height="128" rx="26" fill="#3375BB"/>
-        <path d="M64 30c-18 14-30 14-30 14s2 36 30 54c28-18 30-54 30-54s-12 0-30-14z" fill="white" stroke="white" strokeWidth="2" strokeLinejoin="round"/>
-        <path d="M64 30c-18 14-30 14-30 14s2 36 30 54V30z" fill="#E8F0FE"/>
-      </svg>
-    ),
+    iconSrc: "/wallet-trust.svg",
     url: "https://trustwallet.com",
   },
 ];
@@ -145,7 +113,7 @@ export default function ConnectPage() {
                   }}
                 >
                   <div className={`shrink-0 rounded-xl overflow-hidden transition-transform duration-200 ${hovered === w.id ? "scale-110 rotate-[-3deg]" : ""}`}>
-                    {w.icon}
+                    <img src={w.iconSrc} alt={w.name} className="w-10 h-10 rounded-xl" />
                   </div>
                   <div className="flex-1 text-left">
                     <div className="font-display text-lg text-[#1a1a2e] tracking-wider flex items-center gap-2">
