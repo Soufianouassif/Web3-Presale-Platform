@@ -16,7 +16,7 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
 
   const walletAddress = "7xKp...4mNr";
-  const presaleFilled = 85;
+  const presaleFilled = 0;
 
   const tokenomicsData = [
     { name: "Presale", value: 40, color: "#4CAF50" },
@@ -102,7 +102,7 @@ export default function Home() {
         <div className="pt-28 pb-24 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-6 animate-pulse text-base" style={{ transform: "rotate(-2deg)" }}>
-              🔥 STAGE 1 — 85% SOLD OUT — NGMI IF U MISS THIS!!
+              🔥 STAGE 1 — PRESALE COMING SOON — NGMI IF U MISS THIS!!
             </div>
             <h1 className="text-5xl lg:text-8xl font-display leading-tight mb-6 text-[#1a1a2e] comic-shadow tracking-wider">
               Be Early...<br />Or <span className="text-[#FF4D9D]" style={{ textShadow: "3px 3px 0px #1a1a2e" }}>Cry Later 😭</span>
@@ -114,7 +114,7 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3 mb-8">
-              {[{ l: "💰 Total Raised", v: "$1,247,500" }, { l: "👥 Diamond Hands", v: "8,420+" }, { l: "💎 Stage Price", v: "$0.0002" }].map(s => (
+              {[{ l: "💰 Total Raised", v: "$0" }, { l: "👥 Diamond Hands", v: "0" }, { l: "💎 Stage Price", v: "$0.0000" }].map(s => (
                 <div key={s.l} className="meme-card bg-white rounded-2xl px-5 py-3">
                   <div className="text-xs font-display text-gray-500 tracking-wide">{s.l}</div>
                   <div className="text-xl font-display text-[#1a1a2e] tracking-wider">{s.v}</div>
@@ -159,7 +159,7 @@ export default function Home() {
       <section id="presale" className="py-20 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #FFFDE7, #E8F5E9)" }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
-            <div className="sticker bg-[#FF4D9D] text-white mb-4 text-lg inline-block" style={{ transform: "rotate(-1deg)" }}>⚡ LIVE NOW — DON'T BE LATE SER</div>
+            <div className="sticker bg-[#FF4D9D] text-white mb-4 text-lg inline-block" style={{ transform: "rotate(-1deg)" }}>⚡ COMING SOON — DON'T BE LATE SER</div>
             <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-2">Stage 1 Presale 🎯</h2>
             <p className="font-bold text-[#1a1a2e]/60 text-lg">Price goes UP after this stage. Your future self will thank you. 📈</p>
           </div>
@@ -182,8 +182,8 @@ export default function Home() {
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm font-bold">
-                    <span className="text-[#4CAF50] font-display tracking-wide">🐸 127.5M Sold</span>
-                    <span className="text-[#1a1a2e]/40 font-display tracking-wide">Goal: 150M PWIFE</span>
+                    <span className="text-[#4CAF50] font-display tracking-wide">🐸 0 Sold</span>
+                    <span className="text-[#1a1a2e]/40 font-display tracking-wide">Goal: 0 PWIFE</span>
                   </div>
                   <div className="relative">
                     <Progress value={presaleFilled} className="h-4 rounded-full border-2 border-[#1a1a2e]" />
@@ -192,7 +192,7 @@ export default function Home() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  {[{ l: "🟢 NOW", v: "$0.0002", bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" }, { l: "⬆️ NEXT", v: "$0.0004", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" }, { l: "🚀 LIST", v: "$0.001", bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" }].map(p => (
+                  {[{ l: "🟢 NOW", v: "$0.0000", bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" }, { l: "⬆️ NEXT", v: "$0.0000", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" }, { l: "🚀 LIST", v: "$0.0000", bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" }].map(p => (
                     <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-2.5 text-center`}>
                       <div className="text-[10px] font-display tracking-wider text-[#1a1a2e]/50">{p.l}</div>
                       <div className={`text-lg font-display ${p.tc} tracking-wider`}>{p.v}</div>
@@ -236,7 +236,7 @@ export default function Home() {
               <div>
                 <div className="sticker bg-[#FF4D9D] text-white mb-3 text-sm inline-block" style={{ transform: "rotate(2deg)" }}>🎁 FREE MONEY GLITCH</div>
                 <h3 className="text-4xl font-display text-[#1a1a2e] tracking-wider comic-shadow mb-1">Shill & Earn 💰</h3>
-                <p className="text-[#1a1a2e]/60 font-bold">Share your link, get <span className="text-[#FF4D9D] font-display text-xl">5% rewards</span>. Literally free money fr fr 🤝</p>
+                <p className="text-[#1a1a2e]/60 font-bold">Share your link, earn rewards when your frens buy. Details coming soon 🤝</p>
               </div>
 
               <div className="meme-card bg-white rounded-2xl overflow-hidden">
@@ -253,7 +253,7 @@ export default function Home() {
                     {copied && <p className="text-xs text-[#4CAF50] font-display tracking-wide mt-1">✅ COPIED! NOW GO SHILL SER</p>}
                   </div>
                   <div className="grid grid-cols-3 gap-2">
-                    {[{ l: "Shilled", v: "0", c: "text-[#4CAF50]", bg: "bg-[#E8F5E9]", bc: "border-[#4CAF50]" }, { l: "Pending", v: "0 PWIFE", c: "text-[#FF4D9D]", bg: "bg-[#FCE4EC]", bc: "border-[#FF4D9D]" }, { l: "Rate", v: "5%", c: "text-[#b8860b]", bg: "bg-[#FFFDE7]", bc: "border-[#FFD54F]" }].map(s => (
+                    {[{ l: "Shilled", v: "0", c: "text-[#4CAF50]", bg: "bg-[#E8F5E9]", bc: "border-[#4CAF50]" }, { l: "Pending", v: "0 PWIFE", c: "text-[#FF4D9D]", bg: "bg-[#FCE4EC]", bc: "border-[#FF4D9D]" }, { l: "Rate", v: "0%", c: "text-[#b8860b]", bg: "bg-[#FFFDE7]", bc: "border-[#FFD54F]" }].map(s => (
                       <div key={s.l} className={`${s.bg} rounded-xl p-2.5 text-center border-2 ${s.bc}`}>
                         <div className={`text-xl font-display ${s.c} tracking-wider`}>{s.v}</div>
                         <div className="text-[10px] font-display text-[#1a1a2e]/40 tracking-wider mt-0.5">{s.l}</div>
@@ -266,8 +266,8 @@ export default function Home() {
               <div className="meme-card bg-white rounded-2xl p-5">
                 <h4 className="font-display text-lg text-[#1a1a2e] mb-3 tracking-wider">🏆 TOP SHILLERS (legends)</h4>
                 <div className="space-y-2">
-                  {[{ r: "🥇", a: "9mRk...2xNw", p: "71,000", t: "absolute chad" }, { r: "🥈", a: "4pQj...8vBc", p: "49,000", t: "based af" }, { r: "🥉", a: "7tLx...5kMp", p: "33,500", t: "gigabrain" }].map(x => (
-                    <div key={x.a} className="flex items-center gap-2 bg-[#FFFDE7] rounded-xl px-3 py-2 border-2 border-[#FFD54F]/50">
+                  {[{ r: "🥇", a: "---", p: "0", t: "—" }, { r: "🥈", a: "---", p: "0", t: "—" }, { r: "🥉", a: "---", p: "0", t: "—" }].map((x, i) => (
+                    <div key={i} className="flex items-center gap-2 bg-[#FFFDE7] rounded-xl px-3 py-2 border-2 border-[#FFD54F]/50">
                       <span className="text-lg">{x.r}</span>
                       <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">{x.a}</span>
                       <span className="text-xs font-display text-[#4CAF50] tracking-wide">{x.p} PWIFE</span>
@@ -409,9 +409,9 @@ export default function Home() {
           <h2 className="text-5xl font-display text-center mb-12 text-[#1a1a2e] comic-shadow tracking-wider">Latest Shitposts 📢</h2>
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { text: "PEPEWIFE presale is LIVE! 🎉 Stage 1 just launched. If you're reading this, you're still early. WAGMI! 🚀", time: "2h ago", likes: "🔥 892 degens liked this" },
-              { text: "We just hit 50% sold in 48 hours! The Lady of Memes is TAKING OVER 👑 Bears are literally crying rn 😂", time: "1d ago", likes: "💚 1,247 based reactions" },
-              { text: "Raydium listing CONFIRMED for TGE. Your bags are safe fren. 😏 WAGMI. Not financial advice btw (it kinda is tho) 😂", time: "2d ago", likes: "🚀 2,103 rocket emojis" },
+              { text: "PEPEWIFE presale launching soon! 🎉 If you're reading this, you're still early. WAGMI! 🚀", time: "2h ago", likes: "🔥 0 degens liked this" },
+              { text: "The Lady of Memes is coming 👑 Get ready for the most BASED presale on Solana 😂", time: "1d ago", likes: "💚 0 based reactions" },
+              { text: "Raydium listing CONFIRMED for TGE. Your bags are safe fren. 😏 WAGMI. Not financial advice btw (it kinda is tho) 😂", time: "2d ago", likes: "🚀 0 rocket emojis" },
             ].map((post, i) => (
               <div key={i} className="meme-card bg-white rounded-2xl p-5">
                 <div className="flex items-center gap-3 mb-3">
