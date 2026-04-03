@@ -44,15 +44,20 @@ const WalletContext = createContext<WalletContextType>({
 });
 
 const STORAGE_KEY = "pepewife-wallet";
+const SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours max session
 
 interface StoredWallet {
   walletType: WalletType;
   address: string;
   network: NetworkType;
+  connectedAt: number; // Unix timestamp (ms) — used to enforce TTL
 }
 
 async function verifyStoredConnection(data: StoredWallet): Promise<string | null> {
   try {
+    // Enforce session TTL — expired sessions always require re-connection
+    if (!data.connectedAt || Date.now() - data.connectedAt > SESSION_TTL_MS) return null;
+
     const walletNetwork = getWalletNetwork(data.walletType);
     if (walletNetwork === "solana") {
       const provider = getSolanaProvider(data.walletType);
@@ -108,22 +113,26 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, [refreshDetection]);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    // Clean up any legacy data stored in localStorage by older versions
+    localStorage.removeItem(STORAGE_KEY);
+
+    // Use sessionStorage so the session clears on browser close
+    const stored = sessionStorage.getItem(STORAGE_KEY);
     if (!stored) return;
     let data: StoredWallet;
     try {
       data = JSON.parse(stored);
       const validTypes: WalletType[] = ["phantom", "solflare", "metamask", "okx", "trust"];
       const validNetworks: NetworkType[] = ["solana", "ethereum"];
-      if (!data.walletType || !data.address || !data.network
+      if (!data.walletType || !data.address || !data.network || !data.connectedAt
           || !validTypes.includes(data.walletType)
           || !validNetworks.includes(data.network)
           || data.network !== getWalletNetwork(data.walletType)) {
-        localStorage.removeItem(STORAGE_KEY);
+        sessionStorage.removeItem(STORAGE_KEY);
         return;
       }
     } catch {
-      localStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(STORAGE_KEY);
       return;
     }
 
@@ -135,7 +144,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setNetwork(data.network);
         setStatus("connected");
       } else {
-        localStorage.removeItem(STORAGE_KEY);
+        sessionStorage.removeItem(STORAGE_KEY);
       }
     }, 800);
     return () => clearTimeout(timer);
@@ -153,7 +162,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setAddress(null);
         setWalletType(null);
         setNetwork(null);
-        localStorage.removeItem(STORAGE_KEY);
+        sessionStorage.removeItem(STORAGE_KEY);
       };
       provider.on("disconnect", handleDisconnect);
       return () => {
@@ -169,7 +178,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           setAddress(null);
           setWalletType(null);
           setNetwork(null);
-          localStorage.removeItem(STORAGE_KEY);
+          sessionStorage.removeItem(STORAGE_KEY);
         } else {
           const newAddr = accs[0];
           if (!newAddr || !isValidEthAddress(newAddr)) {
@@ -177,12 +186,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             setAddress(null);
             setWalletType(null);
             setNetwork(null);
-            localStorage.removeItem(STORAGE_KEY);
+            sessionStorage.removeItem(STORAGE_KEY);
             return;
           }
           setAddress(newAddr);
-          const stored: StoredWallet = { walletType: walletType!, address: newAddr, network: network! };
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+          const stored: StoredWallet = { walletType: walletType!, address: newAddr, network: network!, connectedAt: Date.now() };
+          sessionStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
         }
       };
       const handleChainChanged = () => {
@@ -215,8 +224,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       setAddress(addr);
       setStatus("connected");
 
-      const stored: StoredWallet = { walletType: type, address: addr, network: net };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+      // Store in sessionStorage — clears automatically on browser/tab close
+      const stored: StoredWallet = { walletType: type, address: addr, network: net, connectedAt: Date.now() };
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
       return true;
     } catch (err: unknown) {
       const message = (err as Error).message || "CONNECTION_FAILED";
@@ -242,7 +252,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setWalletType(null);
     setNetwork(null);
     setError(null);
-    localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(STORAGE_KEY);
   }, [walletType]);
 
   return (
