@@ -3,7 +3,7 @@ import { Menu, X, Twitter, Send, Wallet, ArrowRight, Copy, Check, ChevronRight, 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { SiCoinmarketcap, SiBinance, SiSolana, SiTether } from "react-icons/si";
+import { SiCoinmarketcap, SiBinance, SiSolana, SiTether, SiEthereum } from "react-icons/si";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/i18n/context";
 import { useWallet } from "@/contexts/wallet-context";
@@ -14,7 +14,7 @@ import SEOHead from "@/components/seo-head";
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 14, minutes: 0, seconds: 0 });
-  const [currency, setCurrency] = useState<"SOL" | "USDT">("SOL");
+  const [currency, setCurrency] = useState<"SOL" | "USDT_SPL" | "USDT_ETH">("SOL");
   const [copied, setCopied] = useState(false);
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
@@ -304,25 +304,35 @@ export default function Home() {
 
                 <div>
                   <p className="text-xs font-display text-[#1a1a2e]/40 tracking-wider mb-2">{t.presale.payWith}</p>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     <button onClick={() => setCurrency("SOL")}
-                      className={`flex items-center justify-center gap-2 rounded-xl h-11 font-display text-base tracking-wide border-2 transition-all ${currency === "SOL" ? "bg-[#14F195]/15 border-[#14F195] text-[#0a9060] shadow-[3px_3px_0px_#0a9060]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
-                      <SiSolana size={16} /> SOL
-                      {currency === "SOL" && <span className="text-xs">✓</span>}
+                      className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "SOL" ? "bg-[#14F195]/15 border-[#14F195] text-[#0a9060] shadow-[3px_3px_0px_#0a9060]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
+                      <div className="flex items-center gap-1 text-sm"><SiSolana size={13} /> SOL</div>
+                      <div className="text-[8px] font-bold opacity-60">Solana</div>
                     </button>
-                    <button onClick={() => setCurrency("USDT")}
-                      className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "USDT" ? "bg-[#26A17B]/15 border-[#26A17B] text-[#1a7a5e] shadow-[3px_3px_0px_#1a7a5e]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
-                      <div className="flex items-center gap-1 text-base"><SiTether size={14} /> USDT</div>
-                      <div className="text-[9px] font-bold opacity-60">SPL · Solana</div>
+                    <button onClick={() => setCurrency("USDT_SPL")}
+                      className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "USDT_SPL" ? "bg-[#26A17B]/15 border-[#26A17B] text-[#1a7a5e] shadow-[3px_3px_0px_#1a7a5e]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
+                      <div className="flex items-center gap-1 text-sm"><SiTether size={13} /> USDT</div>
+                      <div className="text-[8px] font-bold opacity-60">SPL · SOL</div>
+                    </button>
+                    <button onClick={() => setCurrency("USDT_ETH")}
+                      className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "USDT_ETH" ? "bg-[#627EEA]/15 border-[#627EEA] text-[#3d56c9] shadow-[3px_3px_0px_#3d56c9]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
+                      <div className="flex items-center gap-1 text-sm"><SiTether size={13} /> USDT</div>
+                      <div className="text-[8px] font-bold opacity-60">ERC20 · ETH</div>
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-2.5">
                   <div className="relative">
-                    <Input type="number" placeholder={`${t.presale.amountIn} ${currency}`} className="h-12 ps-4 pe-20 text-base rounded-xl border-2 border-[#1a1a2e] font-bold" />
+                    <Input type="number" placeholder={`${t.presale.amountIn} ${currency === "SOL" ? "SOL" : "USDT"}`} className="h-12 ps-4 pe-20 text-base rounded-xl border-2 border-[#1a1a2e] font-bold" />
                     <div className="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-[#FFFDE7] px-2.5 py-1 rounded-lg font-display text-sm text-[#1a1a2e] border border-[#FFD54F]">
-                      {currency === "SOL" ? <SiSolana size={14} className="text-[#14F195]" /> : <SiTether size={14} className="text-[#26A17B]" />} {currency}
+                      {currency === "SOL"
+                        ? <SiSolana size={14} className="text-[#14F195]" />
+                        : currency === "USDT_ETH"
+                          ? <SiEthereum size={14} className="text-[#627EEA]" />
+                          : <SiTether size={14} className="text-[#26A17B]" />}
+                      {currency === "SOL" ? "SOL" : "USDT"}
                     </div>
                   </div>
                   <div className="bg-[#E8F5E9] border-2 border-[#4CAF50]/30 rounded-xl px-3 py-2.5 flex justify-between items-center">
