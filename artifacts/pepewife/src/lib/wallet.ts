@@ -45,8 +45,10 @@ export function getSolanaProvider(walletType: WalletType = "phantom"): SolanaPro
   if (typeof window === "undefined") return null;
 
   if (walletType === "solflare") {
+    // Solflare injects window.solflare — accept it with or without isSolflare flag
+    // because some versions set the flag asynchronously
     const provider = window.solflare;
-    if (provider?.isSolflare) return provider;
+    if (provider) return provider;
     return null;
   }
 
@@ -83,7 +85,8 @@ export function detectWallets(): Record<WalletType, boolean> {
   }
   return {
     phantom: !!(window.phantom?.solana?.isPhantom || window.solana?.isPhantom),
-    solflare: !!window.solflare?.isSolflare,
+    // Solflare may inject window.solflare before isSolflare is set, accept both
+    solflare: !!(window.solflare?.isSolflare || window.solflare),
     metamask: !!window.ethereum?.isMetaMask,
     okx: !!window.okxwallet,
     trust: !!(window.trustwallet?.ethereum || window.ethereum?.isTrust),

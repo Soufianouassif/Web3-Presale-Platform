@@ -92,8 +92,19 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(refreshDetection, 500);
-    return () => clearTimeout(timer);
+    // Initial detection at 500ms and again at 1500ms (Solflare can inject late)
+    const t1 = setTimeout(refreshDetection, 500);
+    const t2 = setTimeout(refreshDetection, 1500);
+
+    // Solflare fires this event when it's fully ready
+    const onSolflareReady = () => refreshDetection();
+    document.addEventListener("solflare#initialized", onSolflareReady);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      document.removeEventListener("solflare#initialized", onSolflareReady);
+    };
   }, [refreshDetection]);
 
   useEffect(() => {
