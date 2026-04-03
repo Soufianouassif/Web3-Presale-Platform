@@ -1,4 +1,5 @@
 import { pgTable, text, serial, boolean, integer, decimal, timestamp } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 
 export const pageVisits = pgTable("page_visits", {
   id: serial("id").primaryKey(),
@@ -50,3 +51,33 @@ export const adminUsers = pgTable("admin_users", {
   lastLogin: timestamp("last_login", { withTimezone: true }).defaultNow(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
+
+export const referralCodes = pgTable("referral_codes", {
+  id: serial("id").primaryKey(),
+  walletAddress: text("wallet_address").notNull().unique(),
+  code: text("code").notNull().unique(),
+  totalReferrals: integer("total_referrals").notNull().default(0),
+  totalRewardTokens: decimal("total_reward_tokens", { precision: 18, scale: 6 }).notNull().default("0"),
+  totalRewardUsd: decimal("total_reward_usd", { precision: 18, scale: 6 }).notNull().default("0"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+export const referrals = pgTable("referrals", {
+  id: serial("id").primaryKey(),
+  referrerWallet: text("referrer_wallet").notNull(),
+  referredWallet: text("referred_wallet").notNull(),
+  purchaseId: integer("purchase_id"),
+  rewardRate: decimal("reward_rate", { precision: 5, scale: 2 }).notNull().default("5.00"),
+  rewardTokens: decimal("reward_tokens", { precision: 18, scale: 6 }).notNull().default("0"),
+  rewardUsd: decimal("reward_usd", { precision: 18, scale: 6 }).notNull().default("0"),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+export const referralCodesRelations = relations(referralCodes, ({ many }) => ({
+  referrals: many(referrals),
+}));
+
+export const referralsRelations = relations(referrals, ({ one }) => ({
+  purchase: one(purchases, { fields: [referrals.purchaseId], references: [purchases.id] }),
+}));
