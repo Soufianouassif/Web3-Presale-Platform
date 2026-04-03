@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { pageVisits, walletConnections, purchases, presaleConfig, adminUsers } from "@workspace/db/schema";
-import { desc, sql, eq, count } from "drizzle-orm";
+import { pageVisits, walletConnections, purchases, presaleConfig, adminUsers, referralCodes, referrals } from "@workspace/db/schema";
+import { desc, sql, eq, count, inArray } from "drizzle-orm";
 import { requireAdminAuth } from "../middleware/admin-auth.js";
 
 const router = Router();
@@ -64,6 +64,30 @@ router.get("/admin/stats", async (_req, res) => {
 
     const [config] = await db.select().from(presaleConfig).where(eq(presaleConfig.id, 1)).limit(1);
 
+    const [totalReferrers] = await db.select({ count: count() }).from(referralCodes).where(sql`${referralCodes.totalReferrals} > 0`);
+    const [totalReferrals] = await db.select({ count: count() }).from(referrals);
+    const [pendingRewards] = await db
+      .select({ total: sql<number>`coalesce(sum(${referrals.rewardTokens}), 0)` })
+      .from(referrals)
+      .where(eq(referrals.status, "pending"));
+    const [paidRewards] = await db
+      .select({ total: sql<number>`coalesce(sum(${referrals.rewardTokens}), 0)` })
+      .from(referrals)
+      .where(eq(referrals.status, "paid"));
+
+    const topReferrers = await db
+      .select({
+        walletAddress: referralCodes.walletAddress,
+        code: referralCodes.code,
+        totalReferrals: referralCodes.totalReferrals,
+        pendingTokens: referralCodes.pendingTokens,
+        paidTokens: referralCodes.paidTokens,
+      })
+      .from(referralCodes)
+      .where(sql`${referralCodes.totalReferrals} > 0`)
+      .orderBy(desc(referralCodes.pendingTokens))
+      .limit(10);
+
     res.json({
       visits: {
         total: Number(totalVisits.count),
@@ -92,6 +116,19 @@ router.get("/admin/stats", async (_req, res) => {
       topPages,
       recentActivity,
       presaleConfig: config ?? null,
+      referrals: {
+        totalReferrers: Number(totalReferrers.count),
+        totalReferrals: Number(totalReferrals.count),
+        pendingRewardTokens: Number(pendingRewards.total),
+        paidRewardTokens: Number(paidRewards.total),
+        topReferrers: topReferrers.map((r) => ({
+          walletAddress: r.walletAddress,
+          code: r.code,
+          totalReferrals: Number(r.totalReferrals),
+          pendingTokens: Number(r.pendingTokens),
+          paidTokens: Number(r.paidTokens),
+        })),
+      },
     });
   } catch (err) {
     console.error(err);
@@ -201,6 +238,123 @@ router.post("/admin/presale/withdraw", async (_req, res) => {
     });
   } catch {
     res.status(500).json({ error: "Failed" });
+  }
+});
+
+router.get("/admin/referrals", async (req, res) => {
+  try {
+    const page = Number(req.query.page ?? 1);
+    const limit = Number(req.query.limit ?? 50);
+    const offset = (page - 1) * limit;
+    const statusFilter = req.query.status as string | undefined;
+
+    const whereClause = statusFilter && ["pending", "paid"].includes(statusFilter)
+      ? eq(referrals.status, statusFilter)
+      : undefined;
+
+    const rows = whereClause
+      ? await db
+          .select({
+            id: referrals.id,
+            referrerWallet: referrals.referrerWallet,
+            referredWallet: referrals.referredWallet,
+            rewardTokens: referrals.rewardTokens,
+            rewardUsd: referrals.rewardUsd,
+            status: referrals.status,
+            createdAt: referrals.createdAt,
+          })
+          .from(referrals)
+          .where(whereClause)
+          .orderBy(desc(referrals.createdAt))
+          .limit(limit)
+          .offset(offset)
+      : await db
+          .select({
+            id: referrals.id,
+            referrerWallet: referrals.referrerWallet,
+            referredWallet: referrals.referredWallet,
+            rewardTokens: referrals.rewardTokens,
+            rewardUsd: referrals.rewardUsd,
+            status: referrals.status,
+            createdAt: referrals.createdAt,
+          })
+          .from(referrals)
+          .orderBy(desc(referrals.createdAt))
+          .limit(limit)
+          .offset(offset);
+
+    const [{ total }] = whereClause
+      ? await db.select({ total: count() }).from(referrals).where(whereClause)
+      : await db.select({ total: count() }).from(referrals);
+
+    res.json({
+      referrals: rows.map((r) => ({
+        ...r,
+        rewardTokens: Number(r.rewardTokens),
+        rewardUsd: Number(r.rewardUsd),
+      })),
+      pagination: {
+        page,
+        limit,
+        total: Number(total),
+        totalPages: Math.ceil(Number(total) / limit),
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch referrals" });
+  }
+});
+
+router.post("/admin/referrals/mark-paid", async (req, res) => {
+  try {
+    const { walletAddress } = req.body as { walletAddress?: string };
+
+    if (walletAddress) {
+      await db
+        .update(referrals)
+        .set({ status: "paid" })
+        .where(sql`${referrals.referrerWallet} = ${walletAddress} AND ${referrals.status} = 'pending'`);
+
+      const [referrerCode] = await db
+        .select({ pendingTokens: referralCodes.pendingTokens, paidTokens: referralCodes.paidTokens })
+        .from(referralCodes)
+        .where(eq(referralCodes.walletAddress, walletAddress))
+        .limit(1);
+
+      if (referrerCode) {
+        const newPaid = Number(referrerCode.paidTokens) + Number(referrerCode.pendingTokens);
+        await db
+          .update(referralCodes)
+          .set({ paidTokens: String(newPaid), pendingTokens: "0" })
+          .where(eq(referralCodes.walletAddress, walletAddress));
+      }
+
+      res.json({ success: true, message: `Rewards marked as paid for ${walletAddress.slice(0, 8)}...` });
+    } else {
+      await db
+        .update(referrals)
+        .set({ status: "paid" })
+        .where(eq(referrals.status, "pending"));
+
+      const allCodes = await db
+        .select({ walletAddress: referralCodes.walletAddress, pendingTokens: referralCodes.pendingTokens, paidTokens: referralCodes.paidTokens })
+        .from(referralCodes)
+        .where(sql`${referralCodes.pendingTokens}::numeric > 0`);
+
+      for (const rc of allCodes) {
+        const newPaid = Number(rc.paidTokens) + Number(rc.pendingTokens);
+        await db
+          .update(referralCodes)
+          .set({ paidTokens: String(newPaid), pendingTokens: "0" })
+          .where(eq(referralCodes.walletAddress, rc.walletAddress));
+      }
+
+      res.json({ success: true, message: "All pending referral rewards marked as paid" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to mark referrals as paid" });
   }
 });
 

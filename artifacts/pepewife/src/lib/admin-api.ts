@@ -36,6 +36,34 @@ export interface AdminStats {
     currentStage: number;
     totalRaisedUsd: string;
   } | null;
+  referrals: {
+    totalReferrers: number;
+    totalReferrals: number;
+    pendingRewardTokens: number;
+    paidRewardTokens: number;
+    topReferrers: {
+      walletAddress: string;
+      code: string;
+      totalReferrals: number;
+      pendingTokens: number;
+      paidTokens: number;
+    }[];
+  };
+}
+
+export interface ReferralRecord {
+  id: number;
+  referrerWallet: string;
+  referredWallet: string;
+  rewardTokens: number;
+  rewardUsd: number;
+  status: "pending" | "paid";
+  createdAt: string;
+}
+
+export interface ReferralsResponse {
+  referrals: ReferralRecord[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
 }
 
 export interface Buyer {
@@ -81,6 +109,16 @@ export const adminApi = {
     fetchApi<{ success: boolean; message: string }>("/admin/presale/staking", {
       method: "POST",
       body: JSON.stringify({ enabled }),
+    }),
+  getReferrals: (page = 1, limit = 50, status?: "pending" | "paid") => {
+    const qs = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (status) qs.set("status", status);
+    return fetchApi<ReferralsResponse>(`/admin/referrals?${qs}`);
+  },
+  markReferralsPaid: (walletAddress?: string) =>
+    fetchApi<{ success: boolean; message: string }>("/admin/referrals/mark-paid", {
+      method: "POST",
+      body: JSON.stringify(walletAddress ? { walletAddress } : {}),
     }),
 };
 

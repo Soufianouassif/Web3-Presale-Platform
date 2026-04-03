@@ -14,6 +14,7 @@ import Terms from "@/pages/terms";
 import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminBuyers from "@/pages/admin/buyers";
+import AdminReferrals from "@/pages/admin/referrals";
 import LoadingPage from "@/components/loading-page";
 import { LanguageProvider } from "@/i18n/context";
 import { WalletProvider } from "@/contexts/wallet-context";
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/buyers" component={AdminBuyers} />
+      <Route path="/admin/referrals" component={AdminReferrals} />
       <Route component={NotFound} />
     </Switch>
   );

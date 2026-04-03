@@ -3,6 +3,12 @@ import { useLocation } from "wouter";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { adminApi, type AdminStats } from "@/lib/admin-api";
 
+function fmt(n: number) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+}
+
 function StatCard({ title, value, sub, color = "green" }: { title: string; value: string | number; sub?: string; color?: "green" | "blue" | "purple" | "yellow" }) {
   const colors = {
     green: "from-[#39ff14]/10 to-[#39ff14]/5 border-[#39ff14]/20 text-[#39ff14]",
@@ -200,6 +206,27 @@ export default function AdminDashboard() {
               </div>
             </section>
 
+            {/* Referral Overview */}
+            <section>
+              <h2 className="text-lg font-semibold mb-4 text-gray-300">Referral System</h2>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard title="Total Referrers" value={stats?.referrals?.totalReferrers ?? 0} sub="active shillers" color="purple" />
+                <StatCard title="Total Referrals" value={stats?.referrals?.totalReferrals ?? 0} sub="referred purchases" color="blue" />
+                <StatCard
+                  title="Pending Rewards"
+                  value={`${fmt(stats?.referrals?.pendingRewardTokens ?? 0)} $PWIFE`}
+                  sub="awaiting TGE payout"
+                  color="yellow"
+                />
+                <StatCard
+                  title="Paid Rewards"
+                  value={`${fmt(stats?.referrals?.paidRewardTokens ?? 0)} $PWIFE`}
+                  sub="already distributed"
+                  color="green"
+                />
+              </div>
+            </section>
+
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Presale Controls */}
               <section className="bg-[#111118] border border-white/10 rounded-2xl p-6">
@@ -308,6 +335,82 @@ export default function AdminDashboard() {
                     </div>
                   ))}
                 </div>
+              </section>
+            )}
+
+            {/* Referrers Management Table */}
+            {stats?.referrals && (
+              <section className="bg-[#111118] border border-white/10 rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold">Referrers Leaderboard</h2>
+                  <ControlButton
+                    label="✅ Mark ALL as Paid"
+                    variant="success"
+                    onClick={() => doAction("markAllPaid", () => adminApi.markReferralsPaid())}
+                    loading={actionLoading === "markAllPaid"}
+                    disabled={(stats?.referrals?.pendingRewardTokens ?? 0) === 0}
+                  />
+                </div>
+
+                {!stats.referrals.topReferrers.length ? (
+                  <p className="text-gray-500 text-sm">No referrals yet.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="text-gray-500 text-xs uppercase tracking-wider border-b border-white/10">
+                          <th className="text-left py-3 pr-4">#</th>
+                          <th className="text-left py-3 pr-4">Wallet</th>
+                          <th className="text-left py-3 pr-4">Code</th>
+                          <th className="text-right py-3 pr-4">Referrals</th>
+                          <th className="text-right py-3 pr-4">Pending $PWIFE</th>
+                          <th className="text-right py-3 pr-4">Paid $PWIFE</th>
+                          <th className="text-right py-3">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {stats.referrals.topReferrers.map((r, i) => (
+                          <tr key={r.walletAddress} className="hover:bg-white/5 transition-colors">
+                            <td className="py-3 pr-4 text-gray-500">{i + 1}</td>
+                            <td className="py-3 pr-4 font-mono text-gray-300">
+                              {r.walletAddress.slice(0, 8)}…{r.walletAddress.slice(-4)}
+                            </td>
+                            <td className="py-3 pr-4">
+                              <span className="px-2 py-0.5 bg-white/10 rounded text-xs font-mono text-[#39ff14]">{r.code}</span>
+                            </td>
+                            <td className="py-3 pr-4 text-right text-white">{r.totalReferrals}</td>
+                            <td className="py-3 pr-4 text-right text-yellow-400 font-medium">{fmt(r.pendingTokens)}</td>
+                            <td className="py-3 pr-4 text-right text-[#39ff14]">{fmt(r.paidTokens)}</td>
+                            <td className="py-3 text-right">
+                              {r.pendingTokens > 0 && (
+                                <button
+                                  onClick={() => doAction(`paid-${r.walletAddress}`, () => adminApi.markReferralsPaid(r.walletAddress))}
+                                  disabled={actionLoading === `paid-${r.walletAddress}`}
+                                  className="px-3 py-1.5 text-xs bg-[#39ff14]/20 hover:bg-[#39ff14]/30 border border-[#39ff14]/30 text-[#39ff14] rounded-lg transition-all disabled:opacity-40 flex items-center gap-1 ml-auto"
+                                >
+                                  {actionLoading === `paid-${r.walletAddress}` && (
+                                    <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+                                  )}
+                                  Mark Paid
+                                </button>
+                              )}
+                              {r.pendingTokens === 0 && (
+                                <span className="text-xs text-gray-600">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => setLocation("/admin/referrals")}
+                  className="mt-4 text-sm text-[#39ff14] hover:underline"
+                >
+                  View all referrals →
+                </button>
               </section>
             )}
 
