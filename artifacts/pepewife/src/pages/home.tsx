@@ -532,12 +532,12 @@ export default function Home() {
                   <p className="text-xs font-display text-[#1a1a2e]/40 tracking-wider mb-2">{t.presale.payWith}</p>
                   <div className="grid grid-cols-3 gap-2">
                     <button onClick={() => { setCurrency("SOL"); setAmount(""); }}
-                      className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "SOL" ? "bg-[#14F195]/15 border-[#14F195] text-[#0a9060] shadow-[3px_3px_0px_#0a9060]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
+                      className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "SOL" ? "bg-[#14F195]/25 border-[#14F195] text-[#0a9060] shadow-[3px_3px_0px_#0a9060]" : "bg-[#14F195]/10 border-[#14F195]/40 text-[#0a9060] hover:border-[#14F195]"}`}>
                       <div className="flex items-center gap-1 text-sm"><SiSolana size={13} /> SOL</div>
                       <div className="text-[8px] font-bold opacity-60">Solana</div>
                     </button>
                     <button onClick={() => { setCurrency("USDT_SPL"); setAmount(""); }}
-                      className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "USDT_SPL" ? "bg-[#26A17B]/15 border-[#26A17B] text-[#1a7a5e] shadow-[3px_3px_0px_#1a7a5e]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
+                      className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "USDT_SPL" ? "bg-[#26A17B]/25 border-[#26A17B] text-[#1a7a5e] shadow-[3px_3px_0px_#1a7a5e]" : "bg-[#26A17B]/10 border-[#26A17B]/40 text-[#1a7a5e] hover:border-[#26A17B]"}`}>
                       <div className="flex items-center gap-1 text-sm"><SiTether size={13} /> USDT</div>
                       <div className="text-[8px] font-bold opacity-60">SPL · SOL</div>
                     </button>
