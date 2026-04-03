@@ -21,12 +21,20 @@ export default function Home() {
   const { status, shortAddress } = useWallet();
   const isConnected = status === "connected";
   const walletAddress = shortAddress || "7xKp...4mNr";
+  const fmt = (n: number) => {
+    if (n >= 1e12) return (n / 1e12).toFixed(2) + "T";
+    if (n >= 1e9)  return (n / 1e9).toFixed(2) + "B";
+    if (n >= 1e6)  return (n / 1e6).toFixed(2) + "M";
+    return n.toLocaleString();
+  };
+
   const STAGE_DATA = [
-    { stage: 1, sig: "0.1", exp: 7, tokens: 5_000_000_000_000, sold: 15_000_000_000, color: "#4CAF50" },
-    { stage: 2, sig: "0.2", exp: 7, tokens: 5_000_000_000_000, sold: 0, color: "#FF4D9D" },
-    { stage: 3, sig: "0.4", exp: 7, tokens: 5_000_000_000_000, sold: 0, color: "#FFD54F" },
-    { stage: 4, sig: "0.6", exp: 7, tokens: 5_000_000_000_000, sold: 0, color: "#42A5F5" },
+    { stage: 1, price: "$0.00000001", tokens: 5_000_000_000_000, sold: 15_000_000_000, color: "#4CAF50" },
+    { stage: 2, price: "$0.00000002", tokens: 5_000_000_000_000, sold: 0, color: "#FF4D9D" },
+    { stage: 3, price: "$0.00000004", tokens: 5_000_000_000_000, sold: 0, color: "#FFD54F" },
+    { stage: 4, price: "$0.00000006", tokens: 5_000_000_000_000, sold: 0, color: "#42A5F5" },
   ];
+  const LISTING_PRICE = "$0.061327";
   const currentStage = 0;
   const totalSold = STAGE_DATA.reduce((a, s) => a + s.sold, 0);
   const totalTokens = STAGE_DATA.reduce((a, s) => a + s.tokens, 0);
@@ -169,9 +177,7 @@ export default function Home() {
               </div>
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                 <div className="text-xs font-display text-gray-500 tracking-wide">💎 Stage 1 Price</div>
-                <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">
-                  0.1<sub style={{ fontSize: "0.6em", verticalAlign: "sub" }}>7</sub>$
-                </div>
+                <div className="text-xl font-display text-[#1a1a2e] tracking-wider">{STAGE_DATA[0].price}</div>
                 <div className="text-[10px] text-gray-400 font-display tracking-wide">per PWIFE</div>
               </div>
             </div>
@@ -259,30 +265,24 @@ export default function Home() {
                     {STAGE_DATA.map((s, i) => (
                       <div key={i} className={`flex-1 text-center rounded-lg py-1 border ${i === currentStage ? "border-[#1a1a2e] bg-[#FFFDE7]" : "border-transparent"}`}>
                         <div className="text-[9px] font-display tracking-wide text-[#1a1a2e]/50">S{s.stage}</div>
-                        <div className="text-[10px] font-display font-bold" style={{ color: s.color }}>
-                          {s.sig}<sub style={{ fontSize: "0.7em", verticalAlign: "sub" }}>{s.exp}</sub>$
-                        </div>
+                        <div className="text-[9px] font-display font-bold" style={{ color: s.color }}>{s.price}</div>
                       </div>
                     ))}
                   </div>
                   <div className="text-center text-[10px] font-display text-[#1a1a2e]/40 tracking-wider">
-                    {(totalSold / 1e9).toLocaleString()}B / {(totalTokens / 1e9).toLocaleString()}B PWIFE
+                    {fmt(totalSold)} / {fmt(totalTokens)} PWIFE
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { l: t.presale.now,  sig: "0.1", exp: 7, sub: "Stage 1", bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" },
-                    { l: t.presale.next, sig: "0.2", exp: 7, sub: "Stage 2", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" },
-                    { l: t.presale.list, sig: "?",   exp: 0, sub: "TBA",     bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" },
+                    { l: t.presale.now,  v: STAGE_DATA[0].price,  sub: "Stage 1", bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" },
+                    { l: t.presale.next, v: STAGE_DATA[1].price,  sub: "Stage 2", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" },
+                    { l: t.presale.list, v: LISTING_PRICE,         sub: "CEX",     bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" },
                   ].map(p => (
                     <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-2.5 text-center`}>
                       <div className="text-[10px] font-display tracking-wider text-[#1a1a2e]/50">{p.l}</div>
-                      <div className={`text-base font-display ${p.tc} tracking-wider font-bold`}>
-                        {p.sig !== "?" ? (
-                          <>{p.sig}<sub style={{ fontSize: "0.65em", verticalAlign: "sub" }}>{p.exp}</sub>$</>
-                        ) : "TBA"}
-                      </div>
+                      <div className={`text-[11px] font-display ${p.tc} tracking-wider font-bold break-all`}>{p.v}</div>
                       <div className="text-[9px] font-display text-[#1a1a2e]/40 tracking-wide">{p.sub}</div>
                     </div>
                   ))}
