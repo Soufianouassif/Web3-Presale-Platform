@@ -1,0 +1,6 @@
+{
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm run typecheck:libs && pnpm --filter @workspace/pepewife run build",
+  "outputDirectory": "artifacts/pepewife/dist/public",
+  "framework": null
+}

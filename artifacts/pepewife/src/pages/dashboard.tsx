@@ -36,11 +36,12 @@ export default function Dashboard() {
 
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
-  const presaleStages = [
-    { stage: 1, name: t.dashboard.earlyBird, price: "$0.0000", tokens: "0", sold: 0, total: "$0", status: "upcoming" as const, color: "#4CAF50", shadow: "#2E7D32", emoji: "🔒" },
-    { stage: 2, name: t.dashboard.community, price: "$0.0000", tokens: "0", sold: 0, total: "$0", status: "upcoming" as const, color: "#FF4D9D", shadow: "#C2185B", emoji: "🔒" },
-    { stage: 3, name: t.dashboard.growth, price: "$0.0000", tokens: "0", sold: 0, total: "$0", status: "upcoming" as const, color: "#42A5F5", shadow: "#1565C0", emoji: "🔒" },
-    { stage: 4, name: t.dashboard.final, price: "$0.0000", tokens: "0", sold: 0, total: "$0", status: "upcoming" as const, color: "#AB47BC", shadow: "#7B1FA2", emoji: "🔒" },
+  type StageStatus = "active" | "sold-out" | "upcoming";
+  const presaleStages: Array<{ stage: number; name: string; price: string; tokens: string; sold: number; total: string; status: StageStatus; color: string; shadow: string; emoji: string }> = [
+    { stage: 1, name: t.dashboard.earlyBird, price: "$0.0000", tokens: "0", sold: 0, total: "$0", status: "upcoming", color: "#4CAF50", shadow: "#2E7D32", emoji: "🔒" },
+    { stage: 2, name: t.dashboard.community, price: "$0.0000", tokens: "0", sold: 0, total: "$0", status: "upcoming", color: "#FF4D9D", shadow: "#C2185B", emoji: "🔒" },
+    { stage: 3, name: t.dashboard.growth, price: "$0.0000", tokens: "0", sold: 0, total: "$0", status: "upcoming", color: "#42A5F5", shadow: "#1565C0", emoji: "🔒" },
+    { stage: 4, name: t.dashboard.final, price: "$0.0000", tokens: "0", sold: 0, total: "$0", status: "upcoming", color: "#AB47BC", shadow: "#7B1FA2", emoji: "🔒" },
   ];
 
   const calculatedTokens = 0;

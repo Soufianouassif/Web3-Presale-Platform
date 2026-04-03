@@ -1,5 +1,5 @@
 const en = {
-  dir: "ltr" as const,
+  dir: "ltr" as "ltr" | "rtl",
   lang: "en",
   label: "English",
   flag: "🇺🇸",
