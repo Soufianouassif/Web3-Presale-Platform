@@ -15,7 +15,6 @@ import {
   fetchBuyerState,
   fetchBuyerTransactions,
   stageTokenPriceUsd,
-  formatStagePriceUsd,
   type PresaleState,
   type BuyerState,
   type BuyerTx,
@@ -184,16 +183,15 @@ export default function Dashboard() {
     );
   };
 
+  // ⚠️ Prices are ALWAYS static — on-chain tokensPerRawUsdtScaled uses a
+  // different internal scale than expected; we use the confirmed values here.
   const STAGE_PRICES_FALLBACK = ["$0.00000001", "$0.00000002", "$0.00000004", "$0.00000006"];
   const STAGE_COLORS = ["#4CAF50", "#FF4D9D", "#FFD54F", "#42A5F5"];
   const STAGE_DATA = STAGE_PRICES_FALLBACK.map((fallbackPrice, i) => {
     const cs = presaleData?.stages[i];
-    const price  = cs?.tokensPerRawUsdtScaled
-      ? formatStagePriceUsd(cs.tokensPerRawUsdtScaled, fallbackPrice)
-      : fallbackPrice;
     const tokens = cs ? Number(cs.maxTokens)  : 5_000_000_000_000;
     const sold   = cs ? Number(cs.tokensSold) : (i === 0 ? 15_000_000_000 : 0);
-    return { stage: i + 1, price, tokens, sold, color: STAGE_COLORS[i] };
+    return { stage: i + 1, price: fallbackPrice, tokens, sold, color: STAGE_COLORS[i] };
   });
   const LISTING_PRICE = "$0.061327";
   const currentStage = presaleData ? presaleData.currentStage : 0;
