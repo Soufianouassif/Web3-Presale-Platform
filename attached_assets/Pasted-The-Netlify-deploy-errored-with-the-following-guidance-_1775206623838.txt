@@ -1,0 +1,100 @@
+The Netlify deploy errored, with the following guidance provided:
+
+- Relevant log lines
+  - [line 68](#L68): "failed to load config from /opt/build/repo/artifacts/mockup-sandbox/vite.config.ts"
+  - [line 70](#L70): "Error: PORT environment variable is required but was not provided."
+  - [line 71](#L71): stack shows the error originates from artifacts/mockup-sandbox/vite.config.ts
+
+- Error type and cause
+  - Type: Build-time configuration error (missing required environment variable).
+  - Cause: The Vite config (artifacts/mockup-sandbox/vite.config.ts) throws if process.env.PORT is not set. During Netlify build there is no PORT environment variable provided, so vite fails to load the config and the build aborts.
+
+- Solutions (pick one)
+
+  1) Set PORT in Netlify environment variables (recommended, no code change)
+     - In the Netlify UI go to Site settings → Build & deploy → Environment → Environment variables, add:
+       - Key: PORT
+       - Value: 5173
+     - Or prefix your build command (in Site settings → Build & deploy → Build settings → Edit build command) with the variable:
+       - Example build command:
+```bash
+PORT=5173 pnpm --filter @workspace/mockup-sandbox... run build
+```
+     - This ensures process.env.PORT is defined during the Vite config load.
+
+  2) Make the Vite config tolerate a missing PORT (code change)
+     - Open artifacts/mockup-sandbox/vite.config.ts in the repo (example file: https://github.com/Soufianouassif/Web3-Presale-Platform/blob/main/artifacts/mockup-sandbox/vite.config.ts).
+     - Replace the code that requires PORT with a safe default, for example:
+```ts
+// typescript
+const port = process.env.PORT ? Number(process.env.PORT) : 5173;
+// use `port` wherever your config expects it
+```
+     - Commit and push the change so Netlify will use the updated config during build.
+
+Notes
+- Prefer solution 1 if you want to avoid changing source code; prefer solution 2 if PORT semantics are part of your app and you want a sensible default.
+- The error originates from artifacts/mockup-sandbox/vite.config.ts, so any fix must ensure that file either reads a default or receives PORT from the build environment.
+
+The relevant error logs are:
+
+Line 0: build-image version: 37c27078fd36bc14c3fa8836175bd77aa6640872 (noble-new-builds)
+Line 1: buildbot version: ee2c327a2718c921510fd736205acbb9fe49aa61
+Line 2: Fetching cached dependencies
+Line 3: Failed to fetch cache, continuing with build
+Line 4: Starting to prepare the repo for build
+Line 5: No cached dependencies found. Cloning fresh repo
+Line 6: git clone --filter=blob:none https://github.com/Soufianouassif/Web3-Presale-Platform
+Line 7: Preparing Git Reference refs/heads/main
+Line 8: Installing dependencies
+Line 9: mise [36m~/.config/mise/config.toml[0m tools: [34mpython[0m@3.14.3
+Line 10: mise [36m~/.config/mise/config.toml[0m tools: [34mruby[0m@3.4.8
+Line 11: mise [36m~/.config/mise/config.toml[0m tools: [34mgo[0m@1.26.1
+Line 12: v22.22.2 is already installed.
+Line 13: Now using node v22.22.2 (npm v10.9.7)
+Line 58: [36m[1m​[22m[39m
+Line 59: [36m[1m❯ Context[22m[39m
+Line 60:   production
+Line 61: [96m[1m​[22m[39m
+Line 62: [96m[1mBuild command from Netlify app                                [22m[39m
+Line 63: [96m[1m────────────────────────────────────────────────────────────────[22m[39m
+Line 64: ​
+Line 65: [36m$ pnpm --filter @workspace/mockup-sandbox... run build[39m
+Line 66: > @workspace/mockup-sandbox@2.0.0 build /opt/build/repo/artifacts/mockup-sandbox
+Line 67: > vite build
+Line 68: [31mfailed to load config from /opt/build/repo/artifacts/mockup-sandbox/vite.config.ts[39m
+Line 69: [31merror during build:
+Line 70: Error: PORT environment variable is required but was not provided.
+Line 71:     at file:///opt/build/repo/artifacts/mockup-sandbox/node_modules/.vite-temp/vite.config.ts.timestamp-1775206459537-734114bd07
+Line 72:     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+Line 73:     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:665:26)
+Line 74:     at async loadConfigFromBundledFile (file:///opt/build/repo/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_light
+Line 75:     at async bundleAndLoadConfigFile (file:///opt/build/repo/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightni
+Line 76:     at async loadConfigFromFile (file:///opt/build/repo/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss
+Line 77:     at async resolveConfig (file:///opt/build/repo/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31
+Line 78:     at async createBuilder (file:///opt/build/repo/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.31
+Line 79:     at async CAC.<anonymous> (file:///opt/build/repo/node_modules/.pnpm/vite@7.3.1_@types+node@25.3.5_jiti@2.6.1_lightningcss@1.
+Line 80: /opt/build/repo/artifacts/mockup-sandbox:
+Line 81: [41m[30m ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL [39m[49m [31m@workspace/mockup-sandbox@2.0.0 build: `vite build`[39m
+Line 82: [31mExit status 1[39m
+Line 83: [91m[1m​[22m[39m
+Line 84: [91m[1m"build.command" failed                                        [22m[39m
+Line 85: [91m[1m────────────────────────────────────────────────────────────────[22m[39m
+Line 86: ​
+Line 87:   [31m[1mError message[22m[39m
+Line 88:   Command failed with exit code 1: pnpm --filter @workspace/mockup-sandbox... run build
+Line 89: ​
+Line 90:   [31m[1mError location[22m[39m
+Line 91:   In Build command from Netlify app:
+Line 92:   pnpm --filter @workspace/mockup-sandbox... run build
+Line 93: ​
+Line 94:   [31m[1mResolved config[22m[39m
+Line 95:   build:
+Line 96:     command: pnpm --filter @workspace/mockup-sandbox... run build
+Line 97:     commandOrigin: ui
+Line 98:     publish: /opt/build/repo/artifacts/mockup-sandbox/dist
+Line 99:     publishOrigin: ui
+Line 100: Build failed due to a user error: Build script returned non-zero exit code: 2
+Line 101: Failed during stage 'building site': Build script returned non-zero exit code: 2
+Line 102: Failing build: Failed to build site
+Line 103: Finished processing build request in 15.339s
