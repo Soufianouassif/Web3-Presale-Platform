@@ -35,9 +35,13 @@ export default function Home() {
   const [txSignature, setTxSignature]   = useState<string | null>(null);
   const [txError,     setTxError]       = useState<string | null>(null);
 
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [walletConnecting, setWalletConnecting] = useState<string | null>(null);
+  const [walletModalError, setWalletModalError] = useState<string | null>(null);
+
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
-  const { status, shortAddress, address } = useWallet();
+  const { status, shortAddress, address, connect, installedWallets } = useWallet();
 
   useEffect(() => {
     fetchPresaleState().then(d => {
@@ -171,15 +175,19 @@ export default function Home() {
   const scrollTo = (id: string) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setIsMenuOpen(false); };
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
-  const handleApeIn = async () => {
-    setTxError(null);
-    setTxSignature(null);
+  // After wallet connects successfully, execute the pending purchase
+  const [pendingBuy, setPendingBuy] = useState(false);
 
-    if (status !== "connected" || !address) {
-      navigate("/connect");
-      return;
+  useEffect(() => {
+    if (pendingBuy && status === "connected" && address) {
+      setPendingBuy(false);
+      setShowWalletModal(false);
+      executeBuy(address);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingBuy, status, address]);
 
+  const executeBuy = async (buyerAddress: string) => {
     if (!amount || !!amountError) return;
     const amountNum2 = parseFloat(amount);
     if (isNaN(amountNum2) || amountNum2 <= 0) return;
@@ -190,31 +198,72 @@ export default function Home() {
     }
 
     setTxLoading(true);
+    setTxError(null);
+    setTxSignature(null);
     try {
       if (currency === "SOL") {
-        const treasury = presaleData?.treasury ?? "9KrLVaHMoGRNM6vn8kS5S69NMvHFq7i8ksVMCnNiNiYq";
-        const result = await buyWithSol(address, amountNum2, treasury);
+        const treasury = presaleData?.treasury ?? "";
+        if (!treasury) throw new Error("Presale not initialized. Try again.");
+        const result = await buyWithSol(buyerAddress, amountNum2, treasury);
         setTxSignature(result.signature);
         setAmount("");
         fetchPresaleState().then(d => { if (d) setPresaleData(d); });
       } else if (currency === "USDT_SPL") {
         const usdtAta = presaleData?.usdtTreasuryAta ?? "";
         if (!usdtAta) throw new Error("USDT treasury not configured on-chain yet.");
-        const result = await buyWithUsdt(address, amountNum2, usdtAta);
+        const result = await buyWithUsdt(buyerAddress, amountNum2, usdtAta);
         setTxSignature(result.signature);
         setAmount("");
         fetchPresaleState().then(d => { if (d) setPresaleData(d); });
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes("User rejected") || msg.includes("Transaction cancelled")) {
-        setTxError("Transaction cancelled.");
+      if (
+        msg.toLowerCase().includes("rejected") ||
+        msg.toLowerCase().includes("cancelled") ||
+        msg.toLowerCase().includes("user denied")
+      ) {
+        setTxError("Transaction cancelled by user.");
       } else {
-        setTxError(msg.slice(0, 120));
+        setTxError(msg.slice(0, 140));
       }
     } finally {
       setTxLoading(false);
     }
+  };
+
+  const handleApeIn = () => {
+    setTxError(null);
+    setTxSignature(null);
+
+    if (currency === "USDT_ETH") {
+      setShowEthModal(true);
+      return;
+    }
+
+    if (!amount || !!amountError) return;
+
+    if (status !== "connected" || !address) {
+      // Show inline wallet modal — do NOT navigate away
+      setWalletModalError(null);
+      setShowWalletModal(true);
+      setPendingBuy(true);
+      return;
+    }
+
+    executeBuy(address);
+  };
+
+  const handleWalletModalConnect = async (walletId: "phantom" | "solflare") => {
+    setWalletModalError(null);
+    setWalletConnecting(walletId);
+    const ok = await connect(walletId);
+    setWalletConnecting(null);
+    if (!ok) {
+      setPendingBuy(false);
+      setWalletModalError("Connection failed. Try again.");
+    }
+    // success: the useEffect above will pick it up and call executeBuy
   };
 
   const navLinks = [
@@ -915,6 +964,82 @@ export default function Home() {
           {t.footer.copyright}
         </div>
       </footer>
+
+      {/* ── Wallet Connect Modal ──────────────────────────────────── */}
+      {showWalletModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}>
+          <div className="bg-white rounded-2xl border-4 border-[#1a1a2e] shadow-[8px_8px_0px_#1a1a2e] w-full max-w-xs" style={{ direction: dir }}>
+            {/* Header */}
+            <div className="bg-[#1a1a2e] rounded-t-xl px-5 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Wallet className="text-[#4CAF50]" size={18} />
+                <span className="font-display text-white text-base tracking-wide">Connect Wallet to Buy</span>
+              </div>
+              <button onClick={() => { setShowWalletModal(false); setPendingBuy(false); }} className="text-white/60 hover:text-white transition-colors">
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-5 space-y-3">
+              <p className="text-xs font-bold text-[#1a1a2e]/50 text-center">
+                Connect your Solana wallet to continue with your purchase
+              </p>
+
+              {/* Phantom */}
+              <button
+                onClick={() => handleWalletModalConnect("phantom")}
+                disabled={!!walletConnecting}
+                className="w-full flex items-center gap-3 rounded-xl border-2 border-[#AB47BC] bg-[#F3E5F5] hover:bg-[#E8D5EE] px-4 py-3 transition-all disabled:opacity-50"
+              >
+                <img src="/wallet-phantom.png" alt="Phantom" className="w-8 h-8 rounded-lg" />
+                <div className="text-start flex-1">
+                  <p className="font-display text-[#AB47BC] tracking-wide text-sm">Phantom</p>
+                  <p className="text-[10px] text-[#1a1a2e]/40 font-bold">
+                    {installedWallets.phantom ? "Installed ✓" : "Not detected"}
+                  </p>
+                </div>
+                {walletConnecting === "phantom"
+                  ? <Loader2 className="h-4 w-4 animate-spin text-[#AB47BC]" />
+                  : <ChevronRight className="h-4 w-4 text-[#AB47BC]" />
+                }
+              </button>
+
+              {/* Solflare */}
+              <button
+                onClick={() => handleWalletModalConnect("solflare")}
+                disabled={!!walletConnecting}
+                className="w-full flex items-center gap-3 rounded-xl border-2 border-[#FC6E21] bg-[#FFF3E0] hover:bg-[#FDEBD0] px-4 py-3 transition-all disabled:opacity-50"
+              >
+                <img src="/wallet-solflare.svg" alt="Solflare" className="w-8 h-8 rounded-lg" />
+                <div className="text-start flex-1">
+                  <p className="font-display text-[#FC6E21] tracking-wide text-sm">Solflare</p>
+                  <p className="text-[10px] text-[#1a1a2e]/40 font-bold">
+                    {installedWallets.solflare ? "Installed ✓" : "Not detected"}
+                  </p>
+                </div>
+                {walletConnecting === "solflare"
+                  ? <Loader2 className="h-4 w-4 animate-spin text-[#FC6E21]" />
+                  : <ChevronRight className="h-4 w-4 text-[#FC6E21]" />
+                }
+              </button>
+
+              {walletModalError && (
+                <div className="bg-[#FCE4EC] border border-[#FF4D9D] rounded-xl px-3 py-2 text-xs font-bold text-[#c81b6c] text-center">
+                  {walletModalError}
+                </div>
+              )}
+
+              <button
+                onClick={() => navigate("/connect")}
+                className="w-full text-center text-[10px] text-[#1a1a2e]/30 font-bold hover:text-[#1a1a2e]/60 transition-colors pt-1"
+              >
+                More wallets →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showEthModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
