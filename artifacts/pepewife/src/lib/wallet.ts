@@ -124,16 +124,38 @@ export async function connectSolanaWallet(walletType: WalletType = "phantom"): P
   }
   try {
     const response = await provider.connect();
-    // Solflare newer versions return undefined from connect(); publicKey lives on provider directly
-    const pk = response?.publicKey ?? provider.publicKey;
-    if (!pk) throw new Error("CONNECTION_FAILED");
+
+    console.log(`[Wallet:${walletType}] connect() response:`, response);
+    console.log(`[Wallet:${walletType}] provider.publicKey after connect:`, provider.publicKey);
+
+    // Solflare newer versions return undefined from connect(); publicKey lives on provider directly.
+    // It may also be set asynchronously — wait up to 600 ms with retries.
+    let pk = response?.publicKey ?? provider.publicKey;
+    if (!pk && walletType === "solflare") {
+      for (let i = 0; i < 6; i++) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        pk = provider.publicKey;
+        console.log(`[Wallet:solflare] retry ${i + 1} publicKey:`, pk);
+        if (pk) break;
+      }
+    }
+
+    if (!pk) {
+      console.error(`[Wallet:${walletType}] publicKey is still null after connect`);
+      throw new Error("CONNECTION_FAILED");
+    }
+
     const address = pk.toString();
+    console.log(`[Wallet:${walletType}] resolved address:`, address);
+
     if (!address || !isValidSolAddress(address)) {
+      console.error(`[Wallet:${walletType}] invalid address format:`, address);
       throw new Error("INVALID_ADDRESS");
     }
     return address;
   } catch (err: unknown) {
     const error = err as { code?: number; message?: string };
+    console.error(`[Wallet:${walletType}] connection error:`, error);
     if (error.message?.includes("NOT_INSTALLED")) throw err as Error;
     if (error.message === "CONNECTION_FAILED" || error.message === "INVALID_ADDRESS") throw err as Error;
     if (
