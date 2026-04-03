@@ -1,9 +1,16 @@
+import { createRequire } from "node:module";
 import express, { type Express } from "express";
 import cors from "cors";
-import pinoHttp from "pino-http";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type pinoHttpType from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
+
+const require = createRequire(import.meta.url);
+// pino-http uses `export =` which is incompatible with ESM default imports
+// under moduleResolution:bundler — load via createRequire and cast to the
+// correct callable type (esModuleInterop gives us the typed default).
+const pinoHttp = require("pino-http") as typeof pinoHttpType;
 
 const app: Express = express();
 
