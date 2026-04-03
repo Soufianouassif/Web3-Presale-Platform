@@ -19,6 +19,18 @@ export default function Home() {
   const [showEthModal, setShowEthModal] = useState(false);
   const [copiedEth, setCopiedEth] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [solPrice, setSolPrice] = useState<number>(150);
+
+  const { t, dir } = useLanguage();
+  const isRTL = dir === "rtl";
+  const { status, shortAddress } = useWallet();
+
+  useEffect(() => {
+    fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd")
+      .then(r => r.json())
+      .then(d => { if (d?.solana?.usd) setSolPrice(d.solana.usd); })
+      .catch(() => {});
+  }, []);
 
   const LIMITS: Record<string, { min: number; max: number }> = {
     SOL:      { min: 1,    max: 50 },
@@ -28,9 +40,6 @@ export default function Home() {
 
   const currSym = currency === "SOL" ? "SOL" : "USDT";
   const lim = LIMITS[currency];
-
-  const limitHint = (tpl: string) =>
-    tpl.replace("{0}", lim.min.toString()).replace("{1}", lim.max.toLocaleString()).replace("{2}", currSym);
 
   const errMsg = (tpl: string, val: number) =>
     tpl.replace("{0}", val.toString()).replace("{1}", currSym);
@@ -60,9 +69,6 @@ export default function Home() {
       setTimeout(() => setCopiedEth(false), 2000);
     });
   };
-  const { t, dir } = useLanguage();
-  const isRTL = dir === "rtl";
-  const { status, shortAddress } = useWallet();
   const isConnected = status === "connected";
   const walletAddress = shortAddress || "7xKp...4mNr";
   const fmt = (n: number) => {
@@ -97,6 +103,12 @@ export default function Home() {
   const totalSold = STAGE_DATA.reduce((a, s) => a + s.sold, 0);
   const totalTokens = STAGE_DATA.reduce((a, s) => a + s.tokens, 0);
   const presaleFilled = Math.round((totalSold / totalTokens) * 100);
+
+  const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace("$", ""));
+  const amountUSD = !isNaN(amountNum) && amount !== ""
+    ? currency === "SOL" ? amountNum * solPrice : amountNum
+    : 0;
+  const tokensOut = stagePrice > 0 && amountUSD > 0 ? Math.floor(amountUSD / stagePrice) : 0;
 
   const tokenomicsData = [
     { name: t.tokenomics.community, value: 40, color: "#4CAF50" },
@@ -421,9 +433,23 @@ export default function Home() {
                     </p>
                   )}
 
-                  <div className="bg-[#E8F5E9] border-2 border-[#4CAF50]/30 rounded-xl px-3 py-2.5 flex justify-between items-center">
-                    <span className="text-xs text-[#1a1a2e]/50 font-bold">{t.presale.youGet}</span>
-                    <span className="font-display text-[#4CAF50] text-lg tracking-wider">~ 0 PWIFE</span>
+                  <div className={`border-2 rounded-xl px-3 py-2.5 transition-colors ${tokensOut > 0 ? "bg-[#E8F5E9] border-[#4CAF50]/50" : "bg-gray-50 border-gray-200"}`}>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-[#1a1a2e]/50 font-bold">{t.presale.youGet}</span>
+                      <span className={`font-display text-lg tracking-wider ${tokensOut > 0 ? "text-[#4CAF50]" : "text-gray-300"}`}>
+                        ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} PWIFE
+                      </span>
+                    </div>
+                    {tokensOut > 0 && currency === "SOL" && (
+                      <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
+                        1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
+                      </p>
+                    )}
+                    {tokensOut > 0 && currency !== "SOL" && (
+                      <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
+                        Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
+                      </p>
+                    )}
                   </div>
                   <button
                     onClick={handleConnect}
