@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 // PORT and BASE_PATH are only required for the dev/preview server.
 // During production builds (e.g. Vercel) they are not needed.
@@ -14,6 +15,7 @@ const basePath = process.env.BASE_PATH ?? "/";
 export default defineConfig({
   base: basePath,
   plugins: [
+    nodePolyfills({ globals: { Buffer: true, process: true, global: true } }),
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Menu, X, Twitter, Send, Wallet, ArrowRight, Copy, Check, ChevronRight, ShieldCheck } from "lucide-react";
+import { Menu, X, Twitter, Send, Wallet, ArrowRight, Copy, Check, ChevronRight, ShieldCheck, Loader2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,12 @@ import { useWallet } from "@/contexts/wallet-context";
 import LanguageSwitcher from "@/components/language-switcher";
 import TwitterFeed from "@/components/twitter-feed";
 import SEOHead from "@/components/seo-head";
+import {
+  buyWithSol,
+  buyWithUsdt,
+  fetchPresaleState,
+  type PresaleState,
+} from "@/lib/presale-contract";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,9 +30,20 @@ export default function Home() {
   const [pricesUpdatedAt, setPricesUpdatedAt] = useState<Date | null>(null);
   const [pricesLoading, setPricesLoading] = useState(false);
 
+  const [presaleData, setPresaleData]   = useState<PresaleState | null>(null);
+  const [txLoading,   setTxLoading]     = useState(false);
+  const [txSignature, setTxSignature]   = useState<string | null>(null);
+  const [txError,     setTxError]       = useState<string | null>(null);
+
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
-  const { status, shortAddress } = useWallet();
+  const { status, shortAddress, address } = useWallet();
+
+  useEffect(() => {
+    fetchPresaleState().then(d => {
+      if (d) setPresaleData(d);
+    });
+  }, []);
 
   useEffect(() => {
     const fetchPrices = () => {
@@ -106,14 +123,17 @@ export default function Home() {
     );
   };
 
-  const STAGE_DATA = [
-    { stage: 1, price: "$0.00000001", tokens: 5_000_000_000_000, sold: 15_000_000_000, color: "#4CAF50" },
-    { stage: 2, price: "$0.00000002", tokens: 5_000_000_000_000, sold: 0, color: "#FF4D9D" },
-    { stage: 3, price: "$0.00000004", tokens: 5_000_000_000_000, sold: 0, color: "#FFD54F" },
-    { stage: 4, price: "$0.00000006", tokens: 5_000_000_000_000, sold: 0, color: "#42A5F5" },
-  ];
+  const STAGE_PRICES_STATIC = ["$0.00000001", "$0.00000002", "$0.00000004", "$0.00000006"];
+  const STAGE_COLORS = ["#4CAF50", "#FF4D9D", "#FFD54F", "#42A5F5"];
+  const STAGE_DATA = STAGE_PRICES_STATIC.map((price, i) => ({
+    stage: i + 1,
+    price,
+    tokens: 5_000_000_000_000,
+    sold: presaleData ? Number(presaleData.stages[i].tokensSold) : (i === 0 ? 15_000_000_000 : 0),
+    color: STAGE_COLORS[i],
+  }));
   const LISTING_PRICE = "$0.061327";
-  const currentStage = 0;
+  const currentStage = presaleData ? presaleData.currentStage : 0;
   const totalSold = STAGE_DATA.reduce((a, s) => a + s.sold, 0);
   const totalTokens = STAGE_DATA.reduce((a, s) => a + s.tokens, 0);
   const presaleFilled = Math.round((totalSold / totalTokens) * 100);
@@ -150,6 +170,52 @@ export default function Home() {
   const handleConnect = () => { navigate("/connect"); };
   const scrollTo = (id: string) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setIsMenuOpen(false); };
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
+
+  const handleApeIn = async () => {
+    setTxError(null);
+    setTxSignature(null);
+
+    if (status !== "connected" || !address) {
+      navigate("/connect");
+      return;
+    }
+
+    if (!amount || !!amountError) return;
+    const amountNum2 = parseFloat(amount);
+    if (isNaN(amountNum2) || amountNum2 <= 0) return;
+
+    if (currency === "USDT_ETH") {
+      setShowEthModal(true);
+      return;
+    }
+
+    setTxLoading(true);
+    try {
+      if (currency === "SOL") {
+        const treasury = presaleData?.treasury ?? "9KrLVaHMoGRNM6vn8kS5S69NMvHFq7i8ksVMCnNiNiYq";
+        const result = await buyWithSol(address, amountNum2, treasury);
+        setTxSignature(result.signature);
+        setAmount("");
+        fetchPresaleState().then(d => { if (d) setPresaleData(d); });
+      } else if (currency === "USDT_SPL") {
+        const usdtAta = presaleData?.usdtTreasuryAta ?? "";
+        if (!usdtAta) throw new Error("USDT treasury not configured on-chain yet.");
+        const result = await buyWithUsdt(address, amountNum2, usdtAta);
+        setTxSignature(result.signature);
+        setAmount("");
+        fetchPresaleState().then(d => { if (d) setPresaleData(d); });
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("User rejected") || msg.includes("Transaction cancelled")) {
+        setTxError("Transaction cancelled.");
+      } else {
+        setTxError(msg.slice(0, 120));
+      }
+    } finally {
+      setTxLoading(false);
+    }
+  };
 
   const navLinks = [
     { id: "presale", label: t.nav.presale, icon: "🛒" },
@@ -504,13 +570,42 @@ export default function Home() {
                     )}
                   </div>
                   <button
-                    onClick={handleConnect}
-                    disabled={!!amountError || amount === ""}
-                    className="btn-meme w-full h-14 text-2xl rounded-xl font-display tracking-wider text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+                    onClick={handleApeIn}
+                    disabled={!!amountError || amount === "" || txLoading}
+                    className="btn-meme w-full h-14 text-2xl rounded-xl font-display tracking-wider text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity flex items-center justify-center gap-2"
                     style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)" }}
                   >
-                    {t.presale.apeIn}
+                    {txLoading
+                      ? <><Loader2 className="h-5 w-5 animate-spin" /> Signing…</>
+                      : status === "connected"
+                        ? t.presale.apeIn
+                        : t.presale.apeIn
+                    }
                   </button>
+
+                  {txSignature && (
+                    <div className="bg-[#E8F5E9] border-2 border-[#4CAF50] rounded-xl p-3 flex items-start gap-2">
+                      <Check className="h-4 w-4 text-[#4CAF50] shrink-0 mt-0.5" />
+                      <div className="min-w-0">
+                        <p className="text-xs font-display text-[#1a4a1e] tracking-wide font-bold">Transaction confirmed! 🎉</p>
+                        <a
+                          href={`https://explorer.solana.com/tx/${txSignature}?cluster=devnet`}
+                          target="_blank" rel="noreferrer"
+                          className="text-[10px] text-[#4CAF50] underline break-all flex items-center gap-1 mt-0.5"
+                        >
+                          {txSignature.slice(0, 20)}…{txSignature.slice(-8)}
+                          <ExternalLink className="h-3 w-3 shrink-0" />
+                        </a>
+                      </div>
+                    </div>
+                  )}
+
+                  {txError && (
+                    <div className="bg-[#FCE4EC] border-2 border-[#FF4D9D] rounded-xl p-3 flex items-start gap-2">
+                      <X className="h-4 w-4 text-[#FF4D9D] shrink-0 mt-0.5" />
+                      <p className="text-xs font-display text-[#4a1a2e] tracking-wide font-bold">{txError}</p>
+                    </div>
+                  )}
                 </div>
                 <p className="text-center text-xs text-[#1a1a2e]/40 font-bold">{t.presale.disclaimer}</p>
               </div>
