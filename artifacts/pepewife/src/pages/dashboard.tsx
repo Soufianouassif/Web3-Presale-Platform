@@ -10,6 +10,7 @@ import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
 import { useWallet } from "@/contexts/wallet-context";
 import { useToast } from "@/components/wallet-toast";
+import WalletBuyModal from "@/components/wallet-buy-modal";
 
 export default function Dashboard() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,6 +19,8 @@ export default function Dashboard() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [currency, setCurrency] = useState<"SOL" | "USDT">("SOL");
   const [buyAmount, setBuyAmount] = useState("");
+  const [showBuyModal, setShowBuyModal] = useState(false);
+  const [dashTxSig, setDashTxSig] = useState<string | null>(null);
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
   const { status, shortAddress, address, network, disconnect } = useWallet();
@@ -264,8 +267,28 @@ export default function Dashboard() {
                             <span className="text-xs text-[#1a1a2e]/50 font-bold">{t.presale.youGet}</span>
                             <span className="font-display text-[#4CAF50] text-lg tracking-wider">~ {calculatedTokens.toLocaleString()} PWIFE</span>
                           </div>
-                          <button className="btn-meme w-full h-13 text-xl rounded-xl font-display tracking-wider text-white" style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)", animation: "pulse-glow 2s infinite" }}>
-                            {t.dashboard.buyNow}
+                          {dashTxSig && (
+                            <div className="bg-[#E8F5E9] border-2 border-[#4CAF50] rounded-xl p-3 flex items-start gap-2">
+                              <Check className="h-4 w-4 text-[#4CAF50] shrink-0 mt-0.5" />
+                              <div className="min-w-0">
+                                <p className="text-xs font-display text-[#1a4a1e] tracking-wide font-bold">Purchase confirmed! 🎉</p>
+                                <a href={`https://explorer.solana.com/tx/${dashTxSig}?cluster=devnet`} target="_blank" rel="noreferrer" className="text-[10px] text-[#4CAF50] underline break-all flex items-center gap-1 mt-0.5">
+                                  {dashTxSig.slice(0, 16)}…<ExternalLink className="h-3 w-3 shrink-0" />
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                          <button
+                            onClick={() => {
+                              const num = parseFloat(buyAmount);
+                              if (!buyAmount || isNaN(num) || num <= 0) return;
+                              setShowBuyModal(true);
+                            }}
+                            disabled={!buyAmount || isNaN(parseFloat(buyAmount)) || parseFloat(buyAmount) <= 0}
+                            className="btn-meme w-full h-13 text-xl rounded-xl font-display tracking-wider text-white disabled:opacity-40 disabled:cursor-not-allowed"
+                            style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)", animation: "pulse-glow 2s infinite" }}
+                          >
+                            {t.dashboard.buyNow} 🚀
                           </button>
                         </div>
                         <p className="text-center text-xs text-[#1a1a2e]/40 font-bold">{t.presale.disclaimer}</p>
@@ -536,6 +559,21 @@ export default function Dashboard() {
           {t.footer.copyright}
         </div>
       </footer>
+
+      {/* ── Wallet Buy Modal ─────────────────────────────────────────── */}
+      {showBuyModal && (
+        <WalletBuyModal
+          amount={parseFloat(buyAmount)}
+          currency={currency === "USDT" ? "USDT_SPL" : "SOL"}
+          presaleData={null}
+          onClose={() => setShowBuyModal(false)}
+          onSuccess={(sig) => {
+            setDashTxSig(sig);
+            setBuyAmount("");
+            setShowBuyModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Menu, X, Twitter, Send, Wallet, ArrowRight, Copy, Check, ChevronRight, ShieldCheck, Loader2, ExternalLink } from "lucide-react";
+import { Menu, X, Twitter, Send, Wallet, ArrowRight, Copy, Check, ChevronRight, ShieldCheck, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
@@ -10,9 +10,8 @@ import { useWallet } from "@/contexts/wallet-context";
 import LanguageSwitcher from "@/components/language-switcher";
 import TwitterFeed from "@/components/twitter-feed";
 import SEOHead from "@/components/seo-head";
+import WalletBuyModal from "@/components/wallet-buy-modal";
 import {
-  buyWithSol,
-  buyWithUsdt,
   fetchPresaleState,
   type PresaleState,
 } from "@/lib/presale-contract";
@@ -30,14 +29,13 @@ export default function Home() {
   const [pricesUpdatedAt, setPricesUpdatedAt] = useState<Date | null>(null);
   const [pricesLoading, setPricesLoading] = useState(false);
 
-  const [presaleData, setPresaleData]   = useState<PresaleState | null>(null);
-  const [txLoading,   setTxLoading]     = useState(false);
-  const [txSignature, setTxSignature]   = useState<string | null>(null);
-  const [txError,     setTxError]       = useState<string | null>(null);
+  const [presaleData, setPresaleData] = useState<PresaleState | null>(null);
+  const [txSignature, setTxSignature] = useState<string | null>(null);
+  const [showBuyModal, setShowBuyModal] = useState(false);
 
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
-  const { status, shortAddress, address, walletType } = useWallet();
+  const { status, shortAddress } = useWallet();
 
   useEffect(() => {
     fetchPresaleState().then(d => {
@@ -171,81 +169,25 @@ export default function Home() {
   const scrollTo = (id: string) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setIsMenuOpen(false); };
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
-  // ── Core buy executor ─────────────────────────────────────────────
-  const executeBuy = async (buyAmountNum: number, buyCurrency: string, buyerAddress: string, buyerWalletType: string) => {
-    setTxError(null);
-    setTxSignature(null);
-    setTxLoading(true);
-    try {
-      if (buyCurrency === "SOL") {
-        const treasury = presaleData?.treasury ?? "9KrLVaHMoGRNM6vn8kS5S69NMvHFq7i8ksVMCnNiNiYq";
-        const result = await buyWithSol(buyerAddress, buyAmountNum, treasury, buyerWalletType);
-        setTxSignature(result.signature);
-        setAmount("");
-        fetchPresaleState().then(d => { if (d) setPresaleData(d); });
-        setTimeout(() => navigate("/dashboard"), 2000);
-      } else if (buyCurrency === "USDT_SPL") {
-        const usdtAta = presaleData?.usdtTreasuryAta ?? "";
-        if (!usdtAta) throw new Error("USDT treasury not configured on-chain yet.");
-        const result = await buyWithUsdt(buyerAddress, buyAmountNum, usdtAta, buyerWalletType);
-        setTxSignature(result.signature);
-        setAmount("");
-        fetchPresaleState().then(d => { if (d) setPresaleData(d); });
-        setTimeout(() => navigate("/dashboard"), 2000);
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (
-        msg.toLowerCase().includes("rejected") ||
-        msg.toLowerCase().includes("cancelled") ||
-        msg.toLowerCase().includes("user denied")
-      ) {
-        setTxError("Transaction cancelled.");
-      } else {
-        setTxError(msg.slice(0, 120));
-      }
-      // On failure: stay on home page so user sees the error
-    } finally {
-      setTxLoading(false);
-    }
+  // ── Modal buy success ─────────────────────────────────────────────
+  const handleBuySuccess = (sig: string) => {
+    setTxSignature(sig);
+    setAmount("");
+    fetchPresaleState().then(d => { if (d) setPresaleData(d); });
+    setTimeout(() => {
+      setShowBuyModal(false);
+      navigate("/dashboard");
+    }, 2500);
   };
 
-  // ── Auto-execute pending purchase after wallet connection ──────────
-  useEffect(() => {
-    if (status !== "connected" || !address || !walletType) return;
-    const raw = sessionStorage.getItem("pendingPurchase");
-    if (!raw) return;
-    sessionStorage.removeItem("pendingPurchase");
-    try {
-      const { savedAmount, savedCurrency, createdAt } = JSON.parse(raw) as { savedAmount: string; savedCurrency: string; createdAt?: number };
-      // Only execute if the intent is fresh (within last 10 minutes)
-      if (!createdAt || Date.now() - createdAt > 10 * 60 * 1000) return;
-      const num = parseFloat(savedAmount);
-      if (!savedAmount || isNaN(num) || num <= 0) return;
-      if (savedCurrency === "USDT_ETH") { setShowEthModal(true); return; }
-      executeBuy(num, savedCurrency, address, walletType);
-    } catch { /* malformed sessionStorage — ignore */ }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, address, walletType]);
-
-  // ── APE IN handler ─────────────────────────────────────────────────
+  // ── APE IN handler — open the wallet/buy modal ─────────────────────
   const handleApeIn = () => {
-    setTxError(null);
-    setTxSignature(null);
-
     if (currency === "USDT_ETH") { setShowEthModal(true); return; }
     if (!amount || !!amountError) return;
     const amountNum = parseFloat(amount);
     if (isNaN(amountNum) || amountNum <= 0) return;
-
-    // ALWAYS save purchase intent and let user choose / confirm their wallet
-    sessionStorage.setItem("pendingPurchase", JSON.stringify({
-      savedAmount: amount,
-      savedCurrency: currency,
-      createdAt: Date.now(),
-    }));
-    sessionStorage.setItem("postConnectPath", "/");
-    navigate("/connect");
+    setTxSignature(null);
+    setShowBuyModal(true);
   };
 
   const navLinks = [
@@ -602,16 +544,11 @@ export default function Home() {
                   </div>
                   <button
                     onClick={handleApeIn}
-                    disabled={!!amountError || amount === "" || txLoading}
-                    className="btn-meme w-full h-14 text-2xl rounded-xl font-display tracking-wider text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity flex items-center justify-center gap-2"
+                    disabled={!!amountError || amount === ""}
+                    className="btn-meme w-full h-14 text-2xl rounded-xl font-display tracking-wider text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
                     style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)" }}
                   >
-                    {txLoading
-                      ? <><Loader2 className="h-5 w-5 animate-spin" /> Signing…</>
-                      : status === "connected"
-                        ? t.presale.apeIn
-                        : t.presale.apeIn
-                    }
+                    {t.presale.apeIn}
                   </button>
 
                   {txSignature && (
@@ -628,13 +565,6 @@ export default function Home() {
                           <ExternalLink className="h-3 w-3 shrink-0" />
                         </a>
                       </div>
-                    </div>
-                  )}
-
-                  {txError && (
-                    <div className="bg-[#FCE4EC] border-2 border-[#FF4D9D] rounded-xl p-3 flex items-start gap-2">
-                      <X className="h-4 w-4 text-[#FF4D9D] shrink-0 mt-0.5" />
-                      <p className="text-xs font-display text-[#4a1a2e] tracking-wide font-bold">{txError}</p>
                     </div>
                   )}
                 </div>
@@ -1002,6 +932,16 @@ export default function Home() {
         </div>
       )}
 
+      {/* ── Wallet Buy Modal ─────────────────────────────────────────── */}
+      {showBuyModal && currency !== "USDT_ETH" && (
+        <WalletBuyModal
+          amount={parseFloat(amount)}
+          currency={currency as "SOL" | "USDT_SPL"}
+          presaleData={presaleData}
+          onClose={() => setShowBuyModal(false)}
+          onSuccess={handleBuySuccess}
+        />
+      )}
     </div>
   );
 }

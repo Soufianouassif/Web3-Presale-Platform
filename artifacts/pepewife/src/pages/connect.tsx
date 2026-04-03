@@ -103,13 +103,7 @@ export default function ConnectPage() {
 
   const handleConnect = async (walletId: WalletType) => {
     if (status === "connected" && connectedWallet === walletId) {
-      // If coming from a buy intent, continue through the animation to home
-      if (sessionStorage.getItem("pendingPurchase")) {
-        setConnectingId(walletId);
-        navigate("/connecting");
-      } else {
-        navigate("/dashboard");
-      }
+      navigate("/dashboard");
       return;
     }
 
