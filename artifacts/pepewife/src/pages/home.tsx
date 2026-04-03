@@ -217,7 +217,9 @@ export default function Home() {
     if (!raw) return;
     sessionStorage.removeItem("pendingPurchase");
     try {
-      const { savedAmount, savedCurrency } = JSON.parse(raw) as { savedAmount: string; savedCurrency: string };
+      const { savedAmount, savedCurrency, createdAt } = JSON.parse(raw) as { savedAmount: string; savedCurrency: string; createdAt?: number };
+      // Only execute if the intent is fresh (within last 10 minutes)
+      if (!createdAt || Date.now() - createdAt > 10 * 60 * 1000) return;
       const num = parseFloat(savedAmount);
       if (!savedAmount || isNaN(num) || num <= 0) return;
       if (savedCurrency === "USDT_ETH") { setShowEthModal(true); return; }
@@ -236,15 +238,14 @@ export default function Home() {
     const amountNum = parseFloat(amount);
     if (isNaN(amountNum) || amountNum <= 0) return;
 
-    if (status !== "connected" || !address) {
-      // Save purchase intent, then send user to connect their wallet
-      sessionStorage.setItem("pendingPurchase", JSON.stringify({ savedAmount: amount, savedCurrency: currency }));
-      sessionStorage.setItem("postConnectPath", "/");
-      navigate("/connect");
-      return;
-    }
-
-    executeBuy(amountNum, currency, address, walletType ?? "phantom");
+    // ALWAYS save purchase intent and let user choose / confirm their wallet
+    sessionStorage.setItem("pendingPurchase", JSON.stringify({
+      savedAmount: amount,
+      savedCurrency: currency,
+      createdAt: Date.now(),
+    }));
+    sessionStorage.setItem("postConnectPath", "/");
+    navigate("/connect");
   };
 
   const navLinks = [
