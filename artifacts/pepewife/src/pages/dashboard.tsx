@@ -894,7 +894,7 @@ export default function Dashboard() {
                           </div>
                         ) : (
                           <div className="h-11 rounded-xl border-2 border-dashed border-[#1a1a2e]/20 bg-[#FFFDE7] flex items-center px-3 animate-pulse">
-                            <span className="font-display text-xs text-[#1a1a2e]/40 tracking-wider">⏳ جاري إنشاء رابطك…</span>
+                            <span className="font-display text-xs text-[#1a1a2e]/40 tracking-wider">{t.presale.generatingLink}</span>
                           </div>
                         )}
                         {refCopied && <p className="text-xs text-[#4CAF50] font-display tracking-wide mt-1">{t.presale.copied}</p>}
@@ -970,7 +970,7 @@ export default function Dashboard() {
                   {/* Recent referrals */}
                   {refStats && refStats.recentReferrals.length > 0 && (
                     <div className="meme-card bg-white rounded-2xl p-5">
-                      <h4 className="font-display text-lg text-[#1a1a2e] mb-3 tracking-wider">🕐 آخر الإحالات</h4>
+                      <h4 className="font-display text-lg text-[#1a1a2e] mb-3 tracking-wider">{t.presale.recentReferrals}</h4>
                       <div className="space-y-2">
                         {refStats.recentReferrals.map((r, i) => (
                           <div key={`recent-${i}`} className="flex items-center gap-2 rounded-xl px-3 py-2 border-2 bg-[#FFFDE7] border-[#FFD54F]/50">
