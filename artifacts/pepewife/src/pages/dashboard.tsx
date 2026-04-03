@@ -14,6 +14,8 @@ import {
   fetchPresaleState,
   fetchBuyerState,
   fetchBuyerTransactions,
+  stageTokenPriceUsd,
+  formatStagePriceUsd,
   type PresaleState,
   type BuyerState,
   type BuyerTx,
@@ -182,15 +184,17 @@ export default function Dashboard() {
     );
   };
 
-  const STAGE_PRICES_STATIC = ["$0.00000001", "$0.00000002", "$0.00000004", "$0.00000006"];
+  const STAGE_PRICES_FALLBACK = ["$0.00000001", "$0.00000002", "$0.00000004", "$0.00000006"];
   const STAGE_COLORS = ["#4CAF50", "#FF4D9D", "#FFD54F", "#42A5F5"];
-  const STAGE_DATA = STAGE_PRICES_STATIC.map((price, i) => ({
-    stage: i + 1,
-    price,
-    tokens: 5_000_000_000_000,
-    sold: presaleData ? Number(presaleData.stages[i].tokensSold) : (i === 0 ? 15_000_000_000 : 0),
-    color: STAGE_COLORS[i],
-  }));
+  const STAGE_DATA = STAGE_PRICES_FALLBACK.map((fallbackPrice, i) => {
+    const cs = presaleData?.stages[i];
+    const price  = cs?.tokensPerRawUsdtScaled
+      ? formatStagePriceUsd(cs.tokensPerRawUsdtScaled, fallbackPrice)
+      : fallbackPrice;
+    const tokens = cs ? Number(cs.maxTokens)  : 5_000_000_000_000;
+    const sold   = cs ? Number(cs.tokensSold) : (i === 0 ? 15_000_000_000 : 0);
+    return { stage: i + 1, price, tokens, sold, color: STAGE_COLORS[i] };
+  });
   const LISTING_PRICE = "$0.061327";
   const currentStage = presaleData ? presaleData.currentStage : 0;
   const totalSold = STAGE_DATA.reduce((a, s) => a + s.sold, 0);

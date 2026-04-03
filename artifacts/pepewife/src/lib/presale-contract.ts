@@ -223,11 +223,47 @@ export interface PresaleState {
   solPriceUsdE6: bigint;
   treasury: string;
   usdtTreasuryAta: string;
+  /** Unix timestamp (seconds) — 0 if not set on-chain */
+  presaleStart: bigint;
+  /** Unix timestamp (seconds) — 0 if not set on-chain */
+  presaleEnd: bigint;
+  /** Unix timestamp (seconds) — 0 if not set on-chain */
+  claimOpensAt: bigint;
   stages: Array<{
     tokensPerRawUsdtScaled: bigint;
     maxTokens: bigint;
     tokensSold: bigint;
   }>;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  PRICE HELPERS
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Convert tokensPerRawUsdtScaled → USD price per token.
+ *
+ * Contract stores: N tokens per 1 raw USDT (1 USDT = 1,000,000 raw USDT).
+ * ∴  price_per_token = 1 / (N × 1,000,000)
+ *
+ * Returns 0 if the value is zero (unset or invalid).
+ */
+export function stageTokenPriceUsd(tokensPerRawUsdtScaled: bigint): number {
+  if (tokensPerRawUsdtScaled === 0n) return 0;
+  return 1 / (Number(tokensPerRawUsdtScaled) * 1_000_000);
+}
+
+/**
+ * Format a stage price as a dollar string (e.g. "$0.00000001").
+ * Falls back to the provided static string if the value is zero.
+ */
+export function formatStagePriceUsd(
+  tokensPerRawUsdtScaled: bigint,
+  fallback: string
+): string {
+  const price = stageTokenPriceUsd(tokensPerRawUsdtScaled);
+  if (price === 0) return fallback;
+  return `$${price.toFixed(10).replace(/\.?0+$/, "")}`;
 }
 
 /**
@@ -285,6 +321,9 @@ export async function fetchPresaleState(): Promise<PresaleState | null> {
       solPriceUsdE6,
       treasury,
       usdtTreasuryAta,
+      presaleStart: _presaleStart,
+      presaleEnd:   _presaleEnd,
+      claimOpensAt: _claimOpensAt,
       stages,
     };
   } catch (err) {

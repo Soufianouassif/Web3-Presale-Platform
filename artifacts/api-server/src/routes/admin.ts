@@ -80,12 +80,12 @@ router.get("/admin/stats", async (_req, res) => {
         walletAddress: referralCodes.walletAddress,
         code: referralCodes.code,
         totalReferrals: referralCodes.totalReferrals,
-        pendingTokens: referralCodes.pendingTokens,
-        paidTokens: referralCodes.paidTokens,
+        totalRewardTokens: referralCodes.totalRewardTokens,
+        totalRewardUsd: referralCodes.totalRewardUsd,
       })
       .from(referralCodes)
       .where(sql`${referralCodes.totalReferrals} > 0`)
-      .orderBy(desc(referralCodes.pendingTokens))
+      .orderBy(desc(referralCodes.totalRewardTokens))
       .limit(10);
 
     res.json({
@@ -125,8 +125,8 @@ router.get("/admin/stats", async (_req, res) => {
           walletAddress: r.walletAddress,
           code: r.code,
           totalReferrals: Number(r.totalReferrals),
-          pendingTokens: Number(r.pendingTokens),
-          paidTokens: Number(r.paidTokens),
+          totalRewardTokens: Number(r.totalRewardTokens),
+          totalRewardUsd: Number(r.totalRewardUsd),
         })),
       },
     });

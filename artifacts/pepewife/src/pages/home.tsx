@@ -13,6 +13,8 @@ import SEOHead from "@/components/seo-head";
 import WalletBuyModal from "@/components/wallet-buy-modal";
 import {
   fetchPresaleState,
+  stageTokenPriceUsd,
+  formatStagePriceUsd,
   type PresaleState,
 } from "@/lib/presale-contract";
 import {
@@ -165,15 +167,17 @@ export default function Home() {
     );
   };
 
-  const STAGE_PRICES_STATIC = ["$0.00000001", "$0.00000002", "$0.00000004", "$0.00000006"];
+  const STAGE_PRICES_FALLBACK = ["$0.00000001", "$0.00000002", "$0.00000004", "$0.00000006"];
   const STAGE_COLORS = ["#4CAF50", "#FF4D9D", "#FFD54F", "#42A5F5"];
-  const STAGE_DATA = STAGE_PRICES_STATIC.map((price, i) => ({
-    stage: i + 1,
-    price,
-    tokens: 5_000_000_000_000,
-    sold: presaleData ? Number(presaleData.stages[i].tokensSold) : (i === 0 ? 15_000_000_000 : 0),
-    color: STAGE_COLORS[i],
-  }));
+  const STAGE_DATA = STAGE_PRICES_FALLBACK.map((fallbackPrice, i) => {
+    const cs = presaleData?.stages[i];
+    const price  = cs?.tokensPerRawUsdtScaled
+      ? formatStagePriceUsd(cs.tokensPerRawUsdtScaled, fallbackPrice)
+      : fallbackPrice;
+    const tokens = cs ? Number(cs.maxTokens)   : 5_000_000_000_000;
+    const sold   = cs ? Number(cs.tokensSold)  : (i === 0 ? 15_000_000_000 : 0);
+    return { stage: i + 1, price, tokens, sold, color: STAGE_COLORS[i] };
+  });
   const LISTING_PRICE = "$0.061327";
   const currentStage = presaleData ? presaleData.currentStage : 0;
   const totalSold = STAGE_DATA.reduce((a, s) => a + s.sold, 0);
@@ -200,17 +204,30 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
-        if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        if (prev.days > 0) return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
-        return prev;
-      });
-    }, 1000);
+    const tick = () => {
+      const end = presaleData ? Number(presaleData.presaleEnd) : 0;
+      if (end > 0) {
+        const remaining = Math.max(0, end - Math.floor(Date.now() / 1000));
+        setTimeLeft({
+          days:    Math.floor(remaining / 86400),
+          hours:   Math.floor((remaining % 86400) / 3600),
+          minutes: Math.floor((remaining % 3600) / 60),
+          seconds: remaining % 60,
+        });
+      } else {
+        setTimeLeft(prev => {
+          if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
+          if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+          if (prev.hours > 0)   return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
+          if (prev.days > 0)    return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
+          return prev;
+        });
+      }
+    };
+    tick();
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [presaleData]);
 
   const [, navigate] = useLocation();
   const handleConnect = () => { navigate("/connect"); };
@@ -226,11 +243,12 @@ export default function Home() {
     // Track the purchase (fire-and-forget) with referral code if present
     const refCode = getStoredReferralCode();
     const amountNum = parseFloat(amount) || 0;
-    const stage = presaleData?.currentStage ?? 1;
-    const stagePrice = presaleData
-      ? [0.00003, 0.00004, 0.00005, 0.00007][stage - 1] ?? 0.00003
-      : 0.00003;
-    const pricePerToken = stagePrice;
+    const stageIdx  = presaleData?.currentStage ?? 0;
+    const stage     = stageIdx + 1; // 1-indexed for tracker
+    const FALLBACK_PRICES_NUM = [0.00000001, 0.00000002, 0.00000004, 0.00000006];
+    const pricePerToken = presaleData?.stages[stageIdx]?.tokensPerRawUsdtScaled
+      ? stageTokenPriceUsd(presaleData.stages[stageIdx].tokensPerRawUsdtScaled)
+      : FALLBACK_PRICES_NUM[stageIdx] ?? 0.00000001;
     const solUsd = currency === "SOL" ? amountNum * solPrice : 0;
     const usdAmt = currency === "SOL" ? solUsd : amountNum;
     const tokensEst = pricePerToken > 0 ? usdAmt / pricePerToken : 0;
@@ -350,7 +368,13 @@ export default function Home() {
         <div className="pt-28 pb-24 px-4">
           <div className="max-w-7xl mx-auto" dir="ltr">
             <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-6 animate-pulse text-base" style={{ transform: "rotate(-2deg)" }}>
-              {"🔥 STAGE 1 — PRESALE COMING SOON — NGMI IF U MISS THIS!!"}
+              {presaleData
+                ? presaleData.isActive
+                  ? `🔥 STAGE ${presaleData.currentStage + 1}/4 — PRESALE LIVE — APE IN NOW!! 🚀`
+                  : presaleData.isPaused
+                  ? `⏸️ STAGE ${presaleData.currentStage + 1}/4 — PRESALE PAUSED — COMING BACK SOON`
+                  : `✅ PRESALE ENDED — CLAIM YOUR $PWIFE SOON!`
+                : "🔥 STAGE 1 — PRESALE COMING SOON — NGMI IF U MISS THIS!!"}
             </div>
             <h1 className="text-5xl lg:text-8xl font-display leading-tight mb-6 text-[#1a1a2e] comic-shadow tracking-wider max-w-3xl">
               {"Be Early..."}<br /><span className="text-[#FF4D9D]" style={{ textShadow: "3px 3px 0px #1a1a2e" }}>{"Or Cry Later 😭"}</span>

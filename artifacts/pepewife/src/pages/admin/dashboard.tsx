@@ -363,8 +363,8 @@ export default function AdminDashboard() {
                           <th className="text-left py-3 pr-4">Wallet</th>
                           <th className="text-left py-3 pr-4">Code</th>
                           <th className="text-right py-3 pr-4">Referrals</th>
-                          <th className="text-right py-3 pr-4">Pending $PWIFE</th>
-                          <th className="text-right py-3 pr-4">Paid $PWIFE</th>
+                          <th className="text-right py-3 pr-4">Total $PWIFE</th>
+                          <th className="text-right py-3 pr-4">Reward USD</th>
                           <th className="text-right py-3">Action</th>
                         </tr>
                       </thead>
@@ -379,10 +379,10 @@ export default function AdminDashboard() {
                               <span className="px-2 py-0.5 bg-white/10 rounded text-xs font-mono text-[#39ff14]">{r.code}</span>
                             </td>
                             <td className="py-3 pr-4 text-right text-white">{r.totalReferrals}</td>
-                            <td className="py-3 pr-4 text-right text-yellow-400 font-medium">{fmt(r.pendingTokens)}</td>
-                            <td className="py-3 pr-4 text-right text-[#39ff14]">{fmt(r.paidTokens)}</td>
+                            <td className="py-3 pr-4 text-right text-yellow-400 font-medium">{fmt(r.totalRewardTokens)}</td>
+                            <td className="py-3 pr-4 text-right text-gray-400">${Number(r.totalRewardUsd ?? 0).toFixed(2)}</td>
                             <td className="py-3 text-right">
-                              {r.pendingTokens > 0 && (
+                              {r.totalRewardTokens > 0 && (
                                 <button
                                   onClick={() => doAction(`paid-${r.walletAddress}`, () => adminApi.markReferralsPaid(r.walletAddress))}
                                   disabled={actionLoading === `paid-${r.walletAddress}`}
@@ -394,7 +394,7 @@ export default function AdminDashboard() {
                                   Mark Paid
                                 </button>
                               )}
-                              {r.pendingTokens === 0 && (
+                              {r.totalRewardTokens === 0 && (
                                 <span className="text-xs text-gray-600">—</span>
                               )}
                             </td>
