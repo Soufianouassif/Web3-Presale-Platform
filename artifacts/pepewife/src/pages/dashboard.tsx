@@ -381,19 +381,19 @@ export default function Dashboard() {
                       {
                         label: t.dashboard.tokensPurchased,
                         value: buyerLoading ? "…" : fmt(userPwife),
-                        sub: "PWIFE",
+                        sub: "$PWIFE",
                         color: "#4CAF50", shadow: "#2E7D32", bg: "bg-[#E8F5E9]",
                       },
                       {
                         label: t.dashboard.claimableTokens,
                         value: buyerLoading ? "…" : "0",
-                        sub: "PWIFE · " + t.dashboard.pendingTge,
+                        sub: "$PWIFE · " + t.dashboard.pendingTge,
                         color: "#FF4D9D", shadow: "#C2185B", bg: "bg-[#FCE4EC]",
                       },
                       {
                         label: t.dashboard.referralRewards,
                         value: "0",
-                        sub: "PWIFE",
+                        sub: "$PWIFE",
                         color: "#AB47BC", shadow: "#7B1FA2", bg: "bg-[#F3E5F5]",
                       },
                       {
@@ -458,7 +458,7 @@ export default function Dashboard() {
                             ))}
                           </div>
                           <div className="text-center text-[10px] font-display text-[#1a1a2e]/40 tracking-wider">
-                            {fmt(totalSold)} / {fmt(totalTokens)} PWIFE
+                            {fmt(totalSold)} / {fmt(totalTokens)} $PWIFE
                           </div>
                         </div>
 
@@ -595,22 +595,22 @@ export default function Dashboard() {
                             <div className="flex justify-between items-center">
                               <span className="text-xs text-[#1a1a2e]/50 font-bold">{t.presale.youGet}</span>
                               <span className={`font-display text-lg tracking-wider ${tokensOut > 0 ? "text-[#4CAF50]" : "text-gray-300"}`}>
-                                ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} PWIFE
+                                ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} $PWIFE
                               </span>
                             </div>
                             {tokensOut > 0 && currency === "SOL" && (
                               <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
-                                1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
+                                1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
                               </p>
                             )}
                             {tokensOut > 0 && currency === "USDT_ETH" && (
                               <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
-                                1 ETH ≈ ${ethPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
+                                1 ETH ≈ ${ethPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
                               </p>
                             )}
                             {tokensOut > 0 && currency === "USDT_SPL" && (
                               <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
-                                Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
+                                Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
                               </p>
                             )}
                           </div>
@@ -655,7 +655,7 @@ export default function Dashboard() {
                                   <span className="text-lg">{s.emoji}</span>
                                   <div>
                                     <div className="font-display text-sm tracking-wider" style={{ color: s.color }}>{t.dashboard.stage} {s.stage} — {s.name.toUpperCase()}</div>
-                                    <div className="text-xs text-[#1a1a2e]/40 font-bold">{s.tokens} PWIFE • {s.total} {t.dashboard.raised}</div>
+                                    <div className="text-xs text-[#1a1a2e]/40 font-bold">{s.tokens} $PWIFE • {s.total} {t.dashboard.raised}</div>
                                   </div>
                                 </div>
                                 <div className="text-end">
@@ -670,7 +670,7 @@ export default function Dashboard() {
                               </div>
                               <div className="flex justify-between mt-1">
                                 <span className="text-[10px] font-nums tracking-wider" style={{ color: s.color }}>{s.sold}% {t.dashboard.soldPercent}</span>
-                                <span className="text-[10px] text-[#1a1a2e]/30 font-nums">{s.tokens} PWIFE</span>
+                                <span className="text-[10px] text-[#1a1a2e]/30 font-nums">{s.tokens} $PWIFE</span>
                               </div>
                             </div>
                           ))}
@@ -686,7 +686,7 @@ export default function Dashboard() {
                               <div className="h-full rounded-full bg-gradient-to-r from-[#4CAF50] via-[#FF4D9D] to-[#42A5F5]" style={{ width: "0%" }} />
                             </div>
                             <div className="flex justify-between mt-1">
-                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">0 / 0 PWIFE</span>
+                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">0 / 0 $PWIFE</span>
                               <span className="text-[10px] font-display text-[#b8860b] tracking-wider">0%</span>
                             </div>
                           </div>
@@ -732,7 +732,7 @@ export default function Dashboard() {
                         ) : (
                           <>
                             <div className="text-3xl font-nums text-[#1a1a2e] tracking-wider">
-                              {fmt(userPwife)} <span className="text-base text-[#1a1a2e]/40">PWIFE</span>
+                              {fmt(userPwife)} <span className="text-base text-[#1a1a2e]/40">$PWIFE</span>
                             </div>
                             <div className="text-sm text-[#1a1a2e]/50 font-bold">
                               ≈ ${userTotalUSD.toFixed(2)} USD
@@ -796,11 +796,11 @@ export default function Dashboard() {
                         <div className="space-y-3">
                           <div className="bg-[#E8F5E9] border-2 border-[#4CAF50]/40 rounded-xl p-4">
                             <div className="flex justify-between items-center mb-2">
-                              <span className="font-display text-xs text-[#4CAF50] tracking-wide">PWIFE {t.dashboard.tokensPurchased}</span>
+                              <span className="font-display text-xs text-[#4CAF50] tracking-wide">$PWIFE {t.dashboard.tokensPurchased}</span>
                               <span className="font-display text-lg text-[#1a1a2e] tracking-wider">{fmt(userPwife)}</span>
                             </div>
                             <div className="text-[10px] text-[#1a1a2e]/40 font-bold">
-                              Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
+                              Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
                             </div>
                           </div>
                           {userSolPaid > 0 && (
@@ -846,12 +846,12 @@ export default function Dashboard() {
                         <div className="meme-card bg-[#E8F5E9] rounded-2xl p-4 border-[#4CAF50] shadow-[3px_3px_0px_#2E7D32]">
                           <div className="text-xs font-display text-[#4CAF50] tracking-wider mb-1">{t.dashboard.yourTokens}</div>
                           <div className="text-xl font-display text-[#1a1a2e] tracking-wider">{buyerLoading ? "…" : fmt(userPwife)}</div>
-                          <div className="text-xs text-[#1a1a2e]/40 font-bold">PWIFE</div>
+                          <div className="text-xs text-[#1a1a2e]/40 font-bold">$PWIFE</div>
                         </div>
                         <div className="meme-card bg-[#FCE4EC] rounded-2xl p-4 border-[#FF4D9D] shadow-[3px_3px_0px_#C2185B]">
                           <div className="text-xs font-display text-[#FF4D9D] tracking-wider mb-1">{t.dashboard.claimable}</div>
                           <div className="text-xl font-display text-[#1a1a2e] tracking-wider">0</div>
-                          <div className="text-xs text-[#1a1a2e]/40 font-bold">PWIFE</div>
+                          <div className="text-xs text-[#1a1a2e]/40 font-bold">$PWIFE</div>
                         </div>
                       </div>
                       <div className="meme-card bg-[#FFFDE7] rounded-2xl p-4 max-w-sm mx-auto mb-6 border-[#FFD54F] shadow-[3px_3px_0px_#F9A825]">
@@ -984,7 +984,7 @@ export default function Dashboard() {
                               {r.referredWallet.slice(0, 4)}…{r.referredWallet.slice(-4)}
                             </span>
                             <span className={`text-xs font-display tracking-wide ${r.status === "paid" ? "text-[#4CAF50]" : "text-[#FF4D9D]"}`}>
-                              +{formatTokens(r.rewardTokens)} PWIFE
+                              +{formatTokens(r.rewardTokens)} $PWIFE
                             </span>
                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-display ${r.status === "paid" ? "bg-[#E8F5E9] text-[#4CAF50]" : "bg-[#FCE4EC] text-[#FF4D9D]"}`}>
                               {r.status}
@@ -1004,14 +1004,14 @@ export default function Dashboard() {
                             <div key={`ph-${i}`} className="flex items-center gap-2 rounded-xl px-3 py-2 border-2 bg-[#FFFDE7] border-[#FFD54F]/50">
                               <span className="text-lg">{x.r}</span>
                               <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">---</span>
-                              <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 PWIFE</span>
+                              <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 $PWIFE</span>
                             </div>
                           ))
                         : leaderboard.slice(0, 5).map((entry, i) => (
                             <div key={`lb-${i}`} className="flex items-center gap-2 rounded-xl px-3 py-2 border-2 bg-[#FFFDE7] border-[#FFD54F]/50">
                               <span className="text-lg">{["🥇", "🥈", "🥉", "4️⃣", "5️⃣"][i]}</span>
                               <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">{entry.walletAddress}</span>
-                              <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} PWIFE</span>
+                              <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} $PWIFE</span>
                             </div>
                           ))}
                     </div>

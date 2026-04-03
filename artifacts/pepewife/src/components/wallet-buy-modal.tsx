@@ -209,7 +209,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, onClose,
                 <span className="text-xs font-display tracking-wider text-[#1a1a2e]/50">YOU GET</span>
                 <span className="font-display text-base text-[#4CAF50] tracking-wider">
                   {presaleData
-                    ? `~${Math.floor(amount / presaleData.pricePerToken).toLocaleString()} PWIFE`
+                    ? `~${Math.floor(amount / presaleData.pricePerToken).toLocaleString()} $PWIFE`
                     : "Calculating…"}
                 </span>
               </div>
@@ -350,7 +350,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, onClose,
                 <span className="text-xs font-display tracking-wider text-[#1a1a2e]/50">YOU GET</span>
                 <span className="font-display text-lg text-[#4CAF50] tracking-wider">
                   {presaleData
-                    ? `~${Math.floor(amount / presaleData.pricePerToken).toLocaleString()} PWIFE`
+                    ? `~${Math.floor(amount / presaleData.pricePerToken).toLocaleString()} $PWIFE`
                     : "Calculating…"}
                 </span>
               </div>
@@ -419,7 +419,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, onClose,
                 You're in! 🐸
               </h3>
               <p className="text-sm text-[#1a1a2e]/50 font-bold mt-2">
-                Your PWIFE tokens are secured. Track them in your dashboard.
+                Your $PWIFE tokens are secured. Track them in your dashboard.
               </p>
             </div>
 

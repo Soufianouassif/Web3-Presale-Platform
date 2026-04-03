@@ -394,7 +394,7 @@ export default function Home() {
                 <div className="text-xs text-gray-500 font-display tracking-wide font-bold">USD</div>
               </div>
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                <div className="text-xs font-display text-gray-500 tracking-wide font-bold">🐸 PWIFE Sold</div>
+                <div className="text-xs font-display text-gray-500 tracking-wide font-bold">🐸 $PWIFE Sold</div>
                 <div className="text-2xl font-nums text-[#1a1a2e] tracking-wider">
                   {totalSold >= 1_000_000_000
                     ? (totalSold / 1_000_000_000).toFixed(1) + "B"
@@ -407,7 +407,7 @@ export default function Home() {
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                 <div className="text-xs font-display text-gray-500 tracking-wide font-bold">💎 Stage {currentStage + 1} Price</div>
                 <P v={STAGE_DATA[currentStage].price} className="text-xl font-nums text-[#1a1a2e] tracking-wider" />
-                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">per PWIFE</div>
+                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">per $PWIFE</div>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -499,7 +499,7 @@ export default function Home() {
                     ))}
                   </div>
                   <div className="text-center text-xs font-sans text-[#1a1a2e]/50 font-semibold">
-                    {fmt(totalSold)} / {fmt(totalTokens)} PWIFE
+                    {fmt(totalSold)} / {fmt(totalTokens)} $PWIFE
                   </div>
                 </div>
 
@@ -627,22 +627,22 @@ export default function Home() {
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-[#1a1a2e]/50 font-bold">{t.presale.youGet}</span>
                       <span className={`font-nums text-lg tracking-wider ${tokensOut > 0 ? "text-[#4CAF50]" : "text-gray-300"}`}>
-                        ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} PWIFE
+                        ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} $PWIFE
                       </span>
                     </div>
                     {tokensOut > 0 && currency === "SOL" && (
                       <p className="text-xs text-[#1a1a2e]/50 font-bold mt-1 text-end">
-                        1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
+                        1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
                       </p>
                     )}
                     {tokensOut > 0 && currency === "USDT_ETH" && (
                       <p className="text-xs text-[#1a1a2e]/50 font-bold mt-1 text-end">
-                        1 ETH ≈ ${ethPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
+                        1 ETH ≈ ${ethPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
                       </p>
                     )}
                     {tokensOut > 0 && currency === "USDT_SPL" && (
                       <p className="text-xs text-[#1a1a2e]/50 font-bold mt-1 text-end">
-                        Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
+                        Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
                       </p>
                     )}
                   </div>
@@ -725,7 +725,7 @@ export default function Home() {
                       },
                       {
                         l: t.presale.pending,
-                        v: refStats ? `${formatTokens(refStats.pendingTokens)} PWIFE` : (address ? "…" : "0 PWIFE"),
+                        v: refStats ? `${formatTokens(refStats.pendingTokens)} $PWIFE` : (address ? "…" : "0 $PWIFE"),
                         c: "text-[#FF4D9D]",
                         bg: "bg-[#FCE4EC]",
                         bc: "border-[#FF4D9D]",
@@ -756,14 +756,14 @@ export default function Home() {
                         <div key={`shiller-ph-${i}`} className="flex items-center gap-2 bg-[#FFFDE7] rounded-xl px-3 py-2 border-2 border-[#FFD54F]/50">
                           <span className="text-lg">{x.r}</span>
                           <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">---</span>
-                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 PWIFE</span>
+                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 $PWIFE</span>
                         </div>
                       ))
                     : leaderboard.slice(0, 3).map((entry, i) => (
                         <div key={`shiller-${i}`} className="flex items-center gap-2 bg-[#FFFDE7] rounded-xl px-3 py-2 border-2 border-[#FFD54F]/50">
                           <span className="text-lg">{["🥇", "🥈", "🥉"][i]}</span>
                           <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">{entry.walletAddress}</span>
-                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} PWIFE</span>
+                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} $PWIFE</span>
                         </div>
                       ))}
                 </div>
@@ -918,7 +918,7 @@ export default function Home() {
             <div className={`space-y-6 ${isRTL ? "md:order-first text-start" : ""}`}>
               <div>
                 <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-3">{t.tokenomics.title}</h2>
-                <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.tokenomics.totalSupply} <span className="font-display text-2xl text-[#4CAF50]">100,000,000,000,000 PWIFE (100T)</span> 🐸</p>
+                <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.tokenomics.totalSupply} <span className="font-display text-2xl text-[#4CAF50]">100,000,000,000,000 $PWIFE (100T)</span> 🐸</p>
               </div>
               <div className="space-y-2">
                 {tokenomicsData.map((item, idx) => (
@@ -926,7 +926,7 @@ export default function Home() {
                     <div className="w-5 h-5 rounded-full shrink-0 border-2 border-[#1a1a2e]" style={{ backgroundColor: item.color }} />
                     <div className="flex-1">
                       <div className="font-display text-[#1a1a2e] text-sm tracking-wider">{item.name}</div>
-                      <div className="text-xs text-[#1a1a2e]/40 font-bold">{item.value}T PWIFE</div>
+                      <div className="text-xs text-[#1a1a2e]/40 font-bold">{item.value}T $PWIFE</div>
                     </div>
                     <div className="font-display text-2xl text-[#1a1a2e] tracking-wider">{item.value}%</div>
                   </div>
