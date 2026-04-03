@@ -1,0 +1,88 @@
+
+Welcome to Solana Playground.
+ 
+Popular crates for Solana development are available to use.
+ 
+See the list of available crates and request new crates from https://github.com/solana-playground/solana-playground
+ 
+Type help to see all commands.
+
+Building...
+error[E0412]: cannot find type `Initialize` in this scope
+   --> src/lib.rs:112:22
+    |
+112 |         ctx: Context<Initialize>,
+    |                      ^^^^^^^^^^ not found in this scope
+    |
+    = help: consider importing one of these items:
+            crate::instruction::Initialize
+            spl_account_compression::Initialize
+            spl_account_compression::accounts::Initialize
+            spl_account_compression::cpi::accounts::Initialize
+            spl_token_metadata_interface::instruction::Initialize
+ 
+error[E0412]: cannot find type `AdminOnly` in this scope
+   --> src/lib.rs:155:34
+    |
+155 |     pub fn activate(ctx: Context<AdminOnly>) -> Result<()> {
+    |                                  ^^^^^^^^^ not found in this scope
+ 
+error[E0412]: cannot find type `Initialize` in this scope
+   --> src/lib.rs:112:22
+    |
+112 |         ctx: Context<Initialize>,
+    |                      ^^^^^^^^^^ not found in this scope
+    |
+help: consider importing one of these items
+    |
+108 |     use crate::instruction::Initialize;
+    |
+108 |     use spl_account_compression::Initialize;
+    |
+108 |     use spl_account_compression::accounts::Initialize;
+    |
+108 |     use spl_account_compression::cpi::accounts::Initialize;
+    |
+      and 1 other candidate
+ 
+Note: This is a shorter version of the error logs to make it easier to debug. Currently 3 errors are displayed but there are 8 errors. Disable "Improve build errors" setting to see the full error output.
+
+Building...
+$ error[E0412]: cannot find type `Initialize` in this scope
+   --> src/lib.rs:112:22
+    |
+112 |         ctx: Context<Initialize>,
+    |                      ^^^^^^^^^^ not found in this scope
+    |
+    = help: consider importing one of these items:
+            crate::instruction::Initialize
+            spl_account_compression::Initialize
+            spl_account_compression::accounts::Initialize
+            spl_account_compression::cpi::accounts::Initialize
+            spl_token_metadata_interface::instruction::Initialize
+ 
+error[E0412]: cannot find type `AdminOnly` in this scope
+   --> src/lib.rs:155:34
+    |
+155 |     pub fn activate(ctx: Context<AdminOnly>) -> Result<()> {
+    |                                  ^^^^^^^^^ not found in this scope
+ 
+error[E0412]: cannot find type `Initialize` in this scope
+   --> src/lib.rs:112:22
+    |
+112 |         ctx: Context<Initialize>,
+    |                      ^^^^^^^^^^ not found in this scope
+    |
+help: consider importing one of these items
+    |
+108 |     use crate::instruction::Initialize;
+    |
+108 |     use spl_account_compression::Initialize;
+    |
+108 |     use spl_account_compression::accounts::Initialize;
+    |
+108 |     use spl_account_compression::cpi::accounts::Initialize;
+    |
+      and 1 other candidate
+ 
+Note: This is a shorter version of the error logs to make it easier to debug. Currently 3 errors are displayed but there are 8 errors. Disable "Improve build errors" setting to see the full error output.
