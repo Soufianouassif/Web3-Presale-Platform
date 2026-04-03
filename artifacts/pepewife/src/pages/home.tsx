@@ -15,7 +15,18 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 14, minutes: 0, seconds: 0 });
   const [currency, setCurrency] = useState<"SOL" | "USDT_SPL" | "USDT_ETH">("SOL");
+  const [showEthModal, setShowEthModal] = useState(false);
+  const [copiedEth, setCopiedEth] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const ETH_WALLET = "0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97";
+
+  const copyEthAddress = () => {
+    navigator.clipboard.writeText(ETH_WALLET).then(() => {
+      setCopiedEth(true);
+      setTimeout(() => setCopiedEth(false), 2000);
+    });
+  };
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
   const { status, shortAddress } = useWallet();
@@ -315,12 +326,24 @@ export default function Home() {
                       <div className="flex items-center gap-1 text-sm"><SiTether size={13} /> USDT</div>
                       <div className="text-[8px] font-bold opacity-60">SPL · SOL</div>
                     </button>
-                    <button onClick={() => setCurrency("USDT_ETH")}
+                    <button onClick={() => { setCurrency("USDT_ETH"); setShowEthModal(true); }}
                       className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "USDT_ETH" ? "bg-[#627EEA]/15 border-[#627EEA] text-[#3d56c9] shadow-[3px_3px_0px_#3d56c9]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
                       <div className="flex items-center gap-1 text-sm"><SiTether size={13} /> USDT</div>
                       <div className="text-[8px] font-bold opacity-60">ERC20 · ETH</div>
                     </button>
                   </div>
+
+                  {currency !== "USDT_ETH" && (
+                    <div className="flex items-start gap-2 bg-amber-50 border-2 border-amber-400 rounded-xl px-3 py-2 mt-2">
+                      <span className="text-base mt-0.5">⚠️</span>
+                      <div>
+                        <p className="text-[11px] font-bold text-amber-800 leading-tight">تحقق من عنوان المحفظة والشبكة</p>
+                        <p className="text-[10px] text-amber-700 leading-tight mt-0.5">
+                          {currency === "SOL" ? "تأكد من إرسالك على شبكة Solana فقط" : "تأكد من إرسالك على شبكة Solana (SPL Token)"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2.5">
@@ -651,6 +674,63 @@ export default function Home() {
           {t.footer.copyright}
         </div>
       </footer>
+
+      {showEthModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+          <div className="bg-white rounded-2xl border-4 border-[#627EEA] shadow-[8px_8px_0px_#3d56c9] w-full max-w-sm" style={{ direction: "rtl" }}>
+            <div className="bg-[#627EEA] rounded-t-xl px-5 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <SiEthereum size={20} className="text-white" />
+                <span className="font-display text-white text-lg tracking-wide">USDT عبر Ethereum</span>
+              </div>
+              <button onClick={() => setShowEthModal(false)} className="text-white/70 hover:text-white transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              <div className="bg-red-50 border-2 border-red-400 rounded-xl p-3 flex items-start gap-2">
+                <span className="text-xl">🚨</span>
+                <div>
+                  <p className="font-display text-red-700 text-sm font-bold leading-tight">تحذير مهم</p>
+                  <p className="text-red-600 text-[11px] leading-snug mt-1">
+                    تأكد أنك على شبكة <strong>Ethereum Mainnet</strong> فقط — أي شبكة أخرى ستؤدي لفقدان أموالك نهائياً.
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[11px] text-[#1a1a2e]/50 font-bold mb-1.5">📋 عنوان محفظة المشروع (ERC-20)</p>
+                <div className="bg-[#f0f4ff] border-2 border-[#627EEA] rounded-xl p-3 flex items-center justify-between gap-2">
+                  <span className="font-mono text-[11px] text-[#3d56c9] break-all leading-snug">{ETH_WALLET}</span>
+                  <button onClick={copyEthAddress} className="shrink-0 bg-[#627EEA] text-white rounded-lg p-2 hover:bg-[#3d56c9] transition-colors">
+                    {copiedEth ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                </div>
+                {copiedEth && <p className="text-[10px] text-[#4CAF50] font-bold mt-1 text-center">✅ تم نسخ العنوان!</p>}
+              </div>
+
+              <div className="bg-amber-50 border-2 border-amber-400 rounded-xl p-3 space-y-1.5">
+                <p className="font-display text-amber-800 text-[11px] font-bold">⚠️ قبل الإرسال تحقق من:</p>
+                <ul className="text-amber-700 text-[10px] space-y-1 list-none">
+                  <li>✔️ الشبكة = <strong>Ethereum Mainnet</strong></li>
+                  <li>✔️ العملة = <strong>USDT (ERC-20)</strong> وليس ETH</li>
+                  <li>✔️ العنوان مطابق تماماً للعنوان أعلاه</li>
+                  <li>✔️ أرسل مبلغاً صغيراً أولاً للتجربة</li>
+                </ul>
+              </div>
+
+              <div className="bg-[#1a1a2e]/5 rounded-xl px-3 py-2 text-center">
+                <p className="text-[10px] text-[#1a1a2e]/50 font-bold">بعد الإرسال، راسلنا على Telegram مع hash العملية لتأكيد استلام توكناتك</p>
+              </div>
+
+              <button onClick={() => setShowEthModal(false)} className="w-full h-11 rounded-xl font-display text-base text-white tracking-wide" style={{ background: "linear-gradient(135deg, #627EEA 0%, #3d56c9 100%)" }}>
+                فهمت — إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
