@@ -171,51 +171,80 @@ export default function Home() {
   const scrollTo = (id: string) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setIsMenuOpen(false); };
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
-  const handleApeIn = async () => {
+  // ── Core buy executor ─────────────────────────────────────────────
+  const executeBuy = async (buyAmountNum: number, buyCurrency: string, buyerAddress: string) => {
+    setTxError(null);
+    setTxSignature(null);
+    setTxLoading(true);
+    try {
+      if (buyCurrency === "SOL") {
+        const treasury = presaleData?.treasury ?? "9KrLVaHMoGRNM6vn8kS5S69NMvHFq7i8ksVMCnNiNiYq";
+        const result = await buyWithSol(buyerAddress, buyAmountNum, treasury);
+        setTxSignature(result.signature);
+        setAmount("");
+        fetchPresaleState().then(d => { if (d) setPresaleData(d); });
+        setTimeout(() => navigate("/dashboard"), 2000);
+      } else if (buyCurrency === "USDT_SPL") {
+        const usdtAta = presaleData?.usdtTreasuryAta ?? "";
+        if (!usdtAta) throw new Error("USDT treasury not configured on-chain yet.");
+        const result = await buyWithUsdt(buyerAddress, buyAmountNum, usdtAta);
+        setTxSignature(result.signature);
+        setAmount("");
+        fetchPresaleState().then(d => { if (d) setPresaleData(d); });
+        setTimeout(() => navigate("/dashboard"), 2000);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (
+        msg.toLowerCase().includes("rejected") ||
+        msg.toLowerCase().includes("cancelled") ||
+        msg.toLowerCase().includes("user denied")
+      ) {
+        setTxError("Transaction cancelled.");
+      } else {
+        setTxError(msg.slice(0, 120));
+      }
+      // On failure: stay on home page so user sees the error
+    } finally {
+      setTxLoading(false);
+    }
+  };
+
+  // ── Auto-execute pending purchase after wallet connection ──────────
+  useEffect(() => {
+    if (status !== "connected" || !address) return;
+    const raw = sessionStorage.getItem("pendingPurchase");
+    if (!raw) return;
+    sessionStorage.removeItem("pendingPurchase");
+    try {
+      const { savedAmount, savedCurrency } = JSON.parse(raw) as { savedAmount: string; savedCurrency: string };
+      const num = parseFloat(savedAmount);
+      if (!savedAmount || isNaN(num) || num <= 0) return;
+      if (savedCurrency === "USDT_ETH") { setShowEthModal(true); return; }
+      executeBuy(num, savedCurrency, address);
+    } catch { /* malformed sessionStorage — ignore */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, address]);
+
+  // ── APE IN handler ─────────────────────────────────────────────────
+  const handleApeIn = () => {
     setTxError(null);
     setTxSignature(null);
 
+    if (currency === "USDT_ETH") { setShowEthModal(true); return; }
+    if (!amount || !!amountError) return;
+    const amountNum = parseFloat(amount);
+    if (isNaN(amountNum) || amountNum <= 0) return;
+
     if (status !== "connected" || !address) {
+      // Save purchase intent, then send user to connect their wallet
+      sessionStorage.setItem("pendingPurchase", JSON.stringify({ savedAmount: amount, savedCurrency: currency }));
       sessionStorage.setItem("postConnectPath", "/");
       navigate("/connect");
       return;
     }
 
-    if (!amount || !!amountError) return;
-    const amountNum2 = parseFloat(amount);
-    if (isNaN(amountNum2) || amountNum2 <= 0) return;
-
-    if (currency === "USDT_ETH") {
-      setShowEthModal(true);
-      return;
-    }
-
-    setTxLoading(true);
-    try {
-      if (currency === "SOL") {
-        const treasury = presaleData?.treasury ?? "9KrLVaHMoGRNM6vn8kS5S69NMvHFq7i8ksVMCnNiNiYq";
-        const result = await buyWithSol(address, amountNum2, treasury);
-        setTxSignature(result.signature);
-        setAmount("");
-        fetchPresaleState().then(d => { if (d) setPresaleData(d); });
-      } else if (currency === "USDT_SPL") {
-        const usdtAta = presaleData?.usdtTreasuryAta ?? "";
-        if (!usdtAta) throw new Error("USDT treasury not configured on-chain yet.");
-        const result = await buyWithUsdt(address, amountNum2, usdtAta);
-        setTxSignature(result.signature);
-        setAmount("");
-        fetchPresaleState().then(d => { if (d) setPresaleData(d); });
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes("User rejected") || msg.includes("Transaction cancelled")) {
-        setTxError("Transaction cancelled.");
-      } else {
-        setTxError(msg.slice(0, 120));
-      }
-    } finally {
-      setTxLoading(false);
-    }
+    executeBuy(amountNum, currency, address);
   };
 
   const navLinks = [
