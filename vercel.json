@@ -2,5 +2,9 @@
   "installCommand": "pnpm install",
   "buildCommand": "pnpm --filter @workspace/pepewife run build && rm -rf dist && cp -r artifacts/pepewife/dist/public dist",
   "outputDirectory": "dist",
-  "framework": null
+  "framework": null,
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
