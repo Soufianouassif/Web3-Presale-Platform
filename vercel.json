@@ -1,6 +1,6 @@
 {
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm -w run typecheck:libs && pnpm --filter @workspace/pepewife run build && cp -r artifacts/pepewife/dist/public ./dist",
+  "buildCommand": "pnpm --filter @workspace/pepewife run build && cp -r artifacts/pepewife/dist/public ./dist",
   "outputDirectory": "dist",
   "framework": null
 }
