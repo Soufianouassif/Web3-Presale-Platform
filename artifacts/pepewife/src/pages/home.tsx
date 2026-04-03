@@ -136,6 +136,10 @@ export default function Home() {
   const totalTokens = STAGE_DATA.reduce((a, s) => a + s.tokens, 0);
   const presaleFilled = Math.round((totalSold / totalTokens) * 100);
 
+  const totalRaisedUSD = presaleData
+    ? (Number(presaleData.totalSolRaised) / 1e9) * solPrice + Number(presaleData.totalUsdtRaised) / 1e6
+    : 0;
+
   const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace("$", ""));
   const amountUSD = !isNaN(amountNum) && amount !== ""
     ? currency === "SOL" ? amountNum * solPrice : amountNum
@@ -290,17 +294,27 @@ export default function Home() {
             <div className="flex flex-wrap gap-3 mb-8">
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                 <div className="text-xs font-display text-gray-500 tracking-wide">💰 Total Raised</div>
-                <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">$0</div>
+                <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">
+                  {presaleData
+                    ? `$${totalRaisedUSD >= 1000 ? (totalRaisedUSD / 1000).toFixed(1) + "K" : totalRaisedUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+                    : "$0"}
+                </div>
                 <div className="text-[10px] text-gray-400 font-display tracking-wide">USD</div>
               </div>
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                <div className="text-xs font-display text-gray-500 tracking-wide">👥 Buyers</div>
-                <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">0</div>
-                <div className="text-[10px] text-gray-400 font-display tracking-wide">wallets</div>
+                <div className="text-xs font-display text-gray-500 tracking-wide">🐸 PWIFE Sold</div>
+                <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">
+                  {totalSold >= 1_000_000_000
+                    ? (totalSold / 1_000_000_000).toFixed(1) + "B"
+                    : totalSold >= 1_000_000
+                      ? (totalSold / 1_000_000).toFixed(1) + "M"
+                      : totalSold.toLocaleString()}
+                </div>
+                <div className="text-[10px] text-gray-400 font-display tracking-wide">tokens</div>
               </div>
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                <div className="text-xs font-display text-gray-500 tracking-wide">💎 Stage 1 Price</div>
-                <P v={STAGE_DATA[0].price} className="text-xl font-display text-[#1a1a2e] tracking-wider" />
+                <div className="text-xs font-display text-gray-500 tracking-wide">💎 Stage {currentStage + 1} Price</div>
+                <P v={STAGE_DATA[currentStage].price} className="text-xl font-display text-[#1a1a2e] tracking-wider" />
                 <div className="text-[10px] text-gray-400 font-display tracking-wide">per PWIFE</div>
               </div>
             </div>
