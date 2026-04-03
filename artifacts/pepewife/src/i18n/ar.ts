@@ -423,6 +423,8 @@ const ar: Translations = {
     noTransactions: "لا توجد معاملات بعد",
     noTransactionsDesc: "سيظهر سجل معاملاتك هنا بمجرد بدء البيع المسبق.",
     transactionHistory: "📜 سجل المعاملات",
+    invested: "مستثمر",
+    refresh: "تحديث",
   },
   walletErrors: {
     connectedTitle: "تم ربط المحفظة! 🎉",

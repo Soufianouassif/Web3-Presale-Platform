@@ -423,6 +423,8 @@ const fr: Translations = {
     noTransactions: "Pas encore de transactions",
     noTransactionsDesc: "Ton historique de transactions apparaîtra ici une fois la prévente commencée.",
     transactionHistory: "📜 Historique des Transactions",
+    invested: "Investi",
+    refresh: "Actualiser",
   },
   walletErrors: {
     connectedTitle: "Wallet Connecté ! 🎉",

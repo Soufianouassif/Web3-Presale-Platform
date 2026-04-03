@@ -326,6 +326,35 @@ export async function fetchBuyerState(buyerAddress: string): Promise<BuyerState 
 }
 
 // ─────────────────────────────────────────────────────────────
+//  FETCH BUYER TRANSACTIONS  (on-chain history)
+// ─────────────────────────────────────────────────────────────
+
+export interface BuyerTx {
+  signature: string;
+  blockTime: number | null;
+  slot: number;
+}
+
+/**
+ * Return up to 20 most recent presale transactions for a wallet.
+ * We query signatures on the buyer's PDA so we only get presale txs.
+ */
+export async function fetchBuyerTransactions(buyerAddress: string): Promise<BuyerTx[]> {
+  try {
+    const buyer = new PublicKey(buyerAddress);
+    const [pda] = await findBuyerRecord(buyer);
+    const sigs = await connection.getSignaturesForAddress(pda, { limit: 20 });
+    return sigs.map(s => ({
+      signature: s.signature,
+      blockTime: s.blockTime ?? null,
+      slot: s.slot,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
 //  INTERNAL — wallet provider
 // ─────────────────────────────────────────────────────────────
 

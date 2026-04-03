@@ -10,7 +10,14 @@ import SEOHead from "@/components/seo-head";
 import { useWallet } from "@/contexts/wallet-context";
 import { useToast } from "@/components/wallet-toast";
 import WalletBuyModal from "@/components/wallet-buy-modal";
-import { fetchPresaleState, type PresaleState } from "@/lib/presale-contract";
+import {
+  fetchPresaleState,
+  fetchBuyerState,
+  fetchBuyerTransactions,
+  type PresaleState,
+  type BuyerState,
+  type BuyerTx,
+} from "@/lib/presale-contract";
 
 export default function Dashboard() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,6 +35,10 @@ export default function Dashboard() {
   const [ethPrice, setEthPrice] = useState<number>(3000);
   const [pricesUpdatedAt, setPricesUpdatedAt] = useState<Date | null>(null);
   const [pricesLoading, setPricesLoading] = useState(false);
+  const [buyerState, setBuyerState] = useState<BuyerState | null>(null);
+  const [buyerLoading, setBuyerLoading] = useState(false);
+  const [buyerTxs, setBuyerTxs] = useState<BuyerTx[]>([]);
+  const [buyerTxsLoading, setBuyerTxsLoading] = useState(false);
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
   const { status, shortAddress, address, network, disconnect } = useWallet();
@@ -71,6 +82,19 @@ export default function Dashboard() {
   useEffect(() => {
     fetchPresaleState().then(s => { if (s) setPresaleData(s); }).catch(() => {});
   }, []);
+
+  // ── Buyer on-chain data ──────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!address) { setBuyerState(null); setBuyerTxs([]); return; }
+    setBuyerLoading(true);
+    fetchBuyerState(address)
+      .then(b => setBuyerState(b))
+      .finally(() => setBuyerLoading(false));
+    setBuyerTxsLoading(true);
+    fetchBuyerTransactions(address)
+      .then(txs => setBuyerTxs(txs))
+      .finally(() => setBuyerTxsLoading(false));
+  }, [address]);
 
   // ── Buy box constants & computations ────────────────────────────────────────
   const LIMITS = {
@@ -152,6 +176,22 @@ export default function Dashboard() {
     : amountNum
     : 0;
   const tokensOut = stagePrice > 0 && amountUSD > 0 ? Math.floor(amountUSD / stagePrice) : 0;
+
+  // ── Buyer derived values ─────────────────────────────────────────────────────
+  const LAMPORTS = 1_000_000_000;
+  const USDT_DECIMALS = 1_000_000;
+  const userPwife     = buyerState ? Number(buyerState.totalTokens) : 0;
+  const userSolPaid   = buyerState ? Number(buyerState.solPaid) / LAMPORTS : 0;
+  const userUsdtPaid  = buyerState ? Number(buyerState.usdtPaid) / USDT_DECIMALS : 0;
+  const userTotalUSD  = userSolPaid * solPrice + userUsdtPaid;
+  const hasPurchased  = userPwife > 0;
+
+  const refreshBuyerData = () => {
+    if (!address) return;
+    fetchBuyerState(address).then(b => setBuyerState(b)).catch(() => {});
+    fetchBuyerTransactions(address).then(txs => setBuyerTxs(txs)).catch(() => {});
+    fetchPresaleState().then(s => { if (s) setPresaleData(s); }).catch(() => {});
+  };
 
   type StageStatus = "active" | "sold-out" | "upcoming";
   const presaleStages: Array<{ stage: number; name: string; price: string; tokens: string; sold: number; total: string; status: StageStatus; color: string; shadow: string; emoji: string }> = [
@@ -305,14 +345,45 @@ export default function Dashboard() {
 
               {activeTab === "overview" && (
                 <div className="space-y-6">
+                  {/* ── On-chain summary cards ── */}
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                     {[
-                      { label: t.dashboard.tokensPurchased, value: "0", sub: "PWIFE", color: "#4CAF50", shadow: "#2E7D32", bg: "bg-[#E8F5E9]" },
-                      { label: t.dashboard.claimableTokens, value: "0", sub: "PWIFE", color: "#FF4D9D", shadow: "#C2185B", bg: "bg-[#FCE4EC]" },
-                      { label: t.dashboard.referralRewards, value: "0", sub: "PWIFE", color: "#AB47BC", shadow: "#7B1FA2", bg: "bg-[#F3E5F5]" },
-                      { label: t.dashboard.currentStage, value: "—", sub: t.dashboard.notStarted, color: "#42A5F5", shadow: "#1565C0", bg: "bg-[#E3F2FD]" },
-                      { label: t.dashboard.totalInvested, value: "$0.00", sub: "0 SOL", color: "#b8860b", shadow: "#8B6914", bg: "bg-[#FFFDE7]" },
-                      { label: t.dashboard.bonusEarned, value: "0%", sub: "—", color: "#4CAF50", shadow: "#2E7D32", bg: "bg-[#E8F5E9]" },
+                      {
+                        label: t.dashboard.tokensPurchased,
+                        value: buyerLoading ? "…" : fmt(userPwife),
+                        sub: "PWIFE",
+                        color: "#4CAF50", shadow: "#2E7D32", bg: "bg-[#E8F5E9]",
+                      },
+                      {
+                        label: t.dashboard.claimableTokens,
+                        value: buyerLoading ? "…" : "0",
+                        sub: "PWIFE · " + t.dashboard.pendingTge,
+                        color: "#FF4D9D", shadow: "#C2185B", bg: "bg-[#FCE4EC]",
+                      },
+                      {
+                        label: t.dashboard.referralRewards,
+                        value: "0",
+                        sub: "PWIFE",
+                        color: "#AB47BC", shadow: "#7B1FA2", bg: "bg-[#F3E5F5]",
+                      },
+                      {
+                        label: t.dashboard.currentStage,
+                        value: presaleData ? `Stage ${presaleData.currentStage + 1}` : "—",
+                        sub: presaleData?.isActive ? "🟢 LIVE" : t.dashboard.notStarted,
+                        color: "#42A5F5", shadow: "#1565C0", bg: "bg-[#E3F2FD]",
+                      },
+                      {
+                        label: t.dashboard.totalInvested,
+                        value: buyerLoading ? "…" : `$${userTotalUSD.toFixed(2)}`,
+                        sub: userSolPaid > 0 ? `${userSolPaid.toFixed(3)} SOL${userUsdtPaid > 0 ? ` + ${userUsdtPaid.toFixed(2)} USDT` : ""}` : "—",
+                        color: "#b8860b", shadow: "#8B6914", bg: "bg-[#FFFDE7]",
+                      },
+                      {
+                        label: t.dashboard.bonusEarned,
+                        value: "0%",
+                        sub: "—",
+                        color: "#4CAF50", shadow: "#2E7D32", bg: "bg-[#E8F5E9]",
+                      },
                     ].map(card => (
                       <div key={card.label} className={`meme-card ${card.bg} rounded-2xl p-4 sm:p-5`} style={{ borderColor: card.color, boxShadow: `${isRTL ? "-4px" : "4px"} 4px 0px ${card.shadow}` }}>
                         <div className="text-xs font-display tracking-wider mb-1" style={{ color: card.color }}>{card.label}</div>
@@ -616,27 +687,112 @@ export default function Dashboard() {
               )}
 
               {activeTab === "purchases" && (
-                <div className="space-y-6">
-                  <div className="meme-card bg-white rounded-2xl overflow-hidden">
-                    <div className="zigzag-border" />
-                    <div className="p-5">
-                      <h3 className="font-display text-xl text-[#1a1a2e] tracking-wider mb-5">🛒 {t.dashboard.myPurchases}</h3>
-                      <div className="text-center py-10">
-                        <div className="text-5xl mb-3">🛒</div>
-                        <p className="font-display text-lg text-[#1a1a2e]/40 tracking-wider">{t.dashboard.noPurchases}</p>
-                        <p className="text-sm text-[#1a1a2e]/30 font-bold">{t.dashboard.noPurchasesDesc}</p>
+                <div className="space-y-5">
+                  {/* ── Total summary card ── */}
+                  <div className="meme-card bg-[#E8F5E9] rounded-2xl p-5 border-[#4CAF50]" style={{ boxShadow: `${isRTL ? "-4px" : "4px"} 4px 0px #2E7D32` }}>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <div className="font-display text-sm text-[#4CAF50] tracking-wider">{t.dashboard.totalPurchased}</div>
+                        {buyerLoading ? (
+                          <div className="text-2xl font-display text-[#1a1a2e]/40 tracking-wider">…</div>
+                        ) : (
+                          <>
+                            <div className="text-3xl font-display text-[#1a1a2e] tracking-wider">
+                              {fmt(userPwife)} <span className="text-base text-[#1a1a2e]/40">PWIFE</span>
+                            </div>
+                            <div className="text-sm text-[#1a1a2e]/50 font-bold">
+                              ≈ ${userTotalUSD.toFixed(2)} USD
+                            </div>
+                          </>
+                        )}
                       </div>
+                      <div className="text-5xl">🐸</div>
                     </div>
                   </div>
 
-                  <div className="meme-card bg-[#E8F5E9] rounded-2xl p-5 border-[#4CAF50] shadow-[4px_4px_0px_#2E7D32]">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-display text-sm text-[#4CAF50] tracking-wider mb-1">{t.dashboard.totalPurchased}</div>
-                        <div className="text-3xl font-display text-[#1a1a2e] tracking-wider">0 <span className="text-base text-[#1a1a2e]/40">PWIFE</span></div>
-                        <div className="text-sm text-[#1a1a2e]/40 font-bold">0 SOL ($0.00)</div>
+                  {/* ── Investment breakdown ── */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="meme-card bg-white rounded-2xl p-4 border-[#14F195]" style={{ boxShadow: `${isRTL ? "-3px" : "3px"} 3px 0px #0a9060` }}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <SiSolana size={16} className="text-[#14F195]" />
+                        <span className="font-display text-sm text-[#0a9060] tracking-wide">SOL {t.dashboard.invested}</span>
                       </div>
-                      <div className="text-5xl">🐸</div>
+                      <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">
+                        {buyerLoading ? "…" : userSolPaid.toFixed(4)}
+                      </div>
+                      <div className="text-xs text-[#1a1a2e]/40 font-bold mt-0.5">
+                        ≈ ${(userSolPaid * solPrice).toFixed(2)}
+                      </div>
+                    </div>
+                    <div className="meme-card bg-white rounded-2xl p-4 border-[#26A17B]" style={{ boxShadow: `${isRTL ? "-3px" : "3px"} 3px 0px #1a7a5e` }}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <SiTether size={16} className="text-[#26A17B]" />
+                        <span className="font-display text-sm text-[#1a7a5e] tracking-wide">USDT {t.dashboard.invested}</span>
+                      </div>
+                      <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">
+                        {buyerLoading ? "…" : userUsdtPaid.toFixed(2)}
+                      </div>
+                      <div className="text-xs text-[#1a1a2e]/40 font-bold mt-0.5">≈ ${userUsdtPaid.toFixed(2)}</div>
+                    </div>
+                  </div>
+
+                  {/* ── Purchase detail card or empty state ── */}
+                  <div className="meme-card bg-white rounded-2xl overflow-hidden">
+                    <div className="zigzag-border" />
+                    <div className="p-5">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-display text-xl text-[#1a1a2e] tracking-wider">🛒 {t.dashboard.myPurchases}</h3>
+                        <button onClick={refreshBuyerData} className="text-xs font-display text-[#1a1a2e]/40 hover:text-[#FF4D9D] transition-colors tracking-wide">
+                          🔄 {t.dashboard.refresh ?? "Refresh"}
+                        </button>
+                      </div>
+
+                      {buyerLoading ? (
+                        <div className="text-center py-8">
+                          <div className="text-3xl mb-2 animate-spin inline-block">⏳</div>
+                          <p className="font-display text-[#1a1a2e]/40 tracking-wider text-sm">Loading on-chain data…</p>
+                        </div>
+                      ) : !hasPurchased ? (
+                        <div className="text-center py-10">
+                          <div className="text-5xl mb-3">🛒</div>
+                          <p className="font-display text-lg text-[#1a1a2e]/40 tracking-wider">{t.dashboard.noPurchases}</p>
+                          <p className="text-sm text-[#1a1a2e]/30 font-bold">{t.dashboard.noPurchasesDesc}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="bg-[#E8F5E9] border-2 border-[#4CAF50]/40 rounded-xl p-4">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="font-display text-xs text-[#4CAF50] tracking-wide">PWIFE {t.dashboard.tokensPurchased}</span>
+                              <span className="font-display text-lg text-[#1a1a2e] tracking-wider">{fmt(userPwife)}</span>
+                            </div>
+                            <div className="text-[10px] text-[#1a1a2e]/40 font-bold">
+                              Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
+                            </div>
+                          </div>
+                          {userSolPaid > 0 && (
+                            <div className="bg-[#E8F5E9]/50 border border-[#14F195]/30 rounded-xl px-4 py-3 flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <SiSolana size={14} className="text-[#14F195]" />
+                                <span className="text-sm font-bold text-[#1a1a2e]/70">SOL paid</span>
+                              </div>
+                              <span className="font-display text-[#0a9060] tracking-wide">{userSolPaid.toFixed(4)} SOL</span>
+                            </div>
+                          )}
+                          {userUsdtPaid > 0 && (
+                            <div className="bg-[#E8F5E9]/50 border border-[#26A17B]/30 rounded-xl px-4 py-3 flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <SiTether size={14} className="text-[#26A17B]" />
+                                <span className="text-sm font-bold text-[#1a1a2e]/70">USDT paid</span>
+                              </div>
+                              <span className="font-display text-[#1a7a5e] tracking-wide">{userUsdtPaid.toFixed(2)} USDT</span>
+                            </div>
+                          )}
+                          <div className="bg-[#FFFDE7] border border-[#FFD54F] rounded-xl px-4 py-3 flex items-center justify-between">
+                            <span className="text-sm font-bold text-[#1a1a2e]/70">💰 {t.dashboard.totalInvested}</span>
+                            <span className="font-display text-[#b8860b] tracking-wide">${userTotalUSD.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -655,7 +811,7 @@ export default function Dashboard() {
                       <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto mb-6">
                         <div className="meme-card bg-[#E8F5E9] rounded-2xl p-4 border-[#4CAF50] shadow-[3px_3px_0px_#2E7D32]">
                           <div className="text-xs font-display text-[#4CAF50] tracking-wider mb-1">{t.dashboard.yourTokens}</div>
-                          <div className="text-xl font-display text-[#1a1a2e] tracking-wider">0</div>
+                          <div className="text-xl font-display text-[#1a1a2e] tracking-wider">{buyerLoading ? "…" : fmt(userPwife)}</div>
                           <div className="text-xs text-[#1a1a2e]/40 font-bold">PWIFE</div>
                         </div>
                         <div className="meme-card bg-[#FCE4EC] rounded-2xl p-4 border-[#FF4D9D] shadow-[3px_3px_0px_#C2185B]">
@@ -763,12 +919,55 @@ export default function Dashboard() {
                   <div className="meme-card bg-white rounded-2xl overflow-hidden">
                     <div className="zigzag-border" />
                     <div className="p-5">
-                      <h3 className="font-display text-xl text-[#1a1a2e] tracking-wider mb-5">{t.dashboard.transactionHistory}</h3>
-                      <div className="text-center py-10">
-                        <div className="text-5xl mb-3">📜</div>
-                        <p className="font-display text-lg text-[#1a1a2e]/40 tracking-wider">{t.dashboard.noTransactions}</p>
-                        <p className="text-sm text-[#1a1a2e]/30 font-bold">{t.dashboard.noTransactionsDesc}</p>
+                      <div className="flex items-center justify-between mb-5">
+                        <h3 className="font-display text-xl text-[#1a1a2e] tracking-wider">{t.dashboard.transactionHistory}</h3>
+                        <button onClick={refreshBuyerData} className="text-xs font-display text-[#1a1a2e]/40 hover:text-[#FF4D9D] transition-colors tracking-wide">
+                          🔄 {t.dashboard.refresh ?? "Refresh"}
+                        </button>
                       </div>
+
+                      {buyerTxsLoading ? (
+                        <div className="text-center py-8">
+                          <div className="text-3xl mb-2 animate-spin inline-block">⏳</div>
+                          <p className="font-display text-[#1a1a2e]/40 tracking-wider text-sm">Loading transactions…</p>
+                        </div>
+                      ) : buyerTxs.length === 0 ? (
+                        <div className="text-center py-10">
+                          <div className="text-5xl mb-3">📜</div>
+                          <p className="font-display text-lg text-[#1a1a2e]/40 tracking-wider">{t.dashboard.noTransactions}</p>
+                          <p className="text-sm text-[#1a1a2e]/30 font-bold">{t.dashboard.noTransactionsDesc}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {buyerTxs.map((tx, i) => {
+                            const date = tx.blockTime
+                              ? new Date(tx.blockTime * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+                              : "—";
+                            return (
+                              <div key={tx.signature} className="flex items-center gap-3 rounded-xl border-2 border-[#1a1a2e]/10 bg-[#FFFDE7]/50 px-4 py-3 hover:bg-[#FFFDE7] transition-colors">
+                                <div className="w-6 h-6 rounded-full bg-[#4CAF50]/15 border border-[#4CAF50]/30 flex items-center justify-center shrink-0">
+                                  <span className="text-[10px] font-display text-[#4CAF50]">#{i + 1}</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-mono text-[11px] text-[#1a1a2e]/70 truncate">{tx.signature.slice(0, 20)}…{tx.signature.slice(-8)}</div>
+                                  <div className="text-[10px] text-[#1a1a2e]/40 font-bold">{date}</div>
+                                </div>
+                                <a
+                                  href={`https://explorer.solana.com/tx/${tx.signature}?cluster=devnet`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="shrink-0 bg-[#4CAF50]/10 hover:bg-[#4CAF50]/20 border border-[#4CAF50]/30 text-[#0a9060] rounded-lg px-2 py-1 text-[10px] font-display tracking-wide flex items-center gap-1 transition-colors"
+                                >
+                                  View <ExternalLink size={10} />
+                                </a>
+                              </div>
+                            );
+                          })}
+                          <p className="text-center text-[10px] text-[#1a1a2e]/30 font-bold pt-2">
+                            {buyerTxs.length} transaction{buyerTxs.length !== 1 ? "s" : ""} on Solana Devnet
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -870,8 +1069,8 @@ export default function Dashboard() {
           onSuccess={(sig) => {
             setDashTxSig(sig);
             setBuyAmount("");
-            fetchPresaleState().then(d => { if (d) setPresaleData(d); }).catch(() => {});
             setShowBuyModal(false);
+            setTimeout(() => refreshBuyerData(), 3000);
           }}
         />
       )}

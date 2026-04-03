@@ -421,6 +421,8 @@ const en = {
     noTransactions: "No transactions yet",
     noTransactionsDesc: "Your transaction history will appear here once the presale begins.",
     transactionHistory: "📜 Transaction History",
+    invested: "Invested",
+    refresh: "Refresh",
   },
   walletErrors: {
     connectedTitle: "Wallet Connected! 🎉",
