@@ -20,16 +20,30 @@ export default function Home() {
   const [copiedEth, setCopiedEth] = useState(false);
   const [copied, setCopied] = useState(false);
   const [solPrice, setSolPrice] = useState<number>(150);
+  const [ethPrice, setEthPrice] = useState<number>(3000);
+  const [pricesUpdatedAt, setPricesUpdatedAt] = useState<Date | null>(null);
+  const [pricesLoading, setPricesLoading] = useState(false);
 
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
   const { status, shortAddress } = useWallet();
 
   useEffect(() => {
-    fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd")
-      .then(r => r.json())
-      .then(d => { if (d?.solana?.usd) setSolPrice(d.solana.usd); })
-      .catch(() => {});
+    const fetchPrices = () => {
+      setPricesLoading(true);
+      fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana,ethereum&vs_currencies=usd")
+        .then(r => r.json())
+        .then(d => {
+          if (d?.solana?.usd)  setSolPrice(d.solana.usd);
+          if (d?.ethereum?.usd) setEthPrice(d.ethereum.usd);
+          setPricesUpdatedAt(new Date());
+        })
+        .catch(() => {})
+        .finally(() => setPricesLoading(false));
+    };
+    fetchPrices();
+    const interval = setInterval(fetchPrices, 60 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const LIMITS: Record<string, { min: number; max: number }> = {
@@ -358,6 +372,39 @@ export default function Home() {
                   ))}
                 </div>
 
+                <div className="bg-[#1a1a2e]/4 border border-[#1a1a2e]/10 rounded-xl px-3 py-2 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5">
+                      <SiSolana size={12} className="text-[#14F195]" />
+                      <span className="font-display text-[11px] text-[#1a1a2e] tracking-wide">
+                        ${solPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <SiEthereum size={12} className="text-[#627EEA]" />
+                      <span className="font-display text-[11px] text-[#1a1a2e] tracking-wide">
+                        ${ethPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <SiTether size={11} className="text-[#26A17B]" />
+                      <span className="font-display text-[11px] text-[#26A17B] tracking-wide">$1.00</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {pricesLoading
+                      ? <span className="text-[9px] text-[#1a1a2e]/30 font-bold">⏳</span>
+                      : <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4CAF50] opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-[#4CAF50]"></span></span>
+                    }
+                    <span className="text-[9px] text-[#1a1a2e]/30 font-bold">
+                      {pricesUpdatedAt
+                        ? pricesUpdatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                        : "..."
+                      }
+                    </span>
+                  </div>
+                </div>
+
                 <div>
                   <p className="text-xs font-display text-[#1a1a2e]/40 tracking-wider mb-2">{t.presale.payWith}</p>
                   <div className="grid grid-cols-3 gap-2">
@@ -445,7 +492,12 @@ export default function Home() {
                         1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
                       </p>
                     )}
-                    {tokensOut > 0 && currency !== "SOL" && (
+                    {tokensOut > 0 && currency === "USDT_ETH" && (
+                      <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
+                        1 ETH ≈ ${ethPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
+                      </p>
+                    )}
+                    {tokensOut > 0 && currency === "USDT_SPL" && (
                       <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
                         Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
                       </p>
