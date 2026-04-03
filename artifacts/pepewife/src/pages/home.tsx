@@ -153,7 +153,7 @@ export default function Home() {
   };
 
   const P = ({ v, className = "", style }: { v: string; className?: string; style?: React.CSSProperties }) => {
-    const num = parseFloat(v.replace("$", ""));
+    const num = parseFloat(v.replace(/\$/g, ""));
     if (isNaN(num) || num >= 0.001) return <span className={className} style={style}>{v}</span>;
     const afterDot = num.toFixed(20).split(".")[1];
     let zeros = 0;
@@ -186,7 +186,7 @@ export default function Home() {
     ? (Number(presaleData.totalSolRaised) / 1e9) * solPrice + Number(presaleData.totalUsdtRaised) / 1e6
     : 0;
 
-  const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace("$", ""));
+  const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace(/\$/g, ""));
   const amountUSD = !isNaN(amountNum) && amount !== ""
     ? currency === "SOL" ? amountNum * solPrice : amountNum
     : 0;

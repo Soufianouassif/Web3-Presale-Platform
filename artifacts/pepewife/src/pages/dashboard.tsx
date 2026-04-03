@@ -170,7 +170,7 @@ export default function Dashboard() {
   };
 
   const P = ({ v, className = "", style }: { v: string; className?: string; style?: React.CSSProperties }) => {
-    const num = parseFloat(v.replace("$", ""));
+    const num = parseFloat(v.replace(/\$/g, ""));
     if (isNaN(num) || num >= 0.001) return <span className={className} style={style}>{v}</span>;
     const afterDot = num.toFixed(20).split(".")[1];
     let zeros = 0;
@@ -199,7 +199,7 @@ export default function Dashboard() {
   const totalTokens = STAGE_DATA.reduce((a, s) => a + s.tokens, 0);
   const presaleFilled = Math.round((totalSold / totalTokens) * 100);
 
-  const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace("$", ""));
+  const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace(/\$/g, ""));
   const amountUSD = !isNaN(amountNum) && buyAmount !== ""
     ? currency === "SOL" ? amountNum * solPrice
     : currency === "USDT_ETH" ? amountNum * ethPrice

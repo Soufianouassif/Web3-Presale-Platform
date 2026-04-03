@@ -71,8 +71,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Trust proxy so secure cookies work behind Replit's reverse proxy in prod
+if (IS_PROD) app.set("trust proxy", 1);
+
 app.use(
   session({
+    name: "__pwife_sid",           // custom name to avoid server fingerprinting
     store: new PgSession({
       pool: pool,
       tableName: "user_sessions",
@@ -84,7 +88,9 @@ app.use(
     cookie: {
       secure: IS_PROD,
       httpOnly: true,
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       sameSite: IS_PROD ? "none" : "lax",
     },
   }),
