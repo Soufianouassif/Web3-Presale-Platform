@@ -85,6 +85,13 @@ const ar: Translations = {
     ethTelegramNote: "بعد الإرسال، راسلنا على Telegram مع hash العملية لتأكيد استلام توكناتك",
     ethCopied: "✅ تم نسخ العنوان!",
     ethClose: "فهمت — إغلاق",
+    inputMin: "الحد الأدنى",
+    inputMax: "الحد الأقصى",
+    inputLimitHint: "أدنى {0} · أقصى {1} {2}",
+    errorTooLow: "الحد الأدنى للإرسال هو {0} {1}",
+    errorTooHigh: "الحد الأقصى للإرسال هو {0} {1}",
+    errorInvalid: "الرجاء إدخال رقم صحيح (أرقام فقط)",
+    clearAmount: "مسح",
   },
 
   whyBuy: {

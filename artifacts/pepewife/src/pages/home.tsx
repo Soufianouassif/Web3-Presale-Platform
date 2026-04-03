@@ -15,9 +15,42 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 14, minutes: 0, seconds: 0 });
   const [currency, setCurrency] = useState<"SOL" | "USDT_SPL" | "USDT_ETH">("SOL");
+  const [amount, setAmount] = useState("");
   const [showEthModal, setShowEthModal] = useState(false);
   const [copiedEth, setCopiedEth] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const LIMITS: Record<string, { min: number; max: number }> = {
+    SOL:      { min: 0.01,  max: 100 },
+    USDT_SPL: { min: 5,     max: 50000 },
+    USDT_ETH: { min: 10,    max: 50000 },
+  };
+
+  const currSym = currency === "SOL" ? "SOL" : "USDT";
+  const lim = LIMITS[currency];
+
+  const limitHint = (tpl: string) =>
+    tpl.replace("{0}", lim.min.toString()).replace("{1}", lim.max.toLocaleString()).replace("{2}", currSym);
+
+  const errMsg = (tpl: string, val: number) =>
+    tpl.replace("{0}", val.toString()).replace("{1}", currSym);
+
+  const amountNum = parseFloat(amount);
+  const amountError =
+    amount !== "" && !/^\d+(\.\d*)?$/.test(amount)
+      ? t.presale.errorInvalid
+      : amount !== "" && !isNaN(amountNum) && amountNum < lim.min
+      ? errMsg(t.presale.errorTooLow, lim.min)
+      : amount !== "" && !isNaN(amountNum) && amountNum > lim.max
+      ? errMsg(t.presale.errorTooHigh, lim.max)
+      : "";
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (/[^0-9.]/.test(val)) return;
+    if ((val.match(/\./g) || []).length > 1) return;
+    setAmount(val);
+  };
 
   const ETH_WALLET = "0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97";
 
@@ -316,17 +349,17 @@ export default function Home() {
                 <div>
                   <p className="text-xs font-display text-[#1a1a2e]/40 tracking-wider mb-2">{t.presale.payWith}</p>
                   <div className="grid grid-cols-3 gap-2">
-                    <button onClick={() => setCurrency("SOL")}
+                    <button onClick={() => { setCurrency("SOL"); setAmount(""); }}
                       className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "SOL" ? "bg-[#14F195]/15 border-[#14F195] text-[#0a9060] shadow-[3px_3px_0px_#0a9060]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
                       <div className="flex items-center gap-1 text-sm"><SiSolana size={13} /> SOL</div>
                       <div className="text-[8px] font-bold opacity-60">Solana</div>
                     </button>
-                    <button onClick={() => setCurrency("USDT_SPL")}
+                    <button onClick={() => { setCurrency("USDT_SPL"); setAmount(""); }}
                       className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "USDT_SPL" ? "bg-[#26A17B]/15 border-[#26A17B] text-[#1a7a5e] shadow-[3px_3px_0px_#1a7a5e]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
                       <div className="flex items-center gap-1 text-sm"><SiTether size={13} /> USDT</div>
                       <div className="text-[8px] font-bold opacity-60">SPL · SOL</div>
                     </button>
-                    <button onClick={() => { setCurrency("USDT_ETH"); setShowEthModal(true); }}
+                    <button onClick={() => { setCurrency("USDT_ETH"); setAmount(""); setShowEthModal(true); }}
                       className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "USDT_ETH" ? "bg-[#627EEA]/15 border-[#627EEA] text-[#3d56c9] shadow-[3px_3px_0px_#3d56c9]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
                       <div className="flex items-center gap-1 text-sm"><SiTether size={13} /> USDT</div>
                       <div className="text-[8px] font-bold opacity-60">ERC20 · ETH</div>
@@ -346,23 +379,58 @@ export default function Home() {
                   )}
                 </div>
 
-                <div className="space-y-2.5">
+                <div className="space-y-2">
                   <div className="relative">
-                    <Input type="number" placeholder={`${t.presale.amountIn} ${currency === "SOL" ? "SOL" : "USDT"}`} className="h-12 ps-4 pe-20 text-base rounded-xl border-2 border-[#1a1a2e] font-bold" />
-                    <div className="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-[#FFFDE7] px-2.5 py-1 rounded-lg font-display text-sm text-[#1a1a2e] border border-[#FFD54F]">
-                      {currency === "SOL"
-                        ? <SiSolana size={14} className="text-[#14F195]" />
-                        : currency === "USDT_ETH"
-                          ? <SiEthereum size={14} className="text-[#627EEA]" />
-                          : <SiTether size={14} className="text-[#26A17B]" />}
-                      {currency === "SOL" ? "SOL" : "USDT"}
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={amount}
+                      onChange={handleAmountChange}
+                      placeholder={`${t.presale.inputMin} ${lim.min} ${currSym}`}
+                      className={`w-full h-12 ps-4 pe-28 text-base rounded-xl border-2 font-bold bg-white outline-none transition-colors ${amountError ? "border-red-400 focus:border-red-500" : amount && !amountError ? "border-[#4CAF50] focus:border-[#4CAF50]" : "border-[#1a1a2e] focus:border-[#FF4D9D]"}`}
+                      style={{ direction: "ltr" }}
+                    />
+                    <div className="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                      {amount && (
+                        <button
+                          onClick={() => setAmount("")}
+                          className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-red-50"
+                          title={t.presale.clearAmount}
+                        >
+                          <X size={13} />
+                        </button>
+                      )}
+                      <div className="flex items-center gap-1 bg-[#FFFDE7] px-2.5 py-1 rounded-lg font-display text-sm text-[#1a1a2e] border border-[#FFD54F]">
+                        {currency === "SOL"
+                          ? <SiSolana size={14} className="text-[#14F195]" />
+                          : currency === "USDT_ETH"
+                            ? <SiEthereum size={14} className="text-[#627EEA]" />
+                            : <SiTether size={14} className="text-[#26A17B]" />}
+                        {currSym}
+                      </div>
                     </div>
                   </div>
+
+                  {amountError ? (
+                    <p className="text-[11px] text-red-500 font-bold px-1">🚫 {amountError}</p>
+                  ) : (
+                    <p className="text-[10px] text-[#1a1a2e]/40 font-bold px-1">
+                      {t.presale.inputMin}: <span className="text-[#0a9060]">{lim.min} {currSym}</span>
+                      {"  ·  "}
+                      {t.presale.inputMax}: <span className="text-[#c0392b]">{lim.max.toLocaleString()} {currSym}</span>
+                    </p>
+                  )}
+
                   <div className="bg-[#E8F5E9] border-2 border-[#4CAF50]/30 rounded-xl px-3 py-2.5 flex justify-between items-center">
                     <span className="text-xs text-[#1a1a2e]/50 font-bold">{t.presale.youGet}</span>
                     <span className="font-display text-[#4CAF50] text-lg tracking-wider">~ 0 PWIFE</span>
                   </div>
-                  <button onClick={handleConnect} className="btn-meme w-full h-14 text-2xl rounded-xl font-display tracking-wider text-white" style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)" }}>
+                  <button
+                    onClick={handleConnect}
+                    disabled={!!amountError || amount === ""}
+                    className="btn-meme w-full h-14 text-2xl rounded-xl font-display tracking-wider text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+                    style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)" }}
+                  >
                     {t.presale.apeIn}
                   </button>
                 </div>

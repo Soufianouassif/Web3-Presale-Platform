@@ -83,6 +83,13 @@ const en = {
     ethTelegramNote: "After sending, message us on Telegram with the transaction hash to confirm your tokens",
     ethCopied: "✅ Address copied!",
     ethClose: "Got it — Close",
+    inputMin: "Min",
+    inputMax: "Max",
+    inputLimitHint: "Min {0} · Max {1} {2}",
+    errorTooLow: "Minimum amount is {0} {1}",
+    errorTooHigh: "Maximum amount is {0} {1}",
+    errorInvalid: "Please enter a valid amount (numbers only)",
+    clearAmount: "Clear",
   },
 
   whyBuy: {

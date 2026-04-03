@@ -85,6 +85,13 @@ const fr: Translations = {
     ethTelegramNote: "Après l'envoi, contacte-nous sur Telegram avec le hash de la transaction pour confirmer tes tokens",
     ethCopied: "✅ Adresse copiée !",
     ethClose: "Compris — Fermer",
+    inputMin: "Min",
+    inputMax: "Max",
+    inputLimitHint: "Min {0} · Max {1} {2}",
+    errorTooLow: "Le montant minimum est {0} {1}",
+    errorTooHigh: "Le montant maximum est {0} {1}",
+    errorInvalid: "Veuillez entrer un montant valide (chiffres uniquement)",
+    clearAmount: "Effacer",
   },
 
   whyBuy: {
