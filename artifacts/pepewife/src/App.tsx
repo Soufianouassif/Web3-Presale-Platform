@@ -14,6 +14,7 @@ import Terms from "@/pages/terms";
 import LoadingPage from "@/components/loading-page";
 import { LanguageProvider } from "@/i18n/context";
 import { WalletProvider } from "@/contexts/wallet-context";
+import { ToastProvider } from "@/components/wallet-toast";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <WalletProvider>
+          <ToastProvider>
           <TooltipProvider>
             {loading && <LoadingPage onComplete={() => setLoading(false)} />}
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
@@ -46,6 +48,7 @@ function App() {
             </WouterRouter>
             <Toaster />
           </TooltipProvider>
+          </ToastProvider>
         </WalletProvider>
       </LanguageProvider>
     </QueryClientProvider>

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, ExternalLink, Shield, Wifi, ChevronRight, Download, CheckCircle, AlertTriangle, X } from "lucide-react";
+import { ArrowLeft, ExternalLink, Shield, Wifi, ChevronRight, Download, CheckCircle, X } from "lucide-react";
 import { useLanguage } from "@/i18n/context";
 import { useWallet } from "@/contexts/wallet-context";
+import { useToast, mapErrorToCode, getWalletLabel } from "@/components/wallet-toast";
 import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
-import { getWalletNetwork, getInstallUrl, type WalletType } from "@/lib/wallet";
+import { getInstallUrl, type WalletType } from "@/lib/wallet";
 
 const wallets: {
   id: WalletType;
@@ -69,38 +70,36 @@ const wallets: {
   },
 ];
 
-function getErrorMessage(error: string, t: ReturnType<typeof useLanguage>["t"]): string {
-  if (error.includes("NOT_INSTALLED")) return t.connect.errorNotInstalled;
-  if (error === "USER_REJECTED") return t.connect.errorRejected;
-  if (error === "WRONG_NETWORK") return t.connect.errorWrongNetwork;
-  if (error === "CONNECTION_FAILED") return t.connect.errorFailed;
-  return t.connect.errorUnknown;
-}
-
 export default function ConnectPage() {
   const [, navigate] = useLocation();
   const { t } = useLanguage();
   const { status, walletType: connectedWallet, shortAddress, address, error, installedWallets, connect, disconnect, refreshDetection } = useWallet();
+  const { showWalletError, showSuccess } = useToast();
   const [connectingId, setConnectingId] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
-  const [showError, setShowError] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   useEffect(() => {
     refreshDetection();
   }, [refreshDetection]);
 
   useEffect(() => {
-    if (error) {
-      setShowError(true);
+    if (error && error !== lastError) {
+      setLastError(error);
+      const code = mapErrorToCode(error);
+      const walletName = connectingId ? getWalletLabel(connectingId as WalletType) : undefined;
+      showWalletError(code, walletName);
       setConnectingId(null);
     }
-  }, [error]);
+  }, [error, lastError, connectingId, showWalletError]);
 
   useEffect(() => {
     if (status === "connected" && connectingId) {
+      const walletName = getWalletLabel(connectingId as WalletType);
+      showSuccess("CONNECTED", walletName);
       navigate("/connecting");
     }
-  }, [status, connectingId, navigate]);
+  }, [status, connectingId, navigate, showSuccess]);
 
   const handleConnect = async (walletId: WalletType) => {
     if (status === "connected" && connectedWallet === walletId) {
@@ -110,11 +109,12 @@ export default function ConnectPage() {
 
     const isInstalled = installedWallets[walletId];
     if (!isInstalled) {
+      showWalletError("NOT_INSTALLED", getWalletLabel(walletId));
       window.open(getInstallUrl(walletId), "_blank", "noopener,noreferrer");
       return;
     }
 
-    setShowError(false);
+    setLastError(null);
     setConnectingId(walletId);
     const success = await connect(walletId);
     if (!success) {
@@ -124,8 +124,9 @@ export default function ConnectPage() {
 
   const handleDisconnect = async () => {
     await disconnect();
+    showSuccess("DISCONNECTED");
     setConnectingId(null);
-    setShowError(false);
+    setLastError(null);
   };
 
   return (
@@ -170,18 +171,6 @@ export default function ConnectPage() {
                   className="shrink-0 text-xs font-display text-red-500 hover:text-red-700 tracking-wider px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 transition-all"
                 >
                   {t.connect.disconnect}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {showError && error && (
-            <div className="mb-4 meme-card bg-red-50 rounded-2xl p-4 border-red-200 backdrop-blur">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
-                <p className="flex-1 text-sm text-red-600 font-bold">{getErrorMessage(error, t)}</p>
-                <button onClick={() => setShowError(false)} className="shrink-0 text-red-400 hover:text-red-600">
-                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>

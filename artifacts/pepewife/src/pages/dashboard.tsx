@@ -9,6 +9,7 @@ import { useLanguage } from "@/i18n/context";
 import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
 import { useWallet } from "@/contexts/wallet-context";
+import { useToast } from "@/components/wallet-toast";
 
 export default function Dashboard() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,6 +21,7 @@ export default function Dashboard() {
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
   const { status, shortAddress, address, network, disconnect } = useWallet();
+  const { showSuccess } = useToast();
   const [walletCopied, setWalletCopied] = useState(false);
 
   const walletAddress = shortAddress || "7xKp...4mNr";
@@ -127,7 +129,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <button onClick={() => navigate("/")} className="w-full text-start text-sm font-display text-[#1a1a2e] hover:text-[#FF4D9D] tracking-wide py-1">🏠 {t.nav.backToHome}</button>
-                    <button onClick={async () => { await disconnect(); navigate("/"); }} className="w-full text-start text-sm font-display text-red-500 tracking-wide py-1">🔌 {t.nav.disconnect}</button>
+                    <button onClick={async () => { await disconnect(); showSuccess("DISCONNECTED"); navigate("/"); }} className="w-full text-start text-sm font-display text-red-500 tracking-wide py-1">🔌 {t.nav.disconnect}</button>
                   </div>
                 )}
               </div>
