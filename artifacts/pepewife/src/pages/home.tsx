@@ -470,13 +470,13 @@ export default function Home() {
                   {/* تسميات المراحل */}
                   <div className="flex gap-1">
                     {STAGE_DATA.map((s, i) => (
-                      <div key={i} className={`flex-1 text-center rounded-lg py-1 border ${i === currentStage ? "border-[#1a1a2e] bg-[#FFFDE7]" : "border-transparent"}`}>
-                        <div className="text-[10px] font-nums tracking-wide text-[#1a1a2e]/60 font-bold">S{s.stage}</div>
-                        <P v={s.price} className="text-[10px] font-nums font-bold" style={{ color: s.color }} />
+                      <div key={i} className={`flex-1 text-center rounded-lg py-1.5 border ${i === currentStage ? "border-[#1a1a2e] bg-[#FFFDE7]" : "border-transparent"}`}>
+                        <div className="text-[11px] font-sans tracking-normal text-[#1a1a2e]/60 font-semibold">S{s.stage}</div>
+                        <P v={s.price} className="text-[11px] font-sans font-bold" style={{ color: s.color }} />
                       </div>
                     ))}
                   </div>
-                  <div className="text-center text-xs font-nums text-[#1a1a2e]/50 tracking-wider font-bold">
+                  <div className="text-center text-xs font-sans text-[#1a1a2e]/50 font-semibold">
                     {fmt(totalSold)} / {fmt(totalTokens)} PWIFE
                   </div>
                 </div>
@@ -488,9 +488,9 @@ export default function Home() {
                     { l: t.presale.list, v: LISTING_PRICE,         sub: "CEX",     bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" },
                   ].map(p => (
                     <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-3 text-center`}>
-                      <div className="text-xs font-display tracking-wider text-[#1a1a2e]/60 font-bold">{p.l}</div>
-                      <P v={p.v} className={`text-sm font-nums ${p.tc} tracking-wider font-bold`} />
-                      <div className="text-[10px] font-display text-[#1a1a2e]/50 tracking-wide font-bold">{p.sub}</div>
+                      <div className="text-xs font-sans text-[#1a1a2e]/60 font-semibold">{p.l}</div>
+                      <P v={p.v} className={`text-sm font-sans ${p.tc} font-bold`} />
+                      <div className="text-[11px] font-sans text-[#1a1a2e]/50 font-semibold">{p.sub}</div>
                     </div>
                   ))}
                 </div>
@@ -499,13 +499,13 @@ export default function Home() {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5">
                       <SiSolana size={13} className="text-[#14F195]" />
-                      <span className="font-nums text-xs text-[#1a1a2e] tracking-wide font-bold">
+                      <span className="font-sans text-xs text-[#1a1a2e] font-bold">
                         ${solPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <SiTether size={13} className="text-[#26A17B]" />
-                      <span className="font-nums text-xs text-[#26A17B] tracking-wide font-bold">$1.00</span>
+                      <span className="font-sans text-xs text-[#26A17B] font-bold">$1.00</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -548,8 +548,8 @@ export default function Home() {
                     <div className="flex items-start gap-2 bg-amber-50 border-2 border-amber-400 rounded-xl px-3 py-2 mt-2">
                       <span className="text-base mt-0.5">⚠️</span>
                       <div>
-                        <p className="text-[11px] font-bold text-amber-800 leading-tight">{t.presale.warnTitle}</p>
-                        <p className="text-[10px] text-amber-700 leading-tight mt-0.5">
+                        <p className="text-xs font-bold text-amber-800 leading-tight">{t.presale.warnTitle}</p>
+                        <p className="text-xs text-amber-700 leading-tight mt-0.5">
                           {currency === "SOL" ? t.presale.warnSol : t.presale.warnSpl}
                         </p>
                       </div>
@@ -639,7 +639,7 @@ export default function Home() {
                         <a
                           href={`https://explorer.solana.com/tx/${txSignature}?cluster=devnet`}
                           target="_blank" rel="noreferrer"
-                          className="text-[10px] text-[#4CAF50] underline break-all flex items-center gap-1 mt-0.5"
+                          className="text-xs text-[#4CAF50] underline break-all flex items-center gap-1 mt-0.5 font-sans"
                         >
                           {txSignature.slice(0, 20)}…{txSignature.slice(-8)}
                           <ExternalLink className="h-3 w-3 shrink-0" />
@@ -716,7 +716,7 @@ export default function Home() {
                     ].map(s => (
                       <div key={s.l} className={`${s.bg} rounded-xl p-2.5 text-center border-2 ${s.bc}`}>
                         <div className={`text-xl font-display ${s.c} tracking-wider`}>{s.v}</div>
-                        <div className="text-[10px] font-display text-[#1a1a2e]/40 tracking-wider mt-0.5">{s.l}</div>
+                        <div className="text-[11px] font-sans text-[#1a1a2e]/50 font-semibold mt-0.5">{s.l}</div>
                       </div>
                     ))}
                   </div>
@@ -796,7 +796,7 @@ export default function Home() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-display text-sm tracking-wider" style={{ color: item.color }}>{item.title}</span>
-                          <span className="text-[10px] font-display bg-white/10 px-2 py-0.5 rounded-full text-white/60">{item.duration}</span>
+                          <span className="text-[11px] font-sans bg-white/10 px-2 py-0.5 rounded-full text-white/60 font-semibold">{item.duration}</span>
                         </div>
                         <p className="text-white/40 text-xs font-bold leading-relaxed mt-0.5">{item.desc}</p>
                       </div>
@@ -806,25 +806,25 @@ export default function Home() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
-                    <div className="text-[10px] text-white/40 font-bold uppercase">{t.security.network}</div>
+                    <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.network}</div>
                     <div className="font-display text-[#AB47BC] tracking-wider text-sm">Solana (SPL)</div>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
-                    <div className="text-[10px] text-white/40 font-bold uppercase">{t.security.symbol}</div>
+                    <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.symbol}</div>
                     <div className="font-display text-[#FF4D9D] tracking-wider text-sm">$PWIFE</div>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
-                    <div className="text-[10px] text-white/40 font-bold uppercase">{t.security.tokenName}</div>
+                    <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.tokenName}</div>
                     <div className="font-display text-[#FFD54F] tracking-wider text-sm">PEPEWIFE</div>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
-                    <div className="text-[10px] text-white/40 font-bold uppercase">{t.security.totalSupply}</div>
+                    <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.totalSupply}</div>
                     <div className="font-display text-[#4CAF50] tracking-wider text-sm">100T</div>
                   </div>
                 </div>
 
                 <div className="mt-4 bg-white/5 rounded-2xl p-4 border border-white/10">
-                  <div className="text-[10px] text-white/40 font-bold uppercase mb-2">{t.security.contractAddress}</div>
+                  <div className="text-xs text-white/50 font-sans font-semibold uppercase mb-2">{t.security.contractAddress}</div>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 bg-white/5 rounded-xl px-4 py-2.5 border border-white/10 font-mono text-sm text-white/30 tracking-wide overflow-hidden text-ellipsis whitespace-nowrap">
                       {t.security.comingSoon}
