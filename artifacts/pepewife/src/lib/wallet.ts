@@ -124,7 +124,13 @@ export async function connectSolanaWallet(walletType: WalletType = "phantom"): P
   }
   try {
     const response = await provider.connect();
-    const address = response.publicKey.toString();
+
+    // Phantom  → returns { publicKey }
+    // Solflare → may return void/undefined in newer versions; publicKey lives on provider
+    const pk = response?.publicKey ?? provider.publicKey;
+    if (!pk) throw new Error("CONNECTION_FAILED");
+
+    const address = pk.toString();
     if (!address || !isValidSolAddress(address)) {
       throw new Error("INVALID_ADDRESS");
     }
@@ -132,7 +138,13 @@ export async function connectSolanaWallet(walletType: WalletType = "phantom"): P
   } catch (err: unknown) {
     const error = err as { code?: number; message?: string };
     if (error.message?.includes("NOT_INSTALLED")) throw err as Error;
-    if (error.code === 4001 || error.message?.includes("rejected")) {
+    if (error.message === "CONNECTION_FAILED" || error.message === "INVALID_ADDRESS") throw err as Error;
+    if (
+      error.code === 4001 ||
+      error.message?.toLowerCase().includes("rejected") ||
+      error.message?.toLowerCase().includes("cancelled") ||
+      error.message?.toLowerCase().includes("user denied")
+    ) {
       throw new Error("USER_REJECTED");
     }
     throw new Error("CONNECTION_FAILED");
