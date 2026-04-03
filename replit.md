@@ -134,4 +134,14 @@ React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
   - Provider event listeners for account changes, disconnects, chain switches
   - Dashboard route guard: redirects to /connect if wallet not connected
   - Error handling: USER_REJECTED, WRONG_NETWORK, NOT_INSTALLED, CONNECTION_FAILED with i18n error messages
-- **All data is static/mocked** — no backend integration
+- **Referral System** (off-chain DB tracking + TGE on-chain payout):
+  - `src/lib/referral.ts` — all referral API calls: `fetchOrCreateReferralCode`, `fetchReferralStats`, `fetchLeaderboard`, `buildReferralUrl`, `captureReferralFromUrl`, `getStoredReferralCode`, `clearStoredReferralCode`, `formatTokens`
+  - URL detection: `?ref=CODE` captured via `captureReferralFromUrl()` on page load, stored in `sessionStorage`
+  - Referral code revealed in Home and Dashboard only when wallet is connected (fetched/created lazily)
+  - Purchase tracking (`tracker.purchase`) now includes `referralCode` field → auto-registers referral on the server after purchase
+  - Reward rate: 5% of purchased tokens → credited to referrer as `pending` (paid at TGE)
+  - Leaderboard (top 10 by reward tokens) and recent referrals list shown on both Home and Dashboard
+  - DB Tables: `referral_codes` (wallet→code mapping + counters), `referrals` (each referral record + reward + status)
+  - API routes in `artifacts/api-server/src/routes/referral.ts`: `GET /api/referral/code/:wallet`, `GET /api/referral/stats/:wallet`, `GET /api/referral/leaderboard`, `GET /api/referral/resolve/:code`, `POST /api/referral/register`
+  - Security: Solana address validation, self-referral prevention, double-referral prevention, atomic DB transactions, rate limiting (20 req/min/IP), code collision retry (5 attempts)
+  - Bug fixed: `requireAdminAuth` middleware now only applies to `/admin/*` routes (was incorrectly blocking all public routes)

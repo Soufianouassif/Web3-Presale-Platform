@@ -109,6 +109,7 @@ export const tracker = {
     amountTokens: number;
     txHash?: string;
     stage?: number;
+    referralCode?: string;
   }) => {
     fetch(`${API_BASE}/track/purchase`, {
       method: "POST",

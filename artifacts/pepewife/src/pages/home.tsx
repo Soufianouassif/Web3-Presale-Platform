@@ -15,6 +15,19 @@ import {
   fetchPresaleState,
   type PresaleState,
 } from "@/lib/presale-contract";
+import {
+  captureReferralFromUrl,
+  getStoredReferralCode,
+  clearStoredReferralCode,
+  fetchOrCreateReferralCode,
+  fetchReferralStats,
+  fetchLeaderboard,
+  buildReferralUrl,
+  formatTokens,
+  type ReferralStats,
+  type LeaderboardEntry,
+} from "@/lib/referral";
+import { tracker } from "@/lib/admin-api";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,9 +46,15 @@ export default function Home() {
   const [txSignature, setTxSignature] = useState<string | null>(null);
   const [showBuyModal, setShowBuyModal] = useState(false);
 
+  // ── Referral state ────────────────────────────────────────────────────────
+  const [myRefCode, setMyRefCode] = useState<string | null>(null);
+  const [refStats, setRefStats] = useState<ReferralStats | null>(null);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [refBannerCode, setRefBannerCode] = useState<string | null>(null);
+
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
-  const { status, shortAddress } = useWallet();
+  const { status, shortAddress, address } = useWallet();
 
   useEffect(() => {
     fetchPresaleState().then(d => {
@@ -60,6 +79,31 @@ export default function Home() {
     const interval = setInterval(fetchPrices, 60 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // ── Detect referral code in URL on first load ──────────────────────────────
+  useEffect(() => {
+    const code = captureReferralFromUrl();
+    if (code) setRefBannerCode(code);
+    // Always load leaderboard
+    fetchLeaderboard().then(lb => setLeaderboard(lb));
+  }, []);
+
+  // ── Load referral code + stats when wallet connects ────────────────────────
+  useEffect(() => {
+    if (!address) {
+      setMyRefCode(null);
+      setRefStats(null);
+      return;
+    }
+    fetchOrCreateReferralCode(address).then(code => {
+      if (code) setMyRefCode(code);
+    });
+    fetchReferralStats(address).then(stats => {
+      if (stats) setRefStats(stats);
+    });
+  }, [address]);
+
+  const myRefUrl = myRefCode ? buildReferralUrl(myRefCode) : "";
 
   const LIMITS: Record<string, { min: number; max: number }> = {
     SOL:      { min: 1,    max: 50 },
@@ -178,6 +222,32 @@ export default function Home() {
     setTxSignature(sig);
     setAmount("");
     fetchPresaleState().then(d => { if (d) setPresaleData(d); });
+
+    // Track the purchase (fire-and-forget) with referral code if present
+    const refCode = getStoredReferralCode();
+    const amountNum = parseFloat(amount) || 0;
+    const stage = presaleData?.currentStage ?? 1;
+    const stagePrice = presaleData
+      ? [0.00003, 0.00004, 0.00005, 0.00007][stage - 1] ?? 0.00003
+      : 0.00003;
+    const pricePerToken = stagePrice;
+    const solUsd = currency === "SOL" ? amountNum * solPrice : 0;
+    const usdAmt = currency === "SOL" ? solUsd : amountNum;
+    const tokensEst = pricePerToken > 0 ? usdAmt / pricePerToken : 0;
+
+    tracker.purchase({
+      walletAddress: address ?? "",
+      network: currency === "SOL" ? "solana" : currency === "USDT_SPL" ? "solana" : "ethereum",
+      amountUsd: usdAmt,
+      amountTokens: tokensEst,
+      txHash: sig,
+      stage,
+      referralCode: refCode ?? undefined,
+    });
+
+    // After a confirmed referral is registered, clear it so it won't double-count
+    if (refCode) clearStoredReferralCode();
+
     setTimeout(() => {
       setShowBuyModal(false);
       navigate("/dashboard");
@@ -596,37 +666,86 @@ export default function Home() {
               <div className="meme-card bg-white rounded-2xl overflow-hidden">
                 <div className="zigzag-border" />
                 <div className="p-5 space-y-5">
+                  {/* Referral link — connect wallet to reveal */}
                   <div>
                     <p className="text-xs font-display text-[#1a1a2e]/40 tracking-wider mb-2">{t.presale.yourLink}</p>
-                    <div className="flex gap-2">
-                      <Input readOnly value="https://pepewife.io/ref/7xKp4mNr" className="h-10 rounded-xl border-2 border-[#1a1a2e] bg-[#FFFDE7] font-mono text-xs" />
-                      <button onClick={handleCopy} className={`btn-meme h-10 px-3 rounded-xl shrink-0 ${copied ? "bg-[#4CAF50]" : "bg-[#FFD54F]"} text-[#1a1a2e]`}>
-                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                      </button>
-                    </div>
+                    {address && myRefUrl ? (
+                      <div className="flex gap-2">
+                        <Input readOnly value={myRefUrl} className="h-10 rounded-xl border-2 border-[#1a1a2e] bg-[#FFFDE7] font-mono text-xs" />
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(myRefUrl);
+                            setCopied(true);
+                            setTimeout(() => setCopied(false), 2000);
+                          }}
+                          className={`btn-meme h-10 px-3 rounded-xl shrink-0 ${copied ? "bg-[#4CAF50]" : "bg-[#FFD54F]"} text-[#1a1a2e]`}
+                        >
+                          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="h-10 rounded-xl border-2 border-dashed border-[#1a1a2e]/20 bg-[#FFFDE7] flex items-center px-3">
+                        <span className="font-display text-xs text-[#1a1a2e]/40 tracking-wider">
+                          {status === "connecting" ? "⏳ جاري الاتصال…" : "🔌 وصّل محفظتك لعرض رابطك"}
+                        </span>
+                      </div>
+                    )}
                     {copied && <p className="text-xs text-[#4CAF50] font-display tracking-wide mt-1">{t.presale.copied}</p>}
                   </div>
+
+                  {/* Stats grid */}
                   <div className="grid grid-cols-3 gap-2">
-                    {[{ l: t.presale.shilled, v: "0", c: "text-[#4CAF50]", bg: "bg-[#E8F5E9]", bc: "border-[#4CAF50]" }, { l: t.presale.pending, v: "0 PWIFE", c: "text-[#FF4D9D]", bg: "bg-[#FCE4EC]", bc: "border-[#FF4D9D]" }, { l: t.presale.rate, v: "0%", c: "text-[#b8860b]", bg: "bg-[#FFFDE7]", bc: "border-[#FFD54F]" }].map(s => (
-                        <div key={s.l} className={`${s.bg} rounded-xl p-2.5 text-center border-2 ${s.bc}`}>
-                          <div className={`text-xl font-display ${s.c} tracking-wider`}>{s.v}</div>
-                          <div className="text-[10px] font-display text-[#1a1a2e]/40 tracking-wider mt-0.5">{s.l}</div>
-                        </div>
+                    {[
+                      {
+                        l: t.presale.shilled,
+                        v: refStats ? String(refStats.totalReferrals) : (address ? "…" : "0"),
+                        c: "text-[#4CAF50]",
+                        bg: "bg-[#E8F5E9]",
+                        bc: "border-[#4CAF50]",
+                      },
+                      {
+                        l: t.presale.pending,
+                        v: refStats ? `${formatTokens(refStats.pendingTokens)} PWIFE` : (address ? "…" : "0 PWIFE"),
+                        c: "text-[#FF4D9D]",
+                        bg: "bg-[#FCE4EC]",
+                        bc: "border-[#FF4D9D]",
+                      },
+                      {
+                        l: t.presale.rate,
+                        v: "5%",
+                        c: "text-[#b8860b]",
+                        bg: "bg-[#FFFDE7]",
+                        bc: "border-[#FFD54F]",
+                      },
+                    ].map(s => (
+                      <div key={s.l} className={`${s.bg} rounded-xl p-2.5 text-center border-2 ${s.bc}`}>
+                        <div className={`text-xl font-display ${s.c} tracking-wider`}>{s.v}</div>
+                        <div className="text-[10px] font-display text-[#1a1a2e]/40 tracking-wider mt-0.5">{s.l}</div>
+                      </div>
                     ))}
                   </div>
                 </div>
               </div>
 
+              {/* Leaderboard */}
               <div className="meme-card bg-white rounded-2xl p-5">
                 <h4 className="font-display text-lg text-[#1a1a2e] mb-3 tracking-wider">{t.presale.topShillers}</h4>
                 <div className="space-y-2">
-                  {[{ r: "🥇", a: "---", p: "0" }, { r: "🥈", a: "---", p: "0" }, { r: "🥉", a: "---", p: "0" }].map((x, i) => (
-                    <div key={`shiller-${i}`} className="flex items-center gap-2 bg-[#FFFDE7] rounded-xl px-3 py-2 border-2 border-[#FFD54F]/50">
-                      <span className="text-lg">{x.r}</span>
-                      <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">{x.a}</span>
-                      <span className="text-xs font-display text-[#4CAF50] tracking-wide">{x.p} PWIFE</span>
-                    </div>
-                  ))}
+                  {leaderboard.length === 0
+                    ? [{ r: "🥇" }, { r: "🥈" }, { r: "🥉" }].map((x, i) => (
+                        <div key={`shiller-ph-${i}`} className="flex items-center gap-2 bg-[#FFFDE7] rounded-xl px-3 py-2 border-2 border-[#FFD54F]/50">
+                          <span className="text-lg">{x.r}</span>
+                          <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">---</span>
+                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 PWIFE</span>
+                        </div>
+                      ))
+                    : leaderboard.slice(0, 3).map((entry, i) => (
+                        <div key={`shiller-${i}`} className="flex items-center gap-2 bg-[#FFFDE7] rounded-xl px-3 py-2 border-2 border-[#FFD54F]/50">
+                          <span className="text-lg">{["🥇", "🥈", "🥉"][i]}</span>
+                          <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">{entry.walletAddress}</span>
+                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} PWIFE</span>
+                        </div>
+                      ))}
                 </div>
               </div>
             </div>

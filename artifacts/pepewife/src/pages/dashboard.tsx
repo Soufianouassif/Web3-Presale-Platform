@@ -18,6 +18,15 @@ import {
   type BuyerState,
   type BuyerTx,
 } from "@/lib/presale-contract";
+import {
+  fetchOrCreateReferralCode,
+  fetchReferralStats,
+  fetchLeaderboard,
+  buildReferralUrl,
+  formatTokens,
+  type ReferralStats,
+  type LeaderboardEntry,
+} from "@/lib/referral";
 
 export default function Dashboard() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,11 +58,30 @@ export default function Dashboard() {
   const fullWallet = address || "7xKp4mNrQ9vB...kL2xNw";
   const [, navigate] = useLocation();
 
+  // ── Referral state ────────────────────────────────────────────────────────
+  const [myRefCode, setMyRefCode] = useState<string | null>(null);
+  const [refStats, setRefStats] = useState<ReferralStats | null>(null);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [refCopied, setRefCopied] = useState(false);
+
+  const myRefUrl = myRefCode ? buildReferralUrl(myRefCode) : "";
+
   useEffect(() => {
     if (status === "disconnected" || status === "error") {
       navigate("/connect");
     }
   }, [status, navigate]);
+
+  // ── Load referral data when address is available ──────────────────────────
+  useEffect(() => {
+    fetchLeaderboard().then(lb => setLeaderboard(lb));
+  }, []);
+
+  useEffect(() => {
+    if (!address) return;
+    fetchOrCreateReferralCode(address).then(code => { if (code) setMyRefCode(code); });
+    fetchReferralStats(address).then(stats => { if (stats) setRefStats(stats); });
+  }, [address]);
 
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
@@ -847,23 +875,62 @@ export default function Dashboard() {
                         <p className="text-[#1a1a2e]/60 font-bold">{t.presale.shillDesc}</p>
                       </div>
 
+                      {/* Referral link */}
                       <div>
                         <p className="text-xs font-display text-[#1a1a2e]/40 tracking-wider mb-2">{t.presale.yourLink}</p>
-                        <div className="flex gap-2">
-                          <Input readOnly value="https://pepewife.io/ref/7xKp4mNr" className="h-11 rounded-xl border-2 border-[#1a1a2e] bg-[#FFFDE7] font-mono text-xs" />
-                          <button onClick={handleCopy} className={`btn-meme h-11 px-4 rounded-xl shrink-0 ${copied ? "bg-[#4CAF50]" : "bg-[#FFD54F]"} text-[#1a1a2e]`}>
-                            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                          </button>
-                        </div>
-                        {copied && <p className="text-xs text-[#4CAF50] font-display tracking-wide mt-1">{t.presale.copied}</p>}
+                        {myRefUrl ? (
+                          <div className="flex gap-2">
+                            <Input readOnly value={myRefUrl} className="h-11 rounded-xl border-2 border-[#1a1a2e] bg-[#FFFDE7] font-mono text-xs" />
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(myRefUrl);
+                                setRefCopied(true);
+                                setTimeout(() => setRefCopied(false), 2000);
+                              }}
+                              className={`btn-meme h-11 px-4 rounded-xl shrink-0 ${refCopied ? "bg-[#4CAF50]" : "bg-[#FFD54F]"} text-[#1a1a2e]`}
+                            >
+                              {refCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="h-11 rounded-xl border-2 border-dashed border-[#1a1a2e]/20 bg-[#FFFDE7] flex items-center px-3 animate-pulse">
+                            <span className="font-display text-xs text-[#1a1a2e]/40 tracking-wider">⏳ جاري إنشاء رابطك…</span>
+                          </div>
+                        )}
+                        {refCopied && <p className="text-xs text-[#4CAF50] font-display tracking-wide mt-1">{t.presale.copied}</p>}
                       </div>
 
+                      {/* Stats grid */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {[
-                          { l: t.dashboard.friendsShilled, v: "0", c: "text-[#4CAF50]", bg: "bg-[#E8F5E9]", bc: "border-[#4CAF50]" },
-                          { l: t.dashboard.pendingRewards, v: "0", c: "text-[#FF4D9D]", bg: "bg-[#FCE4EC]", bc: "border-[#FF4D9D]" },
-                          { l: t.dashboard.earnedTotal, v: "0", c: "text-[#AB47BC]", bg: "bg-[#F3E5F5]", bc: "border-[#AB47BC]" },
-                          { l: t.dashboard.rewardRate, v: "0%", c: "text-[#b8860b]", bg: "bg-[#FFFDE7]", bc: "border-[#FFD54F]" },
+                          {
+                            l: t.dashboard.friendsShilled,
+                            v: refStats ? String(refStats.totalReferrals) : "…",
+                            c: "text-[#4CAF50]",
+                            bg: "bg-[#E8F5E9]",
+                            bc: "border-[#4CAF50]",
+                          },
+                          {
+                            l: t.dashboard.pendingRewards,
+                            v: refStats ? formatTokens(refStats.pendingTokens) : "…",
+                            c: "text-[#FF4D9D]",
+                            bg: "bg-[#FCE4EC]",
+                            bc: "border-[#FF4D9D]",
+                          },
+                          {
+                            l: t.dashboard.earnedTotal,
+                            v: refStats ? formatTokens(refStats.totalRewardTokens) : "…",
+                            c: "text-[#AB47BC]",
+                            bg: "bg-[#F3E5F5]",
+                            bc: "border-[#AB47BC]",
+                          },
+                          {
+                            l: t.dashboard.rewardRate,
+                            v: "5%",
+                            c: "text-[#b8860b]",
+                            bg: "bg-[#FFFDE7]",
+                            bc: "border-[#FFD54F]",
+                          },
                         ].map(s => (
                           <div key={s.l} className={`${s.bg} rounded-xl p-3 text-center border-2 ${s.bc}`}>
                             <div className={`text-xl font-display ${s.c} tracking-wider`}>{s.v}</div>
@@ -874,41 +941,73 @@ export default function Dashboard() {
                     </div>
                   </div>
 
+                  {/* Tier progress */}
                   <div className="meme-card bg-white rounded-2xl p-5">
                     <h4 className="font-display text-lg text-[#1a1a2e] mb-4 tracking-wider">{t.dashboard.referralProgress}</h4>
                     <div className="space-y-3">
                       {[
-                        { label: t.dashboard.referrals, current: 0, target: 0, reward: t.dashboard.bronzeShiller, color: "#4CAF50" },
-                        { label: t.dashboard.referrals, current: 0, target: 0, reward: t.dashboard.silverShiller, color: "#FF4D9D" },
-                        { label: t.dashboard.referrals, current: 0, target: 0, reward: t.dashboard.goldShiller, color: "#FFD54F" },
-                      ].map(p => (
-                        <div key={p.reward} className="bg-[#FFFDE7] rounded-xl p-3 border-2 border-[#FFD54F]/30">
-                          <div className="flex justify-between text-xs font-display tracking-wider mb-1.5">
-                            <span className="text-[#1a1a2e]">{p.reward}</span>
-                            <span className="text-[#1a1a2e]/40">{p.current}/{p.target} {t.dashboard.referralsLabel}</span>
+                        { reward: t.dashboard.bronzeShiller, target: 5,  color: "#4CAF50" },
+                        { reward: t.dashboard.silverShiller, target: 20, color: "#FF4D9D" },
+                        { reward: t.dashboard.goldShiller,   target: 50, color: "#FFD54F" },
+                      ].map(p => {
+                        const current = refStats?.totalReferrals ?? 0;
+                        const pct = Math.min((current / p.target) * 100, 100);
+                        return (
+                          <div key={p.reward} className="bg-[#FFFDE7] rounded-xl p-3 border-2 border-[#FFD54F]/30">
+                            <div className="flex justify-between text-xs font-display tracking-wider mb-1.5">
+                              <span className="text-[#1a1a2e]">{p.reward}</span>
+                              <span className="text-[#1a1a2e]/40">{current}/{p.target} {t.dashboard.referralsLabel}</span>
+                            </div>
+                            <div className="h-3 rounded-full bg-[#1a1a2e]/10 overflow-hidden border border-[#1a1a2e]/20">
+                              <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: p.color }} />
+                            </div>
                           </div>
-                          <div className="h-3 rounded-full bg-[#1a1a2e]/10 overflow-hidden border border-[#1a1a2e]/20">
-                            <div className="h-full rounded-full transition-all" style={{ width: `${p.target > 0 ? (p.current / p.target) * 100 : 0}%`, backgroundColor: p.color }} />
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 
+                  {/* Recent referrals */}
+                  {refStats && refStats.recentReferrals.length > 0 && (
+                    <div className="meme-card bg-white rounded-2xl p-5">
+                      <h4 className="font-display text-lg text-[#1a1a2e] mb-3 tracking-wider">🕐 آخر الإحالات</h4>
+                      <div className="space-y-2">
+                        {refStats.recentReferrals.map((r, i) => (
+                          <div key={`recent-${i}`} className="flex items-center gap-2 rounded-xl px-3 py-2 border-2 bg-[#FFFDE7] border-[#FFD54F]/50">
+                            <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">
+                              {r.referredWallet.slice(0, 4)}…{r.referredWallet.slice(-4)}
+                            </span>
+                            <span className={`text-xs font-display tracking-wide ${r.status === "paid" ? "text-[#4CAF50]" : "text-[#FF4D9D]"}`}>
+                              +{formatTokens(r.rewardTokens)} PWIFE
+                            </span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-display ${r.status === "paid" ? "bg-[#E8F5E9] text-[#4CAF50]" : "bg-[#FCE4EC] text-[#FF4D9D]"}`}>
+                              {r.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Leaderboard */}
                   <div className="meme-card bg-white rounded-2xl p-5">
                     <h4 className="font-display text-lg text-[#1a1a2e] mb-3 tracking-wider">{t.presale.topShillers}</h4>
                     <div className="space-y-2">
-                      {[
-                        { r: "🥇", a: "---", p: "0" },
-                        { r: "🥈", a: "---", p: "0" },
-                        { r: "🥉", a: "---", p: "0" },
-                      ].map((x, i) => (
-                        <div key={`shiller-${i}`} className="flex items-center gap-2 rounded-xl px-3 py-2 border-2 bg-[#FFFDE7] border-[#FFD54F]/50">
-                          <span className="text-lg">{x.r}</span>
-                          <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">{x.a}</span>
-                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">{x.p} PWIFE</span>
-                        </div>
-                      ))}
+                      {leaderboard.length === 0
+                        ? [{ r: "🥇" }, { r: "🥈" }, { r: "🥉" }].map((x, i) => (
+                            <div key={`ph-${i}`} className="flex items-center gap-2 rounded-xl px-3 py-2 border-2 bg-[#FFFDE7] border-[#FFD54F]/50">
+                              <span className="text-lg">{x.r}</span>
+                              <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">---</span>
+                              <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 PWIFE</span>
+                            </div>
+                          ))
+                        : leaderboard.slice(0, 5).map((entry, i) => (
+                            <div key={`lb-${i}`} className="flex items-center gap-2 rounded-xl px-3 py-2 border-2 bg-[#FFFDE7] border-[#FFD54F]/50">
+                              <span className="text-lg">{["🥇", "🥈", "🥉", "4️⃣", "5️⃣"][i]}</span>
+                              <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">{entry.walletAddress}</span>
+                              <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} PWIFE</span>
+                            </div>
+                          ))}
                     </div>
                   </div>
                 </div>
