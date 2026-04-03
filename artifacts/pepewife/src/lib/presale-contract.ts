@@ -91,7 +91,8 @@ export interface BuyWithSolResult {
 export async function buyWithSol(
   buyerAddress: string,
   solAmount: number,
-  treasuryAddress: string
+  treasuryAddress: string,
+  walletType = "phantom"
 ): Promise<BuyWithSolResult> {
   const buyer = new PublicKey(buyerAddress);
   const treasury = new PublicKey(treasuryAddress);
@@ -128,8 +129,8 @@ export async function buyWithSol(
   tx.feePayer = buyer;
   tx.add(ix);
 
-  // Sign via window.solana (Phantom / Solflare)
-  const provider = getProvider();
+  // Sign with the wallet the user actually connected
+  const provider = getProvider(walletType);
   const signed = await provider.signTransaction(tx);
   const signature = await connection.sendRawTransaction(signed.serialize(), {
     skipPreflight: false,
@@ -154,7 +155,8 @@ export async function buyWithSol(
 export async function buyWithUsdt(
   buyerAddress: string,
   usdtAmount: number,
-  usdtTreasuryAta: string
+  usdtTreasuryAta: string,
+  walletType = "phantom"
 ): Promise<BuyWithSolResult> {
   const buyer = new PublicKey(buyerAddress);
   const treasuryAta = new PublicKey(usdtTreasuryAta);
@@ -196,7 +198,7 @@ export async function buyWithUsdt(
   tx.feePayer = buyer;
   tx.add(ix);
 
-  const provider = getProvider();
+  const provider = getProvider(walletType);
   const signed = await provider.signTransaction(tx);
   const signature = await connection.sendRawTransaction(signed.serialize(), {
     skipPreflight: false,
@@ -331,20 +333,24 @@ interface SolanaSignProvider {
   signTransaction(tx: Transaction): Promise<Transaction>;
 }
 
-function getProvider(): SolanaSignProvider {
+function getProvider(walletType = "phantom"): SolanaSignProvider {
   const w = window as unknown as {
     solana?: SolanaSignProvider;
     phantom?: { solana?: SolanaSignProvider };
     solflare?: SolanaSignProvider;
   };
 
-  const provider =
-    w.phantom?.solana ??
-    w.solana ??
-    w.solflare;
-
-  if (!provider) {
-    throw new Error("No Solana wallet found. Please install Phantom or Solflare.");
+  if (walletType === "solflare") {
+    if (w.solflare) return w.solflare;
+    throw new Error("Solflare wallet not found. Is it installed?");
   }
-  return provider;
+
+  // phantom or any other Solana wallet
+  const provider = w.phantom?.solana ?? w.solana;
+  if (provider) return provider;
+
+  // last resort — try solflare
+  if (w.solflare) return w.solflare;
+
+  throw new Error("No Solana wallet found. Please install Phantom or Solflare.");
 }

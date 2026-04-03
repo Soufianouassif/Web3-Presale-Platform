@@ -37,7 +37,7 @@ export default function Home() {
 
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
-  const { status, shortAddress, address } = useWallet();
+  const { status, shortAddress, address, walletType } = useWallet();
 
   useEffect(() => {
     fetchPresaleState().then(d => {
@@ -172,14 +172,14 @@ export default function Home() {
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
   // ── Core buy executor ─────────────────────────────────────────────
-  const executeBuy = async (buyAmountNum: number, buyCurrency: string, buyerAddress: string) => {
+  const executeBuy = async (buyAmountNum: number, buyCurrency: string, buyerAddress: string, buyerWalletType: string) => {
     setTxError(null);
     setTxSignature(null);
     setTxLoading(true);
     try {
       if (buyCurrency === "SOL") {
         const treasury = presaleData?.treasury ?? "9KrLVaHMoGRNM6vn8kS5S69NMvHFq7i8ksVMCnNiNiYq";
-        const result = await buyWithSol(buyerAddress, buyAmountNum, treasury);
+        const result = await buyWithSol(buyerAddress, buyAmountNum, treasury, buyerWalletType);
         setTxSignature(result.signature);
         setAmount("");
         fetchPresaleState().then(d => { if (d) setPresaleData(d); });
@@ -187,7 +187,7 @@ export default function Home() {
       } else if (buyCurrency === "USDT_SPL") {
         const usdtAta = presaleData?.usdtTreasuryAta ?? "";
         if (!usdtAta) throw new Error("USDT treasury not configured on-chain yet.");
-        const result = await buyWithUsdt(buyerAddress, buyAmountNum, usdtAta);
+        const result = await buyWithUsdt(buyerAddress, buyAmountNum, usdtAta, buyerWalletType);
         setTxSignature(result.signature);
         setAmount("");
         fetchPresaleState().then(d => { if (d) setPresaleData(d); });
@@ -212,7 +212,7 @@ export default function Home() {
 
   // ── Auto-execute pending purchase after wallet connection ──────────
   useEffect(() => {
-    if (status !== "connected" || !address) return;
+    if (status !== "connected" || !address || !walletType) return;
     const raw = sessionStorage.getItem("pendingPurchase");
     if (!raw) return;
     sessionStorage.removeItem("pendingPurchase");
@@ -221,10 +221,10 @@ export default function Home() {
       const num = parseFloat(savedAmount);
       if (!savedAmount || isNaN(num) || num <= 0) return;
       if (savedCurrency === "USDT_ETH") { setShowEthModal(true); return; }
-      executeBuy(num, savedCurrency, address);
+      executeBuy(num, savedCurrency, address, walletType);
     } catch { /* malformed sessionStorage — ignore */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, address]);
+  }, [status, address, walletType]);
 
   // ── APE IN handler ─────────────────────────────────────────────────
   const handleApeIn = () => {
@@ -244,7 +244,7 @@ export default function Home() {
       return;
     }
 
-    executeBuy(amountNum, currency, address);
+    executeBuy(amountNum, currency, address, walletType ?? "phantom");
   };
 
   const navLinks = [
