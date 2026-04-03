@@ -124,13 +124,8 @@ export async function connectSolanaWallet(walletType: WalletType = "phantom"): P
   }
   try {
     const response = await provider.connect();
-
-    // Phantom  → returns { publicKey }
-    // Solflare → may return void/undefined in newer versions; publicKey lives on provider
-    const pk = response?.publicKey ?? provider.publicKey;
-    if (!pk) throw new Error("CONNECTION_FAILED");
-
-    const address = pk.toString();
+    if (!response?.publicKey) throw new Error("CONNECTION_FAILED");
+    const address = response.publicKey.toString();
     if (!address || !isValidSolAddress(address)) {
       throw new Error("INVALID_ADDRESS");
     }
