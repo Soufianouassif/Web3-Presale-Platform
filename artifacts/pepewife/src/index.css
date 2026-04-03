@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Boogaloo&family=Orbitron:wght@700;900&family=Comic+Neue:wght@400;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -43,6 +43,7 @@
   --font-sans: var(--app-font-sans);
   --font-display: var(--app-font-display);
   --font-meme: var(--app-font-meme);
+  --font-nums: var(--app-font-nums);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -84,8 +85,9 @@
   --radius: 1rem;
   
   --app-font-sans: 'Comic Neue', 'Inter', system-ui, sans-serif;
-  --app-font-display: 'Bangers', 'Space Grotesk', system-ui, sans-serif;
-  --app-font-meme: 'Bangers', cursive;
+  --app-font-display: 'Boogaloo', 'Comic Neue', system-ui, sans-serif;
+  --app-font-meme: 'Boogaloo', cursive;
+  --app-font-nums: 'Orbitron', 'Boogaloo', system-ui, sans-serif;
 
   --chart-1: 122 39% 49%;
   --chart-2: 330 100% 65%;

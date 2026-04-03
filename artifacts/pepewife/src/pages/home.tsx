@@ -294,7 +294,7 @@ export default function Home() {
             <div className="flex flex-wrap gap-3 mb-8">
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                 <div className="text-xs font-display text-gray-500 tracking-wide">💰 Total Raised</div>
-                <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">
+                <div className="text-2xl font-nums text-[#1a1a2e] tracking-wider">
                   {presaleData
                     ? `$${totalRaisedUSD >= 1000 ? (totalRaisedUSD / 1000).toFixed(1) + "K" : totalRaisedUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
                     : "$0"}
@@ -303,7 +303,7 @@ export default function Home() {
               </div>
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                 <div className="text-xs font-display text-gray-500 tracking-wide">🐸 PWIFE Sold</div>
-                <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">
+                <div className="text-2xl font-nums text-[#1a1a2e] tracking-wider">
                   {totalSold >= 1_000_000_000
                     ? (totalSold / 1_000_000_000).toFixed(1) + "B"
                     : totalSold >= 1_000_000
@@ -314,7 +314,7 @@ export default function Home() {
               </div>
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                 <div className="text-xs font-display text-gray-500 tracking-wide">💎 Stage {currentStage + 1} Price</div>
-                <P v={STAGE_DATA[currentStage].price} className="text-xl font-display text-[#1a1a2e] tracking-wider" />
+                <P v={STAGE_DATA[currentStage].price} className="text-xl font-nums text-[#1a1a2e] tracking-wider" />
                 <div className="text-[10px] text-gray-400 font-display tracking-wide">per PWIFE</div>
               </div>
             </div>
@@ -370,7 +370,7 @@ export default function Home() {
                   <div className="grid grid-cols-4 gap-2">
                     {[{ val: timeLeft.days, label: t.presale.days }, { val: timeLeft.hours.toString().padStart(2, "0"), label: t.presale.hrs }, { val: timeLeft.minutes.toString().padStart(2, "0"), label: t.presale.min }, { val: timeLeft.seconds.toString().padStart(2, "0"), label: t.presale.sec }].map(ti => (
                       <div key={ti.label} className="bg-[#FFFDE7] border-2 border-[#FFD54F] rounded-xl py-2.5 text-center">
-                        <div className="text-3xl font-display text-[#1a1a2e] tracking-wider">{ti.val}</div>
+                        <div className="text-3xl font-nums text-[#1a1a2e] tracking-wider">{ti.val}</div>
                         <div className="text-[10px] font-display text-[#1a1a2e]/40 tracking-wider">{ti.label}</div>
                       </div>
                     ))}
@@ -380,7 +380,7 @@ export default function Home() {
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm font-bold">
                     <span className="text-[#4CAF50] font-display tracking-wide">🐸 {t.presale.sold}</span>
-                    <span className="text-[#1a1a2e]/60 font-display tracking-wide">{presaleFilled}% — Stage {currentStage + 1}/4</span>
+                    <span className="text-[#1a1a2e]/60 font-nums tracking-wide">{presaleFilled}% — Stage {currentStage + 1}/4</span>
                   </div>
                   {/* شريط المراحل الأربع */}
                   <div className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">
@@ -401,12 +401,12 @@ export default function Home() {
                   <div className="flex gap-1">
                     {STAGE_DATA.map((s, i) => (
                       <div key={i} className={`flex-1 text-center rounded-lg py-1 border ${i === currentStage ? "border-[#1a1a2e] bg-[#FFFDE7]" : "border-transparent"}`}>
-                        <div className="text-[9px] font-display tracking-wide text-[#1a1a2e]/50">S{s.stage}</div>
-                        <P v={s.price} className="text-[9px] font-display font-bold" style={{ color: s.color }} />
+                        <div className="text-[9px] font-nums tracking-wide text-[#1a1a2e]/50">S{s.stage}</div>
+                        <P v={s.price} className="text-[9px] font-nums font-bold" style={{ color: s.color }} />
                       </div>
                     ))}
                   </div>
-                  <div className="text-center text-[10px] font-display text-[#1a1a2e]/40 tracking-wider">
+                  <div className="text-center text-[10px] font-nums text-[#1a1a2e]/40 tracking-wider">
                     {fmt(totalSold)} / {fmt(totalTokens)} PWIFE
                   </div>
                 </div>
@@ -419,7 +419,7 @@ export default function Home() {
                   ].map(p => (
                     <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-2.5 text-center`}>
                       <div className="text-[10px] font-display tracking-wider text-[#1a1a2e]/50">{p.l}</div>
-                      <P v={p.v} className={`text-[11px] font-display ${p.tc} tracking-wider font-bold`} />
+                      <P v={p.v} className={`text-[11px] font-nums ${p.tc} tracking-wider font-bold`} />
                       <div className="text-[9px] font-display text-[#1a1a2e]/40 tracking-wide">{p.sub}</div>
                     </div>
                   ))}
@@ -429,19 +429,19 @@ export default function Home() {
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1.5">
                       <SiSolana size={12} className="text-[#14F195]" />
-                      <span className="font-display text-[11px] text-[#1a1a2e] tracking-wide">
+                      <span className="font-nums text-[11px] text-[#1a1a2e] tracking-wide">
                         ${solPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <SiEthereum size={12} className="text-[#627EEA]" />
-                      <span className="font-display text-[11px] text-[#1a1a2e] tracking-wide">
+                      <span className="font-nums text-[11px] text-[#1a1a2e] tracking-wide">
                         ${ethPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <SiTether size={11} className="text-[#26A17B]" />
-                      <span className="font-display text-[11px] text-[#26A17B] tracking-wide">$1.00</span>
+                      <span className="font-nums text-[11px] text-[#26A17B] tracking-wide">$1.00</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -536,7 +536,7 @@ export default function Home() {
                   <div className={`border-2 rounded-xl px-3 py-2.5 transition-colors ${tokensOut > 0 ? "bg-[#E8F5E9] border-[#4CAF50]/50" : "bg-gray-50 border-gray-200"}`}>
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-[#1a1a2e]/50 font-bold">{t.presale.youGet}</span>
-                      <span className={`font-display text-lg tracking-wider ${tokensOut > 0 ? "text-[#4CAF50]" : "text-gray-300"}`}>
+                      <span className={`font-nums text-lg tracking-wider ${tokensOut > 0 ? "text-[#4CAF50]" : "text-gray-300"}`}>
                         ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} PWIFE
                       </span>
                     </div>

@@ -387,7 +387,7 @@ export default function Dashboard() {
                     ].map(card => (
                       <div key={card.label} className={`meme-card ${card.bg} rounded-2xl p-4 sm:p-5`} style={{ borderColor: card.color, boxShadow: `${isRTL ? "-4px" : "4px"} 4px 0px ${card.shadow}` }}>
                         <div className="text-xs font-display tracking-wider mb-1" style={{ color: card.color }}>{card.label}</div>
-                        <div className="text-2xl sm:text-3xl font-display text-[#1a1a2e] tracking-wider">{card.value}</div>
+                        <div className="text-2xl sm:text-3xl font-nums text-[#1a1a2e] tracking-wider">{card.value}</div>
                         <div className="text-xs text-[#1a1a2e]/40 font-bold">{card.sub}</div>
                       </div>
                     ))}
@@ -406,7 +406,7 @@ export default function Dashboard() {
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm font-bold">
                             <span className="text-[#4CAF50] font-display tracking-wide">🐸 {t.presale.sold}</span>
-                            <span className="text-[#1a1a2e]/60 font-display tracking-wide">{presaleFilled}% — Stage {currentStage + 1}/4</span>
+                            <span className="text-[#1a1a2e]/60 font-nums tracking-wide">{presaleFilled}% — Stage {currentStage + 1}/4</span>
                           </div>
                           <div className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">
                             {STAGE_DATA.map((s, i) => {
@@ -635,8 +635,8 @@ export default function Dashboard() {
                                 <div className="h-full rounded-full transition-all duration-500" style={{ width: `${s.sold}%`, backgroundColor: s.color }} />
                               </div>
                               <div className="flex justify-between mt-1">
-                                <span className="text-[10px] font-display tracking-wider" style={{ color: s.color }}>{s.sold}% {t.dashboard.soldPercent}</span>
-                                <span className="text-[10px] text-[#1a1a2e]/30 font-bold">{s.tokens} PWIFE</span>
+                                <span className="text-[10px] font-nums tracking-wider" style={{ color: s.color }}>{s.sold}% {t.dashboard.soldPercent}</span>
+                                <span className="text-[10px] text-[#1a1a2e]/30 font-nums">{s.tokens} PWIFE</span>
                               </div>
                             </div>
                           ))}
@@ -694,10 +694,10 @@ export default function Dashboard() {
                       <div className="space-y-1">
                         <div className="font-display text-sm text-[#4CAF50] tracking-wider">{t.dashboard.totalPurchased}</div>
                         {buyerLoading ? (
-                          <div className="text-2xl font-display text-[#1a1a2e]/40 tracking-wider">…</div>
+                          <div className="text-2xl font-nums text-[#1a1a2e]/40 tracking-wider">…</div>
                         ) : (
                           <>
-                            <div className="text-3xl font-display text-[#1a1a2e] tracking-wider">
+                            <div className="text-3xl font-nums text-[#1a1a2e] tracking-wider">
                               {fmt(userPwife)} <span className="text-base text-[#1a1a2e]/40">PWIFE</span>
                             </div>
                             <div className="text-sm text-[#1a1a2e]/50 font-bold">
@@ -717,7 +717,7 @@ export default function Dashboard() {
                         <SiSolana size={16} className="text-[#14F195]" />
                         <span className="font-display text-sm text-[#0a9060] tracking-wide">SOL {t.dashboard.invested}</span>
                       </div>
-                      <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">
+                      <div className="text-2xl font-nums text-[#1a1a2e] tracking-wider">
                         {buyerLoading ? "…" : userSolPaid.toFixed(4)}
                       </div>
                       <div className="text-xs text-[#1a1a2e]/40 font-bold mt-0.5">
@@ -729,7 +729,7 @@ export default function Dashboard() {
                         <SiTether size={16} className="text-[#26A17B]" />
                         <span className="font-display text-sm text-[#1a7a5e] tracking-wide">USDT {t.dashboard.invested}</span>
                       </div>
-                      <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">
+                      <div className="text-2xl font-nums text-[#1a1a2e] tracking-wider">
                         {buyerLoading ? "…" : userUsdtPaid.toFixed(2)}
                       </div>
                       <div className="text-xs text-[#1a1a2e]/40 font-bold mt-0.5">≈ ${userUsdtPaid.toFixed(2)}</div>
