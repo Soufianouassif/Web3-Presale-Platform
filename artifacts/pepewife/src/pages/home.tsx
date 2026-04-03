@@ -363,16 +363,16 @@ export default function Home() {
             </div>
             <div className="flex flex-wrap gap-3 mb-8">
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                <div className="text-xs font-display text-gray-500 tracking-wide">💰 Total Raised</div>
+                <div className="text-xs font-display text-gray-500 tracking-wide font-bold">💰 Total Raised</div>
                 <div className="text-2xl font-nums text-[#1a1a2e] tracking-wider">
                   {presaleData
                     ? `$${totalRaisedUSD >= 1000 ? (totalRaisedUSD / 1000).toFixed(1) + "K" : totalRaisedUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
                     : "$0"}
                 </div>
-                <div className="text-[10px] text-gray-400 font-display tracking-wide">USD</div>
+                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">USD</div>
               </div>
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                <div className="text-xs font-display text-gray-500 tracking-wide">🐸 PWIFE Sold</div>
+                <div className="text-xs font-display text-gray-500 tracking-wide font-bold">🐸 PWIFE Sold</div>
                 <div className="text-2xl font-nums text-[#1a1a2e] tracking-wider">
                   {totalSold >= 1_000_000_000
                     ? (totalSold / 1_000_000_000).toFixed(1) + "B"
@@ -380,12 +380,12 @@ export default function Home() {
                       ? (totalSold / 1_000_000).toFixed(1) + "M"
                       : totalSold.toLocaleString()}
                 </div>
-                <div className="text-[10px] text-gray-400 font-display tracking-wide">tokens</div>
+                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">tokens</div>
               </div>
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                <div className="text-xs font-display text-gray-500 tracking-wide">💎 Stage {currentStage + 1} Price</div>
+                <div className="text-xs font-display text-gray-500 tracking-wide font-bold">💎 Stage {currentStage + 1} Price</div>
                 <P v={STAGE_DATA[currentStage].price} className="text-xl font-nums text-[#1a1a2e] tracking-wider" />
-                <div className="text-[10px] text-gray-400 font-display tracking-wide">per PWIFE</div>
+                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">per PWIFE</div>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -441,7 +441,7 @@ export default function Home() {
                     {[{ val: timeLeft.days, label: t.presale.days }, { val: timeLeft.hours.toString().padStart(2, "0"), label: t.presale.hrs }, { val: timeLeft.minutes.toString().padStart(2, "0"), label: t.presale.min }, { val: timeLeft.seconds.toString().padStart(2, "0"), label: t.presale.sec }].map(ti => (
                       <div key={ti.label} className="bg-[#FFFDE7] border-2 border-[#FFD54F] rounded-xl py-2.5 text-center">
                         <div className="text-3xl font-nums text-[#1a1a2e] tracking-wider">{ti.val}</div>
-                        <div className="text-[10px] font-display text-[#1a1a2e]/40 tracking-wider">{ti.label}</div>
+                        <div className="text-xs font-display text-[#1a1a2e]/50 tracking-wider font-bold">{ti.label}</div>
                       </div>
                     ))}
                   </div>
@@ -450,7 +450,7 @@ export default function Home() {
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm font-bold">
                     <span className="text-[#4CAF50] font-display tracking-wide">🐸 {t.presale.sold}</span>
-                    <span className="text-[#1a1a2e]/60 font-nums tracking-wide">{presaleFilled}% — Stage {currentStage + 1}/4</span>
+                    <span className="text-sm text-[#1a1a2e]/70 font-nums tracking-wide font-bold">{presaleFilled}% — Stage {currentStage + 1}/4</span>
                   </div>
                   {/* شريط المراحل الأربع */}
                   <div className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">
@@ -471,12 +471,12 @@ export default function Home() {
                   <div className="flex gap-1">
                     {STAGE_DATA.map((s, i) => (
                       <div key={i} className={`flex-1 text-center rounded-lg py-1 border ${i === currentStage ? "border-[#1a1a2e] bg-[#FFFDE7]" : "border-transparent"}`}>
-                        <div className="text-[9px] font-nums tracking-wide text-[#1a1a2e]/50">S{s.stage}</div>
-                        <P v={s.price} className="text-[9px] font-nums font-bold" style={{ color: s.color }} />
+                        <div className="text-[10px] font-nums tracking-wide text-[#1a1a2e]/60 font-bold">S{s.stage}</div>
+                        <P v={s.price} className="text-[10px] font-nums font-bold" style={{ color: s.color }} />
                       </div>
                     ))}
                   </div>
-                  <div className="text-center text-[10px] font-nums text-[#1a1a2e]/40 tracking-wider">
+                  <div className="text-center text-xs font-nums text-[#1a1a2e]/50 tracking-wider font-bold">
                     {fmt(totalSold)} / {fmt(totalTokens)} PWIFE
                   </div>
                 </div>
@@ -487,39 +487,33 @@ export default function Home() {
                     { l: t.presale.next, v: STAGE_DATA[1].price,  sub: "Stage 2", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" },
                     { l: t.presale.list, v: LISTING_PRICE,         sub: "CEX",     bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" },
                   ].map(p => (
-                    <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-2.5 text-center`}>
-                      <div className="text-[10px] font-display tracking-wider text-[#1a1a2e]/50">{p.l}</div>
-                      <P v={p.v} className={`text-[11px] font-nums ${p.tc} tracking-wider font-bold`} />
-                      <div className="text-[9px] font-display text-[#1a1a2e]/40 tracking-wide">{p.sub}</div>
+                    <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-3 text-center`}>
+                      <div className="text-xs font-display tracking-wider text-[#1a1a2e]/60 font-bold">{p.l}</div>
+                      <P v={p.v} className={`text-sm font-nums ${p.tc} tracking-wider font-bold`} />
+                      <div className="text-[10px] font-display text-[#1a1a2e]/50 tracking-wide font-bold">{p.sub}</div>
                     </div>
                   ))}
                 </div>
 
-                <div className="bg-[#1a1a2e]/4 border border-[#1a1a2e]/10 rounded-xl px-3 py-2 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-3">
+                <div className="bg-[#1a1a2e]/5 border border-[#1a1a2e]/15 rounded-xl px-3 py-2.5 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5">
-                      <SiSolana size={12} className="text-[#14F195]" />
-                      <span className="font-nums text-[11px] text-[#1a1a2e] tracking-wide">
+                      <SiSolana size={13} className="text-[#14F195]" />
+                      <span className="font-nums text-xs text-[#1a1a2e] tracking-wide font-bold">
                         ${solPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <SiEthereum size={12} className="text-[#627EEA]" />
-                      <span className="font-nums text-[11px] text-[#1a1a2e] tracking-wide">
-                        ${ethPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <SiTether size={11} className="text-[#26A17B]" />
-                      <span className="font-nums text-[11px] text-[#26A17B] tracking-wide">$1.00</span>
+                      <SiTether size={13} className="text-[#26A17B]" />
+                      <span className="font-nums text-xs text-[#26A17B] tracking-wide font-bold">$1.00</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     {pricesLoading
-                      ? <span className="text-[9px] text-[#1a1a2e]/30 font-bold">⏳</span>
+                      ? <span className="text-[10px] text-[#1a1a2e]/40 font-bold">⏳</span>
                       : <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4CAF50] opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-[#4CAF50]"></span></span>
                     }
-                    <span className="text-[9px] text-[#1a1a2e]/30 font-bold">
+                    <span className="text-[10px] text-[#1a1a2e]/40 font-bold">
                       {pricesUpdatedAt
                         ? pricesUpdatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                         : "..."
@@ -596,9 +590,9 @@ export default function Home() {
                   </div>
 
                   {amountError ? (
-                    <p className="text-[11px] text-red-500 font-bold px-1">🚫 {amountError}</p>
+                    <p className="text-xs text-red-500 font-bold px-1">🚫 {amountError}</p>
                   ) : (
-                    <p className="text-[10px] text-[#1a1a2e]/40 font-bold px-1">
+                    <p className="text-xs text-[#1a1a2e]/50 font-bold px-1">
                       {t.presale.inputMin}: <span className="text-[#0a9060]">{lim.min} {currSym}</span>
                       {"  ·  "}
                       {t.presale.inputMax}: <span className="text-[#c0392b]">{lim.max.toLocaleString()} {currSym}</span>
@@ -613,17 +607,17 @@ export default function Home() {
                       </span>
                     </div>
                     {tokensOut > 0 && currency === "SOL" && (
-                      <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
+                      <p className="text-xs text-[#1a1a2e]/50 font-bold mt-1 text-end">
                         1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
                       </p>
                     )}
                     {tokensOut > 0 && currency === "USDT_ETH" && (
-                      <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
+                      <p className="text-xs text-[#1a1a2e]/50 font-bold mt-1 text-end">
                         1 ETH ≈ ${ethPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
                       </p>
                     )}
                     {tokensOut > 0 && currency === "USDT_SPL" && (
-                      <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
+                      <p className="text-xs text-[#1a1a2e]/50 font-bold mt-1 text-end">
                         Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/PWIFE
                       </p>
                     )}
