@@ -6,7 +6,7 @@ pub mod instructions;
 
 use instructions::*;
 
-declare_id!("PresaLe111111111111111111111111111111111111");
+declare_id!("4KpEeYVW8592GGpcNZLo7CinE1dnV9tJnKYc9JzpQSv7");
 
 #[program]
 pub mod pepewife_presale {

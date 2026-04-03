@@ -6,11 +6,11 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-pepewife_presale = "PresaLe111111111111111111111111111111111111"
+pepewife_presale = "4KpEeYVW8592GGpcNZLo7CinE1dnV9tJnKYc9JzpQSv7"
 pepewife_claim   = "CLaim1111111111111111111111111111111111111111"
 
 [programs.devnet]
-pepewife_presale = "PresaLe111111111111111111111111111111111111"
+pepewife_presale = "4KpEeYVW8592GGpcNZLo7CinE1dnV9tJnKYc9JzpQSv7"
 pepewife_claim   = "CLaim1111111111111111111111111111111111111111"
 
 [programs.mainnet]
