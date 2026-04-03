@@ -22,10 +22,10 @@ export default function Home() {
   const isConnected = status === "connected";
   const walletAddress = shortAddress || "7xKp...4mNr";
   const STAGE_DATA = [
-    { stage: 1, price: "1e-8$",  tokens: 5_000_000_000_000, sold: 15_000_000_000, color: "#4CAF50" },
-    { stage: 2, price: "2e-8$",  tokens: 5_000_000_000_000, sold: 0, color: "#FF4D9D" },
-    { stage: 3, price: "4e-8$",  tokens: 5_000_000_000_000, sold: 0, color: "#FFD54F" },
-    { stage: 4, price: "6e-8$",  tokens: 5_000_000_000_000, sold: 0, color: "#42A5F5" },
+    { stage: 1, sig: "0.1", exp: 7, tokens: 5_000_000_000_000, sold: 15_000_000_000, color: "#4CAF50" },
+    { stage: 2, sig: "0.2", exp: 7, tokens: 5_000_000_000_000, sold: 0, color: "#FF4D9D" },
+    { stage: 3, sig: "0.4", exp: 7, tokens: 5_000_000_000_000, sold: 0, color: "#FFD54F" },
+    { stage: 4, sig: "0.6", exp: 7, tokens: 5_000_000_000_000, sold: 0, color: "#42A5F5" },
   ];
   const currentStage = 0;
   const totalSold = STAGE_DATA.reduce((a, s) => a + s.sold, 0);
@@ -157,17 +157,23 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3 mb-8">
-              {[
-                { l: "💰 Total Raised", v: "$0", sub: "USD" },
-                { l: "👥 Buyers",        v: "0",  sub: "wallets" },
-                { l: "💎 Stage 1 Price", v: "1e-8$", sub: "per PWIFE" },
-              ].map(s => (
-                <div key={s.l} className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                  <div className="text-xs font-display text-gray-500 tracking-wide">{s.l}</div>
-                  <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">{s.v}</div>
-                  <div className="text-[10px] text-gray-400 font-display tracking-wide">{s.sub}</div>
+              <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
+                <div className="text-xs font-display text-gray-500 tracking-wide">💰 Total Raised</div>
+                <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">$0</div>
+                <div className="text-[10px] text-gray-400 font-display tracking-wide">USD</div>
+              </div>
+              <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
+                <div className="text-xs font-display text-gray-500 tracking-wide">👥 Buyers</div>
+                <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">0</div>
+                <div className="text-[10px] text-gray-400 font-display tracking-wide">wallets</div>
+              </div>
+              <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
+                <div className="text-xs font-display text-gray-500 tracking-wide">💎 Stage 1 Price</div>
+                <div className="text-2xl font-display text-[#1a1a2e] tracking-wider">
+                  0.1<sub style={{ fontSize: "0.6em", verticalAlign: "sub" }}>7</sub>$
                 </div>
-              ))}
+                <div className="text-[10px] text-gray-400 font-display tracking-wide">per PWIFE</div>
+              </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <button onClick={() => scrollTo('presale')} className="btn-meme bg-[#4CAF50] text-white rounded-2xl h-14 px-10 text-2xl font-display tracking-wider" style={{ animation: "pulse-glow 2s infinite" }}>
@@ -253,7 +259,9 @@ export default function Home() {
                     {STAGE_DATA.map((s, i) => (
                       <div key={i} className={`flex-1 text-center rounded-lg py-1 border ${i === currentStage ? "border-[#1a1a2e] bg-[#FFFDE7]" : "border-transparent"}`}>
                         <div className="text-[9px] font-display tracking-wide text-[#1a1a2e]/50">S{s.stage}</div>
-                        <div className={`text-[10px] font-display font-bold tracking-wide`} style={{ color: s.color }}>{s.price}</div>
+                        <div className="text-[10px] font-display font-bold" style={{ color: s.color }}>
+                          {s.sig}<sub style={{ fontSize: "0.7em", verticalAlign: "sub" }}>{s.exp}</sub>$
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -264,13 +272,17 @@ export default function Home() {
 
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { l: t.presale.now,  v: "1e-8$", sub: "Stage 1", bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" },
-                    { l: t.presale.next, v: "2e-8$", sub: "Stage 2", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" },
-                    { l: t.presale.list, v: "?",     sub: "TBA",     bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" }
+                    { l: t.presale.now,  sig: "0.1", exp: 7, sub: "Stage 1", bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" },
+                    { l: t.presale.next, sig: "0.2", exp: 7, sub: "Stage 2", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" },
+                    { l: t.presale.list, sig: "?",   exp: 0, sub: "TBA",     bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" },
                   ].map(p => (
                     <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-2.5 text-center`}>
                       <div className="text-[10px] font-display tracking-wider text-[#1a1a2e]/50">{p.l}</div>
-                      <div className={`text-base font-display ${p.tc} tracking-wider font-bold`}>{p.v}</div>
+                      <div className={`text-base font-display ${p.tc} tracking-wider font-bold`}>
+                        {p.sig !== "?" ? (
+                          <>{p.sig}<sub style={{ fontSize: "0.65em", verticalAlign: "sub" }}>{p.exp}</sub>$</>
+                        ) : "TBA"}
+                      </div>
                       <div className="text-[9px] font-display text-[#1a1a2e]/40 tracking-wide">{p.sub}</div>
                     </div>
                   ))}
