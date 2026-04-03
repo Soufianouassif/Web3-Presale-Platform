@@ -1,4 +1,4 @@
-export type WalletType = "phantom" | "metamask" | "binance" | "trust";
+export type WalletType = "phantom" | "solflare" | "metamask" | "okx" | "trust";
 export type NetworkType = "solana" | "ethereum";
 
 export interface WalletInfo {
@@ -12,6 +12,7 @@ export interface WalletInfo {
 
 interface SolanaProvider {
   isPhantom?: boolean;
+  isSolflare?: boolean;
   publicKey?: { toString(): string };
   isConnected?: boolean;
   connect(opts?: { onlyIfTrusted?: boolean }): Promise<{ publicKey: { toString(): string } }>;
@@ -23,6 +24,7 @@ interface SolanaProvider {
 interface EthereumProvider {
   isMetaMask?: boolean;
   isTrust?: boolean;
+  isOkxWallet?: boolean;
   request(args: { method: string; params?: unknown[] }): Promise<unknown>;
   on(event: string, cb: (...args: unknown[]) => void): void;
   removeListener(event: string, cb: (...args: unknown[]) => void): void;
@@ -32,14 +34,22 @@ declare global {
   interface Window {
     solana?: SolanaProvider;
     phantom?: { solana?: SolanaProvider };
+    solflare?: SolanaProvider;
     ethereum?: EthereumProvider;
-    BinanceChain?: EthereumProvider;
+    okxwallet?: EthereumProvider;
     trustwallet?: { ethereum?: EthereumProvider };
   }
 }
 
-export function getSolanaProvider(): SolanaProvider | null {
+export function getSolanaProvider(walletType: WalletType = "phantom"): SolanaProvider | null {
   if (typeof window === "undefined") return null;
+
+  if (walletType === "solflare") {
+    const provider = window.solflare;
+    if (provider?.isSolflare) return provider;
+    return null;
+  }
+
   const provider = window.phantom?.solana || window.solana;
   if (provider?.isPhantom) return provider;
   return null;
@@ -48,8 +58,9 @@ export function getSolanaProvider(): SolanaProvider | null {
 export function getEthereumProvider(walletType: WalletType): EthereumProvider | null {
   if (typeof window === "undefined") return null;
 
-  if (walletType === "binance" && window.BinanceChain) {
-    return window.BinanceChain;
+  if (walletType === "okx") {
+    if (window.okxwallet) return window.okxwallet;
+    return null;
   }
 
   if (walletType === "trust") {
@@ -68,18 +79,19 @@ export function getEthereumProvider(walletType: WalletType): EthereumProvider | 
 
 export function detectWallets(): Record<WalletType, boolean> {
   if (typeof window === "undefined") {
-    return { phantom: false, metamask: false, binance: false, trust: false };
+    return { phantom: false, solflare: false, metamask: false, okx: false, trust: false };
   }
   return {
     phantom: !!(window.phantom?.solana?.isPhantom || window.solana?.isPhantom),
+    solflare: !!window.solflare?.isSolflare,
     metamask: !!window.ethereum?.isMetaMask,
-    binance: !!window.BinanceChain,
+    okx: !!window.okxwallet,
     trust: !!(window.trustwallet?.ethereum || window.ethereum?.isTrust),
   };
 }
 
 export function getWalletNetwork(walletType: WalletType): NetworkType {
-  if (walletType === "phantom") return "solana";
+  if (walletType === "phantom" || walletType === "solflare") return "solana";
   return "ethereum";
 }
 
@@ -91,20 +103,32 @@ export function shortenAddress(address: string, chars = 4): string {
 
 const ETH_MAINNET_CHAIN_ID = "0x1";
 
-export async function connectSolanaWallet(): Promise<string> {
-  const provider = getSolanaProvider();
+const ETH_ADDRESS_REGEX = /^0x[0-9a-fA-F]{40}$/;
+const SOL_ADDRESS_REGEX = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+
+export function isValidEthAddress(addr: string): boolean {
+  return ETH_ADDRESS_REGEX.test(addr);
+}
+
+export function isValidSolAddress(addr: string): boolean {
+  return SOL_ADDRESS_REGEX.test(addr);
+}
+
+export async function connectSolanaWallet(walletType: WalletType = "phantom"): Promise<string> {
+  const provider = getSolanaProvider(walletType);
   if (!provider) {
-    throw new Error("PHANTOM_NOT_INSTALLED");
+    throw new Error(`${walletType.toUpperCase()}_NOT_INSTALLED`);
   }
   try {
     const response = await provider.connect();
     const address = response.publicKey.toString();
-    if (!address || address.length < 32) {
+    if (!address || !isValidSolAddress(address)) {
       throw new Error("INVALID_ADDRESS");
     }
     return address;
   } catch (err: unknown) {
     const error = err as { code?: number; message?: string };
+    if (error.message?.includes("NOT_INSTALLED")) throw err as Error;
     if (error.code === 4001 || error.message?.includes("rejected")) {
       throw new Error("USER_REJECTED");
     }
@@ -137,7 +161,7 @@ export async function connectEthereumWallet(walletType: WalletType): Promise<str
     }
 
     const address = accounts[0];
-    if (!address || !address.startsWith("0x") || address.length !== 42) {
+    if (!address || !isValidEthAddress(address)) {
       throw new Error("INVALID_ADDRESS");
     }
     return address;
@@ -154,7 +178,7 @@ export async function connectEthereumWallet(walletType: WalletType): Promise<str
 export async function connectWallet(walletType: WalletType): Promise<string> {
   const network = getWalletNetwork(walletType);
   if (network === "solana") {
-    return connectSolanaWallet();
+    return connectSolanaWallet(walletType);
   }
   return connectEthereumWallet(walletType);
 }
@@ -162,7 +186,7 @@ export async function connectWallet(walletType: WalletType): Promise<string> {
 export async function disconnectWallet(walletType: WalletType): Promise<void> {
   const network = getWalletNetwork(walletType);
   if (network === "solana") {
-    const provider = getSolanaProvider();
+    const provider = getSolanaProvider(walletType);
     if (provider) {
       await provider.disconnect();
     }
@@ -172,8 +196,9 @@ export async function disconnectWallet(walletType: WalletType): Promise<void> {
 export function getInstallUrl(walletType: WalletType): string {
   const urls: Record<WalletType, string> = {
     phantom: "https://phantom.app/download",
+    solflare: "https://solflare.com/download",
     metamask: "https://metamask.io/download/",
-    binance: "https://www.binance.com/en/web3wallet",
+    okx: "https://www.okx.com/download",
     trust: "https://trustwallet.com/download",
   };
   return urls[walletType];

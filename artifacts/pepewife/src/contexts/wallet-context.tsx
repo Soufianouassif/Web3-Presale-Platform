@@ -9,6 +9,7 @@ import {
   detectWallets,
   getSolanaProvider,
   getEthereumProvider,
+  isValidEthAddress,
 } from "@/lib/wallet";
 
 export type ConnectionStatus = "disconnected" | "connecting" | "connected" | "error";
@@ -36,7 +37,7 @@ const WalletContext = createContext<WalletContextType>({
   address: null,
   shortAddress: "",
   error: null,
-  installedWallets: { phantom: false, metamask: false, binance: false, trust: false },
+  installedWallets: { phantom: false, solflare: false, metamask: false, okx: false, trust: false },
   connect: async () => false,
   disconnect: async () => {},
   refreshDetection: () => {},
@@ -54,7 +55,7 @@ async function verifyStoredConnection(data: StoredWallet): Promise<string | null
   try {
     const walletNetwork = getWalletNetwork(data.walletType);
     if (walletNetwork === "solana") {
-      const provider = getSolanaProvider();
+      const provider = getSolanaProvider(data.walletType);
       if (!provider || !provider.isConnected || !provider.publicKey) return null;
       const currentAddr = provider.publicKey.toString();
       if (currentAddr !== data.address) return null;
@@ -80,7 +81,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [installedWallets, setInstalledWallets] = useState<Record<WalletType, boolean>>({
-    phantom: false, metamask: false, binance: false, trust: false,
+    phantom: false, solflare: false, metamask: false, okx: false, trust: false,
   });
   const connectMutex = useRef(false);
 
@@ -101,7 +102,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     let data: StoredWallet;
     try {
       data = JSON.parse(stored);
-      if (!data.walletType || !data.address || !data.network) {
+      const validTypes: WalletType[] = ["phantom", "solflare", "metamask", "okx", "trust"];
+      const validNetworks: NetworkType[] = ["solana", "ethereum"];
+      if (!data.walletType || !data.address || !data.network
+          || !validTypes.includes(data.walletType)
+          || !validNetworks.includes(data.network)
+          || data.network !== getWalletNetwork(data.walletType)) {
         localStorage.removeItem(STORAGE_KEY);
         return;
       }
@@ -129,7 +135,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
     const walletNetwork = getWalletNetwork(walletType);
     if (walletNetwork === "solana") {
-      const provider = getSolanaProvider();
+      const provider = getSolanaProvider(walletType);
       if (!provider) return;
       const handleDisconnect = () => {
         setStatus("disconnected");
@@ -154,8 +160,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           setNetwork(null);
           localStorage.removeItem(STORAGE_KEY);
         } else {
-          setAddress(accs[0]);
-          const stored: StoredWallet = { walletType: walletType!, address: accs[0], network: network! };
+          const newAddr = accs[0];
+          if (!newAddr || !isValidEthAddress(newAddr)) {
+            setStatus("disconnected");
+            setAddress(null);
+            setWalletType(null);
+            setNetwork(null);
+            localStorage.removeItem(STORAGE_KEY);
+            return;
+          }
+          setAddress(newAddr);
+          const stored: StoredWallet = { walletType: walletType!, address: newAddr, network: network! };
           localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
         }
       };
@@ -191,7 +206,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
       const stored: StoredWallet = { walletType: type, address: addr, network: net };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
-      connectMutex.current = false;
       return true;
     } catch (err: unknown) {
       const message = (err as Error).message || "CONNECTION_FAILED";
@@ -200,8 +214,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       setAddress(null);
       setWalletType(null);
       setNetwork(null);
-      connectMutex.current = false;
       return false;
+    } finally {
+      connectMutex.current = false;
     }
   }, []);
 

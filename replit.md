@@ -106,7 +106,7 @@ React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
 - **Fonts**: Display = `Bangers` (meme headers), Body = `Comic Neue`, Fallback = `Space Grotesk`
 - **CSS Utilities**: `.meme-card`, `.meme-border`, `.btn-meme`, `.sticker`, `.speech-bubble`, `.zigzag-border`, `.rainbow-text`, `.wiggle-hover`, `.comic-shadow`, `.pattern-dots`, `.float-animation`
 - **Pages/Routes**: `/` (Home), `/connect` (Connect Wallet), `/connecting` (Wallet Connecting Animation), `/dashboard` (Investor Dashboard)
-- **Connect Wallet Page**: Supports Phantom (recommended), MetaMask, Binance Wallet, Trust Wallet — each with branded icon, hover/focus states, loading spinner on click, then redirect to `/connecting`
+- **Connect Wallet Page**: Supports Phantom (recommended), Solflare, MetaMask, OKX Wallet, Trust Wallet — each with branded icon, hover/focus states, loading spinner on click, then redirect to `/connecting`
 - **Connecting Page**: Dark-themed full-screen overlay with 5-step animated progress (Connecting → Verifying → Securing → Loading → Welcome), spinning logo, rainbow progress bar, success checkmark, wallet address confirmation card, then auto-redirects to dashboard
 - **Sections**: Hero (background image), Partners ticker, Presale + Referral (2-column), Why Buy (4 cards), How to Buy (5 steps), Tokenomics (image left + details right, no chart), Roadmap (4 phases with images), Social Feed (3 posts), Risk Warning, Footer
 - **Dashboard**: Full-page route with 5 tabs (Overview, My Purchases, Claim, Referrals, Transactions), sidebar nav on desktop, horizontal scroll tabs on mobile
@@ -125,7 +125,7 @@ React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
 - **Pages**: Home (`/`), Connect (`/connect`), Connecting (`/connecting`), Dashboard (`/dashboard`), Whitepaper (`/whitepaper`), Risk Disclaimer (`/risk-disclaimer`), Terms of Use (`/terms`)
 - **About link** in navbar navigates to Whitepaper page; footer on all pages links to Whitepaper, Risk Disclaimer, Terms of Use
 - **SEO**: `SEOHead` component (`src/components/seo-head.tsx`) on all pages — sets title, meta description, canonical URL, OG/Twitter tags; `noindex` on connect/dashboard; `index.html` has base OG/Twitter/JSON-LD; `robots.txt` and `sitemap.xml` in public; whitepaper section images use `loading="lazy"`; all images have descriptive alt text; HTML `lang` and `dir` attributes set dynamically via i18n context
-- **Wallet System**: Real wallet detection and connection for Solana (Phantom) and Ethereum (MetaMask, Binance Wallet, Trust Wallet)
+- **Wallet System**: Real wallet detection and connection for Solana (Phantom, Solflare) and Ethereum (MetaMask, OKX Wallet, Trust Wallet). Strict address validation (hex regex for ETH, base58 for SOL). Mutex with `finally` for race-condition safety. Stored wallet validated against valid types, networks, and type-network consistency.
   - `src/lib/wallet.ts` — provider detection, connection, disconnection utilities; strict provider selection (no permissive fallback)
   - `src/contexts/wallet-context.tsx` — React context with `WalletProvider` wrapping app; `useWallet()` hook returns `{ status, walletType, network, address, shortAddress, error, installedWallets, connect, disconnect }`
   - Wallet detection shows installed/not-installed badges on connect page

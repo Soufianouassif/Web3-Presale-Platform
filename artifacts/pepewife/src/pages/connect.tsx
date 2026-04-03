@@ -10,7 +10,7 @@ import { getWalletNetwork, getInstallUrl, type WalletType } from "@/lib/wallet";
 const wallets: {
   id: WalletType;
   name: string;
-  descKey: "phantomDesc" | "metamaskDesc" | "binanceDesc" | "trustDesc";
+  descKey: "phantomDesc" | "solflareDesc" | "metamaskDesc" | "okxDesc" | "trustDesc";
   color: string;
   shadow: string;
   bg: string;
@@ -28,6 +28,16 @@ const wallets: {
     network: "solana",
   },
   {
+    id: "solflare",
+    name: "Solflare",
+    descKey: "solflareDesc",
+    color: "#FC6E21",
+    shadow: "#C94F0A",
+    bg: "bg-[#FFF3E0]",
+    iconSrc: "/wallet-solflare.svg",
+    network: "solana",
+  },
+  {
     id: "metamask",
     name: "MetaMask",
     descKey: "metamaskDesc",
@@ -38,13 +48,13 @@ const wallets: {
     network: "ethereum",
   },
   {
-    id: "binance",
-    name: "Binance Wallet",
-    descKey: "binanceDesc",
-    color: "#F0B90B",
-    shadow: "#C99A00",
-    bg: "bg-[#FFFDE7]",
-    iconSrc: "/wallet-binance.png",
+    id: "okx",
+    name: "OKX Wallet",
+    descKey: "okxDesc",
+    color: "#000000",
+    shadow: "#333333",
+    bg: "bg-[#F5F5F5]",
+    iconSrc: "/wallet-okx.svg",
     network: "ethereum",
   },
   {
@@ -122,7 +132,7 @@ export default function ConnectPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#E8F5E9] via-[#FCE4EC] to-[#FFFDE7] relative overflow-hidden">
       <SEOHead
         title="Connect Wallet – PEPEWIFE Presale"
-        description="Connect your Solana wallet to participate in the PEPEWIFE presale. Supports Phantom, MetaMask, Binance Wallet, and Trust Wallet."
+        description="Connect your wallet to participate in the PEPEWIFE presale. Supports Phantom, Solflare, MetaMask, OKX Wallet, and Trust Wallet."
         path="/connect"
         noindex
       />
