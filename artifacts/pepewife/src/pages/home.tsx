@@ -21,7 +21,16 @@ export default function Home() {
   const { status, shortAddress } = useWallet();
   const isConnected = status === "connected";
   const walletAddress = shortAddress || "7xKp...4mNr";
-  const presaleFilled = 0;
+  const STAGE_DATA = [
+    { stage: 1, price: "$0.00000001", tokens: 5_000_000_000_000, sold: 15_000_000_000, color: "#4CAF50" },
+    { stage: 2, price: "$0.00000002", tokens: 5_000_000_000_000, sold: 0, color: "#FF4D9D" },
+    { stage: 3, price: "$0.00000004", tokens: 5_000_000_000_000, sold: 0, color: "#FFD54F" },
+    { stage: 4, price: "$0.00000006", tokens: 5_000_000_000_000, sold: 0, color: "#42A5F5" },
+  ];
+  const currentStage = 0;
+  const totalSold = STAGE_DATA.reduce((a, s) => a + s.sold, 0);
+  const totalTokens = STAGE_DATA.reduce((a, s) => a + s.tokens, 0);
+  const presaleFilled = Math.round((totalSold / totalTokens) * 100);
 
   const tokenomicsData = [
     { name: t.tokenomics.community, value: 40, color: "#4CAF50" },
@@ -214,22 +223,49 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex justify-between text-sm font-bold">
                     <span className="text-[#4CAF50] font-display tracking-wide">🐸 {t.presale.sold}</span>
-                    <span className="text-[#1a1a2e]/40 font-display tracking-wide">{t.presale.goal}</span>
+                    <span className="text-[#1a1a2e]/60 font-display tracking-wide">{presaleFilled}% — Stage {currentStage + 1}/4</span>
                   </div>
-                  <div className="relative">
-                    <Progress value={presaleFilled} className="h-4 rounded-full border-2 border-[#1a1a2e]" />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-display text-white drop-shadow tracking-wide">{presaleFilled}%</span>
+                  {/* شريط المراحل الأربع */}
+                  <div className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">
+                    {STAGE_DATA.map((s, i) => {
+                      const pct = Math.min(100, Math.round((s.sold / s.tokens) * 100));
+                      return (
+                        <div key={i} className="relative flex-1 bg-gray-100">
+                          <div
+                            className="h-full transition-all duration-700"
+                            style={{ width: `${pct}%`, background: s.color, opacity: i === currentStage ? 1 : 0.4 }}
+                          />
+                          {i < 3 && <div className="absolute right-0 top-0 h-full w-px bg-[#1a1a2e]/30" />}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* تسميات المراحل */}
+                  <div className="flex gap-1">
+                    {STAGE_DATA.map((s, i) => (
+                      <div key={i} className={`flex-1 text-center rounded-lg py-1 border ${i === currentStage ? "border-[#1a1a2e] bg-[#FFFDE7]" : "border-transparent"}`}>
+                        <div className="text-[9px] font-display tracking-wide text-[#1a1a2e]/50">S{s.stage}</div>
+                        <div className={`text-[10px] font-display font-bold tracking-wide`} style={{ color: s.color }}>{s.price}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-center text-[10px] font-display text-[#1a1a2e]/40 tracking-wider">
+                    {(totalSold / 1e9).toLocaleString()}B / {(totalTokens / 1e9).toLocaleString()}B PWIFE
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  {[{ l: t.presale.now, v: "$0.0000", bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" }, { l: t.presale.next, v: "$0.0000", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" }, { l: t.presale.list, v: "$0.0000", bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" }].map(p => (
+                  {[
+                    { l: t.presale.now,  v: "$0.00000001", bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" },
+                    { l: t.presale.next, v: "$0.00000002", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" },
+                    { l: t.presale.list, v: "$0.00000010", bg: "bg-[#FFD54F]/20",  bc: "border-[#FFD54F]",  tc: "text-[#b8860b]" }
+                  ].map(p => (
                     <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-2.5 text-center`}>
                       <div className="text-[10px] font-display tracking-wider text-[#1a1a2e]/50">{p.l}</div>
-                      <div className={`text-lg font-display ${p.tc} tracking-wider`}>{p.v}</div>
+                      <div className={`text-sm font-display ${p.tc} tracking-wider`}>{p.v}</div>
                     </div>
                   ))}
                 </div>
@@ -237,13 +273,16 @@ export default function Home() {
                 <div>
                   <p className="text-xs font-display text-[#1a1a2e]/40 tracking-wider mb-2">{t.presale.payWith}</p>
                   <div className="grid grid-cols-2 gap-2">
-                    {(["SOL", "USDT"] as const).map(c => (
-                      <button key={c} onClick={() => setCurrency(c)}
-                        className={`flex items-center justify-center gap-2 rounded-xl h-11 font-display text-lg tracking-wide border-2 transition-all ${currency === c ? (c === "SOL" ? "bg-[#14F195]/15 border-[#14F195] text-[#0a9060] shadow-[3px_3px_0px_#0a9060]" : "bg-[#26A17B]/15 border-[#26A17B] text-[#1a7a5e] shadow-[3px_3px_0px_#1a7a5e]") : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
-                        {c === "SOL" ? <SiSolana size={16} /> : <SiTether size={16} />} {c}
-                        {currency === c && <span className="text-xs">✓</span>}
-                      </button>
-                    ))}
+                    <button onClick={() => setCurrency("SOL")}
+                      className={`flex items-center justify-center gap-2 rounded-xl h-11 font-display text-base tracking-wide border-2 transition-all ${currency === "SOL" ? "bg-[#14F195]/15 border-[#14F195] text-[#0a9060] shadow-[3px_3px_0px_#0a9060]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
+                      <SiSolana size={16} /> SOL
+                      {currency === "SOL" && <span className="text-xs">✓</span>}
+                    </button>
+                    <button onClick={() => setCurrency("USDT")}
+                      className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "USDT" ? "bg-[#26A17B]/15 border-[#26A17B] text-[#1a7a5e] shadow-[3px_3px_0px_#1a7a5e]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
+                      <div className="flex items-center gap-1 text-base"><SiTether size={14} /> USDT</div>
+                      <div className="text-[9px] font-bold opacity-60">SPL · Solana</div>
+                    </button>
                   </div>
                 </div>
 
