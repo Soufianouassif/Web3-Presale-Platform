@@ -50,7 +50,9 @@ export default function ConnectingPage() {
       setShowSuccess(true);
       setTimeout(() => {
         setFadeOut(true);
-        setTimeout(() => navigate("/dashboard"), 600);
+        const returnPath = sessionStorage.getItem("postConnectPath") || "/dashboard";
+        sessionStorage.removeItem("postConnectPath");
+        setTimeout(() => navigate(returnPath), 600);
       }, 1200);
     }
   }, [progress, showSuccess, navigate, steps.length]);

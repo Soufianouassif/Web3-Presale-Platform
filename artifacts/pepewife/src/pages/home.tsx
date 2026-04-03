@@ -176,6 +176,7 @@ export default function Home() {
     setTxSignature(null);
 
     if (status !== "connected" || !address) {
+      sessionStorage.setItem("postConnectPath", "/");
       navigate("/connect");
       return;
     }
