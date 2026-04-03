@@ -21,9 +21,9 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
 
   const LIMITS: Record<string, { min: number; max: number }> = {
-    SOL:      { min: 0.01,  max: 100 },
-    USDT_SPL: { min: 5,     max: 50000 },
-    USDT_ETH: { min: 10,    max: 50000 },
+    SOL:      { min: 1,    max: 50 },
+    USDT_SPL: { min: 100,  max: 10000 },
+    USDT_ETH: { min: 100,  max: 10000 },
   };
 
   const currSym = currency === "SOL" ? "SOL" : "USDT";
