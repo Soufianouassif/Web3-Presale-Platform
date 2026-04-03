@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, X, Twitter, Send, Wallet, ArrowRight, Copy, Check, ChevronRight, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -26,6 +26,20 @@ export default function Home() {
     if (n >= 1e9)  return (n / 1e9).toFixed(2) + "B";
     if (n >= 1e6)  return (n / 1e6).toFixed(2) + "M";
     return n.toLocaleString();
+  };
+
+  const P = ({ v, className = "", style }: { v: string; className?: string; style?: React.CSSProperties }) => {
+    const num = parseFloat(v.replace("$", ""));
+    if (isNaN(num) || num >= 0.001) return <span className={className} style={style}>{v}</span>;
+    const afterDot = num.toFixed(20).split(".")[1];
+    let zeros = 0;
+    for (const ch of afterDot) { if (ch !== "0") break; zeros++; }
+    const sig = afterDot.slice(zeros).replace(/0+$/, "");
+    return (
+      <span className={className} style={style}>
+        $0.0<sup style={{ fontSize: "0.65em", lineHeight: 1 }}>{zeros}</sup>{sig}
+      </span>
+    );
   };
 
   const STAGE_DATA = [
@@ -177,7 +191,7 @@ export default function Home() {
               </div>
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                 <div className="text-xs font-display text-gray-500 tracking-wide">💎 Stage 1 Price</div>
-                <div className="text-xl font-display text-[#1a1a2e] tracking-wider">{STAGE_DATA[0].price}</div>
+                <P v={STAGE_DATA[0].price} className="text-xl font-display text-[#1a1a2e] tracking-wider" />
                 <div className="text-[10px] text-gray-400 font-display tracking-wide">per PWIFE</div>
               </div>
             </div>
@@ -265,7 +279,7 @@ export default function Home() {
                     {STAGE_DATA.map((s, i) => (
                       <div key={i} className={`flex-1 text-center rounded-lg py-1 border ${i === currentStage ? "border-[#1a1a2e] bg-[#FFFDE7]" : "border-transparent"}`}>
                         <div className="text-[9px] font-display tracking-wide text-[#1a1a2e]/50">S{s.stage}</div>
-                        <div className="text-[9px] font-display font-bold" style={{ color: s.color }}>{s.price}</div>
+                        <P v={s.price} className="text-[9px] font-display font-bold" style={{ color: s.color }} />
                       </div>
                     ))}
                   </div>
@@ -282,7 +296,7 @@ export default function Home() {
                   ].map(p => (
                     <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-2.5 text-center`}>
                       <div className="text-[10px] font-display tracking-wider text-[#1a1a2e]/50">{p.l}</div>
-                      <div className={`text-[11px] font-display ${p.tc} tracking-wider font-bold break-all`}>{p.v}</div>
+                      <P v={p.v} className={`text-[11px] font-display ${p.tc} tracking-wider font-bold`} />
                       <div className="text-[9px] font-display text-[#1a1a2e]/40 tracking-wide">{p.sub}</div>
                     </div>
                   ))}
