@@ -559,13 +559,15 @@ export default function Home() {
                       <div className="flex items-center gap-1 text-sm"><SiTether size={13} /> USDT</div>
                       <div className="text-[8px] font-bold opacity-60">SPL · SOL</div>
                     </button>
-                    {/* USDT ETH disabled — re-enable when BSC contract is ready
-                    <button onClick={() => { setCurrency("USDT_ETH"); setAmount(""); setShowEthModal(true); }}
-                      className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "USDT_ETH" ? "bg-[#627EEA]/15 border-[#627EEA] text-[#3d56c9] shadow-[3px_3px_0px_#3d56c9]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
-                      <div className="flex items-center gap-1 text-sm"><SiTether size={13} /> USDT</div>
+                    {/* USDT ETH — coming soon when BSC contract is ready */}
+                    <button
+                      disabled
+                      className="flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed opacity-50 relative"
+                    >
+                      <div className="flex items-center gap-1 text-sm"><SiEthereum size={13} /> USDT</div>
                       <div className="text-[8px] font-bold opacity-60">ERC20 · ETH</div>
+                      <span className="absolute -top-2 -right-1 text-[8px] bg-gray-300 text-gray-600 rounded px-1 font-bold">SOON</span>
                     </button>
-                    */}
                   </div>
 
                   {currency !== "USDT_ETH" && (
