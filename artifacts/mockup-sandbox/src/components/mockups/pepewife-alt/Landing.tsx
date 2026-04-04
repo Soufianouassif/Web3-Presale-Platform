@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { 
-  Menu, X, Globe, Wallet, ChevronRight, Copy, CheckCircle2,
+  Menu, X, Twitter, Send, Wallet, ChevronRight, Copy, CheckCircle2,
   Shield, Zap, Lock, Users, Rocket, Coins, ArrowRight,
-  TrendingUp, BarChart3, Clock, DollarSign, Gift, Play
+  TrendingUp, Clock, DollarSign, Gift, Play
 } from "lucide-react";
 
 export function Landing() {
@@ -10,7 +10,6 @@ export function Landing() {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("SOL");
 
-  // Mock countdown timer
   const [timeLeft, setTimeLeft] = useState({
     days: 14,
     hours: 23,
@@ -37,32 +36,24 @@ export function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060B18] text-slate-300 font-sans selection:bg-[#00FF88] selection:text-black overflow-x-hidden relative">
-      {/* Background Effects */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#9B5DE5] rounded-full blur-[150px] opacity-20 animate-pulse"></div>
-        <div className="absolute top-[40%] right-[-10%] w-[30%] h-[30%] bg-[#00FF88] rounded-full blur-[150px] opacity-10"></div>
-        <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-[#00D4FF] rounded-full blur-[150px] opacity-10"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMSIvPjwvc3ZnPg==')] opacity-50 mix-blend-overlay"></div>
-      </div>
+    <div className="min-h-screen bg-[#FFFDF5] text-[#1B1F3B] font-sans selection:bg-[#FFE135] selection:text-[#1B1F3B] overflow-x-hidden relative">
+      <style dangerouslySetContent={{ __html: `
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700;800;900&display=swap');
+      `}} />
 
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0A0F1E]/80 backdrop-blur-md border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#FFFDF5] border-b-4 border-[#1B1F3B] py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-16">
             <div className="flex-shrink-0 flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00FF88] to-[#00D4FF] flex items-center justify-center p-0.5">
-                <div className="w-full h-full bg-[#060B18] rounded-full flex items-center justify-center">
-                  <span className="text-[#00FF88] font-bold text-xl">P</span>
-                </div>
-              </div>
-              <span className="text-white font-bold text-xl tracking-wider">PEPEWIFE<span className="text-[#00FF88]">.</span></span>
+              <span className="text-3xl">🐸</span>
+              <span className="font-['Bangers'] tracking-widest text-3xl text-[#1B1F3B] pt-1">PEPEWIFE</span>
             </div>
             
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-8">
-                {['Presale', 'Why Buy', 'Tokenomics', 'Roadmap', 'About'].map((item) => (
-                  <a key={item} href={`#${item.toLowerCase().replace(' ', '-')}`} className="text-slate-300 hover:text-[#00FF88] transition-colors px-3 py-2 rounded-md text-sm font-medium">
+              <div className="ml-10 flex items-baseline space-x-8 font-bold">
+                {['Presale', 'Why Buy', 'Tokenomics', 'Roadmap'].map((item) => (
+                  <a key={item} href={`#${item.toLowerCase().replace(' ', '-')}`} className="text-[#1B1F3B] hover:text-[#FF4D9D] transition-colors px-3 py-2 rounded-md text-lg">
                     {item}
                   </a>
                 ))}
@@ -70,19 +61,15 @@ export function Landing() {
             </div>
 
             <div className="hidden md:flex items-center gap-4">
-              <button className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
-                <Globe className="w-4 h-4" />
-                <span className="text-sm">EN</span>
-              </button>
-              <button className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-5 py-2.5 rounded-full font-medium transition-all hover:border-[#00FF88]/50 hover:shadow-[0_0_15px_rgba(0,255,136,0.2)]">
-                <Wallet className="w-4 h-4 text-[#00FF88]" />
+              <button className="flex items-center gap-2 bg-[#FFE135] border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] hover:translate-y-1 hover:shadow-[0px_0px_0px_#1B1F3B] text-[#1B1F3B] px-6 py-2.5 rounded-xl font-bold transition-all text-lg">
+                <Wallet className="w-5 h-5" strokeWidth={3} />
                 Connect Wallet
               </button>
             </div>
 
             <div className="md:hidden">
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-slate-300 hover:text-white p-2">
-                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-[#1B1F3B] p-2 border-2 border-[#1B1F3B] rounded-lg shadow-[2px_2px_0px_#1B1F3B] bg-white">
+                {isMenuOpen ? <X className="w-6 h-6" strokeWidth={3} /> : <Menu className="w-6 h-6" strokeWidth={3} />}
               </button>
             </div>
           </div>
@@ -90,20 +77,16 @@ export function Landing() {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-[#0A0F1E] border-b border-white/5 pb-4 px-4">
-            <div className="flex flex-col space-y-3 pt-2">
-              {['Presale', 'Why Buy', 'Tokenomics', 'Roadmap', 'About'].map((item) => (
-                <a key={item} href={`#${item.toLowerCase().replace(' ', '-')}`} className="text-slate-300 hover:text-[#00FF88] transition-colors block px-3 py-2 rounded-md text-base font-medium">
+          <div className="md:hidden bg-[#FFFDF5] border-b-4 border-[#1B1F3B] pb-4 px-4 shadow-xl absolute w-full">
+            <div className="flex flex-col space-y-3 pt-2 font-bold">
+              {['Presale', 'Why Buy', 'Tokenomics', 'Roadmap'].map((item) => (
+                <a key={item} href={`#${item.toLowerCase().replace(' ', '-')}`} className="text-[#1B1F3B] hover:text-[#FF4D9D] hover:bg-black/5 transition-colors block px-4 py-3 rounded-xl border-2 border-transparent hover:border-[#1B1F3B] text-lg">
                   {item}
                 </a>
               ))}
-              <div className="pt-4 flex flex-col gap-4 border-t border-white/5">
-                <button className="flex items-center justify-center gap-2 text-slate-300">
-                  <Globe className="w-4 h-4" />
-                  <span>Language: EN</span>
-                </button>
-                <button className="flex items-center justify-center gap-2 bg-[#00FF88] text-black px-5 py-3 rounded-full font-bold">
-                  <Wallet className="w-4 h-4" />
+              <div className="pt-4 flex flex-col gap-4 border-t-2 border-[#1B1F3B]/10">
+                <button className="flex items-center justify-center gap-2 bg-[#FFE135] border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] active:translate-y-1 active:shadow-[0px_0px_0px_#1B1F3B] text-[#1B1F3B] px-6 py-4 rounded-xl font-bold transition-all text-lg">
+                  <Wallet className="w-5 h-5" strokeWidth={3} />
                   Connect Wallet
                 </button>
               </div>
@@ -113,387 +96,405 @@ export function Landing() {
       </nav>
 
       {/* Main Content */}
-      <main className="relative z-10 pt-32 pb-20">
+      <main className="relative z-10 pt-28 pb-20">
         
         {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
             
-            {/* Hero Text */}
-            <div className="flex flex-col gap-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#9B5DE5]/10 border border-[#9B5DE5]/30 w-fit mx-auto lg:mx-0">
-                <span className="w-2 h-2 rounded-full bg-[#9B5DE5] animate-pulse"></span>
-                <span className="text-[#9B5DE5] text-xs font-bold tracking-widest uppercase">Stage 1 Presale Live</span>
-              </div>
-              
-              <h1 className="text-5xl lg:text-7xl font-extrabold text-white leading-tight tracking-tight">
-                Be Early... <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF88] to-[#00D4FF]">Or Cry Later</span> 😭
-              </h1>
-              
-              <p className="text-lg lg:text-xl text-slate-400 max-w-xl mx-auto lg:mx-0">
-                The queen of memes has arrived on Solana. PEPEWIFE isn't just another token; it's a movement. Secure your bag before the ecosystem explodes.
-              </p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF4D9D] border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] -rotate-2 mb-8 transform hover:rotate-0 transition-transform">
+              <span className="text-white font-['Bangers'] text-xl tracking-widest pt-1">🔥 PRESALE LIVE — STAGE 1/4</span>
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl lg:text-8xl text-[#1B1F3B] leading-none mb-6 font-['Bangers'] tracking-wide drop-shadow-[4px_4px_0px_#FFE135]">
+              PEPE FOUND LOVE.<br/>
+              YOU FOUND THE PRE-SALE.<br/>
+              LFG! 🚀
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-[#1B1F3B]/80 font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
+              Join the most scientifically unhinged presale on Solana. 100% memes, 100% vibes, 0% guarantees.
+            </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-4">
-                <button className="group relative px-8 py-4 bg-[#00FF88] text-black rounded-full font-bold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(0,255,136,0.4)]">
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    APE IN NOW <Rocket className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                  <div className="absolute inset-0 h-full w-full scale-0 rounded-full transition-all duration-300 group-hover:scale-100 group-hover:bg-white/20 z-0"></div>
-                </button>
-                <button className="px-8 py-4 bg-white/5 border border-white/10 hover:border-white/30 hover:bg-white/10 text-white rounded-full font-bold text-lg transition-all flex items-center justify-center gap-2">
-                  Join The Fam <Users className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-8">
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex flex-col gap-1">
-                  <span className="text-slate-400 text-xs font-medium uppercase tracking-wider">Total Raised</span>
-                  <span className="text-white text-2xl font-bold">$0</span>
-                </div>
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex flex-col gap-1">
-                  <span className="text-slate-400 text-xs font-medium uppercase tracking-wider">Tokens Sold</span>
-                  <span className="text-white text-2xl font-bold">0</span>
-                </div>
-                <div className="bg-[#00FF88]/5 border border-[#00FF88]/20 rounded-2xl p-4 flex flex-col gap-1 sm:col-span-1 col-span-2">
-                  <span className="text-[#00FF88] text-xs font-medium uppercase tracking-wider">Stage 1 Price</span>
-                  <span className="text-white text-2xl font-bold">$0.00000001</span>
-                </div>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center w-full max-w-md mx-auto sm:max-w-none">
+              <button className="px-10 py-5 bg-[#FFE135] border-4 border-[#1B1F3B] shadow-[6px_6px_0px_#1B1F3B] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_#1B1F3B] text-[#1B1F3B] rounded-2xl font-['Bangers'] text-3xl tracking-widest transition-all flex items-center justify-center gap-3">
+                APE IN 🚀
+              </button>
+              <button className="px-10 py-5 bg-white border-4 border-[#1B1F3B] shadow-[6px_6px_0px_#1B1F3B] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_#1B1F3B] text-[#1B1F3B] rounded-2xl font-bold text-xl transition-all flex items-center justify-center gap-2">
+                Read Whitepaper
+              </button>
             </div>
 
-            {/* Presale Box */}
-            <div className="relative mx-auto w-full max-w-md" id="presale">
-              <div className="absolute -inset-1 bg-gradient-to-b from-[#00FF88] to-[#9B5DE5] rounded-[2rem] blur opacity-20 animate-pulse"></div>
-              <div className="relative bg-[#0A0F1E]/90 backdrop-blur-xl border border-white/10 rounded-[2rem] p-6 sm:p-8 shadow-2xl">
-                
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-white mb-2">Buy $PWIFE</h3>
-                  <p className="text-sm text-slate-400">Next price increase in:</p>
-                  
-                  {/* Countdown */}
-                  <div className="flex justify-center gap-3 mt-4">
-                    {[
-                      { label: 'Days', value: timeLeft.days },
-                      { label: 'Hours', value: timeLeft.hours },
-                      { label: 'Mins', value: timeLeft.minutes },
-                      { label: 'Secs', value: timeLeft.seconds }
-                    ].map((item, i) => (
-                      <div key={i} className="flex flex-col items-center">
-                        <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-xl font-bold text-white shadow-inner mb-1">
-                          {item.value.toString().padStart(2, '0')}
-                        </div>
-                        <span className="text-[10px] text-slate-500 uppercase tracking-widest">{item.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Progress */}
-                <div className="mb-6">
-                  <div className="flex justify-between text-xs font-medium mb-2">
-                    <span className="text-slate-400">Raised: $0</span>
-                    <span className="text-[#00FF88]">Goal: $500,000</span>
-                  </div>
-                  <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden border border-white/5">
-                    <div className="h-full w-[5%] bg-gradient-to-r from-[#00FF88] to-[#00D4FF] rounded-full relative">
-                      <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Tabs */}
-                <div className="grid grid-cols-3 gap-2 mb-6 p-1 bg-white/5 rounded-xl border border-white/5">
-                  {['SOL', 'USDT', 'ETH'].map(currency => (
-                    <button 
-                      key={currency}
-                      onClick={() => setActiveTab(currency)}
-                      className={`py-2 text-sm font-medium rounded-lg transition-all ${activeTab === currency ? 'bg-[#00FF88] text-black shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
-                    >
-                      {currency}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Input Fields */}
-                <div className="space-y-4 mb-6">
-                  <div>
-                    <div className="flex justify-between text-xs mb-1.5 px-1">
-                      <span className="text-slate-400">You Pay</span>
-                      <span className="text-slate-400">Balance: 0 {activeTab}</span>
-                    </div>
-                    <div className="relative">
-                      <input 
-                        type="number" 
-                        placeholder="0.0" 
-                        className="w-full bg-[#060B18] border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-[#00FF88]/50 focus:ring-1 focus:ring-[#00FF88]/50 transition-all font-mono"
-                      />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                        <span className="text-xs font-bold text-[#00FF88] bg-[#00FF88]/10 px-2 py-1 rounded-md cursor-pointer hover:bg-[#00FF88]/20 transition-colors">MAX</span>
-                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px]">💰</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-center -my-2 relative z-10">
-                    <div className="w-8 h-8 bg-[#0A0F1E] border border-white/10 rounded-full flex items-center justify-center">
-                      <ArrowRight className="w-4 h-4 text-slate-400 rotate-90" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-xs mb-1.5 px-1">
-                      <span className="text-slate-400">You Receive</span>
-                    </div>
-                    <div className="relative">
-                      <input 
-                        type="number" 
-                        placeholder="0.0" 
-                        readOnly
-                        className="w-full bg-[#060B18] border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-slate-600 opacity-70 font-mono"
-                      />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                        <span className="font-bold text-white text-sm">$PWIFE</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <button className="w-full py-4 bg-gradient-to-r from-[#00FF88] to-[#00D4FF] text-black rounded-xl font-bold text-lg hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(0,255,136,0.3)] flex items-center justify-center gap-2">
-                  <Wallet className="w-5 h-5" /> Connect Wallet to Buy
-                </button>
-
-                {/* Stage Prices */}
-                <div className="mt-6 border-t border-white/10 pt-4">
-                  <p className="text-xs text-center text-slate-500 mb-3 font-medium uppercase tracking-wider">Price Stages</p>
-                  <div className="grid grid-cols-4 gap-2 text-center text-[10px]">
-                    <div className="bg-[#00FF88]/10 border border-[#00FF88]/20 rounded-lg p-2 flex flex-col gap-1">
-                      <span className="text-[#00FF88] font-bold">Stage 1</span>
-                      <span className="text-white">$0.00000001</span>
-                    </div>
-                    <div className="bg-white/5 border border-white/5 rounded-lg p-2 flex flex-col gap-1 opacity-50">
-                      <span className="text-slate-400">Stage 2</span>
-                      <span className="text-slate-300">$0.00000002</span>
-                    </div>
-                    <div className="bg-white/5 border border-white/5 rounded-lg p-2 flex flex-col gap-1 opacity-50">
-                      <span className="text-slate-400">Stage 3</span>
-                      <span className="text-slate-300">$0.00000003</span>
-                    </div>
-                    <div className="bg-white/5 border border-white/5 rounded-lg p-2 flex flex-col gap-1 opacity-50">
-                      <span className="text-slate-400">Stage 4</span>
-                      <span className="text-slate-300">$0.00000004</span>
-                    </div>
-                  </div>
-                </div>
-
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-16 w-full">
+              <div className="bg-white border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] rounded-2xl p-6 flex flex-col gap-2 rotate-1">
+                <span className="text-[#1B1F3B]/60 font-bold uppercase tracking-wider text-sm">Total Raised</span>
+                <span className="text-[#1B1F3B] text-4xl font-['Bangers'] tracking-wider">$0</span>
+              </div>
+              <div className="bg-white border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] rounded-2xl p-6 flex flex-col gap-2 -rotate-1">
+                <span className="text-[#1B1F3B]/60 font-bold uppercase tracking-wider text-sm">Tokens Sold</span>
+                <span className="text-[#1B1F3B] text-4xl font-['Bangers'] tracking-wider">0</span>
+              </div>
+              <div className="bg-[#22C55E] border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] rounded-2xl p-6 flex flex-col gap-2 rotate-1">
+                <span className="text-[#1B1F3B]/80 font-bold uppercase tracking-wider text-sm">Stage 1 Price</span>
+                <span className="text-[#1B1F3B] text-4xl font-['Bangers'] tracking-wider">$0.00000001</span>
               </div>
             </div>
           </div>
         </section>
 
         {/* Partners Ticker */}
-        <section className="border-y border-white/5 bg-white/[0.02] py-6 overflow-hidden flex relative">
-          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#060B18] to-transparent z-10 pointer-events-none"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#060B18] to-transparent z-10 pointer-events-none"></div>
-          
-          <div className="flex gap-16 items-center w-max animate-[marquee_20s_linear_infinite]">
-            {[...Array(3)].map((_, i) => (
+        <section className="border-y-4 border-[#1B1F3B] bg-white py-6 overflow-hidden flex relative mb-20 shadow-[0_4px_0px_#1B1F3B]">
+          <div className="flex gap-20 items-center w-max animate-[marquee_20s_linear_infinite]">
+            {[...Array(4)].map((_, i) => (
               <React.Fragment key={i}>
-                <div className="flex items-center gap-2 text-slate-500 font-bold text-xl opacity-50 hover:opacity-100 transition-opacity"><TrendingUp className="w-6 h-6"/> CoinMarketCap</div>
-                <div className="flex items-center gap-2 text-slate-500 font-bold text-xl opacity-50 hover:opacity-100 transition-opacity"><div className="w-6 h-6 bg-slate-500 rounded-full"/> Solana</div>
-                <div className="flex items-center gap-2 text-slate-500 font-bold text-xl opacity-50 hover:opacity-100 transition-opacity"><Coins className="w-6 h-6"/> Binance</div>
-                <div className="flex items-center gap-2 text-slate-500 font-bold text-xl opacity-50 hover:opacity-100 transition-opacity"><Globe className="w-6 h-6"/> Orcal</div>
-                <div className="flex items-center gap-2 text-slate-500 font-bold text-xl opacity-50 hover:opacity-100 transition-opacity"><Zap className="w-6 h-6"/> Raydium</div>
+                <div className="flex items-center gap-3 text-[#1B1F3B]/50 font-['Bangers'] tracking-widest text-3xl"><TrendingUp className="w-8 h-8" strokeWidth={3}/> COINMARKETCAP</div>
+                <div className="flex items-center gap-3 text-[#1B1F3B]/50 font-['Bangers'] tracking-widest text-3xl"><div className="w-8 h-8 bg-[#1B1F3B]/50 rounded-full"/> SOLANA</div>
+                <div className="flex items-center gap-3 text-[#1B1F3B]/50 font-['Bangers'] tracking-widest text-3xl"><Coins className="w-8 h-8" strokeWidth={3}/> BINANCE</div>
+                <div className="flex items-center gap-3 text-[#1B1F3B]/50 font-['Bangers'] tracking-widest text-3xl"><Globe className="w-8 h-8" strokeWidth={3}/> ORCAL</div>
+                <div className="flex items-center gap-3 text-[#1B1F3B]/50 font-['Bangers'] tracking-widest text-3xl"><Zap className="w-8 h-8" strokeWidth={3}/> RAYDIUM</div>
               </React.Fragment>
             ))}
           </div>
         </section>
 
-        {/* Why Buy Section */}
-        <section id="why-buy" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Why Buy <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF88] to-[#00D4FF]">$PWIFE</span>?</h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">Built on Solana for lightning-fast transactions and zero BS. The most secure and hyped meme token of this cycle.</p>
+        {/* Presale Box Section */}
+        <section id="presale" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center mb-12">
+            <h2 className="text-5xl md:text-6xl font-['Bangers'] tracking-widest text-[#1B1F3B] drop-shadow-[3px_3px_0px_#FF4D9D]">
+              BUY $PWIFE BEFORE YOUR FRIENDS DO 😤
+            </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: <Coins className="w-8 h-8 text-[#00FF88]" />, title: "100 Trillion Supply", desc: "Massive supply to ensure everyone can hold millions of tokens. Get your bag.", color: "group-hover:border-[#00FF88]/50 group-hover:shadow-[0_0_30px_rgba(0,255,136,0.1)]" },
-              { icon: <Lock className="w-8 h-8 text-[#9B5DE5]" />, title: "Locked Liquidity", desc: "LP tokens will be burned or locked at launch. Rug-proof by design.", color: "group-hover:border-[#9B5DE5]/50 group-hover:shadow-[0_0_30px_rgba(155,93,229,0.1)]" },
-              { icon: <Shield className="w-8 h-8 text-[#00D4FF]" />, title: "Revoked Mint", desc: "Mint authority is revoked. No new tokens can ever be created. Absolute scarcity.", color: "group-hover:border-[#00D4FF]/50 group-hover:shadow-[0_0_30px_rgba(0,212,255,0.1)]" },
-              { icon: <Users className="w-8 h-8 text-[#FF3366]" />, title: "Community First", desc: "No VC dumps. 40% allocated straight to the community. Power to the players.", color: "group-hover:border-[#FF3366]/50 group-hover:shadow-[0_0_30px_rgba(255,51,102,0.1)]" }
-            ].map((feature, i) => (
-              <div key={i} className={`group bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl transition-all duration-300 ${feature.color}`}>
-                <div className="w-16 h-16 bg-[#060B18] rounded-2xl border border-white/5 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
+            {/* Left Card: Countdown */}
+            <div className="bg-white border-4 border-[#1B1F3B] shadow-[8px_8px_0px_#1B1F3B] rounded-3xl p-8 lg:p-10 -rotate-1">
+              <h3 className="text-2xl font-bold mb-8 text-center uppercase tracking-wide">Next price increase in:</h3>
+              <div className="flex justify-center gap-4 sm:gap-6 mb-10">
+                {[
+                  { label: 'Days', value: timeLeft.days },
+                  { label: 'Hours', value: timeLeft.hours },
+                  { label: 'Mins', value: timeLeft.minutes },
+                  { label: 'Secs', value: timeLeft.seconds }
+                ].map((item, i) => (
+                  <div key={i} className="flex flex-col items-center">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#FFFDF5] border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] rounded-2xl flex items-center justify-center text-4xl sm:text-5xl font-['Bangers'] tracking-widest text-[#1B1F3B] mb-3">
+                      {item.value.toString().padStart(2, '0')}
+                    </div>
+                    <span className="text-sm font-bold text-[#1B1F3B]/60 uppercase tracking-widest">{item.label}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+
+              <div>
+                <div className="flex justify-between font-bold mb-3">
+                  <span className="uppercase">Stage 1 progress: 0%</span>
+                  <span className="text-[#22C55E] uppercase">$0 / $500,000</span>
+                </div>
+                <div className="w-full h-8 bg-[#FFFDF5] rounded-full overflow-hidden border-4 border-[#1B1F3B] p-1">
+                  <div className="h-full w-[5%] bg-[#22C55E] rounded-full border-2 border-[#1B1F3B] relative overflow-hidden">
+                    <div className="absolute inset-0 bg-white/20"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Card: Buy Widget */}
+            <div className="bg-white border-4 border-[#1B1F3B] shadow-[8px_8px_0px_#1B1F3B] rounded-3xl p-8 lg:p-10 rotate-1">
+              {/* Tabs */}
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {['SOL', 'USDT'].map(currency => (
+                  <button 
+                    key={currency}
+                    onClick={() => setActiveTab(currency)}
+                    className={`py-4 text-xl font-bold rounded-xl border-4 transition-all ${
+                      activeTab === currency 
+                      ? 'bg-[#FFE135] border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B]' 
+                      : 'bg-[#FFFDF5] border-[#1B1F3B]/20 text-[#1B1F3B]/50 hover:border-[#1B1F3B]/50 hover:text-[#1B1F3B]'
+                    }`}
+                  >
+                    {currency}
+                  </button>
+                ))}
+              </div>
+
+              {/* Input Fields */}
+              <div className="space-y-6 mb-8">
+                <div>
+                  <div className="flex justify-between font-bold text-sm mb-2 uppercase">
+                    <span>You Pay</span>
+                    <span className="text-[#1B1F3B]/50">Balance: 0 {activeTab}</span>
+                  </div>
+                  <div className="relative">
+                    <input 
+                      type="number" 
+                      placeholder="0.0" 
+                      className="w-full bg-[#FFFDF5] border-4 border-[#1B1F3B] rounded-2xl py-4 px-5 text-2xl font-bold placeholder:text-[#1B1F3B]/30 focus:outline-none focus:shadow-[4px_4px_0px_#FF4D9D] transition-all"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                      <span className="text-sm font-bold text-[#1B1F3B] bg-[#FFE135] border-2 border-[#1B1F3B] px-3 py-1.5 rounded-lg cursor-pointer hover:bg-[#FF4D9D] hover:text-white transition-colors shadow-[2px_2px_0px_#1B1F3B]">MAX</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-center -my-2 relative z-10">
+                  <div className="w-10 h-10 bg-white border-4 border-[#1B1F3B] rounded-full flex items-center justify-center shadow-[2px_2px_0px_#1B1F3B]">
+                    <ArrowRight className="w-5 h-5 text-[#1B1F3B] rotate-90" strokeWidth={3} />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between font-bold text-sm mb-2 uppercase">
+                    <span>You Receive</span>
+                  </div>
+                  <div className="relative">
+                    <input 
+                      type="number" 
+                      placeholder="0.0" 
+                      readOnly
+                      className="w-full bg-[#1B1F3B]/5 border-4 border-[#1B1F3B]/20 rounded-2xl py-4 px-5 text-2xl font-bold placeholder:text-[#1B1F3B]/50 outline-none"
+                    />
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                      <span className="font-['Bangers'] tracking-widest text-2xl text-[#1B1F3B] pt-1">$PWIFE</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button className="w-full py-5 bg-[#FFE135] border-4 border-[#1B1F3B] text-[#1B1F3B] rounded-2xl font-['Bangers'] tracking-widest text-3xl shadow-[6px_6px_0px_#1B1F3B] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_#1B1F3B] transition-all flex items-center justify-center gap-3">
+                <Wallet className="w-6 h-6" strokeWidth={3} /> APE IN 🚀
+              </button>
+            </div>
+          </div>
+
+          {/* Stage Prices */}
+          <div className="mt-16 bg-white border-4 border-[#1B1F3B] shadow-[6px_6px_0px_#1B1F3B] rounded-3xl p-6 sm:p-8">
+            <h4 className="text-center font-['Bangers'] text-2xl tracking-widest mb-6">PRICE PROGRESSION (LISTING: $0.061)</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-[#22C55E] border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] rounded-2xl p-4 flex flex-col items-center gap-1 -rotate-1">
+                <span className="font-bold uppercase text-[#1B1F3B]">Stage 1</span>
+                <span className="font-['Bangers'] text-2xl tracking-wider text-[#1B1F3B]">$0.00000001</span>
+              </div>
+              <div className="bg-[#FFFDF5] border-4 border-[#1B1F3B]/20 rounded-2xl p-4 flex flex-col items-center gap-1 opacity-70">
+                <span className="font-bold uppercase text-[#1B1F3B]/50">Stage 2</span>
+                <span className="font-['Bangers'] text-2xl tracking-wider text-[#1B1F3B]/50">$0.00000002</span>
+              </div>
+              <div className="bg-[#FFFDF5] border-4 border-[#1B1F3B]/20 rounded-2xl p-4 flex flex-col items-center gap-1 opacity-70">
+                <span className="font-bold uppercase text-[#1B1F3B]/50">Stage 3</span>
+                <span className="font-['Bangers'] text-2xl tracking-wider text-[#1B1F3B]/50">$0.00000004</span>
+              </div>
+              <div className="bg-[#FFFDF5] border-4 border-[#1B1F3B]/20 rounded-2xl p-4 flex flex-col items-center gap-1 opacity-70">
+                <span className="font-bold uppercase text-[#1B1F3B]/50">Stage 4</span>
+                <span className="font-['Bangers'] text-2xl tracking-wider text-[#1B1F3B]/50">$0.00000006</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Why Buy Section */}
+        <section id="why-buy" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-['Bangers'] tracking-widest text-[#1B1F3B] drop-shadow-[3px_3px_0px_#FFE135] mb-6">
+              WHY APE INTO $PWIFE?
+            </h2>
+            <p className="text-xl text-[#1B1F3B]/70 font-medium max-w-2xl mx-auto">
+              Because numbers go up, and we have the best stickers. Seriously though, look at these bulletproof fundamentals.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-white border-4 border-[#1B1F3B] shadow-[8px_8px_0px_#1B1F3B] p-8 rounded-3xl -rotate-1 hover:rotate-0 transition-transform">
+              <div className="w-16 h-16 bg-[#FFE135] border-4 border-[#1B1F3B] rounded-2xl flex items-center justify-center mb-6 shadow-[4px_4px_0px_#1B1F3B] text-3xl">
+                💯
+              </div>
+              <h3 className="text-3xl font-['Bangers'] tracking-widest text-[#1B1F3B] mb-4">100 Trillion Supply</h3>
+              <p className="text-lg text-[#1B1F3B]/80 font-medium leading-relaxed">
+                Because we love big numbers and low prices. Why hold one token when you can hold billions?
+              </p>
+            </div>
+            
+            <div className="bg-white border-4 border-[#1B1F3B] shadow-[8px_8px_0px_#1B1F3B] p-8 rounded-3xl rotate-1 hover:rotate-0 transition-transform">
+              <div className="w-16 h-16 bg-[#FF4D9D] border-4 border-[#1B1F3B] rounded-2xl flex items-center justify-center mb-6 shadow-[4px_4px_0px_#1B1F3B] text-3xl">
+                🔒
+              </div>
+              <h3 className="text-3xl font-['Bangers'] tracking-widest text-[#1B1F3B] mb-4">Locked Liquidity</h3>
+              <p className="text-lg text-[#1B1F3B]/80 font-medium leading-relaxed">
+                We can't rug you even if we wanted to (we don't). Funds are SAFU.
+              </p>
+            </div>
+
+            <div className="bg-white border-4 border-[#1B1F3B] shadow-[8px_8px_0px_#1B1F3B] p-8 rounded-3xl rotate-1 hover:rotate-0 transition-transform">
+              <div className="w-16 h-16 bg-[#22C55E] border-4 border-[#1B1F3B] rounded-2xl flex items-center justify-center mb-6 shadow-[4px_4px_0px_#1B1F3B] text-3xl">
+                🔥
+              </div>
+              <h3 className="text-3xl font-['Bangers'] tracking-widest text-[#1B1F3B] mb-4">Revoked Mint</h3>
+              <p className="text-lg text-[#1B1F3B]/80 font-medium leading-relaxed">
+                No printer go brrr. Supply is fixed forever. What you see is what you get.
+              </p>
+            </div>
+
+            <div className="bg-white border-4 border-[#1B1F3B] shadow-[8px_8px_0px_#1B1F3B] p-8 rounded-3xl -rotate-1 hover:rotate-0 transition-transform">
+              <div className="w-16 h-16 bg-[#00D4FF] border-4 border-[#1B1F3B] rounded-2xl flex items-center justify-center mb-6 shadow-[4px_4px_0px_#1B1F3B] text-3xl">
+                🐸
+              </div>
+              <h3 className="text-3xl font-['Bangers'] tracking-widest text-[#1B1F3B] mb-4">Community First</h3>
+              <p className="text-lg text-[#1B1F3B]/80 font-medium leading-relaxed">
+                40% of tokens go to the people. That's you, fren. We're all gonna make it.
+              </p>
+            </div>
           </div>
         </section>
 
         {/* Tokenomics Section */}
-        <section id="tokenomics" className="relative py-24 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Tokenomics</h2>
-              <p className="text-slate-400 max-w-2xl mx-auto">Transparent and fair distribution. Built for long-term sustainability.</p>
-            </div>
+        <section id="tokenomics" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 border-t-4 border-dashed border-[#1B1F3B]/20">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-['Bangers'] tracking-widest text-[#1B1F3B] drop-shadow-[3px_3px_0px_#22C55E] mb-6">
+              WHERE DO THE TOKENS GO? 📊
+            </h2>
+          </div>
 
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              {/* Chart Placeholder */}
-              <div className="relative aspect-square max-w-md mx-auto w-full flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full border-[40px] border-[#0A0F1E] shadow-[0_0_50px_rgba(0,255,136,0.1)]"></div>
-                {/* SVG Donut Mock */}
-                <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90 drop-shadow-2xl">
-                  <circle cx="50" cy="50" r="40" fill="transparent" stroke="#00FF88" strokeWidth="20" strokeDasharray="251.2" strokeDashoffset="0" className="opacity-90"></circle>
-                  <circle cx="50" cy="50" r="40" fill="transparent" stroke="#9B5DE5" strokeWidth="20" strokeDasharray="251.2" strokeDashoffset="100.48" className="opacity-90"></circle>
-                  <circle cx="50" cy="50" r="40" fill="transparent" stroke="#00D4FF" strokeWidth="20" strokeDasharray="251.2" strokeDashoffset="150.72" className="opacity-90"></circle>
-                  <circle cx="50" cy="50" r="40" fill="transparent" stroke="#FF3366" strokeWidth="20" strokeDasharray="251.2" strokeDashoffset="188.4" className="opacity-90"></circle>
-                  <circle cx="50" cy="50" r="40" fill="transparent" stroke="#FFD700" strokeWidth="20" strokeDasharray="251.2" strokeDashoffset="213.52" className="opacity-90"></circle>
-                  <circle cx="50" cy="50" r="40" fill="transparent" stroke="#FFFFFF" strokeWidth="20" strokeDasharray="251.2" strokeDashoffset="238.64" className="opacity-90"></circle>
-                </svg>
-                
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-sm text-slate-400 font-medium uppercase tracking-widest">Total Supply</span>
-                  <span className="text-3xl font-bold text-white">100T</span>
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Chart Mock */}
+            <div className="relative aspect-square max-w-md mx-auto w-full flex items-center justify-center p-8">
+              <div className="absolute inset-0 bg-[#FFE135] border-4 border-[#1B1F3B] rounded-full shadow-[12px_12px_0px_#1B1F3B] rotate-3"></div>
+              <div className="w-[90%] h-[90%] rounded-full border-8 border-[#1B1F3B] relative overflow-hidden" style={{ background: 'conic-gradient(#22C55E 0% 40%, #FF4D9D 40% 60%, #FFE135 60% 75%, #00D4FF 75% 85%, #F97316 85% 95%, #EF4444 95% 100%)' }}>
+                <div className="absolute inset-0 m-auto w-1/2 h-1/2 bg-[#FFFDF5] rounded-full border-8 border-[#1B1F3B] flex items-center justify-center">
+                  <span className="font-['Bangers'] text-4xl text-[#1B1F3B] tracking-wider pt-2">100T</span>
                 </div>
               </div>
+            </div>
 
-              {/* Breakdown List */}
-              <div className="flex flex-col gap-4">
+            {/* List */}
+            <div className="flex flex-col gap-4 font-bold text-lg">
+              <div className="flex items-center gap-4 bg-white border-4 border-[#1B1F3B] p-5 rounded-2xl shadow-[4px_4px_0px_#1B1F3B] hover:-translate-y-1 transition-transform">
+                <span className="text-3xl">🟢</span>
+                <span className="flex-1">Community</span>
+                <span className="font-['Bangers'] text-3xl tracking-wider pt-1">40%</span>
+              </div>
+              <div className="flex items-center gap-4 bg-white border-4 border-[#1B1F3B] p-5 rounded-2xl shadow-[4px_4px_0px_#1B1F3B] hover:-translate-y-1 transition-transform">
+                <span className="text-3xl">🟣</span>
+                <span className="flex-1">Presale</span>
+                <span className="font-['Bangers'] text-3xl tracking-wider pt-1">20%</span>
+              </div>
+              <div className="flex items-center gap-4 bg-white border-4 border-[#1B1F3B] p-5 rounded-2xl shadow-[4px_4px_0px_#1B1F3B] hover:-translate-y-1 transition-transform">
+                <span className="text-3xl">🟡</span>
+                <span className="flex-1">Liquidity</span>
+                <span className="font-['Bangers'] text-3xl tracking-wider pt-1">15%</span>
+              </div>
+              <div className="flex items-center gap-4 bg-white border-4 border-[#1B1F3B] p-5 rounded-2xl shadow-[4px_4px_0px_#1B1F3B] hover:-translate-y-1 transition-transform">
+                <span className="text-3xl">🔵</span>
+                <span className="flex-1">Marketing</span>
+                <span className="font-['Bangers'] text-3xl tracking-wider pt-1">10%</span>
+              </div>
+              <div className="flex items-center gap-4 bg-white border-4 border-[#1B1F3B] p-5 rounded-2xl shadow-[4px_4px_0px_#1B1F3B] hover:-translate-y-1 transition-transform">
+                <span className="text-3xl">🟠</span>
+                <span className="flex-1">Ecosystem</span>
+                <span className="font-['Bangers'] text-3xl tracking-wider pt-1">10%</span>
+              </div>
+              <div className="flex items-center gap-4 bg-white border-4 border-[#1B1F3B] p-5 rounded-2xl shadow-[4px_4px_0px_#1B1F3B] hover:-translate-y-1 transition-transform">
+                <span className="text-3xl">🔴</span>
+                <span className="flex-1">Team</span>
+                <span className="font-['Bangers'] text-3xl tracking-wider pt-1">5%</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Roadmap */}
+        <section id="roadmap" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-['Bangers'] tracking-widest text-[#1B1F3B] drop-shadow-[3px_3px_0px_#00D4FF]">
+              THE MASTER PLAN 🗺️
+            </h2>
+          </div>
+
+          <div className="space-y-8 relative before:absolute before:inset-0 before:ml-[39px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-2 before:bg-[#1B1F3B]">
+            
+            <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+              <div className="flex items-center justify-center w-20 h-20 rounded-full border-4 border-[#1B1F3B] bg-[#22C55E] shadow-[4px_4px_0px_#1B1F3B] shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 text-3xl">
+                ✅
+              </div>
+              <div className="w-[calc(100%-6rem)] md:w-[calc(50%-4rem)] bg-white border-4 border-[#1B1F3B] shadow-[6px_6px_0px_#1B1F3B] p-6 rounded-3xl rotate-1 group-hover:-rotate-1 transition-transform">
+                <h3 className="font-['Bangers'] text-3xl tracking-widest text-[#1B1F3B] mb-2">Phase 1</h3>
+                <p className="font-bold text-[#1B1F3B]/80 text-lg">Presale Launch, Community Building, Token Deployment</p>
+              </div>
+            </div>
+
+            <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+              <div className="flex items-center justify-center w-20 h-20 rounded-full border-4 border-[#1B1F3B] bg-[#FFE135] shadow-[4px_4px_0px_#1B1F3B] shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 text-3xl">
+                🔄
+              </div>
+              <div className="w-[calc(100%-6rem)] md:w-[calc(50%-4rem)] bg-white border-4 border-[#1B1F3B] shadow-[6px_6px_0px_#1B1F3B] p-6 rounded-3xl -rotate-1 group-hover:rotate-1 transition-transform">
+                <h3 className="font-['Bangers'] text-3xl tracking-widest text-[#1B1F3B] mb-2">Phase 2</h3>
+                <p className="font-bold text-[#1B1F3B]/80 text-lg">DEX Listing, CoinGecko/CMC Listing, Marketing Push</p>
+              </div>
+            </div>
+
+            <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+              <div className="flex items-center justify-center w-20 h-20 rounded-full border-4 border-[#1B1F3B] bg-white shadow-[4px_4px_0px_#1B1F3B] shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 text-3xl">
+                ⏳
+              </div>
+              <div className="w-[calc(100%-6rem)] md:w-[calc(50%-4rem)] bg-white border-4 border-[#1B1F3B] shadow-[6px_6px_0px_#1B1F3B] p-6 rounded-3xl rotate-1 group-hover:-rotate-1 transition-transform opacity-70">
+                <h3 className="font-['Bangers'] text-3xl tracking-widest text-[#1B1F3B] mb-2">Phase 3</h3>
+                <p className="font-bold text-[#1B1F3B]/80 text-lg">Tap-to-Earn Game Launch, Staking Rewards, Partnerships</p>
+              </div>
+            </div>
+
+            <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+              <div className="flex items-center justify-center w-20 h-20 rounded-full border-4 border-[#1B1F3B] bg-white shadow-[4px_4px_0px_#1B1F3B] shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 text-3xl">
+                🌙
+              </div>
+              <div className="w-[calc(100%-6rem)] md:w-[calc(50%-4rem)] bg-white border-4 border-[#1B1F3B] shadow-[6px_6px_0px_#1B1F3B] p-6 rounded-3xl -rotate-1 group-hover:rotate-1 transition-transform opacity-70">
+                <h3 className="font-['Bangers'] text-3xl tracking-widest text-[#1B1F3B] mb-2">Phase 4</h3>
+                <p className="font-bold text-[#1B1F3B]/80 text-lg">CEX Listing, Cross-chain Bridge, $PWIFE Ecosystem Expansion</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Referral */}
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="bg-[#FF4D9D] border-4 border-[#1B1F3B] shadow-[12px_12px_0px_#1B1F3B] rounded-[2rem] p-8 md:p-12 text-center rotate-1">
+            <h2 className="text-4xl md:text-5xl font-['Bangers'] tracking-widest text-white drop-shadow-[3px_3px_0px_#1B1F3B] mb-6">
+              TELL YOUR FRIENDS. GET RICH TOGETHER. 💰
+            </h2>
+            <p className="text-xl font-bold text-white mb-10">
+              Earn 5% of every purchase made by anyone you refer. It's not a pyramid, it's a triangle of friendship 🔺
+            </p>
+
+            <div className="bg-[#FFFDF5] border-4 border-[#1B1F3B] rounded-2xl p-6 mb-10 -rotate-1">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input 
+                  type="text" 
+                  value="Connect wallet to get your link" 
+                  readOnly 
+                  className="flex-1 bg-[#1B1F3B]/5 border-4 border-[#1B1F3B]/20 rounded-xl py-4 px-5 text-lg font-bold text-[#1B1F3B]/50 outline-none"
+                />
+                <button className="px-8 py-4 bg-[#FFE135] border-4 border-[#1B1F3B] text-[#1B1F3B] rounded-xl font-['Bangers'] tracking-widest text-2xl shadow-[4px_4px_0px_#1B1F3B] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_#1B1F3B] transition-all whitespace-nowrap">
+                  COPY LINK
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-white border-4 border-[#1B1F3B] rounded-2xl overflow-hidden shadow-[4px_4px_0px_#1B1F3B]">
+              <div className="bg-[#1B1F3B] text-white p-4 font-['Bangers'] tracking-widest text-2xl">
+                TOP REFERRERS
+              </div>
+              <div className="divide-y-4 divide-[#1B1F3B]/10 font-bold">
                 {[
-                  { label: "Community Rewards", percent: "40%", color: "bg-[#00FF88]", desc: "Airdrops, staking, and community incentives" },
-                  { label: "Presale", percent: "20%", color: "bg-[#9B5DE5]", desc: "Initial token offering for early supporters" },
-                  { label: "Liquidity", percent: "15%", color: "bg-[#00D4FF]", desc: "DEX & CEX liquidity provision" },
-                  { label: "Marketing", percent: "10%", color: "bg-[#FF3366]", desc: "Partnerships, influencers, and campaigns" },
-                  { label: "Ecosystem", percent: "10%", color: "bg-[#FFD700]", desc: "Future development and DApps" },
-                  { label: "Team", percent: "5%", color: "bg-[#FFFFFF]", desc: "Locked for 12 months, linear vesting" }
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-4 bg-white/5 border border-white/5 p-4 rounded-2xl hover:bg-white/10 transition-colors">
-                    <div className={`w-3 h-12 rounded-full ${item.color}`}></div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-bold text-white text-lg">{item.label}</span>
-                        <span className="font-mono font-bold text-xl">{item.percent}</span>
-                      </div>
-                      <p className="text-sm text-slate-400">{item.desc}</p>
+                  { rank: 1, address: '8xK...9zP', reward: '5.2M' },
+                  { rank: 2, address: '3mY...2wQ', reward: '4.1M' },
+                  { rank: 3, address: '9aB...7cV', reward: '2.8M' },
+                ].map((row) => (
+                  <div key={row.rank} className="flex justify-between items-center p-4 hover:bg-[#FFFDF5]">
+                    <div className="flex items-center gap-4">
+                      <span className="w-8 h-8 rounded-full bg-[#FFE135] border-2 border-[#1B1F3B] flex items-center justify-center text-[#1B1F3B]">#{row.rank}</span>
+                      <span className="text-[#1B1F3B]">{row.address}</span>
                     </div>
+                    <span className="text-[#22C55E]">{row.reward} $PWIFE</span>
                   </div>
                 ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Roadmap Section */}
-        <section id="roadmap" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">The Master Plan</h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">We're not just here to take part, we're here to take over.</p>
-          </div>
-
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-[28px] md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#00FF88] via-[#9B5DE5] to-[#060B18] -translate-x-1/2"></div>
-
-            <div className="space-y-12">
-              {[
-                { phase: "Phase 1", title: "The Genesis", status: "active", items: ["Smart Contract Deployment", "Website Launch", "Presale Kickoff", "Community Building", "Marketing Campaign V1"] },
-                { phase: "Phase 2", title: "The Expansion", status: "upcoming", items: ["DEX Launch on Raydium", "CoinMarketCap Listing", "CoinGecko Listing", "10,000+ Holders", "CEX Listings Tier 2"] },
-                { phase: "Phase 3", title: "The Utility", status: "upcoming", items: ["Tap-to-Earn Game Beta", "Staking Platform Launch", "NFT Collection Drop", "Tier 1 CEX Listings", "Major Partnerships"] },
-                { phase: "Phase 4", title: "The Ecosystem", status: "upcoming", items: ["PEPEWIFE Swap", "Ecosystem Expansion", "Real-world Events", "Merch Store", "100M+ Market Cap Goal"] }
-              ].map((phase, i) => (
-                <div key={i} className={`relative flex flex-col md:flex-row gap-8 md:justify-between items-start md:items-center ${i % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
-                  
-                  {/* Timeline node */}
-                  <div className="absolute left-0 md:left-1/2 w-14 h-14 rounded-full bg-[#060B18] border-2 border-[#00FF88] shadow-[0_0_15px_rgba(0,255,136,0.5)] flex items-center justify-center -translate-x-1/2 z-10">
-                    {phase.status === 'active' ? <div className="w-4 h-4 bg-[#00FF88] rounded-full animate-pulse"></div> : <div className="w-4 h-4 bg-white/20 rounded-full"></div>}
-                  </div>
-
-                  <div className="ml-16 md:ml-0 md:w-[45%] bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${phase.status === 'active' ? 'bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/30' : 'bg-white/10 text-slate-400 border border-white/10'}`}>
-                        {phase.phase}
-                      </span>
-                      <h3 className="text-2xl font-bold text-white">{phase.title}</h3>
-                    </div>
-                    <ul className="space-y-3">
-                      {phase.items.map((item, j) => (
-                        <li key={j} className="flex items-start gap-3 text-slate-300">
-                          <CheckCircle2 className={`w-5 h-5 shrink-0 ${phase.status === 'active' ? 'text-[#00FF88]' : 'text-slate-600'}`} />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Referral Section */}
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="bg-gradient-to-br from-[#1A1025] to-[#0A1A1E] border border-white/10 rounded-[3rem] p-8 md:p-12 relative overflow-hidden">
-            <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#9B5DE5] rounded-full blur-[120px] opacity-20"></div>
-            
-            <div className="relative z-10 text-center mb-10">
-              <div className="w-16 h-16 bg-[#00FF88]/10 border border-[#00FF88]/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Gift className="w-8 h-8 text-[#00FF88]" />
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Shill & Earn <span className="text-[#00FF88]">5%</span> Instantly</h2>
-              <p className="text-slate-400 max-w-xl mx-auto">Generate your unique referral link. When someone buys $PWIFE through your link, you instantly receive 5% of their purchase in SOL directly to your wallet.</p>
-            </div>
-
-            <div className="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto mb-16">
-              <input 
-                type="text" 
-                readOnly 
-                value="Connect wallet to generate link" 
-                className="flex-1 bg-[#060B18] border border-white/10 rounded-xl py-4 px-6 text-slate-500 font-mono text-center md:text-left focus:outline-none"
-              />
-              <button className="bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl py-4 px-8 font-bold flex items-center justify-center gap-2 transition-colors whitespace-nowrap opacity-50 cursor-not-allowed">
-                <Copy className="w-5 h-5" /> Copy Link
-              </button>
-            </div>
-
-            {/* Leaderboard */}
-            <div className="bg-[#060B18]/50 border border-white/5 rounded-2xl overflow-hidden backdrop-blur-sm max-w-3xl mx-auto">
-              <div className="px-6 py-4 border-b border-white/5 bg-white/[0.02]">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-[#9B5DE5]" /> Top Shillers
-                </h3>
-              </div>
-              <div className="p-0">
-                <table className="w-full text-left text-sm">
-                  <thead className="text-xs uppercase text-slate-500 bg-white/[0.02] border-b border-white/5">
-                    <tr>
-                      <th className="px-6 py-4 font-medium">Rank</th>
-                      <th className="px-6 py-4 font-medium">Wallet</th>
-                      <th className="px-6 py-4 font-medium text-right">Earned</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {[
-                      { rank: 1, wallet: "8x9T...3qWa", earned: "45.2 SOL", color: "text-[#FFD700]" },
-                      { rank: 2, wallet: "4mZP...9kLs", earned: "32.8 SOL", color: "text-slate-300" },
-                      { rank: 3, wallet: "G7bN...1yXr", earned: "18.5 SOL", color: "text-[#CD7F32]" },
-                      { rank: 4, wallet: "9vCw...5hQm", earned: "12.1 SOL", color: "text-slate-500" },
-                      { rank: 5, wallet: "2pLk...8jRt", earned: "8.4 SOL", color: "text-slate-500" }
-                    ].map((row, i) => (
-                      <tr key={i} className="hover:bg-white/[0.02] transition-colors">
-                        <td className={`px-6 py-4 font-bold ${row.color}`}>#{row.rank}</td>
-                        <td className="px-6 py-4 text-slate-300 font-mono">{row.wallet}</td>
-                        <td className="px-6 py-4 text-[#00FF88] font-mono text-right font-medium">{row.earned}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
             </div>
           </div>
@@ -502,66 +503,31 @@ export function Landing() {
       </main>
 
       {/* Footer */}
-      <footer className="relative border-t border-white/10 bg-[#0A0F1E] pt-16 pb-8">
+      <footer className="border-t-4 border-[#1B1F3B] bg-[#FFFDF5] pt-16 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00FF88] to-[#00D4FF] flex items-center justify-center p-0.5">
-                  <div className="w-full h-full bg-[#060B18] rounded-full flex items-center justify-center">
-                    <span className="text-[#00FF88] font-bold">P</span>
-                  </div>
-                </div>
-                <span className="text-white font-bold text-xl tracking-wider">PEPEWIFE<span className="text-[#00FF88]">.</span></span>
-              </div>
-              <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
-                The most advanced meme token ecosystem on Solana. Don't fade the wife. Join the presale, earn rewards, and be part of the revolution.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-sm">Quick Links</h4>
-              <ul className="space-y-3 text-sm text-slate-400">
-                <li><a href="#presale" className="hover:text-[#00FF88] transition-colors">Buy Presale</a></li>
-                <li><a href="#tokenomics" className="hover:text-[#00FF88] transition-colors">Tokenomics</a></li>
-                <li><a href="#roadmap" className="hover:text-[#00FF88] transition-colors">Roadmap</a></li>
-                <li><a href="#" className="hover:text-[#00FF88] transition-colors">Whitepaper</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-sm">Community</h4>
-              <div className="flex gap-4">
-                <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-[#00FF88] hover:border-[#00FF88]/50 hover:bg-[#00FF88]/10 transition-all">
-                  <span className="font-bold text-lg">X</span>
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-[#00D4FF] hover:border-[#00D4FF]/50 hover:bg-[#00D4FF]/10 transition-all">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-                </a>
-              </div>
+          <div className="flex flex-col items-center justify-center text-center gap-6">
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-5xl">🐸</span>
+              <span className="font-['Bangers'] tracking-widest text-4xl text-[#1B1F3B] pt-2">PEPEWIFE</span>
+              <p className="text-xl font-bold text-[#1B1F3B]/70 mt-2">The wife Pepe never knew he needed 💅</p>
             </div>
             
-          </div>
-
-          <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-            <p>© {new Date().getFullYear()} PEPEWIFE. All rights reserved.</p>
-            <p>Cryptocurrency investments carry a high degree of risk. Do your own research.</p>
+            <div className="flex gap-4 my-4">
+              <a href="#" className="w-14 h-14 bg-white border-4 border-[#1B1F3B] rounded-full flex items-center justify-center shadow-[4px_4px_0px_#1B1F3B] hover:translate-y-1 hover:shadow-[0px_0px_0px_#1B1F3B] transition-all text-[#1B1F3B]">
+                <Twitter className="w-6 h-6" strokeWidth={2.5} />
+              </a>
+              <a href="#" className="w-14 h-14 bg-[#00D4FF] border-4 border-[#1B1F3B] rounded-full flex items-center justify-center shadow-[4px_4px_0px_#1B1F3B] hover:translate-y-1 hover:shadow-[0px_0px_0px_#1B1F3B] transition-all text-[#1B1F3B]">
+                <Send className="w-6 h-6" strokeWidth={2.5} />
+              </a>
+            </div>
+            
+            <div className="text-[#1B1F3B]/50 font-bold text-sm max-w-lg mt-8">
+              <p className="mb-2">© 2025 PEPEWIFE. Not financial advice. Never financial advice.</p>
+              <p>Cryptocurrency investments are highly volatile. Do your own research and only invest what you can afford to lose to a cartoon frog's spouse.</p>
+            </div>
           </div>
         </div>
       </footer>
-
-      {/* Global Styles */}
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(calc(-50% - 2rem)); }
-        }
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-      `}} />
     </div>
   );
 }
