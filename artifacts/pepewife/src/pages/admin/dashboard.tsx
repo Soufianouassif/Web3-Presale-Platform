@@ -60,6 +60,10 @@ function ControlButton({
 // ─── Withdraw Panel ──────────────────────────────────────────────────────────
 type WithdrawStep = "idle" | "connecting" | "signing" | "confirming" | "success" | "error";
 
+// The exact authority registered in the Config PDA on-chain
+// Verified by reading account bytes: hex 53a0aa403c121009d543c6840b4a86e05c2b018a2fe2e89027757abc9271471b
+const PRESALE_AUTHORITY = "6dSw3tPGZtiykZXoSx4uPb6jPc95WAV39fHbN1QG7Aci";
+
 function WithdrawPanel() {
   const [vaultSol, setVaultSol]         = useState<number | null>(null);
   const [walletAddr, setWalletAddr]     = useState<string>("");
@@ -68,6 +72,8 @@ function WithdrawPanel() {
   const [txSig, setTxSig]              = useState("");
   const [withdrawn, setWithdrawn]       = useState<string>("");
   const [errMsg, setErrMsg]             = useState("");
+
+  const isCorrectWallet = walletAddr === PRESALE_AUTHORITY;
 
   // Fetch vault balance
   useEffect(() => {
@@ -83,7 +89,7 @@ function WithdrawPanel() {
       const provider = walletType === "phantom"
         ? (window as any).phantom?.solana
         : (window as any).solflare;
-      if (!provider) throw new Error(`${walletType} not found`);
+      if (!provider) throw new Error(`${walletType} wallet extension not found. Install it first.`);
       const resp = await provider.connect();
       const addr = resp.publicKey?.toString() ?? provider.publicKey?.toString();
       if (!addr) throw new Error("No public key returned");
@@ -98,6 +104,19 @@ function WithdrawPanel() {
   // Execute withdrawal
   async function doWithdraw() {
     if (!walletAddr) return;
+
+    // Guard: must be the correct authority wallet
+    if (!isCorrectWallet) {
+      setErrMsg(
+        `Wrong wallet connected.\n` +
+        `Required: ${PRESALE_AUTHORITY.slice(0, 8)}…${PRESALE_AUTHORITY.slice(-6)}\n` +
+        `Connected: ${walletAddr.slice(0, 8)}…${walletAddr.slice(-6)}\n\n` +
+        `Please switch to the presale authority wallet in your extension.`
+      );
+      setStep("error");
+      return;
+    }
+
     setStep("signing");
     setErrMsg("");
     try {
@@ -109,10 +128,13 @@ function WithdrawPanel() {
       connection.getBalance(SOL_VAULT_PDA).then(lamps => setVaultSol(lamps / 1e9)).catch(() => {});
     } catch (e: any) {
       const msg: string = e.message ?? String(e);
-      if (msg.toLowerCase().includes("unauthorized")) {
-        setErrMsg("This wallet is not the presale authority. Connect the correct admin wallet.");
+      if (msg.toLowerCase().includes("unauthorized") || msg.includes("6009")) {
+        setErrMsg(
+          `On-chain authorization failed. The signing wallet does not match the presale authority.\n` +
+          `Required: ${PRESALE_AUTHORITY.slice(0, 8)}…${PRESALE_AUTHORITY.slice(-6)}`
+        );
       } else {
-        setErrMsg(msg.length > 150 ? msg.slice(0, 150) + "…" : msg);
+        setErrMsg(msg.length > 200 ? msg.slice(0, 200) + "…" : msg);
       }
       setStep("error");
     }
@@ -144,7 +166,7 @@ function WithdrawPanel() {
         >
           Get free Devnet SOL → faucet.solana.com
         </a>
-        <p className="mt-1 text-blue-300/70">Address to fund: <span className="font-mono">6dSw3tP6…67Ac1</span></p>
+        <p className="mt-1 text-blue-300/70">Address to fund: <span className="font-mono select-all">{PRESALE_AUTHORITY}</span></p>
       </div>
 
       {/* Wallet selector */}
@@ -177,14 +199,32 @@ function WithdrawPanel() {
 
       {step === "idle" && walletAddr && (
         <div className="space-y-2">
-          <p className="text-xs text-green-400">
-            ✓ Connected: <span className="font-mono">{walletAddr.slice(0,8)}…{walletAddr.slice(-4)}</span>
-          </p>
-          <ControlButton
-            label="💸 Withdraw All SOL"
-            variant="warning"
-            onClick={doWithdraw}
-          />
+          {isCorrectWallet ? (
+            <p className="text-xs text-green-400">
+              ✅ Correct authority wallet connected
+              <span className="block font-mono text-green-300/70">{walletAddr.slice(0,10)}…{walletAddr.slice(-6)}</span>
+            </p>
+          ) : (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-xs">
+              <p className="text-red-400 font-semibold mb-1">⛔ Wrong wallet connected</p>
+              <p className="text-gray-400">Connected: <span className="font-mono text-red-300">{walletAddr.slice(0,8)}…{walletAddr.slice(-6)}</span></p>
+              <p className="text-gray-400 mt-1">Required: <span className="font-mono text-yellow-300">{PRESALE_AUTHORITY.slice(0,8)}…{PRESALE_AUTHORITY.slice(-6)}</span></p>
+              <p className="text-gray-500 mt-2">Switch to the authority wallet in your Phantom/Solflare extension, then click Connect again.</p>
+              <button
+                onClick={() => setWalletAddr("")}
+                className="mt-2 text-xs text-blue-400 underline"
+              >
+                Disconnect and try again
+              </button>
+            </div>
+          )}
+          {isCorrectWallet && (
+            <ControlButton
+              label="💸 Withdraw All SOL"
+              variant="warning"
+              onClick={doWithdraw}
+            />
+          )}
         </div>
       )}
 
