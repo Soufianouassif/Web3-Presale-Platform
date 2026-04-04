@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { adminApi, type AdminStats } from "@/lib/admin-api";
-import { withdrawSol, connection, SOL_VAULT_PDA } from "@/lib/presale-contract";
+import { withdrawSol, withdrawSolWithKeypair, connection, SOL_VAULT_PDA } from "@/lib/presale-contract";
 
 function fmt(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
@@ -64,16 +64,18 @@ type WithdrawStep = "idle" | "connecting" | "signing" | "confirming" | "success"
 // Verified by reading account bytes: hex 53a0aa403c121009d543c6840b4a86e05c2b018a2fe2e89027757abc9271471b
 const PRESALE_AUTHORITY = "6dSw3tPGZtiykZXoSx4uPb6jPc95WAV39fHbN1QG7Aci";
 
-function WithdrawPanel() {
-  const [vaultSol, setVaultSol]         = useState<number | null>(null);
-  const [walletAddr, setWalletAddr]     = useState<string>("");
-  const [walletType, setWalletType]     = useState<"phantom" | "solflare">("phantom");
-  const [step, setStep]                 = useState<WithdrawStep>("idle");
-  const [txSig, setTxSig]              = useState("");
-  const [withdrawn, setWithdrawn]       = useState<string>("");
-  const [errMsg, setErrMsg]             = useState("");
+type WithdrawMethod = "file" | "phantom" | "solflare";
 
-  const isCorrectWallet = walletAddr === PRESALE_AUTHORITY;
+function WithdrawPanel() {
+  const [vaultSol, setVaultSol]     = useState<number | null>(null);
+  const [method, setMethod]         = useState<WithdrawMethod>("file");
+  const [walletAddr, setWalletAddr] = useState<string>("");
+  const [keypairBytes, setKeypairBytes] = useState<number[] | null>(null);
+  const [fileAddr, setFileAddr]     = useState<string>("");
+  const [step, setStep]             = useState<WithdrawStep>("idle");
+  const [txSig, setTxSig]           = useState("");
+  const [withdrawn, setWithdrawn]   = useState<string>("");
+  const [errMsg, setErrMsg]         = useState("");
 
   // Fetch vault balance
   useEffect(() => {
@@ -82,14 +84,47 @@ function WithdrawPanel() {
       .catch(() => setVaultSol(null));
   }, []);
 
-  // Connect admin wallet
+  // ── Keypair file handler ────────────────────────────────────
+  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const bytes: number[] = JSON.parse(ev.target?.result as string);
+        if (!Array.isArray(bytes) || bytes.length !== 64) {
+          setErrMsg("Invalid keypair file — expected a JSON array of 64 numbers.");
+          setStep("error");
+          return;
+        }
+        // Derive public key from last 32 bytes (ed25519 pubkey is bytes [32..64])
+        // We'll let the contract derive it; just validate address via bs58 math
+        setKeypairBytes(bytes);
+        // Rough address preview using last 32 bytes as pubkey
+        const pubBytes = new Uint8Array(bytes.slice(32));
+        const ALPHA = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+        let n = BigInt("0x" + Array.from(pubBytes).map(b => b.toString(16).padStart(2,"0")).join(""));
+        let addr = "";
+        while (n > 0n) { const r = n % 58n; n = n / 58n; addr = ALPHA[Number(r)] + addr; }
+        setFileAddr(addr);
+        setStep("idle");
+        setErrMsg("");
+      } catch {
+        setErrMsg("Could not parse the file. Make sure it's the keypair JSON from Solana Playground.");
+        setStep("error");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // ── Phantom/Solflare connect ────────────────────────────────
   async function connectWallet() {
     setStep("connecting");
     try {
-      const provider = walletType === "phantom"
+      const provider = method === "phantom"
         ? (window as any).phantom?.solana
         : (window as any).solflare;
-      if (!provider) throw new Error(`${walletType} wallet extension not found. Install it first.`);
+      if (!provider) throw new Error(`${method} wallet extension not found. Install it first.`);
       const resp = await provider.connect();
       const addr = resp.publicKey?.toString() ?? provider.publicKey?.toString();
       if (!addr) throw new Error("No public key returned");
@@ -101,177 +136,174 @@ function WithdrawPanel() {
     }
   }
 
-  // Execute withdrawal
+  // ── Execute withdrawal ──────────────────────────────────────
   async function doWithdraw() {
-    if (!walletAddr) return;
-
-    // Guard: must be the correct authority wallet
-    if (!isCorrectWallet) {
-      setErrMsg(
-        `Wrong wallet connected.\n` +
-        `Required: ${PRESALE_AUTHORITY.slice(0, 8)}…${PRESALE_AUTHORITY.slice(-6)}\n` +
-        `Connected: ${walletAddr.slice(0, 8)}…${walletAddr.slice(-6)}\n\n` +
-        `Please switch to the presale authority wallet in your extension.`
-      );
-      setStep("error");
-      return;
-    }
-
     setStep("signing");
     setErrMsg("");
     try {
-      const result = await withdrawSol(walletAddr, walletType, () => setStep("confirming"));
+      let result: { signature: string; withdrawnLamports: bigint };
+
+      if (method === "file") {
+        if (!keypairBytes) return;
+        result = await withdrawSolWithKeypair(keypairBytes, () => setStep("confirming"));
+      } else {
+        if (!walletAddr) return;
+        if (walletAddr !== PRESALE_AUTHORITY) {
+          setErrMsg(
+            `Wrong wallet connected.\nRequired: ${PRESALE_AUTHORITY.slice(0,8)}…${PRESALE_AUTHORITY.slice(-6)}\nConnected: ${walletAddr.slice(0,8)}…${walletAddr.slice(-6)}`
+          );
+          setStep("error");
+          return;
+        }
+        result = await withdrawSol(walletAddr, method, () => setStep("confirming"));
+      }
+
       setTxSig(result.signature);
       setWithdrawn((Number(result.withdrawnLamports) / 1e9).toFixed(4));
       setStep("success");
-      // Refresh vault balance
-      connection.getBalance(SOL_VAULT_PDA).then(lamps => setVaultSol(lamps / 1e9)).catch(() => {});
+      connection.getBalance(SOL_VAULT_PDA).then(l => setVaultSol(l / 1e9)).catch(() => {});
     } catch (e: any) {
       const msg: string = e.message ?? String(e);
-      if (msg.toLowerCase().includes("unauthorized") || msg.includes("6009")) {
-        setErrMsg(
-          `On-chain authorization failed. The signing wallet does not match the presale authority.\n` +
-          `Required: ${PRESALE_AUTHORITY.slice(0, 8)}…${PRESALE_AUTHORITY.slice(-6)}`
-        );
-      } else {
-        setErrMsg(msg.length > 200 ? msg.slice(0, 200) + "…" : msg);
-      }
+      setErrMsg(
+        msg.includes("6009") || msg.toLowerCase().includes("unauthorized")
+          ? `Authorization failed on-chain (error 6009).\nThe keypair file does not match the presale authority.\nMake sure you're using the exact keypair file from when the contract was deployed.`
+          : msg.length > 250 ? msg.slice(0, 250) + "…" : msg
+      );
       setStep("error");
     }
   }
 
+  const spinning = (
+    <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin inline-block" />
+  );
+
   return (
-    <div>
-      <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Vault Funds</p>
+    <div className="space-y-4">
+      <p className="text-xs text-gray-500 uppercase tracking-wider">Vault Funds</p>
 
       {/* Vault balance */}
-      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-4">
+      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4">
         <p className="text-xs text-yellow-300/70 mb-1">SOL Vault Balance</p>
         <p className="text-2xl font-bold text-yellow-300">
           {vaultSol === null ? "Loading…" : `${vaultSol.toFixed(4)} SOL`}
         </p>
-        <p className="text-xs text-gray-500 mt-1">
-          Vault: <span className="font-mono">4vWdK1b3…ZjfK</span>
-        </p>
       </div>
 
-      {/* Need SOL for fees alert */}
-      <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 mb-4 text-xs text-blue-300">
-        ⚠️ Your admin wallet needs a tiny amount of SOL (~0.001) to pay transaction fees before withdrawing.
-        <a
-          href="https://faucet.solana.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="ml-1 underline text-blue-200 hover:text-white"
-        >
-          Get free Devnet SOL → faucet.solana.com
+      {/* Faucet hint */}
+      <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 text-xs text-blue-300">
+        <p>⚠️ The authority wallet needs ~0.001 SOL for fees.</p>
+        <a href="https://faucet.solana.com/" target="_blank" rel="noopener noreferrer"
+           className="underline text-blue-200 hover:text-white">
+          faucet.solana.com
         </a>
-        <p className="mt-1 text-blue-300/70">Address to fund: <span className="font-mono select-all">{PRESALE_AUTHORITY}</span></p>
+        <span className="text-blue-300/60 mx-1">→ paste:</span>
+        <span className="font-mono text-yellow-300 select-all break-all">{PRESALE_AUTHORITY}</span>
       </div>
 
-      {/* Wallet selector */}
+      {/* Method tabs */}
       {step !== "success" && (
-        <div className="flex gap-2 mb-3">
-          {(["phantom", "solflare"] as const).map(w => (
-            <button
-              key={w}
-              onClick={() => setWalletType(w)}
-              className={`px-3 py-1.5 rounded-lg text-sm border transition-all capitalize ${
-                walletType === w
-                  ? "bg-yellow-500/20 border-yellow-500/50 text-yellow-300"
-                  : "bg-white/5 border-white/20 text-gray-400 hover:bg-white/10"
-              }`}
-            >
-              {w}
+        <div className="flex gap-2 flex-wrap">
+          {([
+            { id: "file",     label: "📂 Solana Playground File" },
+            { id: "phantom",  label: "👻 Phantom" },
+            { id: "solflare", label: "🌞 Solflare" },
+          ] as { id: WithdrawMethod; label: string }[]).map(m => (
+            <button key={m.id} onClick={() => { setMethod(m.id); setStep("idle"); setErrMsg(""); setKeypairBytes(null); setWalletAddr(""); setFileAddr(""); }}
+              className={`px-3 py-1.5 rounded-lg text-xs border transition-all ${method === m.id ? "bg-yellow-500/20 border-yellow-500/50 text-yellow-200" : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"}`}>
+              {m.label}
             </button>
           ))}
         </div>
       )}
 
-      {/* Connect / Withdraw button */}
-      {step === "idle" && !walletAddr && (
-        <ControlButton
-          label={`🔌 Connect ${walletType.charAt(0).toUpperCase() + walletType.slice(1)}`}
-          variant="warning"
-          onClick={connectWallet}
-        />
+      {/* ── Solana Playground file method ── */}
+      {method === "file" && step === "idle" && !keypairBytes && (
+        <div className="space-y-3">
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-gray-300 space-y-2">
+            <p className="font-semibold text-white">كيفية تصدير ملف المحفظة من Solana Playground:</p>
+            <ol className="list-decimal list-inside space-y-1 text-xs text-gray-400">
+              <li>افتح <a href="https://beta.solpg.io" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">beta.solpg.io</a></li>
+              <li>اضغط على أيقونة المحفظة (أسفل يسار الشاشة)</li>
+              <li>اضغط <strong className="text-white">"Export Keypair"</strong></li>
+              <li>احفظ الملف على جهازك</li>
+              <li>ارفعه هنا ↓</li>
+            </ol>
+          </div>
+          <label className="block cursor-pointer">
+            <div className="border-2 border-dashed border-yellow-500/40 rounded-xl p-6 text-center hover:border-yellow-500/70 transition-colors">
+              <p className="text-yellow-300 text-sm font-medium">📁 اختر ملف keypair.json</p>
+              <p className="text-gray-500 text-xs mt-1">الملف من Solana Playground — مصفوفة JSON بـ 64 رقماً</p>
+            </div>
+            <input type="file" accept=".json,application/json" className="hidden" onChange={handleFileUpload} />
+          </label>
+        </div>
       )}
 
-      {step === "idle" && walletAddr && (
+      {method === "file" && step === "idle" && keypairBytes && (
+        <div className="space-y-3">
+          <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-3 text-xs">
+            <p className="text-green-400 font-semibold">✅ Keypair file loaded</p>
+            <p className="text-gray-400 mt-1 break-all">Address: <span className="font-mono text-green-300">{fileAddr.slice(0,10)}…{fileAddr.slice(-8)}</span></p>
+            <p className="text-gray-500 mt-1">The address will be verified on-chain during the transaction.</p>
+          </div>
+          <ControlButton label="💸 Withdraw All SOL" variant="warning" onClick={doWithdraw} />
+          <button onClick={() => { setKeypairBytes(null); setFileAddr(""); }}
+            className="text-xs text-gray-500 underline">
+            Use a different file
+          </button>
+        </div>
+      )}
+
+      {/* ── Phantom / Solflare method ── */}
+      {(method === "phantom" || method === "solflare") && step === "idle" && !walletAddr && (
+        <ControlButton label={`🔌 Connect ${method === "phantom" ? "Phantom" : "Solflare"}`}
+          variant="warning" onClick={connectWallet} />
+      )}
+
+      {(method === "phantom" || method === "solflare") && step === "idle" && walletAddr && (
         <div className="space-y-2">
-          {isCorrectWallet ? (
-            <p className="text-xs text-green-400">
-              ✅ Correct authority wallet connected
-              <span className="block font-mono text-green-300/70">{walletAddr.slice(0,10)}…{walletAddr.slice(-6)}</span>
-            </p>
+          {walletAddr === PRESALE_AUTHORITY ? (
+            <p className="text-xs text-green-400">✅ Correct authority wallet: <span className="font-mono">{walletAddr.slice(0,8)}…{walletAddr.slice(-6)}</span></p>
           ) : (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-xs">
-              <p className="text-red-400 font-semibold mb-1">⛔ Wrong wallet connected</p>
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-xs space-y-1">
+              <p className="text-red-400 font-semibold">⛔ Wrong wallet</p>
               <p className="text-gray-400">Connected: <span className="font-mono text-red-300">{walletAddr.slice(0,8)}…{walletAddr.slice(-6)}</span></p>
-              <p className="text-gray-400 mt-1">Required: <span className="font-mono text-yellow-300">{PRESALE_AUTHORITY.slice(0,8)}…{PRESALE_AUTHORITY.slice(-6)}</span></p>
-              <p className="text-gray-500 mt-2">Switch to the authority wallet in your Phantom/Solflare extension, then click Connect again.</p>
-              <button
-                onClick={() => setWalletAddr("")}
-                className="mt-2 text-xs text-blue-400 underline"
-              >
-                Disconnect and try again
-              </button>
+              <p className="text-gray-400">Required: <span className="font-mono text-yellow-300">{PRESALE_AUTHORITY.slice(0,8)}…{PRESALE_AUTHORITY.slice(-6)}</span></p>
+              <button onClick={() => setWalletAddr("")} className="text-blue-400 underline">Disconnect</button>
             </div>
           )}
-          {isCorrectWallet && (
-            <ControlButton
-              label="💸 Withdraw All SOL"
-              variant="warning"
-              onClick={doWithdraw}
-            />
+          {walletAddr === PRESALE_AUTHORITY && (
+            <ControlButton label="💸 Withdraw All SOL" variant="warning" onClick={doWithdraw} />
           )}
         </div>
       )}
 
-      {step === "connecting" && (
-        <div className="flex items-center gap-2 text-sm text-gray-400">
-          <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
-          Connecting wallet…
-        </div>
-      )}
-
-      {step === "signing" && (
-        <div className="flex items-center gap-2 text-sm text-yellow-300">
-          <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
-          Approve in your wallet…
-        </div>
-      )}
-
+      {/* ── Shared status states ── */}
+      {step === "connecting" && <div className="flex items-center gap-2 text-sm text-gray-400">{spinning} Connecting wallet…</div>}
+      {step === "signing"    && <div className="flex items-center gap-2 text-sm text-yellow-300">{spinning} Signing transaction…</div>}
       {step === "confirming" && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm text-blue-300">
-            <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
-            Transaction sent — waiting for on-chain confirmation…
-          </div>
-          <p className="text-xs text-gray-500">This can take up to 30–60 seconds on Devnet. Please wait.</p>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm text-blue-300">{spinning} Waiting for on-chain confirmation…</div>
+          <p className="text-xs text-gray-500">قد يستغرق 30–60 ثانية. لا تغلق الصفحة.</p>
         </div>
       )}
 
       {step === "success" && (
         <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4">
-          <p className="text-green-400 font-semibold mb-1">✅ Withdrawal Successful!</p>
-          <p className="text-sm text-gray-300">Received: <span className="text-white font-bold">{withdrawn} SOL</span></p>
-          <a
-            href={`https://explorer.solana.com/tx/${txSig}?cluster=devnet`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-blue-400 underline mt-2 block"
-          >
-            View on Explorer: {txSig.slice(0, 16)}…
+          <p className="text-green-400 font-semibold mb-1">✅ تم السحب بنجاح!</p>
+          <p className="text-sm text-gray-300">المبلغ: <span className="text-white font-bold">{withdrawn} SOL</span></p>
+          <a href={`https://explorer.solana.com/tx/${txSig}?cluster=devnet`} target="_blank" rel="noopener noreferrer"
+             className="text-xs text-blue-400 underline mt-2 block">
+            عرض على Explorer ↗
           </a>
         </div>
       )}
 
       {step === "error" && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-sm text-red-300">
-          <p className="font-semibold mb-1">❌ Failed</p>
-          <p className="text-xs">{errMsg}</p>
-          <button onClick={() => setStep("idle")} className="mt-2 text-xs underline text-red-400">Try again</button>
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
+          <p className="text-red-400 font-semibold text-sm mb-1">❌ فشل</p>
+          <p className="text-xs text-red-300 whitespace-pre-wrap">{errMsg}</p>
+          <button onClick={() => { setStep("idle"); setErrMsg(""); }} className="mt-2 text-xs underline text-red-400">حاول مجدداً</button>
         </div>
       )}
     </div>

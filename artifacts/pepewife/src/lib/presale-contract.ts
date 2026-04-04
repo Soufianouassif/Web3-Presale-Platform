@@ -10,6 +10,7 @@
 
 import {
   Connection,
+  Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
@@ -340,6 +341,55 @@ export async function withdrawSol(
 
   // Rent-exempt minimum that stays in vault (~0.001 SOL for 8-byte account)
   const rentMin = BigInt(890880); // ~0.00089 SOL
+  const withdrawnLamports = BigInt(vaultLamports) - rentMin;
+
+  return { signature, withdrawnLamports };
+}
+
+// ─────────────────────────────────────────────────────────────
+//  ADMIN: WITHDRAW SOL — using local Keypair (Solana Playground export)
+//  Pass the raw 64-byte keypair array from the Playground JSON file.
+// ─────────────────────────────────────────────────────────────
+export async function withdrawSolWithKeypair(
+  keypairBytes: number[],
+  onSigned?: () => void,
+): Promise<{ signature: string; withdrawnLamports: bigint }> {
+  const keypair   = Keypair.fromSecretKey(new Uint8Array(keypairBytes));
+  const admin     = keypair.publicKey;
+  const discriminator = await getDiscriminator("withdraw_sol");
+
+  const ix = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA,    isSigner: false, isWritable: false },
+      { pubkey: SOL_VAULT_PDA, isSigner: false, isWritable: true  },
+      { pubkey: admin,         isSigner: true,  isWritable: true  },
+    ],
+    data: discriminator,
+  });
+
+  const vaultLamports = await connection.getBalance(SOL_VAULT_PDA);
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+
+  // Sign locally — no wallet extension needed
+  tx.sign(keypair);
+  onSigned?.();
+
+  const signature = await sendAndConfirmTx(
+    tx.serialize(),
+    blockhash,
+    lastValidBlockHeight,
+  );
+
+  const rentMin         = BigInt(890880);
   const withdrawnLamports = BigInt(vaultLamports) - rentMin;
 
   return { signature, withdrawnLamports };
