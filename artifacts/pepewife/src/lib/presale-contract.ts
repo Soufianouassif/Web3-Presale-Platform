@@ -23,47 +23,58 @@ import {
 
 // ─────────────────────────────────────────────────────────────
 //  SEND + CONFIRM HELPER
-//  If confirmTransaction times out (block height expired),
-//  we poll the signature status directly.  The tx may have
-//  already landed even though the subscription timed out.
+//  Uses polling instead of confirmTransaction() subscription so
+//  that proxy latency and websocket issues don't cause false
+//  "block height exceeded" errors.
 // ─────────────────────────────────────────────────────────────
 async function sendAndConfirmTx(
   rawTx: Uint8Array,
-  blockhash: string,
-  lastValidBlockHeight: number,
+  _blockhash: string,
+  _lastValidBlockHeight: number,
 ): Promise<string> {
+  // Re-send with keepalive retries so the tx stays in the mempool
   const signature = await connection.sendRawTransaction(rawTx, {
     skipPreflight: true,
-    maxRetries: 5,
+    maxRetries: 0, // we handle retries below
   });
 
-  try {
-    const result = await connection.confirmTransaction(
-      { signature, blockhash, lastValidBlockHeight },
-      "confirmed",
-    );
-    if (result.value.err) {
-      throw new Error(`Transaction failed on-chain: ${JSON.stringify(result.value.err)}`);
-    }
-  } catch (timeoutErr) {
-    // Timeout / block-height exceeded — check whether the tx actually landed
-    const status = await connection.getSignatureStatus(signature, {
-      searchTransactionHistory: true,
-    });
-    const conf = status?.value;
-    if (
-      conf &&
-      !conf.err &&
-      (conf.confirmationStatus === "confirmed" || conf.confirmationStatus === "finalized")
-    ) {
-      // Transaction DID land — treat as success
-      return signature;
-    }
-    // Truly failed
-    throw timeoutErr;
-  }
+  // Keep resending while we poll — nodes drop unconfirmed txs
+  const RESEND_INTERVAL_MS  = 3_000;
+  const POLL_INTERVAL_MS    = 2_000;
+  const TIMEOUT_MS          = 90_000; // 90 s total
+  const deadline             = Date.now() + TIMEOUT_MS;
 
-  return signature;
+  const resendTimer = setInterval(async () => {
+    try {
+      await connection.sendRawTransaction(rawTx, { skipPreflight: true, maxRetries: 0 });
+    } catch { /* ignore duplicate errors */ }
+  }, RESEND_INTERVAL_MS);
+
+  try {
+    while (Date.now() < deadline) {
+      await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
+
+      const status = await connection.getSignatureStatus(signature, {
+        searchTransactionHistory: true,
+      });
+      const conf = status?.value;
+
+      if (conf) {
+        if (conf.err) {
+          throw new Error(`Transaction failed on-chain: ${JSON.stringify(conf.err)}`);
+        }
+        if (conf.confirmationStatus === "confirmed" || conf.confirmationStatus === "finalized") {
+          return signature; // ✅ success
+        }
+      }
+    }
+    throw new Error(
+      `Transaction not confirmed within 90 s. Signature: ${signature.slice(0, 20)}… — ` +
+      `check https://explorer.solana.com/tx/${signature}?cluster=devnet`,
+    );
+  } finally {
+    clearInterval(resendTimer);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -290,6 +301,7 @@ export async function buyWithUsdt(
 export async function withdrawSol(
   adminAddress: string,
   walletType = "phantom",
+  onSigned?: () => void,
 ): Promise<{ signature: string; withdrawnLamports: bigint }> {
   const admin = new PublicKey(adminAddress);
   const discriminator = await getDiscriminator("withdraw_sol");
@@ -318,6 +330,7 @@ export async function withdrawSol(
 
   const provider = getProvider(walletType);
   const signed = await provider.signTransaction(tx);
+  onSigned?.(); // notify UI that wallet approved — now waiting on-chain
 
   const signature = await sendAndConfirmTx(
     signed.serialize(),

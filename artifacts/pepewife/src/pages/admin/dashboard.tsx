@@ -58,7 +58,7 @@ function ControlButton({
 }
 
 // ─── Withdraw Panel ──────────────────────────────────────────────────────────
-type WithdrawStep = "idle" | "connecting" | "signing" | "success" | "error";
+type WithdrawStep = "idle" | "connecting" | "signing" | "confirming" | "success" | "error";
 
 function WithdrawPanel() {
   const [vaultSol, setVaultSol]         = useState<number | null>(null);
@@ -101,7 +101,7 @@ function WithdrawPanel() {
     setStep("signing");
     setErrMsg("");
     try {
-      const result = await withdrawSol(walletAddr, walletType);
+      const result = await withdrawSol(walletAddr, walletType, () => setStep("confirming"));
       setTxSig(result.signature);
       setWithdrawn((Number(result.withdrawnLamports) / 1e9).toFixed(4));
       setStep("success");
@@ -198,7 +198,17 @@ function WithdrawPanel() {
       {step === "signing" && (
         <div className="flex items-center gap-2 text-sm text-yellow-300">
           <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
-          Waiting for wallet approval…
+          Approve in your wallet…
+        </div>
+      )}
+
+      {step === "confirming" && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-blue-300">
+            <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+            Transaction sent — waiting for on-chain confirmation…
+          </div>
+          <p className="text-xs text-gray-500">This can take up to 30–60 seconds on Devnet. Please wait.</p>
         </div>
       )}
 
