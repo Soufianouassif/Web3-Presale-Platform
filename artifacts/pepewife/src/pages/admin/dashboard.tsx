@@ -10,6 +10,15 @@ function fmt(n: number) {
   return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
 }
 
+// Token amounts are stored as whole tokens (no decimals) — values reach trillions
+function fmtTokens(n: number): string {
+  if (n >= 1_000_000_000_000) return `${(n / 1_000_000_000_000).toFixed(2)}T`;
+  if (n >= 1_000_000_000)     return `${(n / 1_000_000_000).toFixed(2)}B`;
+  if (n >= 1_000_000)         return `${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 1_000)             return `${(n / 1_000).toFixed(1)}K`;
+  return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+}
+
 function StatCard({ title, value, sub, color = "green" }: { title: string; value: string | number; sub?: string; color?: "green" | "blue" | "purple" | "yellow" }) {
   const colors = {
     green: "from-[#39ff14]/10 to-[#39ff14]/5 border-[#39ff14]/20 text-[#39ff14]",
@@ -526,7 +535,7 @@ export default function AdminDashboard() {
                     {/* Tokens Sold */}
                     <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
                       <p className="text-xs text-gray-500 mb-1">Tokens Sold</p>
-                      <p className="text-2xl font-bold text-[#00d4ff]">{fmt(Number(chainData.totalTokensSold / 1_000_000n))}</p>
+                      <p className="text-2xl font-bold text-[#00d4ff]">{fmtTokens(Number(chainData.totalTokensSold))}</p>
                       <p className="text-xs text-gray-500 mt-1">$PWIFE tokens</p>
                     </div>
 
@@ -602,10 +611,12 @@ export default function AdminDashboard() {
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Stage Details (On-Chain)</p>
                     <div className="space-y-4">
                       {chainData.stages.map((stage, i) => {
-                        const sold = Number(stage.tokensSold / 1_000_000n);
-                        const max  = Number(stage.maxTokens  / 1_000_000n);
+                        // max_tokens / tokens_sold are whole tokens — NO decimal division
+                        const sold = Number(stage.tokensSold);
+                        const max  = Number(stage.maxTokens);
                         const pct  = max > 0 ? Math.min(100, (sold / max) * 100) : 0;
                         const isCurrent = i + 1 === chainData.currentStage;
+                        // Price formula: 0.001 / tokensPerRawUsdtScaled (PRICE_SCALE=1000)
                         const priceUsd = stageTokenPriceUsd(stage.tokensPerRawUsdtScaled);
                         return (
                           <div key={i} className={`rounded-xl p-3 border ${isCurrent ? "border-[#9945FF]/30 bg-[#9945FF]/5" : "border-white/5 bg-[#0a0a0f]"}`}>
@@ -624,7 +635,7 @@ export default function AdminDashboard() {
                                 </span>
                               </div>
                               <span className="text-xs text-gray-500">
-                                {fmt(sold)} / {fmt(max)} $PWIFE
+                                {fmtTokens(sold)} / {fmtTokens(max)} $PWIFE
                                 <span className="ml-1 text-gray-600">({pct.toFixed(1)}%)</span>
                               </span>
                             </div>

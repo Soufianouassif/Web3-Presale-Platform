@@ -433,14 +433,17 @@ export interface PresaleState {
 /**
  * Convert tokensPerRawUsdtScaled → USD price per token.
  *
- * Contract stores: N tokens per 1 raw USDT (1 USDT = 1,000,000 raw USDT).
- * ∴  price_per_token = 1 / (N × 1,000,000)
+ * Contract formula:  tokens = usdt_raw × scaled / PRICE_SCALE   (PRICE_SCALE = 1000)
+ * ∴  price_per_token_USD = PRICE_SCALE / (scaled × 1_000_000)
+ *                        = 0.001 / scaled
+ *
+ * Example (Stage 1): scaled = 100_000 → 0.001 / 100_000 = $0.00000001 ✓
  *
  * Returns 0 if the value is zero (unset or invalid).
  */
 export function stageTokenPriceUsd(tokensPerRawUsdtScaled: bigint): number {
   if (tokensPerRawUsdtScaled === 0n) return 0;
-  return 1 / (Number(tokensPerRawUsdtScaled) * 1_000_000);
+  return 0.001 / Number(tokensPerRawUsdtScaled);
 }
 
 /**
