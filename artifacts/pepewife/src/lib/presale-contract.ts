@@ -38,8 +38,11 @@ export const USDT_MINT = new PublicKey(
   "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 );
 
-/** Devnet connection — switch to mainnet-beta for production */
-export const SOLANA_ENDPOINT = "https://api.devnet.solana.com";
+/** RPC endpoint — routed through our API proxy to avoid CORS issues */
+export const SOLANA_ENDPOINT =
+  typeof window !== "undefined"
+    ? `${window.location.origin}/api/rpc`
+    : "https://api.devnet.solana.com";
 
 export const connection = new Connection(SOLANA_ENDPOINT, "confirmed");
 

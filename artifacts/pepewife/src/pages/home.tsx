@@ -173,7 +173,7 @@ export default function Home() {
   const STAGE_DATA = STAGE_PRICES_FALLBACK.map((fallbackPrice, i) => {
     const cs = presaleData?.stages[i];
     const tokens = cs ? Number(cs.maxTokens)  : 5_000_000_000_000;
-    const sold   = cs ? Number(cs.tokensSold) : (i === 0 ? 15_000_000_000 : 0);
+    const sold   = cs ? Number(cs.tokensSold) : 0;
     return { stage: i + 1, price: fallbackPrice, tokens, sold, color: STAGE_COLORS[i] };
   });
   const LISTING_PRICE = "$0.061327";
