@@ -99,47 +99,71 @@ export function Landing() {
       <main className="relative z-10 pt-28 pb-20">
         
         {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-            
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF4D9D] border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] -rotate-2 mb-8 transform hover:rotate-0 transition-transform">
-              <span className="text-white font-['Bangers'] text-xl tracking-widest pt-1">🔥 PRESALE LIVE — STAGE 1/4</span>
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl lg:text-8xl text-[#1B1F3B] leading-none mb-6 font-['Bangers'] tracking-wide drop-shadow-[4px_4px_0px_#FFE135]">
-              PEPE FOUND LOVE.<br/>
-              YOU FOUND THE PRE-SALE.<br/>
-              LFG! 🚀
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-[#1B1F3B]/80 font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
-              Join the most scientifically unhinged presale on Solana. 100% memes, 100% vibes, 0% guarantees.
-            </p>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center w-full max-w-md mx-auto sm:max-w-none">
-              <button className="px-10 py-5 bg-[#FFE135] border-4 border-[#1B1F3B] shadow-[6px_6px_0px_#1B1F3B] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_#1B1F3B] text-[#1B1F3B] rounded-2xl font-['Bangers'] text-3xl tracking-widest transition-all flex items-center justify-center gap-3">
-                APE IN 🚀
-              </button>
-              <button className="px-10 py-5 bg-white border-4 border-[#1B1F3B] shadow-[6px_6px_0px_#1B1F3B] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_#1B1F3B] text-[#1B1F3B] rounded-2xl font-bold text-xl transition-all flex items-center justify-center gap-2">
-                Read Whitepaper
-              </button>
+            {/* Left: Text */}
+            <div className="flex-1 flex flex-col items-start text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF4D9D] border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] -rotate-2 mb-8 transform hover:rotate-0 transition-transform">
+                <span className="text-white font-['Bangers'] text-xl tracking-widest pt-1">🔥 PRESALE LIVE — STAGE 1/4</span>
+              </div>
+
+              <h1 className="text-5xl md:text-6xl lg:text-7xl text-[#1B1F3B] leading-none mb-6 font-['Bangers'] tracking-wide drop-shadow-[4px_4px_0px_#FFE135]">
+                PEPE FOUND LOVE.<br/>
+                YOU FOUND THE<br/>
+                PRE-SALE. LFG! 🚀
+              </h1>
+
+              <p className="text-xl md:text-2xl text-[#1B1F3B]/80 font-medium mb-10 leading-relaxed">
+                Join the most scientifically unhinged presale on Solana. 100% memes, 100% vibes, 0% guarantees.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-5">
+                <button className="px-10 py-5 bg-[#FFE135] border-4 border-[#1B1F3B] shadow-[6px_6px_0px_#1B1F3B] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_#1B1F3B] text-[#1B1F3B] rounded-2xl font-['Bangers'] text-3xl tracking-widest transition-all flex items-center justify-center gap-3">
+                  APE IN 🚀
+                </button>
+                <button className="px-10 py-5 bg-white border-4 border-[#1B1F3B] shadow-[6px_6px_0px_#1B1F3B] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_#1B1F3B] text-[#1B1F3B] rounded-2xl font-bold text-xl transition-all flex items-center justify-center gap-2">
+                  Read Whitepaper
+                </button>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-3 gap-4 mt-12 w-full">
+                <div className="bg-white border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] rounded-2xl p-5 flex flex-col gap-1 rotate-1">
+                  <span className="text-[#1B1F3B]/60 font-bold uppercase tracking-wider text-xs">Total Raised</span>
+                  <span className="text-[#1B1F3B] text-3xl font-['Bangers'] tracking-wider">$0</span>
+                </div>
+                <div className="bg-white border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] rounded-2xl p-5 flex flex-col gap-1 -rotate-1">
+                  <span className="text-[#1B1F3B]/60 font-bold uppercase tracking-wider text-xs">Tokens Sold</span>
+                  <span className="text-[#1B1F3B] text-3xl font-['Bangers'] tracking-wider">0</span>
+                </div>
+                <div className="bg-[#22C55E] border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] rounded-2xl p-5 flex flex-col gap-1 rotate-1">
+                  <span className="text-[#1B1F3B]/80 font-bold uppercase tracking-wider text-xs">Stage 1 Price</span>
+                  <span className="text-[#1B1F3B] text-2xl font-['Bangers'] tracking-wider">$0.00000001</span>
+                </div>
+              </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-16 w-full">
-              <div className="bg-white border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] rounded-2xl p-6 flex flex-col gap-2 rotate-1">
-                <span className="text-[#1B1F3B]/60 font-bold uppercase tracking-wider text-sm">Total Raised</span>
-                <span className="text-[#1B1F3B] text-4xl font-['Bangers'] tracking-wider">$0</span>
-              </div>
-              <div className="bg-white border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] rounded-2xl p-6 flex flex-col gap-2 -rotate-1">
-                <span className="text-[#1B1F3B]/60 font-bold uppercase tracking-wider text-sm">Tokens Sold</span>
-                <span className="text-[#1B1F3B] text-4xl font-['Bangers'] tracking-wider">0</span>
-              </div>
-              <div className="bg-[#22C55E] border-4 border-[#1B1F3B] shadow-[4px_4px_0px_#1B1F3B] rounded-2xl p-6 flex flex-col gap-2 rotate-1">
-                <span className="text-[#1B1F3B]/80 font-bold uppercase tracking-wider text-sm">Stage 1 Price</span>
-                <span className="text-[#1B1F3B] text-4xl font-['Bangers'] tracking-wider">$0.00000001</span>
+            {/* Right: Hero Image */}
+            <div className="flex-1 flex items-center justify-center relative">
+              <div className="relative w-full max-w-md">
+                <div className="absolute inset-0 bg-[#FFE135] border-4 border-[#1B1F3B] rounded-3xl rotate-3 shadow-[8px_8px_0px_#1B1F3B]"></div>
+                <img
+                  src={`${import.meta.env.BASE_URL}images/pepe-hero.png`}
+                  alt="Pepe and Wife cartoon characters"
+                  className="relative z-10 w-full rounded-3xl border-4 border-[#1B1F3B] shadow-[8px_8px_0px_#1B1F3B] object-cover"
+                />
+                {/* Floating coin badge */}
+                <div className="absolute -top-6 -right-6 z-20">
+                  <img
+                    src={`${import.meta.env.BASE_URL}images/pwife-coin.png`}
+                    alt="$PWIFE coin"
+                    className="w-20 h-20 drop-shadow-xl animate-bounce"
+                  />
+                </div>
               </div>
             </div>
+
           </div>
         </section>
 
@@ -402,7 +426,12 @@ export function Landing() {
 
         {/* Roadmap */}
         <section id="roadmap" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 flex flex-col items-center gap-4">
+            <img
+              src={`${import.meta.env.BASE_URL}images/pepe-rocket.png`}
+              alt="Pepe on rocket"
+              className="w-36 h-36 object-contain drop-shadow-xl"
+            />
             <h2 className="text-5xl md:text-6xl font-['Bangers'] tracking-widest text-[#1B1F3B] drop-shadow-[3px_3px_0px_#00D4FF]">
               THE MASTER PLAN 🗺️
             </h2>

@@ -180,6 +180,24 @@ uri = "file://artifacts/pepewife/public/meme-posts/meme10.png"
 type = "image"
 title = "pepe wife couple sunset"
 
+[[generated]]
+id = "Did4hEqdaY2CnMhtU9Obt"
+uri = "file://artifacts/mockup-sandbox/public/images/pepe-hero.png"
+type = "image"
+title = "pepe hero mascot"
+
+[[generated]]
+id = "Zjjf9FSEy3-OYjDWuSN-A"
+uri = "file://artifacts/mockup-sandbox/public/images/pwife-coin.png"
+type = "image"
+title = "pwife coin mascot"
+
+[[generated]]
+id = "b4RPga8VorW7ieeBcmgOO"
+uri = "file://artifacts/mockup-sandbox/public/images/pepe-rocket.png"
+type = "image"
+title = "pepe rocket moon"
+
 [[outputs]]
 id = "enG-yn5f3oQ2SCQFxzrS0"
 uri = "file://PEPEWIFE-GUIDE.md"
