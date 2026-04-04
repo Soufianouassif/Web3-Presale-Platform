@@ -44,6 +44,29 @@ export const SOLANA_ENDPOINT = "https://api.devnet.solana.com";
 export const connection = new Connection(SOLANA_ENDPOINT, "confirmed");
 
 // ─────────────────────────────────────────────────────────────
+//  VAULT PDAs  (derived deterministically from program ID)
+//  sol_vault  : seeds = [b"sol_vault"]  — holds buyer SOL
+//  vault_auth : seeds = [b"vault_auth"] — owns the USDT ATA
+// ─────────────────────────────────────────────────────────────
+
+export const [SOL_VAULT_PDA] = PublicKey.findProgramAddressSync(
+  [Buffer.from("sol_vault")],
+  PROGRAM_ID
+);
+
+export const [VAULT_AUTH_PDA] = PublicKey.findProgramAddressSync(
+  [Buffer.from("vault_auth")],
+  PROGRAM_ID
+);
+
+/** USDT ATA owned by vault_auth PDA — receives USDT from buyers */
+export const VAULT_USDT_ATA = getAssociatedTokenAddressSync(
+  USDT_MINT,
+  VAULT_AUTH_PDA,
+  true // allowOwnerOffCurve — required for PDA owners
+);
+
+// ─────────────────────────────────────────────────────────────
 //  DISCRIMINATOR HELPERS
 //  Anchor discriminator = sha256("global:{instruction_name}")[0..8]
 // ─────────────────────────────────────────────────────────────
@@ -74,6 +97,7 @@ export async function findBuyerRecord(
 
 // ─────────────────────────────────────────────────────────────
 //  BUY WITH SOL
+//  Accounts: config, sol_vault, buyer_record, buyer, system_program
 // ─────────────────────────────────────────────────────────────
 
 export interface BuyWithSolResult {
@@ -82,25 +106,22 @@ export interface BuyWithSolResult {
 
 /**
  * Build and send a buy_with_sol transaction.
+ * SOL goes to the sol_vault PDA — no treasury address needed.
  *
  * @param buyerAddress  Connected wallet public key string
  * @param solAmount     Amount in SOL (e.g. 1.5)
- * @param treasuryAddress  Treasury wallet from PresaleConfig
- * @param sendTransaction  Wallet adapter send function (from context / window.solana)
+ * @param walletType    "phantom" | "solflare"
  */
 export async function buyWithSol(
   buyerAddress: string,
   solAmount: number,
-  treasuryAddress: string,
   walletType = "phantom"
 ): Promise<BuyWithSolResult> {
   const buyer = new PublicKey(buyerAddress);
-  const treasury = new PublicKey(treasuryAddress);
   const lamports = BigInt(Math.floor(solAmount * LAMPORTS_PER_SOL));
 
   const [buyerRecord] = await findBuyerRecord(buyer);
 
-  // Instruction discriminator
   const discriminator = await getDiscriminator("buy_with_sol");
 
   // Encode args: u64 lamports (little-endian 8 bytes)
@@ -112,11 +133,11 @@ export async function buyWithSol(
   const ix = new TransactionInstruction({
     programId: PROGRAM_ID,
     keys: [
-      { pubkey: CONFIG_PDA,   isSigner: false, isWritable: true  },
-      { pubkey: treasury,     isSigner: false, isWritable: true  },
-      { pubkey: buyerRecord,  isSigner: false, isWritable: true  },
-      { pubkey: buyer,        isSigner: true,  isWritable: true  },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      { pubkey: CONFIG_PDA,                isSigner: false, isWritable: true  },
+      { pubkey: SOL_VAULT_PDA,             isSigner: false, isWritable: true  },
+      { pubkey: buyerRecord,               isSigner: false, isWritable: true  },
+      { pubkey: buyer,                     isSigner: true,  isWritable: true  },
+      { pubkey: SystemProgram.programId,   isSigner: false, isWritable: false },
     ],
     data,
   });
@@ -129,7 +150,6 @@ export async function buyWithSol(
   tx.feePayer = buyer;
   tx.add(ix);
 
-  // Sign with the wallet the user actually connected
   const provider = getProvider(walletType);
   const signed = await provider.signTransaction(tx);
   const signature = await connection.sendRawTransaction(signed.serialize(), {
@@ -143,23 +163,24 @@ export async function buyWithSol(
 
 // ─────────────────────────────────────────────────────────────
 //  BUY WITH USDT-SPL
+//  Accounts: config, vault_usdt_ata, buyer_usdt_ata,
+//            buyer_record, buyer, token_program, system_program
 // ─────────────────────────────────────────────────────────────
 
 /**
  * Build and send a buy_with_usdt transaction.
+ * USDT goes to the vault_auth's ATA — no treasury ATA address needed.
  *
- * @param buyerAddress       Connected wallet public key string
- * @param usdtAmount         Amount in USDT (e.g. 500)
- * @param usdtTreasuryAta    Treasury ATA from PresaleConfig
+ * @param buyerAddress  Connected wallet public key string
+ * @param usdtAmount    Amount in USDT (e.g. 500)
+ * @param walletType    "phantom" | "solflare"
  */
 export async function buyWithUsdt(
   buyerAddress: string,
   usdtAmount: number,
-  usdtTreasuryAta: string,
   walletType = "phantom"
 ): Promise<BuyWithSolResult> {
   const buyer = new PublicKey(buyerAddress);
-  const treasuryAta = new PublicKey(usdtTreasuryAta);
 
   // USDT has 6 decimals
   const usdtRaw = BigInt(Math.floor(usdtAmount * 1_000_000));
@@ -179,12 +200,12 @@ export async function buyWithUsdt(
   const ix = new TransactionInstruction({
     programId: PROGRAM_ID,
     keys: [
-      { pubkey: CONFIG_PDA,     isSigner: false, isWritable: true  },
-      { pubkey: treasuryAta,    isSigner: false, isWritable: true  },
-      { pubkey: buyerUsdtAta,   isSigner: false, isWritable: true  },
-      { pubkey: buyerRecord,    isSigner: false, isWritable: true  },
-      { pubkey: buyer,          isSigner: true,  isWritable: true  },
-      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+      { pubkey: CONFIG_PDA,              isSigner: false, isWritable: true  },
+      { pubkey: VAULT_USDT_ATA,          isSigner: false, isWritable: true  },
+      { pubkey: buyerUsdtAta,            isSigner: false, isWritable: true  },
+      { pubkey: buyerRecord,             isSigner: false, isWritable: true  },
+      { pubkey: buyer,                   isSigner: true,  isWritable: true  },
+      { pubkey: TOKEN_PROGRAM_ID,        isSigner: false, isWritable: false },
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
     ],
     data,
@@ -221,7 +242,11 @@ export interface PresaleState {
   totalSolRaised: bigint;
   totalUsdtRaised: bigint;
   solPriceUsdE6: bigint;
+  /** buyers_count — total unique buyers so far */
+  buyersCount: bigint;
+  /** @deprecated — vault PDA is now used instead. Kept for backward compat. */
   treasury: string;
+  /** @deprecated — vault_auth ATA is now used instead. Kept for backward compat. */
   usdtTreasuryAta: string;
   /** Unix timestamp (seconds) — 0 if not set on-chain */
   presaleStart: bigint;
@@ -268,7 +293,29 @@ export function formatStagePriceUsd(
 
 /**
  * Read presale config from-chain. Returns null on error.
- * Discriminator (first 8 bytes) is skipped; data parsed manually.
+ *
+ * PresaleConfig on-chain layout (after 8-byte discriminator):
+ *   authority         : 32
+ *   treasury          : 32  (now = sol_vault PDA, field kept for compat)
+ *   usdt_treasury_ata : 32  (now = vault_auth ATA, field kept for compat)
+ *   usdt_mint         : 32
+ *   current_stage     : 1
+ *   is_active         : 1
+ *   is_paused         : 1
+ *   presale_start     : 8
+ *   presale_end       : 8
+ *   claim_opens_at    : 8
+ *   total_tokens_sold : 8
+ *   total_sol_raised  : 8
+ *   total_usdt_raised : 8
+ *   total_manual_tokens: 8
+ *   sol_price_usd_e6  : 8
+ *   stages[4]         : 4 × 24 = 96
+ *   buyers_count      : 8   (NEW)
+ *   sol_vault_bump    : 1   (NEW)
+ *   vault_auth_bump   : 1   (NEW)
+ *   bump              : 1
+ *   _reserved         : 54
  */
 export async function fetchPresaleState(): Promise<PresaleState | null> {
   try {
@@ -284,23 +331,25 @@ export async function fetchPresaleState(): Promise<PresaleState | null> {
     const readI64     = () => { const v = buf.readBigInt64LE(offset); offset += 8; return v; };
     const readU64     = () => { const v = buf.readBigUInt64LE(offset); offset += 8; return v; };
 
-    const authority          = readPubkey();
+    const _authority         = readPubkey();
     const treasury           = readPubkey();
     const usdtTreasuryAta    = readPubkey();
     const _usdtMint          = readPubkey();
     const currentStage       = readU8();
     const isActive           = readBool();
     const isPaused           = readBool();
-    const _presaleStart      = readI64();
-    const _presaleEnd        = readI64();
-    const _claimOpensAt      = readI64();
+    const presaleStart       = readI64();
+    const presaleEnd         = readI64();
+    const claimOpensAt       = readI64();
     const totalTokensSold    = readU64();
     const totalSolRaised     = readU64();
     const totalUsdtRaised    = readU64();
     const _totalManualTokens = readU64();
     const solPriceUsdE6      = readU64();
 
-    void authority;
+    void _authority;
+    void _usdtMint;
+    void _totalManualTokens;
 
     const stages: PresaleState["stages"] = [];
     for (let i = 0; i < 4; i++) {
@@ -311,6 +360,15 @@ export async function fetchPresaleState(): Promise<PresaleState | null> {
       });
     }
 
+    // NEW fields
+    const buyersCount    = readU64();
+    const _solVaultBump  = readU8();
+    const _vaultAuthBump = readU8();
+    // remaining: bump(1) + _reserved(54) — not needed in UI
+
+    void _solVaultBump;
+    void _vaultAuthBump;
+
     return {
       currentStage,
       isActive,
@@ -319,11 +377,12 @@ export async function fetchPresaleState(): Promise<PresaleState | null> {
       totalSolRaised,
       totalUsdtRaised,
       solPriceUsdE6,
+      buyersCount,
       treasury,
       usdtTreasuryAta,
-      presaleStart: _presaleStart,
-      presaleEnd:   _presaleEnd,
-      claimOpensAt: _claimOpensAt,
+      presaleStart,
+      presaleEnd,
+      claimOpensAt,
       stages,
     };
   } catch (err) {
@@ -334,13 +393,38 @@ export async function fetchPresaleState(): Promise<PresaleState | null> {
 
 /**
  * Fetch the buyer record for a given wallet. Returns null if not found.
+ *
+ * BuyerRecord on-chain layout (after 8-byte discriminator):
+ *   presale               : 32
+ *   wallet                : 32
+ *   total_tokens          : 8
+ *   sol_paid              : 8
+ *   usdt_paid             : 8
+ *   last_is_manual        : 1
+ *   last_purchase_at      : 8
+ *   stage_at_first_purchase: 1  (NEW)
+ *   payment_flags         : 1   (NEW)
+ *   bump                  : 1
+ *   _reserved             : 30
  */
 export interface BuyerState {
   totalTokens: bigint;
   solPaid: bigint;
   usdtPaid: bigint;
   lastPurchaseAt: bigint;
+  /** Stage index (0-3) at the time of first purchase */
+  stageAtFirstPurchase: number;
+  /**
+   * Bit-field: bit0 = paid SOL, bit1 = paid USDT, bit2 = manual allocation
+   * Use FLAG_SOL / FLAG_USDT / FLAG_MANUAL constants to test bits.
+   */
+  paymentFlags: number;
 }
+
+/** Bit flags for BuyerState.paymentFlags */
+export const FLAG_SOL    = 0b001;
+export const FLAG_USDT   = 0b010;
+export const FLAG_MANUAL = 0b100;
 
 export async function fetchBuyerState(buyerAddress: string): Promise<BuyerState | null> {
   try {
@@ -355,10 +439,14 @@ export async function fetchBuyerState(buyerAddress: string): Promise<BuyerState 
     const totalTokens   = buf.readBigUInt64LE(offset); offset += 8;
     const solPaid       = buf.readBigUInt64LE(offset); offset += 8;
     const usdtPaid      = buf.readBigUInt64LE(offset); offset += 8;
-    offset += 1; // last_is_manual bool
-    const lastPurchaseAt = buf.readBigInt64LE(offset);
+    offset += 1; // last_is_manual (bool)
+    const lastPurchaseAt = buf.readBigInt64LE(offset); offset += 8;
+    // NEW fields
+    const stageAtFirstPurchase = buf.readUInt8(offset); offset += 1;
+    const paymentFlags         = buf.readUInt8(offset); offset += 1;
+    // remaining: bump(1) + _reserved(30) — not needed in UI
 
-    return { totalTokens, solPaid, usdtPaid, lastPurchaseAt };
+    return { totalTokens, solPaid, usdtPaid, lastPurchaseAt, stageAtFirstPurchase, paymentFlags };
   } catch {
     return null;
   }

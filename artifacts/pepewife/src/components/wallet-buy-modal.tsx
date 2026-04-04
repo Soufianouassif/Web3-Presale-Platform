@@ -129,15 +129,12 @@ export default function WalletBuyModal({ amount, currency, presaleData, onClose,
     setStep("signing");
     try {
       if (currency === "SOL") {
-        const treasury = presaleData?.treasury ?? "9KrLVaHMoGRNM6vn8kS5S69NMvHFq7i8ksVMCnNiNiYq";
-        const result = await buyWithSol(address, amount, treasury, selectedWallet);
+        const result = await buyWithSol(address, amount, selectedWallet);
         setSignature(result.signature);
         setStep("success");
         onSuccess(result.signature);
       } else {
-        const usdtAta = presaleData?.usdtTreasuryAta ?? "";
-        if (!usdtAta) throw new Error("USDT treasury ATA not configured on-chain yet.");
-        const result = await buyWithUsdt(address, amount, usdtAta, selectedWallet);
+        const result = await buyWithUsdt(address, amount, selectedWallet);
         setSignature(result.signature);
         setStep("success");
         onSuccess(result.signature);
