@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { 
   Menu, X, Twitter, Send, Wallet, ChevronRight, Copy, CheckCircle2,
   Shield, Zap, Lock, Users, Rocket, Coins, ArrowRight,
-  TrendingUp, Clock, DollarSign, Gift, Play
+  TrendingUp, Clock, DollarSign, Gift, Play, Globe
 } from "lucide-react";
 
 export function Landing() {
