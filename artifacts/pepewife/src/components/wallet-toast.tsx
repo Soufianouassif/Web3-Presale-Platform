@@ -139,11 +139,10 @@ export function useToast() {
 }
 
 const WALLET_LABELS: Record<WalletType, string> = {
-  phantom: "Phantom",
+  phantom:  "Phantom",
   solflare: "Solflare",
-  metamask: "MetaMask",
-  okx: "OKX Wallet",
-  trust: "Trust Wallet",
+  backpack: "Backpack",
+  okx:      "OKX Wallet",
 };
 
 export function mapErrorToCode(errorMessage: string): WalletErrorCode {

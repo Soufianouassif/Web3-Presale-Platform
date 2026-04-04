@@ -63,7 +63,7 @@ export default function ConnectingPage() {
   }, [progress, showSuccess, navigate, steps.length]);
 
   const displayAddress = shortAddress || "7xKp...4mNr";
-  const encryptedText = network === "ethereum" ? t.connecting.encryptedEth : t.connecting.encrypted;
+  const encryptedText = t.connecting.encrypted;
 
   return (
     <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#1a1a2e] transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"}`}>

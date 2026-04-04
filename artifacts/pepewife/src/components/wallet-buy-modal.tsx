@@ -5,7 +5,7 @@ import { useLanguage } from "@/i18n/context";
 import { getInstallUrl, type WalletType } from "@/lib/wallet";
 import { buyWithSol, buyWithUsdt, type PresaleState } from "@/lib/presale-contract";
 
-// ─── Wallet definitions ─────────────────────────────────────────────────────
+// ─── Wallet definitions (Solana only) ───────────────────────────────────────
 const WALLETS: {
   id: WalletType;
   name: string;
@@ -13,13 +13,11 @@ const WALLETS: {
   color: string;
   shadow: string;
   bg: string;
-  network: "solana" | "ethereum";
 }[] = [
-  { id: "phantom",  name: "Phantom",      iconSrc: "/wallet-phantom.png",  color: "#AB47BC", shadow: "#7B1FA2", bg: "bg-[#F3E5F5]", network: "solana"   },
-  { id: "solflare", name: "Solflare",     iconSrc: "/wallet-solflare.svg", color: "#FC6E21", shadow: "#C94F0A", bg: "bg-[#FFF3E0]", network: "solana"   },
-  { id: "metamask", name: "MetaMask",     iconSrc: "/wallet-metamask.png", color: "#E2761B", shadow: "#C65D0A", bg: "bg-[#FFF3E0]", network: "ethereum" },
-  { id: "okx",      name: "OKX Wallet",  iconSrc: "/wallet-okx.svg",      color: "#000000", shadow: "#333333", bg: "bg-[#F5F5F5]", network: "ethereum" },
-  { id: "trust",    name: "Trust Wallet", iconSrc: "/wallet-trust.svg",   color: "#3375BB", shadow: "#1A5A9E", bg: "bg-[#E3F2FD]", network: "ethereum" },
+  { id: "phantom",  name: "Phantom",     iconSrc: "/wallet-phantom.png",  color: "#AB47BC", shadow: "#7B1FA2", bg: "bg-[#F3E5F5]" },
+  { id: "solflare", name: "Solflare",    iconSrc: "/wallet-solflare.svg", color: "#FC6E21", shadow: "#C94F0A", bg: "bg-[#FFF3E0]" },
+  { id: "backpack", name: "Backpack",    iconSrc: "/wallet-backpack.svg", color: "#E05CFF", shadow: "#9B1DCC", bg: "bg-[#FAF0FF]" },
+  { id: "okx",      name: "OKX Wallet", iconSrc: "/wallet-okx.svg",      color: "#000000", shadow: "#333333", bg: "bg-[#F5F5F5]" },
 ];
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -101,13 +99,6 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
       return;
     }
 
-    // MetaMask / OKX / Trust are Ethereum — USDT_SPL not supported
-    if (currency === "USDT_SPL" && (walletId === "metamask" || walletId === "okx" || walletId === "trust")) {
-      setStep("error");
-      setErrorMsg("USDT on Solana requires a Solana wallet (Phantom or Solflare).");
-      return;
-    }
-
     setConnectingId(walletId);
     setStep("connecting");
     const ok = await connect(walletId);
@@ -121,13 +112,6 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
   // ── Sign / send transaction ────────────────────────────────────────────────
   const handleSign = useCallback(async () => {
     if (!address || !selectedWallet) return;
-
-    // Validation guards
-    if (currency === "SOL" && (selectedWallet === "metamask" || selectedWallet === "okx" || selectedWallet === "trust")) {
-      setStep("error");
-      setErrorMsg("SOL purchases require a Solana wallet (Phantom or Solflare).");
-      return;
-    }
 
     setStep("signing");
     try {
@@ -219,13 +203,13 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
             <div className="mb-2">
               <span className="text-[10px] font-display tracking-widest text-[#14F195]/80 uppercase ps-1">⬡ Solana</span>
               <div className="space-y-2 mt-1">
-                {WALLETS.filter(w => w.network === "solana").map(w => {
+                {WALLETS.map(w => {
                   const installed = installedWallets[w.id];
                   return (
                     <button
                       key={w.id}
                       onClick={() => handleSelectWallet(w.id)}
-                      className={`w-full flex items-center gap-3 rounded-xl border-2 p-3 transition-all text-start ${w.bg} hover:shadow-[3px_3px_0px_${w.shadow}] hover:border-[${w.color}]`}
+                      className={`w-full flex items-center gap-3 rounded-xl border-2 p-3 transition-all text-start ${w.bg}`}
                       style={{ borderColor: installed ? w.color : "#1a1a2e20" }}
                     >
                       <img src={w.iconSrc} alt={w.name} className="w-9 h-9 rounded-xl border-2 border-[#1a1a2e]/10 shrink-0" />
@@ -248,54 +232,6 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
                 })}
               </div>
             </div>
-
-            {/* ETH wallets — only for USDT_SPL disabled */}
-            {currency === "SOL" && (
-              <div className="mb-4">
-                <span className="text-[10px] font-display tracking-widest text-[#627EEA]/80 uppercase ps-1">⬡ Ethereum</span>
-                <div className="space-y-2 mt-1 opacity-40 pointer-events-none">
-                  {WALLETS.filter(w => w.network === "ethereum").map(w => (
-                    <div key={w.id} className={`w-full flex items-center gap-3 rounded-xl border-2 p-3 ${w.bg} border-[#1a1a2e]/10`}>
-                      <img src={w.iconSrc} alt={w.name} className="w-9 h-9 rounded-xl border-2 border-[#1a1a2e]/10 shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-display text-base tracking-wide text-[#1a1a2e]/50">{w.name}</div>
-                        <div className="text-[11px] text-[#1a1a2e]/30 font-bold">SOL purchases require a Solana wallet</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {currency === "USDT_SPL" && (
-              <div className="mb-4">
-                <span className="text-[10px] font-display tracking-widest text-[#26A17B]/80 uppercase ps-1">⬡ Ethereum (USDT)</span>
-                <div className="space-y-2 mt-1">
-                  {WALLETS.filter(w => w.network === "ethereum").map(w => {
-                    const installed = installedWallets[w.id];
-                    return (
-                      <button
-                        key={w.id}
-                        onClick={() => handleSelectWallet(w.id)}
-                        className={`w-full flex items-center gap-3 rounded-xl border-2 p-3 transition-all text-start ${w.bg}`}
-                        style={{ borderColor: installed ? w.color : "#1a1a2e20" }}
-                      >
-                        <img src={w.iconSrc} alt={w.name} className="w-9 h-9 rounded-xl border-2 border-[#1a1a2e]/10 shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-display text-base tracking-wide" style={{ color: w.color }}>{w.name}</div>
-                          <div className="text-[11px] text-[#1a1a2e]/40 font-bold">{installed ? "Installed · ready to connect" : "Not installed"}</div>
-                        </div>
-                        {!installed && (
-                          <span className="shrink-0 flex items-center gap-1 text-[11px] font-display text-[#1a1a2e]/40 border border-[#1a1a2e]/20 rounded-lg px-2 py-0.5">
-                            <Download className="h-3 w-3" /> Install
-                          </span>
-                        )}
-                        {installed && <span className="shrink-0 w-2 h-2 rounded-full bg-[#4CAF50]" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
 
             <p className="text-center text-[11px] text-[#1a1a2e]/30 font-bold">
               🔒 Your keys, your crypto. We never store private keys.
@@ -357,7 +293,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
               <div className="flex justify-between items-center px-4 py-3">
                 <span className="text-xs font-display tracking-wider text-[#1a1a2e]/50">NETWORK</span>
                 <span className="font-display text-sm text-[#14F195] tracking-wider">
-                  {walletMeta.network === "solana" ? "⬡ Solana" : "⟠ Ethereum"}
+                  ⬡ Solana
                 </span>
               </div>
             </div>

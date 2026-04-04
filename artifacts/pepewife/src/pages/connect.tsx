@@ -12,12 +12,11 @@ import { tracker } from "@/lib/admin-api";
 const wallets: {
   id: WalletType;
   name: string;
-  descKey: "phantomDesc" | "solflareDesc" | "metamaskDesc" | "okxDesc" | "trustDesc";
+  descKey: "phantomDesc" | "solflareDesc" | "backpackDesc" | "okxDesc";
   color: string;
   shadow: string;
   bg: string;
   iconSrc: string;
-  network: "solana" | "ethereum";
 }[] = [
   {
     id: "phantom",
@@ -27,7 +26,6 @@ const wallets: {
     shadow: "#7B1FA2",
     bg: "bg-[#F3E5F5]",
     iconSrc: "/wallet-phantom.png",
-    network: "solana",
   },
   {
     id: "solflare",
@@ -37,17 +35,15 @@ const wallets: {
     shadow: "#C94F0A",
     bg: "bg-[#FFF3E0]",
     iconSrc: "/wallet-solflare.svg",
-    network: "solana",
   },
   {
-    id: "metamask",
-    name: "MetaMask",
-    descKey: "metamaskDesc",
-    color: "#E2761B",
-    shadow: "#C65D0A",
-    bg: "bg-[#FFF3E0]",
-    iconSrc: "/wallet-metamask.png",
-    network: "ethereum",
+    id: "backpack",
+    name: "Backpack",
+    descKey: "backpackDesc",
+    color: "#E05CFF",
+    shadow: "#9B1DCC",
+    bg: "bg-[#FAF0FF]",
+    iconSrc: "/wallet-backpack.svg",
   },
   {
     id: "okx",
@@ -57,17 +53,6 @@ const wallets: {
     shadow: "#333333",
     bg: "bg-[#F5F5F5]",
     iconSrc: "/wallet-okx.svg",
-    network: "ethereum",
-  },
-  {
-    id: "trust",
-    name: "Trust Wallet",
-    descKey: "trustDesc",
-    color: "#3375BB",
-    shadow: "#1A5A9E",
-    bg: "bg-[#E3F2FD]",
-    iconSrc: "/wallet-trust.svg",
-    network: "ethereum",
   },
 ];
 
@@ -196,7 +181,7 @@ export default function ConnectPage() {
                 const isInstalled = installedWallets[w.id];
                 const isConnecting = connectingId === w.id && status === "connecting";
                 const isThisConnected = status === "connected" && connectedWallet === w.id;
-                const networkLabel = w.network === "solana" ? t.connect.networkSolana : t.connect.networkEthereum;
+                const networkLabel = t.connect.networkSolana;
 
                 return (
                   <button
