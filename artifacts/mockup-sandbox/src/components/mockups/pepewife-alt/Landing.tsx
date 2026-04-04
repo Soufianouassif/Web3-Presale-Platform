@@ -37,7 +37,7 @@ export function Landing() {
 
   return (
     <div className="min-h-screen bg-[#FFFDF5] text-[#1B1F3B] font-sans selection:bg-[#FFE135] selection:text-[#1B1F3B] overflow-x-hidden relative">
-      <style dangerouslySetContent={{ __html: `
+      <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700;800;900&display=swap');
       `}} />
 
