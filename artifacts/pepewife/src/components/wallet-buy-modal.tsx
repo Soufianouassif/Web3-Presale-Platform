@@ -35,6 +35,7 @@ interface Props {
   amount: number;
   currency: "SOL" | "USDT_SPL";
   presaleData: PresaleState | null;
+  tokensEstimate: number;
   onClose: () => void;
   onSuccess: (signature: string) => void;
 }
@@ -54,7 +55,7 @@ function friendlyError(msg: string): string {
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export default function WalletBuyModal({ amount, currency, presaleData, onClose, onSuccess }: Props) {
+export default function WalletBuyModal({ amount, currency, presaleData, tokensEstimate, onClose, onSuccess }: Props) {
   const { status, walletType: connectedWallet, address, connect, installedWallets, refreshDetection } = useWallet();
   const { dir } = useLanguage();
   const isRTL = dir === "rtl";
@@ -205,8 +206,8 @@ export default function WalletBuyModal({ amount, currency, presaleData, onClose,
               <div className="flex justify-between items-center mt-1">
                 <span className="text-xs font-display tracking-wider text-[#1a1a2e]/50">YOU GET</span>
                 <span className="font-display text-base text-[#4CAF50] tracking-wider">
-                  {presaleData
-                    ? `~${Math.floor(amount / presaleData.pricePerToken).toLocaleString()} $PWIFE`
+                  {tokensEstimate > 0
+                    ? `~${tokensEstimate.toLocaleString()} $PWIFE`
                     : "Calculating…"}
                 </span>
               </div>
@@ -346,8 +347,8 @@ export default function WalletBuyModal({ amount, currency, presaleData, onClose,
               <div className="flex justify-between items-center px-4 py-3">
                 <span className="text-xs font-display tracking-wider text-[#1a1a2e]/50">YOU GET</span>
                 <span className="font-display text-lg text-[#4CAF50] tracking-wider">
-                  {presaleData
-                    ? `~${Math.floor(amount / presaleData.pricePerToken).toLocaleString()} $PWIFE`
+                  {tokensEstimate > 0
+                    ? `~${tokensEstimate.toLocaleString()} $PWIFE`
                     : "Calculating…"}
                 </span>
               </div>

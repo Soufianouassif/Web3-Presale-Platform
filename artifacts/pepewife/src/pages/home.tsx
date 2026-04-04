@@ -1091,6 +1091,7 @@ export default function Home() {
           amount={parseFloat(amount)}
           currency={currency as "SOL" | "USDT_SPL"}
           presaleData={presaleData}
+          tokensEstimate={tokensOut}
           onClose={() => setShowBuyModal(false)}
           onSuccess={handleBuySuccess}
         />
