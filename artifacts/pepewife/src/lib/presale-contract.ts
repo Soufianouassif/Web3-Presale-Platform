@@ -26,11 +26,11 @@ import {
 // ─────────────────────────────────────────────────────────────
 
 export const PROGRAM_ID = new PublicKey(
-  "DfzSShi9CyhUDnDh47nFacg974KV4GVtk3qbQx1QbDh6"
+  "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145"
 );
 
 export const CONFIG_PDA = new PublicKey(
-  "8XHndAPMyHRvqyyEj4XfYQBiZcARB2SSuEkTPicPJC48"
+  "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi"
 );
 
 /** Mainnet USDT-SPL mint */
