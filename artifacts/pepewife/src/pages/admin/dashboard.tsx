@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { adminApi, type AdminStats } from "@/lib/admin-api";
-import { withdrawSol, withdrawSolWithKeypair, connection, SOL_VAULT_PDA, fetchPresaleState, type PresaleState } from "@/lib/presale-contract";
+import { withdrawSol, withdrawSolWithKeypair, connection, SOL_VAULT_PDA, fetchPresaleState, stageTokenPriceUsd, type PresaleState } from "@/lib/presale-contract";
 
 function fmt(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
@@ -342,7 +342,9 @@ export default function AdminDashboard() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ msg: string; type: "success" | "error" } | null>(null);
   const [chainData, setChainData] = useState<PresaleState | null>(null);
+  const [vaultBalance, setVaultBalance] = useState<number | null>(null);
   const [chainLoading, setChainLoading] = useState(false);
+  const [chainLastUpdated, setChainLastUpdated] = useState<Date | null>(null);
 
   const showNotification = (msg: string, type: "success" | "error" = "success") => {
     setNotification({ msg, type });
@@ -368,8 +370,13 @@ export default function AdminDashboard() {
   const refreshChainData = useCallback(async () => {
     setChainLoading(true);
     try {
-      const d = await fetchPresaleState();
+      const [d, lamports] = await Promise.all([
+        fetchPresaleState(),
+        connection.getBalance(SOL_VAULT_PDA).catch(() => null),
+      ]);
       if (d) setChainData(d);
+      if (lamports !== null) setVaultBalance(lamports / 1e9);
+      setChainLastUpdated(new Date());
     } catch { /* ignore */ }
     finally { setChainLoading(false); }
   }, []);
@@ -480,10 +487,16 @@ export default function AdminDashboard() {
 
             {/* Live On-Chain Data */}
             <section className="bg-[#111118] border border-[#9945FF]/20 rounded-2xl p-6">
+              {/* Header */}
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-semibold text-gray-300">Live On-Chain Data</h2>
                   <span className="text-xs px-2 py-0.5 bg-[#9945FF]/10 text-[#9945FF] rounded-full border border-[#9945FF]/20">Solana Devnet</span>
+                  {chainLastUpdated && (
+                    <span className="text-xs text-gray-600">
+                      Updated {chainLastUpdated.toLocaleTimeString()}
+                    </span>
+                  )}
                 </div>
                 <button
                   onClick={refreshChainData}
@@ -496,50 +509,128 @@ export default function AdminDashboard() {
                   Refresh
                 </button>
               </div>
+
               {chainData ? (
-                <>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
+                <div className="space-y-6">
+                  {/* Row 1 — Main metrics */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {/* Stage + Status */}
+                    <div className="bg-[#0a0a0f] border border-[#9945FF]/20 rounded-xl p-4">
                       <p className="text-xs text-gray-500 mb-1">Current Stage</p>
                       <p className="text-2xl font-bold text-[#9945FF]">Stage {chainData.currentStage}</p>
-                      <p className={`text-xs mt-1 ${chainData.isActive ? "text-[#39ff14]" : "text-red-400"}`}>
-                        {chainData.isActive ? "● Active" : "● Paused"}
+                      <p className={`text-xs mt-1 font-medium ${chainData.isActive && !chainData.isPaused ? "text-[#39ff14]" : "text-red-400"}`}>
+                        {chainData.isActive && !chainData.isPaused ? "● Active" : chainData.isPaused ? "⏸ Paused" : "● Inactive"}
                       </p>
                     </div>
+
+                    {/* Tokens Sold */}
                     <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
-                      <p className="text-xs text-gray-500 mb-1">Tokens Sold (on-chain)</p>
+                      <p className="text-xs text-gray-500 mb-1">Tokens Sold</p>
                       <p className="text-2xl font-bold text-[#00d4ff]">{fmt(Number(chainData.totalTokensSold / 1_000_000n))}</p>
-                      <p className="text-xs text-gray-500 mt-1">$PWIFE</p>
+                      <p className="text-xs text-gray-500 mt-1">$PWIFE tokens</p>
                     </div>
+
+                    {/* SOL Raised */}
                     <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
-                      <p className="text-xs text-gray-500 mb-1">SOL Raised (on-chain)</p>
-                      <p className="text-2xl font-bold text-[#39ff14]">{(Number(chainData.totalSolRaised) / 1e9).toFixed(3)}</p>
-                      <p className="text-xs text-gray-500 mt-1">SOL</p>
+                      <p className="text-xs text-gray-500 mb-1">SOL Raised</p>
+                      <p className="text-2xl font-bold text-[#39ff14]">
+                        {(Number(chainData.totalSolRaised) / 1e9).toFixed(4)}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        SOL
+                        {chainData.solPriceUsdE6 > 0n && (
+                          <span className="ml-1 text-gray-600">
+                            ≈ ${((Number(chainData.totalSolRaised) / 1e9) * (Number(chainData.solPriceUsdE6) / 1e6)).toFixed(2)}
+                          </span>
+                        )}
+                      </p>
                     </div>
+
+                    {/* Buyers */}
                     <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
-                      <p className="text-xs text-gray-500 mb-1">Buyers (on-chain)</p>
+                      <p className="text-xs text-gray-500 mb-1">Buyers</p>
                       <p className="text-2xl font-bold text-yellow-400">{Number(chainData.buyersCount).toLocaleString()}</p>
                       <p className="text-xs text-gray-500 mt-1">unique wallets</p>
                     </div>
                   </div>
+
+                  {/* Row 2 — Secondary metrics */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {/* USDT Raised */}
+                    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
+                      <p className="text-xs text-gray-500 mb-1">USDT Raised</p>
+                      <p className="text-xl font-bold text-green-400">
+                        ${(Number(chainData.totalUsdtRaised) / 1e6).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">raw USDT raised</p>
+                    </div>
+
+                    {/* Vault Balance */}
+                    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
+                      <p className="text-xs text-gray-500 mb-1">Vault Balance</p>
+                      <p className="text-xl font-bold text-orange-400">
+                        {vaultBalance !== null ? vaultBalance.toFixed(4) : "—"}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">SOL in vault PDA</p>
+                    </div>
+
+                    {/* SOL Price */}
+                    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
+                      <p className="text-xs text-gray-500 mb-1">SOL Price (contract)</p>
+                      <p className="text-xl font-bold text-blue-400">
+                        {chainData.solPriceUsdE6 > 0n
+                          ? `$${(Number(chainData.solPriceUsdE6) / 1e6).toLocaleString(undefined, { maximumFractionDigits: 2 })}`
+                          : "Not set"}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">USD / SOL on-chain</p>
+                    </div>
+
+                    {/* Claim status */}
+                    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
+                      <p className="text-xs text-gray-500 mb-1">Claim Opens</p>
+                      <p className="text-xl font-bold text-purple-400">
+                        {chainData.claimOpensAt > 0n
+                          ? new Date(Number(chainData.claimOpensAt) * 1000).toLocaleDateString()
+                          : "Not set"}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">on-chain timestamp</p>
+                    </div>
+                  </div>
+
+                  {/* Stage progress + prices */}
                   <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Stage Progress</p>
-                    <div className="space-y-3">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Stage Details (On-Chain)</p>
+                    <div className="space-y-4">
                       {chainData.stages.map((stage, i) => {
                         const sold = Number(stage.tokensSold / 1_000_000n);
-                        const max = Number(stage.maxTokens / 1_000_000n);
-                        const pct = max > 0 ? Math.min(100, (sold / max) * 100) : 0;
+                        const max  = Number(stage.maxTokens  / 1_000_000n);
+                        const pct  = max > 0 ? Math.min(100, (sold / max) * 100) : 0;
+                        const isCurrent = i + 1 === chainData.currentStage;
+                        const priceUsd = stageTokenPriceUsd(stage.tokensPerRawUsdtScaled);
                         return (
-                          <div key={i}>
-                            <div className="flex justify-between text-xs mb-1">
-                              <span className={`font-medium ${i + 1 === chainData.currentStage ? "text-[#9945FF]" : "text-gray-400"}`}>
-                                Stage {i + 1}{i + 1 === chainData.currentStage ? " ← current" : ""}
+                          <div key={i} className={`rounded-xl p-3 border ${isCurrent ? "border-[#9945FF]/30 bg-[#9945FF]/5" : "border-white/5 bg-[#0a0a0f]"}`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className={`text-sm font-semibold ${isCurrent ? "text-[#9945FF]" : "text-gray-400"}`}>
+                                  Stage {i + 1}
+                                </span>
+                                {isCurrent && (
+                                  <span className="text-xs px-1.5 py-0.5 bg-[#9945FF]/20 text-[#9945FF] rounded-md border border-[#9945FF]/30">
+                                    current
+                                  </span>
+                                )}
+                                <span className="text-xs text-gray-500">
+                                  Price: {priceUsd > 0 ? `$${priceUsd.toFixed(8)}` : "not set"}
+                                </span>
+                              </div>
+                              <span className="text-xs text-gray-500">
+                                {fmt(sold)} / {fmt(max)} $PWIFE
+                                <span className="ml-1 text-gray-600">({pct.toFixed(1)}%)</span>
                               </span>
-                              <span className="text-gray-500">{fmt(sold)} / {fmt(max)} $PWIFE ({pct.toFixed(1)}%)</span>
                             </div>
-                            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                               <div
-                                className={`h-full rounded-full transition-all ${i + 1 === chainData.currentStage ? "bg-[#9945FF]" : "bg-white/20"}`}
+                                className={`h-full rounded-full transition-all ${isCurrent ? "bg-[#9945FF]" : "bg-white/20"}`}
                                 style={{ width: `${pct}%` }}
                               />
                             </div>
@@ -548,10 +639,38 @@ export default function AdminDashboard() {
                       })}
                     </div>
                   </div>
-                </>
+
+                  {/* Presale dates */}
+                  {(chainData.presaleStart > 0n || chainData.presaleEnd > 0n) && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {chainData.presaleStart > 0n && (
+                        <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-3 flex items-center justify-between">
+                          <span className="text-xs text-gray-500">Presale Start</span>
+                          <span className="text-sm text-gray-300">{new Date(Number(chainData.presaleStart) * 1000).toLocaleString()}</span>
+                        </div>
+                      )}
+                      {chainData.presaleEnd > 0n && (
+                        <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-3 flex items-center justify-between">
+                          <span className="text-xs text-gray-500">Presale End</span>
+                          <span className="text-sm text-gray-300">{new Date(Number(chainData.presaleEnd) * 1000).toLocaleString()}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               ) : (
-                <div className="text-center py-8 text-gray-500 text-sm">
-                  {chainLoading ? "Fetching on-chain data…" : "Failed to load on-chain data. Check RPC connection."}
+                <div className="text-center py-10 text-gray-500 text-sm space-y-2">
+                  {chainLoading ? (
+                    <>
+                      <span className="w-6 h-6 border-2 border-[#9945FF]/50 border-t-[#9945FF] rounded-full animate-spin mx-auto block" />
+                      <p>Reading from Solana blockchain…</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-red-400">Could not read on-chain data</p>
+                      <p className="text-xs">Check RPC connection · Config PDA: BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi</p>
+                    </>
+                  )}
                 </div>
               )}
             </section>
