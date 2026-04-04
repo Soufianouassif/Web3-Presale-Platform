@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { adminApi, type AdminStats } from "@/lib/admin-api";
+import { withdrawSol, connection, SOL_VAULT_PDA } from "@/lib/presale-contract";
 
 function fmt(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
@@ -53,6 +54,177 @@ function ControlButton({
       {loading && <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />}
       {label}
     </button>
+  );
+}
+
+// ─── Withdraw Panel ──────────────────────────────────────────────────────────
+type WithdrawStep = "idle" | "connecting" | "signing" | "success" | "error";
+
+function WithdrawPanel() {
+  const [vaultSol, setVaultSol]         = useState<number | null>(null);
+  const [walletAddr, setWalletAddr]     = useState<string>("");
+  const [walletType, setWalletType]     = useState<"phantom" | "solflare">("phantom");
+  const [step, setStep]                 = useState<WithdrawStep>("idle");
+  const [txSig, setTxSig]              = useState("");
+  const [withdrawn, setWithdrawn]       = useState<string>("");
+  const [errMsg, setErrMsg]             = useState("");
+
+  // Fetch vault balance
+  useEffect(() => {
+    connection.getBalance(SOL_VAULT_PDA)
+      .then(lamps => setVaultSol(lamps / 1e9))
+      .catch(() => setVaultSol(null));
+  }, []);
+
+  // Connect admin wallet
+  async function connectWallet() {
+    setStep("connecting");
+    try {
+      const provider = walletType === "phantom"
+        ? (window as any).phantom?.solana
+        : (window as any).solflare;
+      if (!provider) throw new Error(`${walletType} not found`);
+      const resp = await provider.connect();
+      const addr = resp.publicKey?.toString() ?? provider.publicKey?.toString();
+      if (!addr) throw new Error("No public key returned");
+      setWalletAddr(addr);
+      setStep("idle");
+    } catch (e: any) {
+      setErrMsg(e.message ?? "Connection failed");
+      setStep("error");
+    }
+  }
+
+  // Execute withdrawal
+  async function doWithdraw() {
+    if (!walletAddr) return;
+    setStep("signing");
+    setErrMsg("");
+    try {
+      const result = await withdrawSol(walletAddr, walletType);
+      setTxSig(result.signature);
+      setWithdrawn((Number(result.withdrawnLamports) / 1e9).toFixed(4));
+      setStep("success");
+      // Refresh vault balance
+      connection.getBalance(SOL_VAULT_PDA).then(lamps => setVaultSol(lamps / 1e9)).catch(() => {});
+    } catch (e: any) {
+      const msg: string = e.message ?? String(e);
+      if (msg.toLowerCase().includes("unauthorized")) {
+        setErrMsg("This wallet is not the presale authority. Connect the correct admin wallet.");
+      } else {
+        setErrMsg(msg.length > 150 ? msg.slice(0, 150) + "…" : msg);
+      }
+      setStep("error");
+    }
+  }
+
+  return (
+    <div>
+      <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Vault Funds</p>
+
+      {/* Vault balance */}
+      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-4">
+        <p className="text-xs text-yellow-300/70 mb-1">SOL Vault Balance</p>
+        <p className="text-2xl font-bold text-yellow-300">
+          {vaultSol === null ? "Loading…" : `${vaultSol.toFixed(4)} SOL`}
+        </p>
+        <p className="text-xs text-gray-500 mt-1">
+          Vault: <span className="font-mono">4vWdK1b3…ZjfK</span>
+        </p>
+      </div>
+
+      {/* Need SOL for fees alert */}
+      <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 mb-4 text-xs text-blue-300">
+        ⚠️ Your admin wallet needs a tiny amount of SOL (~0.001) to pay transaction fees before withdrawing.
+        <a
+          href="https://faucet.solana.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-1 underline text-blue-200 hover:text-white"
+        >
+          Get free Devnet SOL → faucet.solana.com
+        </a>
+        <p className="mt-1 text-blue-300/70">Address to fund: <span className="font-mono">6dSw3tP6…67Ac1</span></p>
+      </div>
+
+      {/* Wallet selector */}
+      {step !== "success" && (
+        <div className="flex gap-2 mb-3">
+          {(["phantom", "solflare"] as const).map(w => (
+            <button
+              key={w}
+              onClick={() => setWalletType(w)}
+              className={`px-3 py-1.5 rounded-lg text-sm border transition-all capitalize ${
+                walletType === w
+                  ? "bg-yellow-500/20 border-yellow-500/50 text-yellow-300"
+                  : "bg-white/5 border-white/20 text-gray-400 hover:bg-white/10"
+              }`}
+            >
+              {w}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Connect / Withdraw button */}
+      {step === "idle" && !walletAddr && (
+        <ControlButton
+          label={`🔌 Connect ${walletType.charAt(0).toUpperCase() + walletType.slice(1)}`}
+          variant="warning"
+          onClick={connectWallet}
+        />
+      )}
+
+      {step === "idle" && walletAddr && (
+        <div className="space-y-2">
+          <p className="text-xs text-green-400">
+            ✓ Connected: <span className="font-mono">{walletAddr.slice(0,8)}…{walletAddr.slice(-4)}</span>
+          </p>
+          <ControlButton
+            label="💸 Withdraw All SOL"
+            variant="warning"
+            onClick={doWithdraw}
+          />
+        </div>
+      )}
+
+      {step === "connecting" && (
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+          Connecting wallet…
+        </div>
+      )}
+
+      {step === "signing" && (
+        <div className="flex items-center gap-2 text-sm text-yellow-300">
+          <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+          Waiting for wallet approval…
+        </div>
+      )}
+
+      {step === "success" && (
+        <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4">
+          <p className="text-green-400 font-semibold mb-1">✅ Withdrawal Successful!</p>
+          <p className="text-sm text-gray-300">Received: <span className="text-white font-bold">{withdrawn} SOL</span></p>
+          <a
+            href={`https://explorer.solana.com/tx/${txSig}?cluster=devnet`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-blue-400 underline mt-2 block"
+          >
+            View on Explorer: {txSig.slice(0, 16)}…
+          </a>
+        </div>
+      )}
+
+      {step === "error" && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-sm text-red-300">
+          <p className="font-semibold mb-1">❌ Failed</p>
+          <p className="text-xs">{errMsg}</p>
+          <button onClick={() => setStep("idle")} className="mt-2 text-xs underline text-red-400">Try again</button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -274,16 +446,7 @@ export default function AdminDashboard() {
 
                   <div className="h-px bg-white/10" />
 
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Funds</p>
-                    <ControlButton
-                      label="💸 Withdraw Presale Funds"
-                      variant="warning"
-                      onClick={() => doAction("withdraw", adminApi.withdraw)}
-                      loading={actionLoading === "withdraw"}
-                    />
-                    <p className="text-xs text-gray-600 mt-2">Complete withdrawal via your wallet app after confirmation.</p>
-                  </div>
+                  <WithdrawPanel />
                 </div>
               </section>
 

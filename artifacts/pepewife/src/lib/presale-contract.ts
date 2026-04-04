@@ -282,6 +282,57 @@ export async function buyWithUsdt(
 }
 
 // ─────────────────────────────────────────────────────────────
+//  ADMIN: WITHDRAW SOL FROM VAULT
+//  Accounts: config (read), sol_vault (mut), authority (signer+mut)
+//  The authority MUST match config.authority — only admin can call.
+// ─────────────────────────────────────────────────────────────
+
+export async function withdrawSol(
+  adminAddress: string,
+  walletType = "phantom",
+): Promise<{ signature: string; withdrawnLamports: bigint }> {
+  const admin = new PublicKey(adminAddress);
+  const discriminator = await getDiscriminator("withdraw_sol");
+
+  const ix = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA,    isSigner: false, isWritable: false },
+      { pubkey: SOL_VAULT_PDA, isSigner: false, isWritable: true  },
+      { pubkey: admin,         isSigner: true,  isWritable: true  },
+    ],
+    data: discriminator,
+  });
+
+  // Check how much is in the vault before withdrawing
+  const vaultLamports = await connection.getBalance(SOL_VAULT_PDA);
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+
+  const provider = getProvider(walletType);
+  const signed = await provider.signTransaction(tx);
+
+  const signature = await sendAndConfirmTx(
+    signed.serialize(),
+    blockhash,
+    lastValidBlockHeight,
+  );
+
+  // Rent-exempt minimum that stays in vault (~0.001 SOL for 8-byte account)
+  const rentMin = BigInt(890880); // ~0.00089 SOL
+  const withdrawnLamports = BigInt(vaultLamports) - rentMin;
+
+  return { signature, withdrawnLamports };
+}
+
+// ─────────────────────────────────────────────────────────────
 //  FETCH PRESALE STATE  (for live progress bar / stage data)
 // ─────────────────────────────────────────────────────────────
 
