@@ -55,4 +55,13 @@ pub enum PresaleError {
 
     #[msg("Treasury ATA does not match configured ATA")]
     WrongTreasuryAta,
+
+    #[msg("Insufficient funds in vault for withdrawal")]
+    InsufficientFunds,
+
+    #[msg("SOL vault does not match the configured vault")]
+    WrongSolVault,
+
+    #[msg("Withdrawal amount must be greater than zero")]
+    ZeroWithdrawAmount,
 }

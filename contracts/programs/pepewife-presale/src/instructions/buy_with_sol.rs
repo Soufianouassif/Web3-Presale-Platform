@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
-use crate::state::{PresaleConfig, BuyerRecord};
+use crate::state::{PresaleConfig, SolVault, BuyerRecord, FLAG_SOL};
 use crate::error::PresaleError;
 
 /// Minimum purchase: 1 SOL
@@ -17,12 +17,14 @@ pub struct BuyWithSol<'info> {
     )]
     pub config: Account<'info, PresaleConfig>,
 
-    /// CHECK: treasury wallet that receives SOL – validated against config
+    /// SOL vault PDA — program-controlled. Validated against config.treasury.
     #[account(
         mut,
-        constraint = treasury.key() == config.treasury @ PresaleError::Unauthorized
+        seeds = [b"sol_vault"],
+        bump = config.sol_vault_bump,
+        constraint = sol_vault.key() == config.treasury @ PresaleError::WrongSolVault,
     )]
-    pub treasury: UncheckedAccount<'info>,
+    pub sol_vault: Account<'info, SolVault>,
 
     #[account(
         init_if_needed,
@@ -43,36 +45,38 @@ pub fn handle_buy_with_sol(ctx: Context<BuyWithSol>, lamports: u64) -> Result<()
     let config = &mut ctx.accounts.config;
     let now = Clock::get()?.unix_timestamp;
 
-    // ── Guards ──────────────────────────────────────────────
-    require!(config.is_active, PresaleError::NotActive);
-    require!(!config.is_paused, PresaleError::Paused);
-    require!(now >= config.presale_start, PresaleError::NotStarted);
-    require!(now < config.presale_end, PresaleError::Ended);
-    require!(lamports >= MIN_SOL_LAMPORTS, PresaleError::BelowMinimum);
-    require!(lamports <= MAX_SOL_LAMPORTS, PresaleError::ExceedsMaximum);
-    require!(config.sol_price_usd_e6 > 0, PresaleError::SolPriceNotSet);
+    // ── Guards ──────────────────────────────────────────────────────
+    require!(config.is_active,              PresaleError::NotActive);
+    require!(!config.is_paused,             PresaleError::Paused);
+    require!(now >= config.presale_start,   PresaleError::NotStarted);
+    require!(now <  config.presale_end,     PresaleError::Ended);
+    require!(lamports >= MIN_SOL_LAMPORTS,  PresaleError::BelowMinimum);
+    require!(lamports <= MAX_SOL_LAMPORTS,  PresaleError::ExceedsMaximum);
+    require!(config.sol_price_usd_e6 > 0,  PresaleError::SolPriceNotSet);
 
     let stage_idx = config.current_stage as usize;
     require!(stage_idx < 4, PresaleError::InvalidStage);
 
-    // ── Token calculation ────────────────────────────────────
+    // ── Token calculation ────────────────────────────────────────────
     let tokens = config.tokens_for_sol(stage_idx, lamports);
     require!(tokens > 0, PresaleError::ZeroTokens);
 
-    let stage = &mut config.stages[stage_idx];
-    require!(stage.remaining() >= tokens, PresaleError::InsufficientStageTokens);
+    require!(
+        config.stages[stage_idx].remaining() >= tokens,
+        PresaleError::InsufficientStageTokens
+    );
 
-    // ── Transfer SOL to treasury ─────────────────────────────
+    // ── Transfer SOL from buyer to sol_vault PDA ─────────────────────
     let cpi_ctx = CpiContext::new(
         ctx.accounts.system_program.to_account_info(),
         system_program::Transfer {
             from: ctx.accounts.buyer.to_account_info(),
-            to:   ctx.accounts.treasury.to_account_info(),
+            to:   ctx.accounts.sol_vault.to_account_info(),
         },
     );
     system_program::transfer(cpi_ctx, lamports)?;
 
-    // ── Update state ─────────────────────────────────────────
+    // ── Update global state ──────────────────────────────────────────
     config.stages[stage_idx].tokens_sold = config.stages[stage_idx]
         .tokens_sold
         .checked_add(tokens)
@@ -86,32 +90,47 @@ pub fn handle_buy_with_sol(ctx: Context<BuyWithSol>, lamports: u64) -> Result<()
         .checked_add(lamports)
         .ok_or(PresaleError::MathOverflow)?;
 
-    // ── Buyer record ─────────────────────────────────────────
+    // ── Buyer record ─────────────────────────────────────────────────
     let record = &mut ctx.accounts.buyer_record;
-    if record.wallet == Pubkey::default() {
-        record.presale          = config.key();
-        record.wallet           = ctx.accounts.buyer.key();
-        record.bump             = ctx.bumps.buyer_record;
-        record._reserved        = [0u8; 32];
+    let is_new_buyer = record.wallet == Pubkey::default();
+
+    if is_new_buyer {
+        record.presale                  = config.key();
+        record.wallet                   = ctx.accounts.buyer.key();
+        record.bump                     = ctx.bumps.buyer_record;
+        record.stage_at_first_purchase  = stage_idx as u8;
+        record.payment_flags            = 0;
+        record._reserved                = [0u8; 30];
+
+        // Increment unique buyer counter
+        config.buyers_count = config.buyers_count
+            .checked_add(1)
+            .ok_or(PresaleError::MathOverflow)?;
     }
+
     record.total_tokens = record.total_tokens
         .checked_add(tokens)
         .ok_or(PresaleError::MathOverflow)?;
-    record.sol_paid     = record.sol_paid
+    record.sol_paid = record.sol_paid
         .checked_add(lamports)
         .ok_or(PresaleError::MathOverflow)?;
-    record.last_is_manual    = false;
-    record.last_purchase_at  = now;
+    record.last_is_manual   = false;
+    record.last_purchase_at = now;
+    record.payment_flags   |= FLAG_SOL;
 
-    // Auto-advance stage if sold out
+    // ── Auto-advance stage if sold out ───────────────────────────────
     if config.stages[stage_idx].is_sold_out() && stage_idx < 3 {
         config.current_stage += 1;
-        msg!("Stage {} sold out. Advancing to stage {}", stage_idx, config.current_stage);
+        msg!(
+            "Stage {} sold out. Auto-advancing to stage {}",
+            stage_idx, config.current_stage
+        );
     }
 
     msg!(
-        "SOL purchase: {} lamports → {} tokens (stage {})",
-        lamports, tokens, stage_idx
+        "SOL_BUY wallet={} lamports={} tokens={} stage={} buyers_total={}",
+        ctx.accounts.buyer.key(),
+        lamports, tokens, stage_idx, config.buyers_count
     );
     Ok(())
 }

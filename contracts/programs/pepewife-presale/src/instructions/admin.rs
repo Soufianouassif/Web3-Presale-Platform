@@ -46,7 +46,7 @@ pub fn handle_end_presale(ctx: Context<AdminOnly>) -> Result<()> {
     let c = &mut ctx.accounts.config;
     require!(c.is_active, PresaleError::NotActive);
     c.is_active = false;
-    // Set end time to now so claim contract can validate
+    // Stamp end time so the claim contract can validate
     c.presale_end = Clock::get()?.unix_timestamp;
     msg!("Presale ENDED at {}", c.presale_end);
     Ok(())
@@ -56,13 +56,15 @@ pub fn handle_end_presale(ctx: Context<AdminOnly>) -> Result<()> {
 pub fn handle_advance_stage(ctx: Context<AdminOnly>) -> Result<()> {
     let c = &mut ctx.accounts.config;
     let next = c.current_stage + 1;
-    require!(next < 4, PresaleError::AllStagesSoldOut);
+    require!((next as usize) < 4, PresaleError::AllStagesSoldOut);
     c.current_stage = next;
     msg!("Stage advanced to {}", next);
     Ok(())
 }
 
-// ── Update SOL price ──────────────────────────────────────
+// ──────────────────────────────────────────────────────────
+//  UpdateSolPrice — also shared by set_claim_time
+// ──────────────────────────────────────────────────────────
 #[derive(Accounts)]
 pub struct UpdateSolPrice<'info> {
     #[account(
@@ -88,7 +90,7 @@ pub fn handle_update_sol_price(
 
 // ── Update claim open time ────────────────────────────────
 pub fn handle_set_claim_time(
-    ctx: Context<UpdateSolPrice>,  // same accounts
+    ctx: Context<UpdateSolPrice>,
     new_claim_opens_at: i64,
 ) -> Result<()> {
     ctx.accounts.config.claim_opens_at = new_claim_opens_at;
