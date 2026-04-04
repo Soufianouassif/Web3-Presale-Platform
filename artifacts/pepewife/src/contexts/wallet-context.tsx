@@ -11,6 +11,7 @@ import {
   getEthereumProvider,
   isValidEthAddress,
 } from "@/lib/wallet";
+import { tracker } from "@/lib/admin-api";
 
 export type ConnectionStatus = "disconnected" | "connecting" | "connected" | "error";
 
@@ -223,6 +224,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const addr = await connectWallet(type);
       setAddress(addr);
       setStatus("connected");
+
+      // Track wallet connection in admin analytics
+      tracker.wallet(addr, type, net);
 
       // Store in sessionStorage — clears automatically on browser/tab close
       const stored: StoredWallet = { walletType: type, address: addr, network: net, connectedAt: Date.now() };
