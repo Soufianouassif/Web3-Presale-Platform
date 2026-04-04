@@ -4,6 +4,11 @@ const router = Router();
 
 const SOLANA_RPC = "https://api.devnet.solana.com";
 
+// Health-check probe sent by web3.js Connection
+router.get("/rpc", (_req, res) => {
+  res.json({ status: "ok" });
+});
+
 router.post("/rpc", async (req, res) => {
   try {
     const response = await fetch(SOLANA_RPC, {

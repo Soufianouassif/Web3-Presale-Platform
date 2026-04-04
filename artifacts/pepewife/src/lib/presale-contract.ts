@@ -146,21 +146,27 @@ export async function buyWithSol(
   });
 
   const tx = new Transaction();
+  tx.feePayer = buyer;
+  tx.add(ix);
+
+  // Fetch blockhash as late as possible — right before signing — to maximise validity window
   const { blockhash, lastValidBlockHeight } =
     await connection.getLatestBlockhash("confirmed");
   tx.recentBlockhash = blockhash;
   tx.lastValidBlockHeight = lastValidBlockHeight;
-  tx.feePayer = buyer;
-  tx.add(ix);
 
   const provider = getProvider(walletType);
   const signed = await provider.signTransaction(tx);
+
   const signature = await connection.sendRawTransaction(signed.serialize(), {
-    skipPreflight: false,
-    preflightCommitment: "confirmed",
+    skipPreflight: true,
+    maxRetries: 5,
   });
 
-  await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, "confirmed");
+  await connection.confirmTransaction(
+    { signature, blockhash, lastValidBlockHeight },
+    "confirmed",
+  );
   return { signature };
 }
 
@@ -215,21 +221,26 @@ export async function buyWithUsdt(
   });
 
   const tx = new Transaction();
+  tx.feePayer = buyer;
+  tx.add(ix);
+
   const { blockhash, lastValidBlockHeight } =
     await connection.getLatestBlockhash("confirmed");
   tx.recentBlockhash = blockhash;
   tx.lastValidBlockHeight = lastValidBlockHeight;
-  tx.feePayer = buyer;
-  tx.add(ix);
 
   const provider = getProvider(walletType);
   const signed = await provider.signTransaction(tx);
+
   const signature = await connection.sendRawTransaction(signed.serialize(), {
-    skipPreflight: false,
-    preflightCommitment: "confirmed",
+    skipPreflight: true,
+    maxRetries: 5,
   });
 
-  await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, "confirmed");
+  await connection.confirmTransaction(
+    { signature, blockhash, lastValidBlockHeight },
+    "confirmed",
+  );
   return { signature };
 }
 
