@@ -9,6 +9,7 @@ import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
 import { useWallet } from "@/contexts/wallet-context";
 import { useToast } from "@/components/wallet-toast";
+import { tracker } from "@/lib/admin-api";
 import WalletBuyModal from "@/components/wallet-buy-modal";
 import {
   fetchPresaleState,
@@ -72,6 +73,11 @@ export default function Dashboard() {
       navigate("/connect");
     }
   }, [status, navigate]);
+
+  // ── Page visit tracking ──────────────────────────────────────────────────
+  useEffect(() => {
+    tracker.visit("/dashboard");
+  }, []);
 
   // ── Load referral data when address is available ──────────────────────────
   useEffect(() => {

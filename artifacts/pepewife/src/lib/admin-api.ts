@@ -1,5 +1,16 @@
 const API_BASE = "/api";
 
+// Persistent anonymous visitor ID — stored in localStorage
+function getOrCreateVisitorId(): string {
+  const KEY = "__pwife_vid";
+  let id = localStorage.getItem(KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(KEY, id);
+  }
+  return id;
+}
+
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: "include",
@@ -123,7 +134,8 @@ export const adminApi = {
 };
 
 export const tracker = {
-  visit: (page: string, visitorId?: string) => {
+  visit: (page: string) => {
+    const visitorId = getOrCreateVisitorId();
     fetch(`${API_BASE}/track/visit`, {
       method: "POST",
       credentials: "include",

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { adminApi, type AdminStats } from "@/lib/admin-api";
-import { withdrawSol, withdrawSolWithKeypair, connection, SOL_VAULT_PDA } from "@/lib/presale-contract";
+import { withdrawSol, withdrawSolWithKeypair, connection, SOL_VAULT_PDA, fetchPresaleState, type PresaleState } from "@/lib/presale-contract";
 
 function fmt(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
@@ -341,6 +341,8 @@ export default function AdminDashboard() {
   const [dataLoading, setDataLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ msg: string; type: "success" | "error" } | null>(null);
+  const [chainData, setChainData] = useState<PresaleState | null>(null);
+  const [chainLoading, setChainLoading] = useState(false);
 
   const showNotification = (msg: string, type: "success" | "error" = "success") => {
     setNotification({ msg, type });
@@ -361,6 +363,22 @@ export default function AdminDashboard() {
   }, [authenticated]);
 
   useEffect(() => { fetchStats(); }, [fetchStats]);
+
+  // ── On-chain live data ───────────────────────────────────────────────────
+  const refreshChainData = useCallback(async () => {
+    setChainLoading(true);
+    try {
+      const d = await fetchPresaleState();
+      if (d) setChainData(d);
+    } catch { /* ignore */ }
+    finally { setChainLoading(false); }
+  }, []);
+
+  useEffect(() => {
+    refreshChainData();
+    const interval = setInterval(refreshChainData, 30_000);
+    return () => clearInterval(interval);
+  }, [refreshChainData]);
 
   const doAction = async (key: string, fn: () => Promise<{ success: boolean; message: string }>) => {
     setActionLoading(key);
@@ -458,6 +476,84 @@ export default function AdminDashboard() {
                 <StatCard title="Unique Buyers" value={stats?.buyers.unique ?? 0} sub={`${stats?.buyers.total ?? 0} total purchases`} color="yellow" />
                 <StatCard title="Total Raised" value={`$${(stats?.revenue.totalUsd ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`} sub="USD from presale" color="green" />
               </div>
+            </section>
+
+            {/* Live On-Chain Data */}
+            <section className="bg-[#111118] border border-[#9945FF]/20 rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-semibold text-gray-300">Live On-Chain Data</h2>
+                  <span className="text-xs px-2 py-0.5 bg-[#9945FF]/10 text-[#9945FF] rounded-full border border-[#9945FF]/20">Solana Devnet</span>
+                </div>
+                <button
+                  onClick={refreshChainData}
+                  disabled={chainLoading}
+                  className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-1"
+                >
+                  {chainLoading ? (
+                    <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+                  ) : "↻"}
+                  Refresh
+                </button>
+              </div>
+              {chainData ? (
+                <>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
+                      <p className="text-xs text-gray-500 mb-1">Current Stage</p>
+                      <p className="text-2xl font-bold text-[#9945FF]">Stage {chainData.currentStage}</p>
+                      <p className={`text-xs mt-1 ${chainData.isActive ? "text-[#39ff14]" : "text-red-400"}`}>
+                        {chainData.isActive ? "● Active" : "● Paused"}
+                      </p>
+                    </div>
+                    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
+                      <p className="text-xs text-gray-500 mb-1">Tokens Sold (on-chain)</p>
+                      <p className="text-2xl font-bold text-[#00d4ff]">{fmt(Number(chainData.totalTokensSold / 1_000_000n))}</p>
+                      <p className="text-xs text-gray-500 mt-1">$PWIFE</p>
+                    </div>
+                    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
+                      <p className="text-xs text-gray-500 mb-1">SOL Raised (on-chain)</p>
+                      <p className="text-2xl font-bold text-[#39ff14]">{(Number(chainData.totalSolRaised) / 1e9).toFixed(3)}</p>
+                      <p className="text-xs text-gray-500 mt-1">SOL</p>
+                    </div>
+                    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
+                      <p className="text-xs text-gray-500 mb-1">Buyers (on-chain)</p>
+                      <p className="text-2xl font-bold text-yellow-400">{Number(chainData.buyersCount).toLocaleString()}</p>
+                      <p className="text-xs text-gray-500 mt-1">unique wallets</p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Stage Progress</p>
+                    <div className="space-y-3">
+                      {chainData.stages.map((stage, i) => {
+                        const sold = Number(stage.tokensSold / 1_000_000n);
+                        const max = Number(stage.maxTokens / 1_000_000n);
+                        const pct = max > 0 ? Math.min(100, (sold / max) * 100) : 0;
+                        return (
+                          <div key={i}>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className={`font-medium ${i + 1 === chainData.currentStage ? "text-[#9945FF]" : "text-gray-400"}`}>
+                                Stage {i + 1}{i + 1 === chainData.currentStage ? " ← current" : ""}
+                              </span>
+                              <span className="text-gray-500">{fmt(sold)} / {fmt(max)} $PWIFE ({pct.toFixed(1)}%)</span>
+                            </div>
+                            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all ${i + 1 === chainData.currentStage ? "bg-[#9945FF]" : "bg-white/20"}`}
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-8 text-gray-500 text-sm">
+                  {chainLoading ? "Fetching on-chain data…" : "Failed to load on-chain data. Check RPC connection."}
+                </div>
+              )}
             </section>
 
             {/* Referral Overview */}

@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { CheckCircle, Shield, Zap } from "lucide-react";
 import { useLanguage } from "@/i18n/context";
 import { useWallet } from "@/contexts/wallet-context";
+import { tracker } from "@/lib/admin-api";
 
 export default function ConnectingPage() {
   const [, navigate] = useLocation();
@@ -20,6 +21,10 @@ export default function ConnectingPage() {
     { text: t.connecting.step4, emoji: "📊", color: "#FF4D9D" },
     { text: t.connecting.step5, emoji: "🚀", color: "#4CAF50" },
   ];
+
+  useEffect(() => {
+    tracker.visit("/connecting");
+  }, []);
 
   useEffect(() => {
     if (status !== "connected") {

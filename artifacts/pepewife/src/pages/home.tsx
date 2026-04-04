@@ -58,6 +58,7 @@ export default function Home() {
   const { status, shortAddress, address } = useWallet();
 
   useEffect(() => {
+    tracker.visit("/");
     fetchPresaleState().then(d => {
       if (d) setPresaleData(d);
     });

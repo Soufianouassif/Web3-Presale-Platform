@@ -7,6 +7,7 @@ import { useToast, mapErrorToCode, getWalletLabel } from "@/components/wallet-to
 import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
 import { getInstallUrl, type WalletType } from "@/lib/wallet";
+import { tracker } from "@/lib/admin-api";
 
 const wallets: {
   id: WalletType;
@@ -80,6 +81,7 @@ export default function ConnectPage() {
   const [lastError, setLastError] = useState<string | null>(null);
 
   useEffect(() => {
+    tracker.visit("/connect");
     refreshDetection();
   }, [refreshDetection]);
 
