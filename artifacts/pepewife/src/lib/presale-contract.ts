@@ -22,6 +22,51 @@ import {
 } from "@solana/spl-token";
 
 // ─────────────────────────────────────────────────────────────
+//  SEND + CONFIRM HELPER
+//  If confirmTransaction times out (block height expired),
+//  we poll the signature status directly.  The tx may have
+//  already landed even though the subscription timed out.
+// ─────────────────────────────────────────────────────────────
+async function sendAndConfirmTx(
+  rawTx: Uint8Array,
+  blockhash: string,
+  lastValidBlockHeight: number,
+): Promise<string> {
+  const signature = await connection.sendRawTransaction(rawTx, {
+    skipPreflight: true,
+    maxRetries: 5,
+  });
+
+  try {
+    const result = await connection.confirmTransaction(
+      { signature, blockhash, lastValidBlockHeight },
+      "confirmed",
+    );
+    if (result.value.err) {
+      throw new Error(`Transaction failed on-chain: ${JSON.stringify(result.value.err)}`);
+    }
+  } catch (timeoutErr) {
+    // Timeout / block-height exceeded — check whether the tx actually landed
+    const status = await connection.getSignatureStatus(signature, {
+      searchTransactionHistory: true,
+    });
+    const conf = status?.value;
+    if (
+      conf &&
+      !conf.err &&
+      (conf.confirmationStatus === "confirmed" || conf.confirmationStatus === "finalized")
+    ) {
+      // Transaction DID land — treat as success
+      return signature;
+    }
+    // Truly failed
+    throw timeoutErr;
+  }
+
+  return signature;
+}
+
+// ─────────────────────────────────────────────────────────────
 //  CONSTANTS
 // ─────────────────────────────────────────────────────────────
 
@@ -149,7 +194,7 @@ export async function buyWithSol(
   tx.feePayer = buyer;
   tx.add(ix);
 
-  // Fetch blockhash as late as possible — right before signing — to maximise validity window
+  // Fetch blockhash as late as possible — right before signing
   const { blockhash, lastValidBlockHeight } =
     await connection.getLatestBlockhash("confirmed");
   tx.recentBlockhash = blockhash;
@@ -158,14 +203,10 @@ export async function buyWithSol(
   const provider = getProvider(walletType);
   const signed = await provider.signTransaction(tx);
 
-  const signature = await connection.sendRawTransaction(signed.serialize(), {
-    skipPreflight: true,
-    maxRetries: 5,
-  });
-
-  await connection.confirmTransaction(
-    { signature, blockhash, lastValidBlockHeight },
-    "confirmed",
+  const signature = await sendAndConfirmTx(
+    signed.serialize(),
+    blockhash,
+    lastValidBlockHeight,
   );
   return { signature };
 }
@@ -232,14 +273,10 @@ export async function buyWithUsdt(
   const provider = getProvider(walletType);
   const signed = await provider.signTransaction(tx);
 
-  const signature = await connection.sendRawTransaction(signed.serialize(), {
-    skipPreflight: true,
-    maxRetries: 5,
-  });
-
-  await connection.confirmTransaction(
-    { signature, blockhash, lastValidBlockHeight },
-    "confirmed",
+  const signature = await sendAndConfirmTx(
+    signed.serialize(),
+    blockhash,
+    lastValidBlockHeight,
   );
   return { signature };
 }

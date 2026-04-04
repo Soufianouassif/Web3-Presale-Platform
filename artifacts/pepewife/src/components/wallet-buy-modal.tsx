@@ -49,6 +49,8 @@ function friendlyError(msg: string): string {
     return "Wallet extension not found. Please install it first.";
   if (m.includes("insufficient") || m.includes("balance"))
     return "Insufficient balance to complete this purchase.";
+  if (m.includes("block height") || m.includes("blockhash") || m.includes("expired"))
+    return "Transaction timed out — but your SOL may already be deducted. Check Solana Explorer for your signature to confirm the purchase went through.";
   if (m.includes("network") || m.includes("timeout") || m.includes("failed to fetch"))
     return "Network error. Check your connection and try again.";
   return msg.length > 120 ? msg.slice(0, 120) + "…" : msg;
