@@ -2,7 +2,11 @@ import { Router } from "express";
 
 const router = Router();
 
-const SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.mainnet-beta.solana.com";
+// Strip accidental "KEY=value" format if user entered it that way
+const rawRpc = process.env.SOLANA_RPC_URL ?? "";
+const SOLANA_RPC = rawRpc.includes("=")
+  ? rawRpc.split("=").slice(1).join("=").trim()
+  : rawRpc.trim() || "https://api.mainnet-beta.solana.com";
 
 // Health-check probe sent by web3.js Connection
 router.get("/rpc", (_req, res) => {
