@@ -14,7 +14,7 @@ const WALLETS: {
   shadow: string;
   bg: string;
 }[] = [
-  { id: "phantom",  name: "Phantom",     iconSrc: "/wallet-phantom.svg",  color: "#AB47BC", shadow: "#7B1FA2", bg: "bg-[#F3E5F5]" },
+  { id: "phantom",  name: "Phantom",     iconSrc: "/wallet-phantom.png",  color: "#AB47BC", shadow: "#7B1FA2", bg: "bg-[#F3E5F5]" },
   { id: "solflare", name: "Solflare",    iconSrc: "/wallet-solflare.svg", color: "#FC6E21", shadow: "#C94F0A", bg: "bg-[#FFF3E0]" },
   { id: "backpack", name: "Backpack",    iconSrc: "/wallet-backpack.svg", color: "#E05CFF", shadow: "#9B1DCC", bg: "bg-[#FAF0FF]" },
   { id: "okx",      name: "OKX Wallet", iconSrc: "/wallet-okx.svg",      color: "#000000", shadow: "#333333", bg: "bg-[#F5F5F5]" },

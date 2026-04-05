@@ -100,7 +100,7 @@ export default function Whitepaper() {
       <div className="pt-16" style={{ background: "linear-gradient(180deg, #1a1a2e 0%, #311B92 50%, #1a1a2e 100%)" }}>
         <div className="relative overflow-hidden">
           <img
-            src="/pepewife-bg.png"
+            src="/whitepaper-cover.png"
             alt="PEPEWIFE Whitepaper cover – The Lady of Memes, Solana meme token documentation"
             className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover opacity-80"
           />
@@ -126,7 +126,6 @@ export default function Whitepaper() {
                     alt={`PEPEWIFE whitepaper – ${sectionImages[i].alt}`}
                     loading="lazy"
                     className="w-full h-[200px] sm:h-[280px] object-cover"
-                    onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
                   />
                 </div>
               )}
