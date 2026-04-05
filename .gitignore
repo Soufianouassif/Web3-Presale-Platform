@@ -4,6 +4,7 @@
 dist
 tmp
 artifacts/pepewife/public
+artifacts/pepewife/vercel_out
 out-tsc
 *.tsbuildinfo
 .expo
