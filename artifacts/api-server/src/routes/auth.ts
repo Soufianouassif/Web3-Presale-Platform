@@ -94,7 +94,10 @@ router.get(
       req.session.userId = user.id;
       req.session.userEmail = user.email;
     }
-    res.redirect("/admin/dashboard");
+    // Save session explicitly before redirect (required for serverless/Vercel)
+    req.session.save(() => {
+      res.redirect("/admin/dashboard");
+    });
   },
 );
 
