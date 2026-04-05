@@ -1,0 +1,10 @@
+{
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm --filter @workspace/pepewife run build && mkdir -p frontend_dist && cp -r ../pepewife/dist/. frontend_dist/",
+  "outputDirectory": "frontend_dist",
+  "framework": null,
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
