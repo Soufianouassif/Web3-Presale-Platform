@@ -662,7 +662,7 @@ export default function Home() {
                       <div className="min-w-0">
                         <p className="text-xs font-display text-[#1a4a1e] tracking-wide font-bold">Transaction confirmed! 🎉</p>
                         <a
-                          href={`https://explorer.solana.com/tx/${txSignature}?cluster=devnet`}
+                          href={`https://explorer.solana.com/tx/${txSignature}`}
                           target="_blank" rel="noreferrer"
                           className="text-xs text-[#4CAF50] underline break-all flex items-center gap-1 mt-0.5 font-sans"
                         >

@@ -1,0 +1,251 @@
+Thought for 2sExplore • 2 Files • 1 SearchExplore • 5 Files • 1 SearchExplore • 6 FilesExplore • 5 Files • 1 SearchExplore • 4 Files • 2 Searchesبعد فحص شامل للمشروع، إليك التقرير الكامل:
+
+---
+
+# تقرير شامل عن أخطاء وثغرات منصة Web3 Presale (PEPEWIFE)
+
+## 1. أخطاء تعيق البناء (Build Errors)
+
+### 1.1 خطأ حرج: عدم وجود DATABASE_URL
+
+**الموقع:** `lib/db/src/index.ts` (السطر 10)
+**الوصف:** التطبيق يفشل في البدء لأن متغير البيئة `DATABASE_URL` غير موجود
+**رسالة الخطأ:**
+
+```plaintext
+Error: DATABASE_URL must be set. Did you forget to provision a database?
+```
+
+**الحل:**
+
+1. إضافة Supabase أو Neon كقاعدة بيانات
+2. تعيين متغير `DATABASE_URL` أو `SUPABASE_DATABASE_URL` في إعدادات المشروع
+
+
+### 1.2 ملف Schema مفقود
+
+**الموقع:** `lib/db/src/schema.ts`
+**الوصف:** الملف غير موجود، لكن يتم استيراده من `lib/db/src/index.ts`
+**الحل:** الملف الصحيح موجود في `lib/db/src/schema/index.ts` - يجب التأكد من صحة المسار في الاستيراد
+
+---
+
+## 2. ثغرات أمنية (Security Vulnerabilities)
+
+### 2.1 ثغرة حرجة: SESSION_SECRET افتراضي
+
+**الموقع:** `artifacts/api-server/src/app.ts` (السطر 25)
+
+```typescript
+const SESSION_SECRET = process.env.SESSION_SECRET ?? "fallback-dev-secret-change-in-prod";
+```
+
+**الخطورة:** عالية جداً
+**الوصف:** استخدام كلمة سر افتراضية للجلسات في حال عدم تعيينها، مما يمكّن المهاجمين من تزوير جلسات المستخدمين
+**الحل:**
+
+- إجبار وجود `SESSION_SECRET` في الإنتاج
+- رمي خطأ إذا لم يكن موجوداً
+
+
+### 2.2 ثغرة: التحقق الضعيف من المسؤول (Admin Auth)
+
+**الموقع:** `artifacts/api-server/src/middleware/admin-auth.ts`
+
+```typescript
+if (!req.session?.userId) {
+  res.status(401).json({ error: "Unauthorized", code: "NOT_AUTHENTICATED" });
+  return;
+}
+```
+
+**الخطورة:** متوسطة
+**الوصف:** لا يتم التحقق مما إذا كان المستخدم مسؤولاً فعلياً، فقط أنه مسجل الدخول
+**الحل:** إضافة فحص لدور المستخدم (isAdmin) من قاعدة البيانات
+
+### 2.3 ثغرة: عدم وجود Rate Limiting على معظم الـ API
+
+**الموقع:** `artifacts/api-server/src/routes/tracker.ts`, `auth.ts`, `admin.ts`
+**الخطورة:** متوسطة
+**الوصف:** فقط `/referral/code/:wallet` يحتوي على rate limiting، باقي المسارات معرضة لهجمات DoS
+**الحل:** إضافة rate limiting لجميع المسارات الحساسة
+
+### 2.4 ثغرة: تخزين Keypair في الذاكرة
+
+**الموقع:** `artifacts/pepewife/src/lib/presale-contract.ts` (السطور 389-432)
+
+```typescript
+export async function withdrawSolWithKeypair(keypairBytes: number[])
+```
+
+**الخطورة:** عالية
+**الوصف:** دوال الـ Admin تقبل keypair مباشرة كمصفوفة أرقام، مما قد يعرض المفاتيح الخاصة للتسريب
+**الحل:** استخدام Hardware Wallet أو تقنية أكثر أماناً
+
+### 2.5 ثغرة: SQL Injection محتمل
+
+**الموقع:** `artifacts/api-server/src/routes/tracker.ts` (السطور 65-75)
+
+```typescript
+await client.query(
+  `UPDATE referral_codes
+   SET total_referrals = total_referrals + 1...
+   WHERE wallet_address = $3`,
+  [rewardTokens, rewardUsd, referrerWallet],
+);
+```
+
+**الخطورة:** منخفضة (محمي بـ parameterized queries)
+**ملاحظة:** الكود يستخدم queries محمية لكن بعض الأماكن تستخدم `sql` template literals مما قد يكون خطراً
+
+### 2.6 ثغرة: CORS مفتوح جزئياً
+
+**الموقع:** `artifacts/api-server/src/app.ts` (السطور 28-36)
+**الوصف:** يسمح بـ `localhost` origins مما قد يكون خطراً في الإنتاج
+
+### 2.7 ثغرة: Cookies بدون Secure في التطوير
+
+**الموقع:** `artifacts/api-server/src/app.ts` (السطر 85)
+
+```typescript
+secure: IS_PROD,
+```
+
+**الوصف:** Cookies غير مؤمنة في بيئة التطوير
+
+---
+
+## 3. أخطاء منطقية (Logic Errors)
+
+### 3.1 خطأ: Devnet مستخدم في الإنتاج
+
+**الموقع:** `artifacts/pepewife/src/lib/presale-contract.ts` (السطور 117-121)
+
+```typescript
+export const SOLANA_ENDPOINT =
+  typeof window !== "undefined" && window.location.hostname === "localhost"
+    ? `${window.location.origin}/api/rpc`
+    : "https://api.devnet.solana.com";
+```
+
+**الوصف:** التطبيق يستخدم Devnet حتى في الإنتاج، مما يعني أن المعاملات الحقيقية لن تعمل
+**الحل:** تغيير إلى Mainnet للإنتاج
+
+### 3.2 خطأ: Explorer URL يشير إلى Devnet
+
+**الموقع:** `artifacts/pepewife/src/components/wallet-buy-modal.tsx` (السطر 161)
+
+```typescript
+const explorerUrl = signature
+  ? `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+  : "";
+```
+
+### 3.3 خطأ: أسعار ثابتة غير محدثة
+
+**الموقع:** `artifacts/pepewife/src/pages/home.tsx` (السطور 172-173)
+
+```typescript
+const STAGE_PRICES_FALLBACK = ["$0.00000001", "$0.00000002", "$0.00000004", "$0.00000006"];
+```
+
+**الوصف:** الأسعار hardcoded بدلاً من قراءتها من السلسلة
+
+### 3.4 خطأ: USDT_ETH يعامل بسعر ETH بدلاً من USDT
+
+**الموقع:** `artifacts/pepewife/src/pages/dashboard.tsx` (السطور 209-213)
+
+```typescript
+const amountUSD = !isNaN(amountNum) && buyAmount !== ""
+  ? currency === "SOL" ? amountNum * solPrice
+  : currency === "USDT_ETH" ? amountNum * ethPrice  // خطأ!
+  : amountNum
+```
+
+**الحل:** USDT قيمته 1 USD دائماً، لا علاقة له بسعر ETH
+
+---
+
+## 4. أخطاء في التهيئة (Configuration Issues)
+
+### 4.1 متغيرات بيئة مفقودة
+
+المطلوبة للتشغيل:
+
+- `DATABASE_URL` أو `SUPABASE_DATABASE_URL`
+- `SESSION_SECRET`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_CALLBACK_URL`
+- `ADMIN_EMAILS`
+
+
+### 4.2 عدم وجود ملفات Migration
+
+**الوصف:** لا توجد ملفات migration لإنشاء جداول قاعدة البيانات
+**الحل:** إنشاء وتشغيل migrations لـ:
+
+- `page_visits`
+- `wallet_connections`
+- `purchases`
+- `presale_config`
+- `admin_users`
+- `referral_codes`
+- `referrals`
+- `user_sessions`
+
+
+---
+
+## 5. مشاكل في الأداء
+
+### 5.1 حجم الـ Bundle كبير
+
+```plaintext
+dist/index.mjs 1.8mb ⚠️
+```
+
+**الحل:** استخدام tree-shaking وتقسيم الكود
+
+### 5.2 استعلامات متعددة غير محسنة
+
+**الموقع:** `artifacts/api-server/src/routes/admin.ts`
+**الوصف:** `/admin/stats` يجري أكثر من 15 استعلام منفصل
+**الحل:** دمج الاستعلامات أو استخدام caching
+
+---
+
+## 6. طريقة الحل النهائية
+
+### الخطوة 1: إضافة قاعدة البيانات
+
+```plaintext
+1. ربط Supabase/Neon من إعدادات v0
+2. إنشاء جداول باستخدام migration script
+```
+
+### الخطوة 2: تعيين متغيرات البيئة
+
+```plaintext
+DATABASE_URL=postgresql://...
+SESSION_SECRET=<random-32-char-string>
+GOOGLE_CLIENT_ID=<from-google-console>
+GOOGLE_CLIENT_SECRET=<from-google-console>
+ADMIN_EMAILS=admin@example.com
+```
+
+### الخطوة 3: إصلاح الـ Endpoint
+
+تغيير من Devnet إلى Mainnet للإنتاج
+
+### الخطوة 4: إضافة Rate Limiting
+
+تطبيق rate limiting على جميع المسارات
+
+### الخطوة 5: تقوية Auth Middleware
+
+إضافة فحص صريح لصلاحيات المسؤول
+
+---
+
+هل تريد أن أقوم بإصلاح هذه المشاكل؟

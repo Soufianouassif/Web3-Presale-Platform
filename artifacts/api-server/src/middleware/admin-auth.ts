@@ -1,7 +1,9 @@
 import { type Request, type Response, type NextFunction } from "express";
+import { db } from "@workspace/db";
+import { adminUsers } from "@workspace/db/schema";
+import { eq } from "drizzle-orm";
 
-export function requireAdminAuth(req: Request, res: Response, next: NextFunction) {
-  // Only protect /admin/* routes — skip public routes that pass through this middleware
+export async function requireAdminAuth(req: Request, res: Response, next: NextFunction) {
   if (!req.path.startsWith("/admin")) {
     return next();
   }
@@ -9,5 +11,19 @@ export function requireAdminAuth(req: Request, res: Response, next: NextFunction
     res.status(401).json({ error: "Unauthorized", code: "NOT_AUTHENTICATED" });
     return;
   }
-  next();
+  try {
+    const [user] = await db
+      .select()
+      .from(adminUsers)
+      .where(eq(adminUsers.id, req.session.userId))
+      .limit(1);
+
+    if (!user) {
+      res.status(403).json({ error: "Forbidden", code: "NOT_ADMIN" });
+      return;
+    }
+    next();
+  } catch {
+    res.status(500).json({ error: "Internal server error" });
+  }
 }

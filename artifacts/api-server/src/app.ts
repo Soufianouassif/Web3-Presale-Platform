@@ -23,8 +23,12 @@ const passport = require("passport") as typeof import("passport");
 
 const PgSession = connectPgSimple(session);
 
-const SESSION_SECRET = process.env.SESSION_SECRET ?? "fallback-dev-secret-change-in-prod";
 const IS_PROD = process.env.NODE_ENV === "production";
+
+if (IS_PROD && !process.env.SESSION_SECRET) {
+  throw new Error("SESSION_SECRET must be set in production!");
+}
+const SESSION_SECRET = process.env.SESSION_SECRET ?? "fallback-dev-secret-change-in-prod";
 
 const ALLOWED_ORIGINS = [
   "http://localhost:22793",

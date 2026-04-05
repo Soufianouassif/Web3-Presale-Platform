@@ -208,7 +208,6 @@ export default function Dashboard() {
   const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace(/\$/g, ""));
   const amountUSD = !isNaN(amountNum) && buyAmount !== ""
     ? currency === "SOL" ? amountNum * solPrice
-    : currency === "USDT_ETH" ? amountNum * ethPrice
     : amountNum
     : 0;
   const tokensOut = stagePrice > 0 && amountUSD > 0 ? Math.floor(amountUSD / stagePrice) : 0;
@@ -626,7 +625,7 @@ export default function Dashboard() {
                               <Check className="h-4 w-4 text-[#4CAF50] shrink-0 mt-0.5" />
                               <div className="min-w-0">
                                 <p className="text-xs font-display text-[#1a4a1e] tracking-wide font-bold">Purchase confirmed! 🎉</p>
-                                <a href={`https://explorer.solana.com/tx/${dashTxSig}?cluster=devnet`} target="_blank" rel="noreferrer" className="text-[10px] text-[#4CAF50] underline break-all flex items-center gap-1 mt-0.5">
+                                <a href={`https://explorer.solana.com/tx/${dashTxSig}`} target="_blank" rel="noreferrer" className="text-[10px] text-[#4CAF50] underline break-all flex items-center gap-1 mt-0.5">
                                   {dashTxSig.slice(0, 16)}…<ExternalLink className="h-3 w-3 shrink-0" />
                                 </a>
                               </div>
@@ -1064,7 +1063,7 @@ export default function Dashboard() {
                                   <div className="text-[10px] text-[#1a1a2e]/40 font-bold">{date}</div>
                                 </div>
                                 <a
-                                  href={`https://explorer.solana.com/tx/${tx.signature}?cluster=devnet`}
+                                  href={`https://explorer.solana.com/tx/${tx.signature}`}
                                   target="_blank"
                                   rel="noreferrer"
                                   className="shrink-0 bg-[#4CAF50]/10 hover:bg-[#4CAF50]/20 border border-[#4CAF50]/30 text-[#0a9060] rounded-lg px-2 py-1 text-[10px] font-display tracking-wide flex items-center gap-1 transition-colors"

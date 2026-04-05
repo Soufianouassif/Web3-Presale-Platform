@@ -158,7 +158,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
   const walletMeta = WALLETS.find(w => w.id === selectedWallet);
   const currencyLabel = currency === "SOL" ? "SOL" : "USDT";
   const explorerUrl = signature
-    ? `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+    ? `https://explorer.solana.com/tx/${signature}`
     : "";
 
   // Close on backdrop click only when not in the middle of signing
