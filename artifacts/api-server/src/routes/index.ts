@@ -6,8 +6,22 @@ import adminRouter from "./admin.js";
 import trackerRouter from "./tracker.js";
 import referralRouter from "./referral.js";
 import rpcProxyRouter from "./rpc-proxy.js";
+import {
+  generalLimiter,
+  authLimiter,
+  trackerLimiter,
+  adminLimiter,
+  rpcLimiter,
+} from "../middleware/rate-limit.js";
 
 const router: IRouter = Router();
+
+router.use(generalLimiter);
+
+router.use("/rpc", rpcLimiter);
+router.use("/auth", authLimiter);
+router.use("/admin", adminLimiter);
+router.use("/track", trackerLimiter);
 
 router.use(rpcProxyRouter);
 router.use(authRouter);
