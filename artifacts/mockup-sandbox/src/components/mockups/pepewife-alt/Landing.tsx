@@ -4,6 +4,9 @@ import {
   Shield, Zap, Lock, Users, Rocket, Coins, ArrowRight,
   TrendingUp, Clock, DollarSign, Gift, Play, Globe
 } from "lucide-react";
+import pepeHeroImg from "./pepe-hero.png";
+import pwifeCoinImg from "./pwife-coin.png";
+import pepeRocketImg from "./pepe-rocket.png";
 
 export function Landing() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -149,14 +152,14 @@ export function Landing() {
               <div className="relative w-full max-w-md">
                 <div className="absolute inset-0 bg-[#FFE135] border-4 border-[#1B1F3B] rounded-3xl rotate-3 shadow-[8px_8px_0px_#1B1F3B]"></div>
                 <img
-                  src={`${import.meta.env.BASE_URL}images/pepe-hero.png`}
+                  src={pepeHeroImg}
                   alt="Pepe and Wife cartoon characters"
                   className="relative z-10 w-full rounded-3xl border-4 border-[#1B1F3B] shadow-[8px_8px_0px_#1B1F3B] object-cover"
                 />
                 {/* Floating coin badge */}
                 <div className="absolute -top-6 -right-6 z-20">
                   <img
-                    src={`${import.meta.env.BASE_URL}images/pwife-coin.png`}
+                    src={pwifeCoinImg}
                     alt="$PWIFE coin"
                     className="w-20 h-20 drop-shadow-xl animate-bounce"
                   />
@@ -428,7 +431,7 @@ export function Landing() {
         <section id="roadmap" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center mb-16 flex flex-col items-center gap-4">
             <img
-              src={`${import.meta.env.BASE_URL}images/pepe-rocket.png`}
+              src={pepeRocketImg}
               alt="Pepe on rocket"
               className="w-36 h-36 object-contain drop-shadow-xl"
             />
