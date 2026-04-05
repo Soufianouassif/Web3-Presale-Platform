@@ -62,7 +62,21 @@ async function sendAndConfirmTx(
 
       if (conf) {
         if (conf.err) {
-          throw new Error(`Transaction failed on-chain: ${JSON.stringify(conf.err)}`);
+          const errStr = JSON.stringify(conf.err);
+          // Map known Custom error codes to user-friendly messages
+          const customMatch = errStr.match(/"Custom":(\d+)/);
+          if (customMatch) {
+            const code = parseInt(customMatch[1]);
+            if (code === 1)  throw new Error("ERR_PRESALE_NOT_ACTIVE");
+            if (code === 2)  throw new Error("ERR_PRESALE_PAUSED");
+            if (code === 3)  throw new Error("ERR_AMOUNT_TOO_LOW");
+            if (code === 4)  throw new Error("ERR_AMOUNT_TOO_HIGH");
+            if (code === 5)  throw new Error("ERR_STAGE_SOLD_OUT");
+            if (code === 6)  throw new Error("ERR_PRESALE_ENDED");
+            if (code === 7)  throw new Error("ERR_UNAUTHORIZED");
+            throw new Error(`ERR_PROGRAM_CUSTOM_${code}`);
+          }
+          throw new Error(`Transaction failed on-chain: ${errStr}`);
         }
         if (conf.confirmationStatus === "confirmed" || conf.confirmationStatus === "finalized") {
           return signature; // ✅ success
@@ -181,6 +195,15 @@ export async function buyWithSol(
   solAmount: number,
   walletType = "phantom"
 ): Promise<BuyWithSolResult> {
+  // ── Pre-flight: verify presale state before sending tx ──────────────────
+  const state = await fetchPresaleState();
+  if (state) {
+    if (!state.isActive) throw new Error("ERR_PRESALE_NOT_ACTIVE");
+    if (state.isPaused)  throw new Error("ERR_PRESALE_PAUSED");
+    const stage = state.stages[state.currentStage];
+    if (stage && stage.tokensSold >= stage.maxTokens) throw new Error("ERR_STAGE_SOLD_OUT");
+  }
+
   const buyer = new PublicKey(buyerAddress);
   const lamports = BigInt(Math.floor(solAmount * LAMPORTS_PER_SOL));
 
@@ -246,6 +269,15 @@ export async function buyWithUsdt(
   usdtAmount: number,
   walletType = "phantom"
 ): Promise<BuyWithSolResult> {
+  // ── Pre-flight: verify presale state before sending tx ──────────────────
+  const state = await fetchPresaleState();
+  if (state) {
+    if (!state.isActive) throw new Error("ERR_PRESALE_NOT_ACTIVE");
+    if (state.isPaused)  throw new Error("ERR_PRESALE_PAUSED");
+    const stage = state.stages[state.currentStage];
+    if (stage && stage.tokensSold >= stage.maxTokens) throw new Error("ERR_STAGE_SOLD_OUT");
+  }
+
   const buyer = new PublicKey(buyerAddress);
 
   // USDT has 6 decimals

@@ -40,6 +40,25 @@ interface Props {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function friendlyError(msg: string): string {
+  // ── Known program error codes ──────────────────────────────────────────
+  if (msg === "ERR_PRESALE_NOT_ACTIVE")
+    return "The presale is not active yet. Please wait for the official launch date.";
+  if (msg === "ERR_PRESALE_PAUSED")
+    return "The presale is temporarily paused. Please try again later.";
+  if (msg === "ERR_STAGE_SOLD_OUT")
+    return "This stage is sold out. The next stage will open shortly.";
+  if (msg === "ERR_PRESALE_ENDED")
+    return "The presale has ended. Token distribution will begin soon.";
+  if (msg === "ERR_AMOUNT_TOO_LOW")
+    return "Amount is below the minimum purchase limit. Please increase the amount.";
+  if (msg === "ERR_AMOUNT_TOO_HIGH")
+    return "Amount exceeds the maximum purchase limit. Please reduce the amount.";
+  if (msg === "ERR_UNAUTHORIZED")
+    return "This wallet is not authorized to perform this action.";
+  if (msg.startsWith("ERR_PROGRAM_CUSTOM_"))
+    return `Transaction rejected by the presale contract (code: ${msg.replace("ERR_PROGRAM_CUSTOM_", "")}). Please contact support.`;
+
+  // ── Wallet / network errors ────────────────────────────────────────────
   const m = msg.toLowerCase();
   if (m.includes("reject") || m.includes("cancel") || m.includes("denied"))
     return "Transaction rejected in wallet.";
@@ -48,9 +67,11 @@ function friendlyError(msg: string): string {
   if (m.includes("insufficient") || m.includes("balance"))
     return "Insufficient balance to complete this purchase.";
   if (m.includes("block height") || m.includes("blockhash") || m.includes("expired"))
-    return "Transaction timed out — but your SOL may already be deducted. Check Solana Explorer for your signature to confirm the purchase went through.";
+    return "Transaction timed out — check Solana Explorer to confirm whether the purchase went through.";
   if (m.includes("network") || m.includes("timeout") || m.includes("failed to fetch"))
     return "Network error. Check your connection and try again.";
+  if (m.includes("instructionerror") || m.includes("custom"))
+    return "Transaction rejected by the presale contract. The presale may not be active yet.";
   return msg.length > 120 ? msg.slice(0, 120) + "…" : msg;
 }
 
