@@ -31,6 +31,9 @@ const ALLOWED_ORIGINS = [
   "http://localhost:3000",
   ...(process.env.REPLIT_DEV_DOMAIN ? [`https://${process.env.REPLIT_DEV_DOMAIN}`] : []),
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+  // Vercel auto-provides VERCEL_URL (deployment URL) and VERCEL_PROJECT_PRODUCTION_URL
+  ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+  ...(process.env.VERCEL_PROJECT_PRODUCTION_URL ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`] : []),
 ];
 
 const app: Express = express();
