@@ -95,9 +95,13 @@ export const USDT_MINT = new PublicKey(
   "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 );
 
-/** RPC endpoint — routed through our API proxy to avoid CORS issues */
+/**
+ * RPC endpoint:
+ *  - localhost  → proxy via Express (/api/rpc) to avoid CORS on HTTP
+ *  - production → devnet directly (CORS is allowed on HTTPS domains)
+ */
 export const SOLANA_ENDPOINT =
-  typeof window !== "undefined"
+  typeof window !== "undefined" && window.location.hostname === "localhost"
     ? `${window.location.origin}/api/rpc`
     : "https://api.devnet.solana.com";
 
