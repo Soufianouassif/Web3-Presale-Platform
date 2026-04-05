@@ -1,7 +1,7 @@
 {
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm -w run vercel-build",
-  "outputDirectory": "artifacts/pepewife/dist/public",
+  "buildCommand": "pnpm --filter @workspace/pepewife run build",
+  "outputDirectory": "artifacts/pepewife/dist",
   "framework": null,
   "routes": [
     { "handle": "filesystem" },
