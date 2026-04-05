@@ -30,6 +30,13 @@ import {
 } from "@/lib/referral";
 import { tracker } from "@/lib/admin-api";
 
+import imgLogo         from "@assets/hero-character_1775153683720.png";
+import imgHeroBg       from "@assets/3_1775156071077.jpg";
+import imgTokenomics   from "@assets/2_1775156111513.jpg";
+import imgRoadmap1     from "@assets/FvkBjWdXsAUVunG_1775154999902.jpg";
+import imgRoadmap2     from "@assets/4_1775155776075.png";
+import imgRoadmap34    from "@assets/5_1775156245789.jpg";
+
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 14, minutes: 0, seconds: 0 });
@@ -302,7 +309,7 @@ export default function Home() {
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center gap-4 lg:gap-8">
               <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer wiggle-hover shrink-0" onClick={() => scrollTo('hero')}>
-                <img src="/logo.png" alt="PEPEWIFE" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
+                <img src={imgLogo} alt="PEPEWIFE" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
                 <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
                 <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e] whitespace-nowrap" style={{ transform: "rotate(3deg)" }}>$PWIFE</span>
               </div>
@@ -363,7 +370,7 @@ export default function Home() {
         )}
       </nav>
 
-      <section id="hero" className="relative overflow-hidden" style={{ backgroundImage: "url('/pepewife-bg.png')", backgroundSize: "cover", backgroundPosition: isRTL ? "left center" : "right center", backgroundRepeat: "no-repeat" }}>
+      <section id="hero" className="relative overflow-hidden" style={{ backgroundImage: `url(${imgHeroBg})`, backgroundSize: "cover", backgroundPosition: isRTL ? "left center" : "right center", backgroundRepeat: "no-repeat" }}>
         <div className="pt-28 pb-24 px-4">
           <div className="max-w-7xl mx-auto" dir="ltr">
             <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-6 animate-pulse text-base" style={{ transform: "rotate(-2deg)" }}>
@@ -914,7 +921,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className={`flex justify-center ${isRTL ? "md:order-last" : ""}`}>
-              <img src="/tokenomics-girl.png" alt="PEPEWIFE tokenomics distribution chart showing 100 trillion PWIFE total supply" loading="lazy" className={`w-full max-w-lg object-contain drop-shadow-2xl ${isRTL ? "scale-x-[-1]" : ""}`} />
+              <img src={imgTokenomics} alt="PEPEWIFE tokenomics distribution chart showing 100 trillion PWIFE total supply" loading="lazy" className={`w-full max-w-lg object-contain drop-shadow-2xl ${isRTL ? "scale-x-[-1]" : ""}`} />
             </div>
             <div className={`space-y-6 ${isRTL ? "md:order-first text-start" : ""}`}>
               <div>
@@ -948,11 +955,11 @@ export default function Home() {
           </div>
           <div className="space-y-6">
             {[
-              { phase: t.roadmap.phase1, title: t.roadmap.phase1Title, desc: t.roadmap.phase1Desc, active: true, img: "/roadmap-phase1.png", color: "#4CAF50", meme: t.roadmap.phase1Meme },
-              { phase: t.roadmap.phase2, title: t.roadmap.phase2Title, desc: t.roadmap.phase2Desc, active: false, img: "/roadmap-phase2.png", color: "#FF4D9D", meme: t.roadmap.phase2Meme },
-              { phase: t.roadmap.phase3, title: t.roadmap.phase3Title, desc: t.roadmap.phase3Desc, active: false, img: "/roadmap-phase3.png", color: "#42A5F5", meme: t.roadmap.phase3Meme },
-              { phase: t.roadmap.phase4, title: t.roadmap.phase4Title, desc: t.roadmap.phase4Desc, active: false, img: "/roadmap-phase4.png", color: "#AB47BC", meme: t.roadmap.phase4Meme },
-              { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: "/roadmap-phase4.png", color: "#FF9800", meme: t.roadmap.phase5Meme },
+              { phase: t.roadmap.phase1, title: t.roadmap.phase1Title, desc: t.roadmap.phase1Desc, active: true, img: imgRoadmap1, color: "#4CAF50", meme: t.roadmap.phase1Meme },
+              { phase: t.roadmap.phase2, title: t.roadmap.phase2Title, desc: t.roadmap.phase2Desc, active: false, img: imgRoadmap2, color: "#FF4D9D", meme: t.roadmap.phase2Meme },
+              { phase: t.roadmap.phase3, title: t.roadmap.phase3Title, desc: t.roadmap.phase3Desc, active: false, img: imgRoadmap34, color: "#42A5F5", meme: t.roadmap.phase3Meme },
+              { phase: t.roadmap.phase4, title: t.roadmap.phase4Title, desc: t.roadmap.phase4Desc, active: false, img: imgRoadmap34, color: "#AB47BC", meme: t.roadmap.phase4Meme },
+              { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: imgRoadmap34, color: "#FF9800", meme: t.roadmap.phase5Meme },
             ].map((step, i) => (
               <div key={i} className={`meme-card flex flex-col md:flex-row items-center gap-6 p-6 rounded-3xl bg-white ${step.active ? `border-[#4CAF50] ${isRTL ? "shadow-[-6px_6px_0px_#2E7D32]" : "shadow-[6px_6px_0px_#2E7D32]"}` : ""}`}>
                 <img src={step.img} alt={`PEPEWIFE roadmap ${step.title}`} loading="lazy" className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
@@ -1011,7 +1018,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-start">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="PEPEWIFE" className="w-12 h-12 rounded-full border-3 border-white/30" />
+              <img src={imgLogo} alt="PEPEWIFE" className="w-12 h-12 rounded-full border-3 border-white/30" />
               <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPEWIFE</span>
             </div>
             <p className="text-white/40 text-sm font-bold">{t.footer.tagline}</p>

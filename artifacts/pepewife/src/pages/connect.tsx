@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { ArrowLeft, ExternalLink, Shield, Wifi, ChevronRight, Download, CheckCircle, X } from "lucide-react";
 import { useLanguage } from "@/i18n/context";
 import { useWallet } from "@/contexts/wallet-context";
+import imgLogo from "@assets/hero-character_1775153683720.png";
 import { useToast, mapErrorToCode, getWalletLabel } from "@/components/wallet-toast";
 import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
@@ -164,7 +165,7 @@ export default function ConnectPage() {
           )}
 
           <div className="text-center mb-8">
-            <img src="/logo.png" alt="PEPEWIFE" className="w-16 h-16 mx-auto mb-4 rounded-full border-3 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e]" />
+            <img src={imgLogo} alt="PEPEWIFE" className="w-16 h-16 mx-auto mb-4 rounded-full border-3 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e]" />
             <div className="sticker bg-[#4CAF50] text-white text-sm inline-block mb-3" style={{ transform: "rotate(-2deg)" }}>{t.connect.step1}</div>
             <h1 className="text-4xl sm:text-5xl font-display text-[#1a1a2e] tracking-wider comic-shadow">
               {status === "connected" ? t.connect.switchWallet : t.connect.title}

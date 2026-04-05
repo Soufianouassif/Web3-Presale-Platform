@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { CheckCircle, Shield, Zap } from "lucide-react";
 import { useLanguage } from "@/i18n/context";
 import { useWallet } from "@/contexts/wallet-context";
+import imgLogo from "@assets/hero-character_1775153683720.png";
 import { tracker } from "@/lib/admin-api";
 
 export default function ConnectingPage() {
@@ -85,7 +86,7 @@ export default function ConnectingPage() {
                 style={{ animation: "spin 1s linear infinite" }}
               />
               <div className="absolute inset-2 rounded-full bg-[#1a1a2e] border-2 border-white/10 flex items-center justify-center overflow-hidden">
-                <img src="/logo.png" alt="PEPEWIFE" className="w-full h-full object-cover rounded-full" />
+                <img src={imgLogo} alt="PEPEWIFE" className="w-full h-full object-cover rounded-full" />
               </div>
             </div>
           ) : (

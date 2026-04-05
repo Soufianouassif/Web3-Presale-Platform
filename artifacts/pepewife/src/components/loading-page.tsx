@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/i18n/context";
+import imgLogo from "@assets/hero-character_1775153683720.png";
 
 export default function LoadingPage({ onComplete }: { onComplete: () => void }) {
   const { t } = useLanguage();
@@ -50,7 +51,7 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
             className="w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-[#1a1a2e] shadow-[5px_5px_0px_#1a1a2e] overflow-hidden bg-white"
             style={{ animation: "pulse 2s ease-in-out infinite" }}
           >
-            <img src="/logo.png" alt="PEPEWIFE" className="w-full h-full object-cover" />
+            <img src={imgLogo} alt="PEPEWIFE" className="w-full h-full object-cover" />
           </div>
           <div
             className="absolute -top-2 -right-2 sticker bg-[#4CAF50] text-white text-xs px-2 py-1"
