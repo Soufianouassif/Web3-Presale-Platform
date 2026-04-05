@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { adminApi, type AdminStats } from "@/lib/admin-api";
-import { withdrawSol, withdrawSolWithKeypair, connection, SOL_VAULT_PDA, fetchPresaleState, stageTokenPriceUsd, type PresaleState } from "@/lib/presale-contract";
+import { withdrawSol, withdrawSolWithKeypair, pausePresaleWithKeypair, unpausePresaleWithKeypair, setPresaleEndWithKeypair, connection, SOL_VAULT_PDA, fetchPresaleState, stageTokenPriceUsd, type PresaleState } from "@/lib/presale-contract";
 
 function fmt(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
@@ -319,6 +319,215 @@ function WithdrawPanel() {
   );
 }
 
+// ─── Presale Control Panel ───────────────────────────────────────────────────
+type CtrlStep = "idle" | "signing" | "confirming" | "success" | "error";
+
+function PresaleControlPanel({ chainData, onRefresh }: {
+  chainData: PresaleState | null;
+  onRefresh: () => void;
+}) {
+  const [keypairBytes, setKeypairBytes] = useState<number[] | null>(null);
+  const [fileAddr, setFileAddr]         = useState<string>("");
+  const [step, setStep]                 = useState<CtrlStep>("idle");
+  const [errMsg, setErrMsg]             = useState("");
+  const [txSig, setTxSig]               = useState("");
+  const [successMsg, setSuccessMsg]     = useState("");
+
+  // End-date extend fields
+  const [newEndDate, setNewEndDate] = useState<string>(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().slice(0, 16);
+  });
+
+  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const bytes: number[] = JSON.parse(ev.target?.result as string);
+        if (!Array.isArray(bytes) || bytes.length !== 64) {
+          setErrMsg("ملف غير صالح — يجب أن يكون JSON array من 64 رقم.");
+          setStep("error"); return;
+        }
+        setKeypairBytes(bytes);
+        const pubBytes = new Uint8Array(bytes.slice(32));
+        const ALPHA = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+        let n = BigInt("0x" + Array.from(pubBytes).map(b => b.toString(16).padStart(2,"0")).join(""));
+        let addr = "";
+        while (n > 0n) { const r = n % 58n; n = n / 58n; addr = ALPHA[Number(r)] + addr; }
+        setFileAddr(addr);
+        setStep("idle"); setErrMsg("");
+      } catch { setErrMsg("لا يمكن قراءة الملف."); setStep("error"); }
+    };
+    reader.readAsText(file);
+  }
+
+  async function runAction(label: string, fn: () => Promise<{ signature: string }>) {
+    if (!keypairBytes) { setErrMsg("ارفع ملف Keypair أولاً."); setStep("error"); return; }
+    setStep("signing"); setErrMsg(""); setTxSig("");
+    try {
+      const { signature } = await fn();
+      setTxSig(signature); setSuccessMsg(label); setStep("success");
+      setTimeout(onRefresh, 1500);
+    } catch (e: any) {
+      const msg: string = e?.message ?? String(e);
+      setErrMsg(msg.length > 300 ? msg.slice(0, 300) + "…" : msg);
+      setStep("error");
+    }
+  }
+
+  const spinning = <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin inline-block" />;
+  const isActive = chainData?.isActive ?? false;
+  const isPaused = chainData?.isPaused ?? false;
+  const presaleEndSec = chainData?.presaleEnd ? Number(chainData.presaleEnd) : null;
+  const presaleEndDate = presaleEndSec ? new Date(presaleEndSec * 1000) : null;
+  const isEnded = presaleEndDate ? presaleEndDate < new Date() : false;
+
+  return (
+    <div className="space-y-5">
+      <p className="text-xs text-gray-500 uppercase tracking-wider">التحكم اليدوي في البيع</p>
+
+      {/* Status summary */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className={`rounded-xl p-3 border text-center ${isActive ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"}`}>
+          <p className="text-xs text-gray-400 mb-1">الحالة</p>
+          <p className={`text-sm font-bold ${isActive ? "text-green-400" : "text-red-400"}`}>
+            {isActive ? "● نشط" : "○ غير نشط"}
+          </p>
+        </div>
+        <div className={`rounded-xl p-3 border text-center ${isPaused ? "bg-yellow-500/10 border-yellow-500/30" : "bg-white/5 border-white/10"}`}>
+          <p className="text-xs text-gray-400 mb-1">البيع</p>
+          <p className={`text-sm font-bold ${isPaused ? "text-yellow-400" : "text-gray-300"}`}>
+            {isPaused ? "⏸ موقوف" : "▶ يعمل"}
+          </p>
+        </div>
+        <div className={`rounded-xl p-3 border text-center ${isEnded ? "bg-red-500/10 border-red-500/30" : "bg-white/5 border-white/10"}`}>
+          <p className="text-xs text-gray-400 mb-1">تاريخ الانتهاء</p>
+          <p className={`text-xs font-bold ${isEnded ? "text-red-400" : "text-gray-300"}`}>
+            {presaleEndDate ? presaleEndDate.toLocaleDateString("ar-MA") : "—"}
+            {isEnded && <span className="block text-red-400">⚠ انتهى!</span>}
+          </p>
+        </div>
+      </div>
+
+      {/* Keypair upload */}
+      {!keypairBytes ? (
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+          <p className="text-sm font-semibold text-white">ارفع ملف المحفظة (Admin Keypair)</p>
+          <p className="text-xs text-gray-400">نفس الملف الذي استخدمته لنشر العقد من Solana Playground</p>
+          <label className="block">
+            <span className="sr-only">Upload keypair</span>
+            <input type="file" accept=".json" onChange={handleFileUpload}
+              className="block w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#39ff14]/20 file:text-[#39ff14] hover:file:bg-[#39ff14]/30 cursor-pointer" />
+          </label>
+        </div>
+      ) : (
+        <div className="bg-[#39ff14]/5 border border-[#39ff14]/20 rounded-xl p-3 flex items-center justify-between">
+          <div>
+            <p className="text-xs text-[#39ff14] font-semibold">✅ المحفظة محملة</p>
+            <p className="text-xs text-gray-500 font-mono">{fileAddr.slice(0,10)}…{fileAddr.slice(-6)}</p>
+          </div>
+          <button onClick={() => { setKeypairBytes(null); setFileAddr(""); setStep("idle"); }}
+            className="text-xs text-red-400 hover:text-red-300 underline">إزالة</button>
+        </div>
+      )}
+
+      {/* Action buttons */}
+      {keypairBytes && step !== "success" && (
+        <div className="space-y-3">
+          {/* Pause / Resume */}
+          <div className="flex gap-3">
+            <button
+              disabled={!isPaused || step !== "idle"}
+              onClick={() => runAction("تم تفعيل البيع ✅", () => unpausePresaleWithKeypair(keypairBytes!, () => setStep("confirming")))}
+              className="flex-1 py-3 rounded-xl border text-sm font-bold transition-all bg-green-500/20 hover:bg-green-500/30 border-green-500/40 text-green-300 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {step === "signing" || step === "confirming" ? spinning : "▶"} تفعيل البيع
+            </button>
+            <button
+              disabled={isPaused || step !== "idle"}
+              onClick={() => runAction("تم إيقاف البيع مؤقتاً ⏸", () => pausePresaleWithKeypair(keypairBytes!, () => setStep("confirming")))}
+              className="flex-1 py-3 rounded-xl border text-sm font-bold transition-all bg-yellow-500/20 hover:bg-yellow-500/30 border-yellow-500/40 text-yellow-300 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {step === "signing" || step === "confirming" ? spinning : "⏸"} إيقاف مؤقت
+            </button>
+          </div>
+
+          {/* Extend end date */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+            <p className="text-sm font-semibold text-white">تمديد / تغيير تاريخ انتهاء البيع</p>
+            {isEnded && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-2 text-xs text-red-300">
+                ⚠️ تاريخ الانتهاء انتهى — يجب تمديده حتى تعود المشتريات تعمل
+              </div>
+            )}
+            <div className="flex gap-2">
+              <input
+                type="datetime-local"
+                value={newEndDate}
+                onChange={e => setNewEndDate(e.target.value)}
+                className="flex-1 bg-[#0a0a0f] border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9945FF]/50"
+              />
+              <button
+                disabled={step !== "idle" || !newEndDate}
+                onClick={() => {
+                  const ts = Math.floor(new Date(newEndDate).getTime() / 1000);
+                  runAction(`تم تمديد البيع حتى ${new Date(newEndDate).toLocaleDateString("ar-MA")} ✅`, () => setPresaleEndWithKeypair(keypairBytes!, ts, () => setStep("confirming")));
+                }}
+                className="px-4 py-2 rounded-xl border text-sm font-bold bg-[#9945FF]/20 hover:bg-[#9945FF]/30 border-[#9945FF]/40 text-purple-300 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {step !== "idle" ? spinning : "📅"} تمديد
+              </button>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {[
+                { label: "شهر واحد", months: 1 },
+                { label: "3 أشهر", months: 3 },
+                { label: "سنة كاملة", months: 12 },
+                { label: "بلا حد (2030)", months: 12 * 4 },
+              ].map(({ label, months }) => (
+                <button key={label} onClick={() => {
+                  const d = new Date();
+                  d.setMonth(d.getMonth() + months);
+                  setNewEndDate(d.toISOString().slice(0,16));
+                }} className="px-2 py-1 text-xs rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white transition-all">
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Status messages */}
+      {step === "signing"    && <div className="flex items-center gap-2 text-sm text-yellow-300">{spinning} جاري توقيع العملية…</div>}
+      {step === "confirming" && (
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm text-blue-300">{spinning} انتظار التأكيد على السلسلة…</div>
+          <p className="text-xs text-gray-500">قد يستغرق 30–60 ثانية. لا تغلق الصفحة.</p>
+        </div>
+      )}
+      {step === "success" && (
+        <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4">
+          <p className="text-green-400 font-semibold mb-1">✅ {successMsg}</p>
+          <a href={`https://explorer.solana.com/tx/${txSig}?cluster=devnet`} target="_blank" rel="noopener noreferrer"
+             className="text-xs text-blue-400 underline">عرض على Explorer ↗</a>
+          <button onClick={() => { setStep("idle"); setTxSig(""); }} className="block mt-2 text-xs underline text-gray-400">عملية أخرى</button>
+        </div>
+      )}
+      {step === "error" && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
+          <p className="text-red-400 font-semibold text-sm mb-1">❌ فشلت العملية</p>
+          <p className="text-xs text-red-300 whitespace-pre-wrap">{errMsg}</p>
+          <button onClick={() => { setStep("idle"); setErrMsg(""); }} className="mt-2 text-xs underline text-red-400">حاول مجدداً</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function NetworkBar({ network, count, totalUsd, maxCount }: { network: string; count: number; totalUsd: number; maxCount: number }) {
   const pct = maxCount > 0 ? (count / maxCount) * 100 : 0;
   const networkColors: Record<string, string> = {
@@ -482,6 +691,15 @@ export default function AdminDashboard() {
                 </span>
               </div>
             )}
+
+            {/* Presale Control Panel */}
+            <section className="bg-[#111118] border border-red-500/20 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-5">
+                <h2 className="text-lg font-semibold text-gray-300">🎛️ لوحة التحكم في البيع</h2>
+                <span className="text-xs px-2 py-0.5 bg-red-500/10 text-red-400 rounded-full border border-red-500/20">Admin Only</span>
+              </div>
+              <PresaleControlPanel chainData={chainData} onRefresh={refreshChainData} />
+            </section>
 
             {/* Stats Grid */}
             <section>

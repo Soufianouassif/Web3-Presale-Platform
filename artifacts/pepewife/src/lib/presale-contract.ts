@@ -686,6 +686,110 @@ export async function fetchBuyerTransactions(buyerAddress: string): Promise<Buye
 }
 
 // ─────────────────────────────────────────────────────────────
+//  ADMIN: PAUSE PRESALE
+//  Stops all new purchases immediately. Call from admin wallet.
+// ─────────────────────────────────────────────────────────────
+export async function pausePresaleWithKeypair(
+  keypairBytes: number[],
+  onSigned?: () => void,
+): Promise<{ signature: string }> {
+  const keypair = Keypair.fromSecretKey(new Uint8Array(keypairBytes));
+  const admin   = keypair.publicKey;
+  const discriminator = await getDiscriminator("pause_presale");
+
+  const ix = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: admin,      isSigner: true,  isWritable: false },
+    ],
+    data: discriminator,
+  });
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+  tx.sign(keypair);
+  onSigned?.();
+  const signature = await sendAndConfirmTx(tx.serialize(), blockhash, lastValidBlockHeight);
+  return { signature };
+}
+
+// ─────────────────────────────────────────────────────────────
+//  ADMIN: UNPAUSE / RESUME PRESALE
+// ─────────────────────────────────────────────────────────────
+export async function unpausePresaleWithKeypair(
+  keypairBytes: number[],
+  onSigned?: () => void,
+): Promise<{ signature: string }> {
+  const keypair = Keypair.fromSecretKey(new Uint8Array(keypairBytes));
+  const admin   = keypair.publicKey;
+  const discriminator = await getDiscriminator("unpause_presale");
+
+  const ix = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: admin,      isSigner: true,  isWritable: false },
+    ],
+    data: discriminator,
+  });
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+  tx.sign(keypair);
+  onSigned?.();
+  const signature = await sendAndConfirmTx(tx.serialize(), blockhash, lastValidBlockHeight);
+  return { signature };
+}
+
+// ─────────────────────────────────────────────────────────────
+//  ADMIN: EXTEND PRESALE END DATE
+//  Sends update_config with a new presale_end timestamp (Unix seconds).
+//  Use a far-future date (e.g. year 2030) for indefinite presale.
+// ─────────────────────────────────────────────────────────────
+export async function setPresaleEndWithKeypair(
+  keypairBytes: number[],
+  newEndTimestampSec: number,
+  onSigned?: () => void,
+): Promise<{ signature: string }> {
+  const keypair = Keypair.fromSecretKey(new Uint8Array(keypairBytes));
+  const admin   = keypair.publicKey;
+  const discriminator = await getDiscriminator("update_config");
+
+  // Encode the new end timestamp as i64 little-endian
+  const argsBuf = Buffer.alloc(8);
+  argsBuf.writeBigInt64LE(BigInt(newEndTimestampSec), 0);
+
+  const ix = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: admin,      isSigner: true,  isWritable: false },
+    ],
+    data: Buffer.concat([discriminator, argsBuf]),
+  });
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+  tx.sign(keypair);
+  onSigned?.();
+  const signature = await sendAndConfirmTx(tx.serialize(), blockhash, lastValidBlockHeight);
+  return { signature };
+}
+
+// ─────────────────────────────────────────────────────────────
 //  INTERNAL — wallet provider
 // ─────────────────────────────────────────────────────────────
 
