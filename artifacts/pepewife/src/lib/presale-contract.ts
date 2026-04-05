@@ -1,8 +1,8 @@
 /**
  * PEPEWIFE Presale Contract — Browser Integration
  *
- * Program ID : 4KpEeYVW8592GGpcNZLo7CinE1dnV9tJnKYc9JzpQSv7  (Devnet)
- * Config PDA : 7tvmjEGj9k4QV7oVNeAD13CVxdjRPCNfYdtz1mXQ8sDs
+ * Program ID : AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145  (Devnet)
+ * Config PDA : BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi
  *
  * Uses @solana/web3.js directly (no Anchor runtime needed).
  * Instruction data layout follows Anchor discriminator convention.
@@ -802,6 +802,8 @@ function getProvider(walletType = "phantom"): SolanaSignProvider {
     solana?: SolanaSignProvider;
     phantom?: { solana?: SolanaSignProvider };
     solflare?: SolanaSignProvider;
+    backpack?: SolanaSignProvider;
+    okxwallet?: { solana?: SolanaSignProvider };
   };
 
   if (walletType === "solflare") {
@@ -809,12 +811,24 @@ function getProvider(walletType = "phantom"): SolanaSignProvider {
     throw new Error("Solflare wallet not found. Is it installed?");
   }
 
-  // phantom or any other Solana wallet
+  if (walletType === "backpack") {
+    if (w.backpack) return w.backpack;
+    throw new Error("Backpack wallet not found. Is it installed?");
+  }
+
+  if (walletType === "okx") {
+    const okxSol = w.okxwallet?.solana;
+    if (okxSol) return okxSol;
+    throw new Error("OKX Wallet not found. Is it installed?");
+  }
+
+  // phantom (default) or any other Solana wallet
   const provider = w.phantom?.solana ?? w.solana;
   if (provider) return provider;
 
-  // last resort — try solflare
+  // last resort — try other wallets in order
   if (w.solflare) return w.solflare;
+  if (w.backpack) return w.backpack;
 
-  throw new Error("No Solana wallet found. Please install Phantom or Solflare.");
+  throw new Error("No Solana wallet found. Please install Phantom, Solflare, Backpack, or OKX Wallet.");
 }
