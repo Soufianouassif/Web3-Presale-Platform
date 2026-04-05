@@ -1,7 +1,7 @@
 {
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm run build",
-  "outputDirectory": "dist/public",
+  "buildCommand": "pnpm run vercel-build",
+  "outputDirectory": "public",
   "framework": null,
   "routes": [
     { "handle": "filesystem" },
