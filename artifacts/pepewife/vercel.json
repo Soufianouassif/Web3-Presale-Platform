@@ -1,0 +1,10 @@
+{
+  "installCommand": "cd ../../ && pnpm install",
+  "buildCommand": "pnpm run build",
+  "outputDirectory": "dist/public",
+  "framework": null,
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
