@@ -1,7 +1,7 @@
 {
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm --filter @workspace/pepewife run build && mkdir -p public && cp -r dist/public/. public/",
-  "outputDirectory": "public",
+  "buildCommand": "pnpm run build",
+  "outputDirectory": "dist/public",
   "framework": null,
   "routes": [
     { "handle": "filesystem" },
