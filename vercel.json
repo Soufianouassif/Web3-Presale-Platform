@@ -3,7 +3,14 @@
   "buildCommand": "pnpm --filter @workspace/pepewife run build && rm -rf dist && cp -r artifacts/pepewife/dist/public dist",
   "outputDirectory": "dist",
   "framework": null,
+  "functions": {
+    "api/index.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
   "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]

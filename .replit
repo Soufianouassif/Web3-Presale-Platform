@@ -53,4 +53,13 @@ channel = "stable-25_05"
 
 [userenv.shared]
 ADMIN_EMAILS = "soufian1122a@gmail.com"
-GOOGLE_CALLBACK_URL = "https://6afa6591-9a46-45cf-882d-be0352148609-00-oj1et396t49z.picard.replit.dev/api/auth/google/callback"
+
+[userenv.production]
+FRONTEND_URL = "https://www.pwifecoin.fun"
+VERCEL_PREVIEW_DOMAIN = "pwifecoin.fun"
+GOOGLE_CALLBACK_URL = "https://www.pwifecoin.fun/api/auth/google/callback"
+SOLANA_RPC_URL = "https://api.devnet.solana.com"
+
+[userenv.development]
+GOOGLE_CALLBACK_URL = "http://localhost:8080/api/auth/google/callback"
+SOLANA_RPC_URL = "https://api.devnet.solana.com"

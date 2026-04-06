@@ -71,7 +71,7 @@ async function sendAndConfirmTx(
     }
     throw new Error(
       `Transaction not confirmed within 90 s. Signature: ${signature.slice(0, 20)}… — ` +
-      `check https://explorer.solana.com/tx/${signature}?cluster=devnet`,
+      `check https://explorer.solana.com/tx/${signature}${SOLANA_ENDPOINT.includes("devnet") ? "?cluster=devnet" : ""}`,
     );
   } finally {
     clearInterval(resendTimer);
@@ -95,11 +95,9 @@ export const USDT_MINT = new PublicKey(
   "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 );
 
-/** RPC endpoint — routed through our API proxy to avoid CORS issues */
-export const SOLANA_ENDPOINT =
-  typeof window !== "undefined"
-    ? `${window.location.origin}/api/rpc`
-    : "https://api.devnet.solana.com";
+/** RPC endpoint — set VITE_SOLANA_RPC_URL in .env to override */
+export const SOLANA_ENDPOINT: string =
+  import.meta.env.VITE_SOLANA_RPC_URL || "https://api.devnet.solana.com";
 
 export const connection = new Connection(SOLANA_ENDPOINT, "confirmed");
 

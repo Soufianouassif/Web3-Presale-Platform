@@ -277,10 +277,6 @@ export default function ConnectPage() {
               </div>
               <div className="w-1 h-1 rounded-full bg-[#1a1a2e]/20" />
               <div className="flex items-center gap-1 text-xs font-bold">
-                <Wifi className="h-3 w-3" /> {t.connect.ethMainnet}
-              </div>
-              <div className="w-1 h-1 rounded-full bg-[#1a1a2e]/20" />
-              <div className="flex items-center gap-1 text-xs font-bold">
                 <Shield className="h-3 w-3" /> {t.connect.secureConnection}
               </div>
             </div>

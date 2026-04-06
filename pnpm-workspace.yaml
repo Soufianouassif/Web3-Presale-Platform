@@ -149,3 +149,6 @@ overrides:
   "@expo/ngrok-bin>@expo/ngrok-bin-win32-x64": "-"
   # drizzle-kit uses esbuild internally on an older version that's vulnerable, this overrides it
   "@esbuild-kit/esm-loader": "npm:tsx@^4.21.0"
+  # Force old esbuild transitive deps to a version that works in Replit (avoids EACCES on postinstall)
+  "@esbuild-kit/core-utils>esbuild": "^0.25.0"
+  "esbuild-register>esbuild": "^0.25.0"

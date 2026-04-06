@@ -1,0 +1,12 @@
+schemaVersion = 2
+id = "artifacts/pepewife"
+kind = "web"
+title = "PEPEWIFE"
+
+[services.web]
+path = "/"
+devCommand = "pnpm --filter @workspace/pepewife run dev"
+port = 22793
+serveKind = "static"
+buildCommand = "pnpm --filter @workspace/pepewife run build"
+buildOutputDir = "artifacts/pepewife/dist/public"

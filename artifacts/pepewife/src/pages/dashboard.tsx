@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Menu, X, Twitter, Send, Wallet, Copy, Check, ChevronDown, Shield, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SiSolana, SiTether, SiEthereum } from "react-icons/si";
+import { SiSolana, SiTether } from "react-icons/si";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/i18n/context";
 import LanguageSwitcher from "@/components/language-switcher";
@@ -35,15 +35,12 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [copied, setCopied] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [currency, setCurrency] = useState<"SOL" | "USDT_SPL" | "USDT_ETH">("SOL");
+  const [currency, setCurrency] = useState<"SOL" | "USDT_SPL">("SOL");
   const [buyAmount, setBuyAmount] = useState("");
   const [showBuyModal, setShowBuyModal] = useState(false);
-  const [showEthModal, setShowEthModal] = useState(false);
-  const [copiedEth, setCopiedEth] = useState(false);
   const [dashTxSig, setDashTxSig] = useState<string | null>(null);
   const [presaleData, setPresaleData] = useState<PresaleState | null>(null);
   const [solPrice, setSolPrice] = useState<number>(150);
-  const [ethPrice, setEthPrice] = useState<number>(3000);
   const [pricesUpdatedAt, setPricesUpdatedAt] = useState<Date | null>(null);
   const [pricesLoading, setPricesLoading] = useState(false);
   const [buyerState, setBuyerState] = useState<BuyerState | null>(null);
@@ -98,12 +95,11 @@ export default function Dashboard() {
     const load = async () => {
       setPricesLoading(true);
       try {
-        const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana,ethereum&vs_currencies=usd");
+        const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd");
         if (!r.ok) throw new Error();
         const d = await r.json();
         if (!cancelled) {
           if (d?.solana?.usd)  setSolPrice(d.solana.usd);
-          if (d?.ethereum?.usd) setEthPrice(d.ethereum.usd);
           setPricesUpdatedAt(new Date());
         }
       } catch { /* keep fallback */ } finally { if (!cancelled) setPricesLoading(false); }
@@ -135,7 +131,6 @@ export default function Dashboard() {
   const LIMITS = {
     SOL:      { min: 1,    max: 50 },
     USDT_SPL: { min: 100,  max: 10000 },
-    USDT_ETH: { min: 100,  max: 10000 },
   };
   const currSym = currency === "SOL" ? "SOL" : "USDT";
   const lim = LIMITS[currency];
@@ -158,14 +153,6 @@ export default function Dashboard() {
     if (/[^0-9.]/.test(val)) return;
     if ((val.match(/\./g) || []).length > 1) return;
     setBuyAmount(val);
-  };
-
-  const ETH_WALLET = "0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97";
-  const copyEthAddress = () => {
-    navigator.clipboard.writeText(ETH_WALLET).then(() => {
-      setCopiedEth(true);
-      setTimeout(() => setCopiedEth(false), 2000);
-    });
   };
 
   const fmt = (n: number) => {
@@ -208,7 +195,6 @@ export default function Dashboard() {
   const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace(/\$/g, ""));
   const amountUSD = !isNaN(amountNum) && buyAmount !== ""
     ? currency === "SOL" ? amountNum * solPrice
-    : currency === "USDT_ETH" ? amountNum * ethPrice
     : amountNum
     : 0;
   const tokensOut = stagePrice > 0 && amountUSD > 0 ? Math.floor(amountUSD / stagePrice) : 0;
@@ -301,10 +287,7 @@ export default function Dashboard() {
                         </button>
                         <span className="text-[#1a1a2e]/10">|</span>
                         <a
-                          href={network === "solana"
-                            ? `https://solscan.io/account/${address}`
-                            : `https://etherscan.io/address/${address}`
-                          }
+                          href={`https://solscan.io/account/${address}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1 text-[10px] font-display tracking-wider text-[#AB47BC] hover:text-[#7B1FA2] transition-colors"
@@ -316,7 +299,7 @@ export default function Dashboard() {
                       <div className="mt-1.5 flex items-center gap-1">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50]" />
                         <span className="text-[9px] font-display tracking-wider text-[#1a1a2e]/40">
-                          {network === "solana" ? "Solana Mainnet" : "Ethereum Mainnet"}
+                          Solana Mainnet
                         </span>
                       </div>
                     </div>
@@ -492,12 +475,6 @@ export default function Dashboard() {
                                 ${solPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </span>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                              <SiEthereum size={12} className="text-[#627EEA]" />
-                              <span className="font-display text-[11px] text-[#1a1a2e] tracking-wide">
-                                ${ethPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                              </span>
-                            </div>
                             <div className="flex items-center gap-1">
                               <SiTether size={11} className="text-[#26A17B]" />
                               <span className="font-display text-[11px] text-[#26A17B] tracking-wide">$1.00</span>
@@ -519,7 +496,7 @@ export default function Dashboard() {
                         {/* Currency selector */}
                         <div>
                           <p className="text-xs font-display text-[#1a1a2e]/40 tracking-wider mb-2">{t.presale.payWith}</p>
-                          <div className="grid grid-cols-3 gap-2">
+                          <div className="grid grid-cols-2 gap-2">
                             <button onClick={() => { setCurrency("SOL"); setBuyAmount(""); }}
                               className={`flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 transition-all ${currency === "SOL" ? "bg-[#14F195]/15 border-[#14F195] text-[#0a9060] shadow-[3px_3px_0px_#0a9060]" : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"}`}>
                               <div className="flex items-center gap-1 text-sm"><SiSolana size={13} /> SOL</div>
@@ -530,28 +507,17 @@ export default function Dashboard() {
                               <div className="flex items-center gap-1 text-sm"><SiTether size={13} /> USDT</div>
                               <div className="text-[8px] font-bold opacity-60">SPL · SOL</div>
                             </button>
-                            {/* USDT ETH — coming soon when BSC contract is ready */}
-                            <button
-                              disabled
-                              className="flex flex-col items-center justify-center rounded-xl h-11 font-display tracking-wide border-2 bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed opacity-50 relative"
-                            >
-                              <div className="flex items-center gap-1 text-sm"><SiEthereum size={13} /> USDT</div>
-                              <div className="text-[8px] font-bold opacity-60">ERC20 · ETH</div>
-                              <span className="absolute -top-2 -right-1 text-[8px] bg-gray-300 text-gray-600 rounded px-1 font-bold">SOON</span>
-                            </button>
                           </div>
 
-                          {currency !== "USDT_ETH" && (
-                            <div className="flex items-start gap-2 bg-amber-50 border-2 border-amber-400 rounded-xl px-3 py-2 mt-2">
-                              <span className="text-base mt-0.5">⚠️</span>
-                              <div>
-                                <p className="text-[11px] font-bold text-amber-800 leading-tight">{t.presale.warnTitle}</p>
-                                <p className="text-[10px] text-amber-700 leading-tight mt-0.5">
-                                  {currency === "SOL" ? t.presale.warnSol : t.presale.warnSpl}
-                                </p>
-                              </div>
+                          <div className="flex items-start gap-2 bg-amber-50 border-2 border-amber-400 rounded-xl px-3 py-2 mt-2">
+                            <span className="text-base mt-0.5">⚠️</span>
+                            <div>
+                              <p className="text-[11px] font-bold text-amber-800 leading-tight">{t.presale.warnTitle}</p>
+                              <p className="text-[10px] text-amber-700 leading-tight mt-0.5">
+                                {currency === "SOL" ? t.presale.warnSol : t.presale.warnSpl}
+                              </p>
                             </div>
-                          )}
+                          </div>
                         </div>
 
                         {/* Amount input & token calculator */}
@@ -579,9 +545,7 @@ export default function Dashboard() {
                               <div className="flex items-center gap-1 bg-[#FFFDE7] px-2.5 py-1 rounded-lg font-display text-sm text-[#1a1a2e] border border-[#FFD54F]">
                                 {currency === "SOL"
                                   ? <SiSolana size={14} className="text-[#14F195]" />
-                                  : currency === "USDT_ETH"
-                                    ? <SiEthereum size={14} className="text-[#627EEA]" />
-                                    : <SiTether size={14} className="text-[#26A17B]" />}
+                                  : <SiTether size={14} className="text-[#26A17B]" />}
                                 {currSym}
                               </div>
                             </div>
@@ -609,11 +573,6 @@ export default function Dashboard() {
                                 1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
                               </p>
                             )}
-                            {tokensOut > 0 && currency === "USDT_ETH" && (
-                              <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
-                                1 ETH ≈ ${ethPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
-                              </p>
-                            )}
                             {tokensOut > 0 && currency === "USDT_SPL" && (
                               <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
                                 Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
@@ -635,11 +594,10 @@ export default function Dashboard() {
 
                           <button
                             onClick={() => {
-                              if (currency === "USDT_ETH") { setShowEthModal(true); return; }
                               if (!buyAmount || !!amountError) return;
                               setShowBuyModal(true);
                             }}
-                            disabled={currency !== "USDT_ETH" && (!!amountError || buyAmount === "")}
+                            disabled={!!amountError || buyAmount === ""}
                             className="btn-meme w-full h-14 text-2xl rounded-xl font-display tracking-wider text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
                             style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)" }}
                           >
@@ -1114,64 +1072,8 @@ export default function Dashboard() {
         </div>
       </footer>
 
-      {/* ── ETH Manual Payment Modal ─────────────────────────────────── */}
-      {showEthModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
-          <div className="bg-white rounded-2xl border-4 border-[#627EEA] shadow-[8px_8px_0px_#3d56c9] w-full max-w-sm" style={{ direction: dir }}>
-            <div className="bg-[#627EEA] rounded-t-xl px-5 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <SiEthereum size={20} className="text-white" />
-                <span className="font-display text-white text-lg tracking-wide">{t.presale.ethModalTitle}</span>
-              </div>
-              <button onClick={() => setShowEthModal(false)} className="text-white/70 hover:text-white transition-colors">
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="p-5 space-y-4">
-              <div className="bg-red-50 border-2 border-red-400 rounded-xl p-3 flex items-start gap-2">
-                <span className="text-xl">🚨</span>
-                <div>
-                  <p className="font-display text-red-700 text-sm font-bold leading-tight">{t.presale.ethWarnTitle}</p>
-                  <p className="text-red-600 text-[11px] leading-snug mt-1">{t.presale.ethWarnDesc}</p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-[11px] text-[#1a1a2e]/50 font-bold mb-1.5">{t.presale.ethWalletLabel}</p>
-                <div className="bg-[#f0f4ff] border-2 border-[#627EEA] rounded-xl p-3 flex items-center justify-between gap-2">
-                  <span className="font-mono text-[11px] text-[#3d56c9] break-all leading-snug">{ETH_WALLET}</span>
-                  <button onClick={copyEthAddress} className="shrink-0 bg-[#627EEA] text-white rounded-lg p-2 hover:bg-[#3d56c9] transition-colors">
-                    {copiedEth ? <Check size={14} /> : <Copy size={14} />}
-                  </button>
-                </div>
-                {copiedEth && <p className="text-[10px] text-[#4CAF50] font-bold mt-1 text-center">{t.presale.ethCopied}</p>}
-              </div>
-
-              <div className="bg-amber-50 border-2 border-amber-400 rounded-xl p-3 space-y-1.5">
-                <p className="font-display text-amber-800 text-[11px] font-bold">{t.presale.ethCheckTitle}</p>
-                <ul className="text-amber-700 text-[10px] space-y-1 list-none">
-                  <li>✔️ {t.presale.ethCheck1}</li>
-                  <li>✔️ {t.presale.ethCheck2}</li>
-                  <li>✔️ {t.presale.ethCheck3}</li>
-                  <li>✔️ {t.presale.ethCheck4}</li>
-                </ul>
-              </div>
-
-              <div className="bg-[#1a1a2e]/5 rounded-xl px-3 py-2 text-center">
-                <p className="text-[10px] text-[#1a1a2e]/50 font-bold">{t.presale.ethTelegramNote}</p>
-              </div>
-
-              <button onClick={() => setShowEthModal(false)} className="w-full h-11 rounded-xl font-display text-base text-white tracking-wide" style={{ background: "linear-gradient(135deg, #627EEA 0%, #3d56c9 100%)" }}>
-                {t.presale.ethClose}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* ── Wallet Buy Modal ─────────────────────────────────────────── */}
-      {showBuyModal && currency !== "USDT_ETH" && (
+      {showBuyModal && (
         <WalletBuyModal
           amount={parseFloat(buyAmount)}
           currency={currency as "SOL" | "USDT_SPL"}

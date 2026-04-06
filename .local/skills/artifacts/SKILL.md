@@ -1,6 +1,6 @@
 ---
 name: artifacts
-description: "Use when creating or updating the artifact.toml for artifacts such as websites, web apps, mobile apps, slide decks, pitch decks, videos, and data visualizations. Formerly called the create-artifact skill."
+description: "Use when creating or updating the artifact.toml for artifacts such as websites, web apps, mobile apps, slide decks, pitch decks, videos, and data visualizations."
 ---
 
 

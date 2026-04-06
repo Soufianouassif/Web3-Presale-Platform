@@ -23,15 +23,30 @@ const passport = require("passport") as typeof import("passport");
 
 const PgSession = connectPgSimple(session);
 
-const SESSION_SECRET = process.env.SESSION_SECRET ?? "fallback-dev-secret-change-in-prod";
 const IS_PROD = process.env.NODE_ENV === "production";
 
-const ALLOWED_ORIGINS = [
-  "http://localhost:22793",
-  "http://localhost:3000",
+if (IS_PROD && !process.env.SESSION_SECRET) {
+  throw new Error("SESSION_SECRET environment variable is required in production");
+}
+const SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-production";
+
+// Exact origins always allowed
+const ALLOWED_ORIGINS_EXACT: string[] = [
+  ...(IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000"]),
   ...(process.env.REPLIT_DEV_DOMAIN ? [`https://${process.env.REPLIT_DEV_DOMAIN}`] : []),
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ];
+
+// Vercel preview deployments: any subdomain of VERCEL_PREVIEW_DOMAIN is allowed
+// e.g. VERCEL_PREVIEW_DOMAIN=pepewife.vercel.app allows pepewife-git-main-user.vercel.app
+const VERCEL_PREVIEW_DOMAIN = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
+
+const isOriginAllowed = (origin: string): boolean => {
+  if (ALLOWED_ORIGINS_EXACT.includes(origin)) return true;
+  if (VERCEL_PREVIEW_DOMAIN && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN}`)) return true;
+  if (VERCEL_PREVIEW_DOMAIN && origin === `https://${VERCEL_PREVIEW_DOMAIN}`) return true;
+  return false;
+};
 
 const app: Express = express();
 
@@ -60,7 +75,7 @@ app.use(
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+      if (!origin || isOriginAllowed(origin)) return cb(null, true);
       return cb(null, false);
     },
     credentials: true,
