@@ -1,0 +1,35 @@
+[toolchain]
+anchor_version = "0.30.1"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+pepewife_presale = "4KpEeYVW8592GGpcNZLo7CinE1dnV9tJnKYc9JzpQSv7"
+pepewife_claim   = "CLaim1111111111111111111111111111111111111111"
+
+[programs.devnet]
+pepewife_presale = "4KpEeYVW8592GGpcNZLo7CinE1dnV9tJnKYc9JzpQSv7"
+pepewife_claim   = "CLaim1111111111111111111111111111111111111111"
+
+[programs.mainnet]
+# Replace with real program IDs after deployment
+pepewife_presale = "REPLACE_WITH_MAINNET_PRESALE_PROGRAM_ID"
+pepewife_claim   = "REPLACE_WITH_MAINNET_CLAIM_PROGRAM_ID"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Devnet"
+wallet   = "~/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+
+[workspace]
+members = [
+  "programs/pepewife-presale",
+  "programs/pepewife-claim",
+]
