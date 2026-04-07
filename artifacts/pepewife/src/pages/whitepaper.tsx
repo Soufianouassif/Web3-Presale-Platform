@@ -78,13 +78,13 @@ export default function Whitepaper() {
         description="Read the official PEPEWIFE whitepaper. Learn about $PWIFE tokenomics, roadmap, security commitments, staking, Tap-to-Earn, and the Solana meme token vision."
         path="/whitepaper"
       />
-      <nav className="fixed top-0 w-full z-50 border-b-4 border-[#1a1a2e]" style={{ background: "linear-gradient(90deg, #FFFDE7, #E8F5E9)" }}>
+      <nav className="fixed top-0 w-full z-50 border-b-4 border-[#00ff88]" style={{ background: "#0a0a0a" }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer wiggle-hover shrink-0" onClick={() => navigate("/")}>
-                <img src="/logo.png" alt="PEPEWIFE" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
-                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
+                <img src="/logo.png" alt="PEPEWIFE" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#00ff88] shrink-0" />
+                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #00ff88" : "2px 2px 0px #00ff88" }}>PEPEWIFE</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -107,7 +107,7 @@ export default function Whitepaper() {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#1a1a2e]" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
             <div className="sticker bg-[#4CAF50] text-white mb-4 text-2xl inline-block" style={{ transform: "rotate(-2deg)" }}>📄</div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-display text-white tracking-wider mb-3" style={{ textShadow: "3px 3px 0px #FF4D9D, -1px -1px 0px #4CAF50" }}>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-display text-white tracking-wider mb-3" style={{ textShadow: "3px 3px 0px #ffe000, -1px -1px 0px #00ff88" }}>
               {t.whitepaper.title}
             </h1>
             <p className="text-lg sm:text-xl text-white/70 font-bold max-w-2xl">{t.whitepaper.subtitle}</p>
@@ -115,7 +115,7 @@ export default function Whitepaper() {
         </div>
       </div>
 
-      <div className="py-16 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #1a1a2e, #FFFDE7 15%, #E8F5E9 85%, #1a1a2e)" }}>
+      <div className="py-16 px-4 pattern-dots" style={{ background: "#0a0a0a" }}>
         <div className="max-w-4xl mx-auto space-y-8">
           {sections.map((section, i) => (
             <div key={i}>
@@ -129,13 +129,13 @@ export default function Whitepaper() {
                   />
                 </div>
               )}
-              <div className="meme-card bg-white rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+              <div className="meme-card bg-[#111111] rounded-2xl p-6 sm:p-8 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1.5" style={{ background: sectionColors[i] || "#4CAF50" }} />
                 <div className="flex items-start gap-3 mb-4">
                   <span className="text-3xl shrink-0">{sectionIcons[i] || "📌"}</span>
                   <h2 className="font-display text-2xl sm:text-3xl text-[#1a1a2e] tracking-wider">{section.title}</h2>
                 </div>
-                <p className="text-[#1a1a2e]/70 font-bold leading-relaxed whitespace-pre-line text-base sm:text-lg">{section.content}</p>
+                <p className="text-white/70 font-bold leading-relaxed whitespace-pre-line text-base sm:text-lg">{section.content}</p>
               </div>
             </div>
           ))}
@@ -157,8 +157,8 @@ export default function Whitepaper() {
             <button onClick={() => navigate("/terms")} className="text-white/50 hover:text-[#FFD54F] font-display text-lg tracking-wide transition-colors">{t.footer.terms}</button>
           </div>
           <div className="flex gap-3">
-            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#1DA1F2] hover:bg-white/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
-            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#0088cc] hover:bg-white/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
+            <button className="btn-meme w-10 h-10 rounded-full bg-[#111111]/10 text-white/60 hover:text-[#1DA1F2] hover:bg-[#111111]/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
+            <button className="btn-meme w-10 h-10 rounded-full bg-[#111111]/10 text-white/60 hover:text-[#0088cc] hover:bg-[#111111]/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-5 border-t border-white/10 text-center text-sm text-white/30 font-display tracking-wide">

@@ -1,0 +1,120 @@
+{
+  "colorScheme": "dark",
+  "fonts": [
+    {
+      "family": "Bangers",
+      "role": "display"
+    },
+    {
+      "family": "Nunito",
+      "role": "body"
+    }
+  ],
+  "colors": {
+    "primary": "#00FF88",
+    "accent": "#00FF88",
+    "background": "#0A0A0A",
+    "textPrimary": "#0A0A0A",
+    "link": "#FFE100"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Nunito",
+      "heading": "Bangers"
+    },
+    "fontStacks": {
+      "heading": [
+        "Bangers",
+        "cursive"
+      ],
+      "body": [
+        "Nunito",
+        "sans-serif"
+      ],
+      "paragraph": [
+        "Bangers",
+        "cursive"
+      ]
+    },
+    "fontSizes": {
+      "h1": "136px",
+      "h2": "96px",
+      "body": "24px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 8,
+    "borderRadius": "0px"
+  },
+  "components": {
+    "buttonPrimary": {
+      "background": "#00FF88",
+      "textColor": "#000000",
+      "borderColor": "#000000",
+      "borderRadius": "6px",
+      "borderRadiusCorners": {
+        "topLeft": "6px",
+        "topRight": "6px",
+        "bottomRight": "6px",
+        "bottomLeft": "6px"
+      },
+      "shadow": "rgb(255, 225, 0) 5px 5px 0px 0px"
+    },
+    "buttonSecondary": {
+      "background": "transparent",
+      "textColor": "#FFFFFF",
+      "borderColor": "#FFFFFF",
+      "borderRadius": "6px",
+      "borderRadiusCorners": {
+        "topLeft": "6px",
+        "topRight": "6px",
+        "bottomRight": "6px",
+        "bottomLeft": "6px"
+      },
+      "shadow": "rgba(255, 255, 255, 0.2) 5px 5px 0px 0px"
+    }
+  },
+  "images": {
+    "logo": null,
+    "favicon": "https://admin-dashboard-memepepe138.replit.app/favicon.svg",
+    "ogImage": null
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": 0,
+      "text": "BUY NOW — NGMI",
+      "reasoning": "Button #0 has a vibrant green background (#00FF88), which is typically used for primary CTAs. The text 'BUY NOW — NGMI' is action-oriented, making it a strong candidate for the primary button."
+    },
+    "secondary": {
+      "index": 1,
+      "text": "JOIN THE CULT",
+      "reasoning": "Button #1 has a transparent background, making it less prominent. The text 'JOIN THE CULT' suggests a secondary action, suitable for a secondary button."
+    },
+    "confidence": 0.95
+  },
+  "personality": {
+    "tone": "bold",
+    "energy": "high",
+    "targetAudience": "crypto enthusiasts"
+  },
+  "designSystem": {
+    "framework": "tailwind",
+    "componentLibrary": ""
+  },
+  "confidence": {
+    "buttons": 0.95,
+    "colors": 0.9,
+    "overall": 0.925
+  },
+  "__llm_metadata": {
+    "logoSelection": {
+      "llmCalled": false,
+      "llmSucceeded": false,
+      "finalSource": "none"
+    },
+    "buttonClassification": {
+      "llmCalled": true,
+      "llmSucceeded": true
+    }
+  }
+}

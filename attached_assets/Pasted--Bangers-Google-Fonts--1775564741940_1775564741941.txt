@@ -1,0 +1,77 @@
+أريد منك تطبيق هذا الستايل الكامل على المشروع:
+
+═══ الخطوط ═══
+استخدم خط Bangers من Google Fonts للعناوين وخط Nunito للنصوص العادية.
+أضف هذا السطر في index.html:
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+═══ الألوان ═══
+- الخلفية: #0a0a0a (أسود تقريباً)
+- اللون الرئيسي Primary: #00ff88 (أخضر ليموني نيون)
+- اللون الثانوي Secondary: #ffe000 (أصفر ذهبي)
+- النص: #ffffff أبيض
+
+═══ CSS يجب إضافته ═══
+
+/* بطاقات meme بإطار أخضر */
+.meme-card {
+  border: 3px solid #00ff88;
+  box-shadow: 4px 4px 0px #00ff88;
+  transition: transform 0.2s ease;
+}
+.meme-card:hover {
+  transform: scale(1.02) rotate(1deg);
+  box-shadow: 6px 6px 0px #00ff88;
+}
+
+/* بطاقات بإطار أصفر */
+.meme-card-yellow {
+  border: 3px solid #ffe000;
+  box-shadow: 4px 4px 0px #ffe000;
+  transition: transform 0.2s ease;
+}
+.meme-card-yellow:hover {
+  transform: scale(1.02) rotate(-1deg);
+}
+
+/* توهج */
+.glow-green { box-shadow: 0 0 20px rgba(0,255,136,0.6); }
+.glow-yellow { box-shadow: 0 0 20px rgba(255,224,0,0.6); }
+
+/* خلفية نقاط */
+.bg-polka {
+  background-image: radial-gradient(#00ff88 2px, transparent 2px);
+  background-size: 30px 30px;
+  opacity: 0.15;
+}
+
+/* خلفية شبكة */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(0,255,136,0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,255,136,0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* تأثير الاهتزاز */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+  75% { transform: rotate(-2deg); }
+}
+.animate-wiggle { animation: wiggle 2s infinite ease-in-out; }
+
+/* تأثير الطفو */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+.animate-float { animation: float 4s infinite ease-in-out; }
+
+═══ قواعد التطبيق ═══
+- جميع العناوين h1 h2 h3: font-family Bangers، أسود داكن كخلفية
+- أزرار CTA الرئيسية: خلفية #00ff88 نص أسود، border 4px solid black، box-shadow 5px 5px 0 #ffe000
+- البطاقات: استخدم كلاس meme-card مع خلفية #111111
+- الصفحة كلها: background #0a0a0a، color white
+- أضف framer-motion للتحريك: fade in من الأسفل للعناصر عند فتح الصفحة
