@@ -49642,6 +49642,12 @@ app.use(
 app.use(import_passport2.default.initialize());
 app.use(import_passport2.default.session());
 app.use("/api", routes_default);
+app.use((err, _req, res, _next) => {
+  const status = err.status ?? 500;
+  const message = err.message ?? "Internal Server Error";
+  logger.error({ err }, "Unhandled error");
+  res.status(status).json({ error: message, stack: IS_PROD ? void 0 : err.stack });
+});
 var app_default = app;
 export {
   app_default as default

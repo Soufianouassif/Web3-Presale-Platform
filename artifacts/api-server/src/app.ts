@@ -102,4 +102,12 @@ app.use(passport.session());
 
 app.use("/api", router);
 
+// Global error handler — returns JSON so errors are visible in logs/browser
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  const status = (err as { status?: number }).status ?? 500;
+  const message = err.message ?? "Internal Server Error";
+  logger.error({ err }, "Unhandled error");
+  res.status(status).json({ error: message, stack: IS_PROD ? undefined : err.stack });
+});
+
 export default app;
