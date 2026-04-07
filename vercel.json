@@ -1,6 +1,6 @@
 {
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/pepewife run build && rm -rf dist && cp -r artifacts/pepewife/dist/public dist",
+  "buildCommand": "pnpm --filter @workspace/api-server run build && cp artifacts/api-server/dist/*.mjs api/ && pnpm --filter @workspace/pepewife run build && rm -rf dist && cp -r artifacts/pepewife/dist/public dist",
   "outputDirectory": "dist",
   "framework": null,
   "functions": {
