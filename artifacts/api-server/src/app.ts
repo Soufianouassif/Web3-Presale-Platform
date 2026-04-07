@@ -1,27 +1,19 @@
-import { createRequire } from "node:module";
 import express, { type Express, type RequestHandler } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import pinoHttp from "pino-http";
+import session from "express-session";
+import connectPgSimpleFactory from "connect-pg-simple";
+import passport from "passport";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import router from "./routes/index.js";
 import { logger } from "./lib/logger.js";
 import { pool } from "@workspace/db";
 
-const require = createRequire(import.meta.url);
-
-// pino-http uses `export =` (CJS) which is incompatible with ESM default imports.
-// We load it via createRequire and define the callable type ourselves so the fix
-// works regardless of tsconfig esModuleInterop settings or build environment.
 type PinoHttpFactory = (opts?: Record<string, unknown>) => RequestHandler;
-const pinoHttp = require("pino-http") as PinoHttpFactory;
+const pinoHttpMiddleware = (pinoHttp as unknown as PinoHttpFactory);
 
-const session = require("express-session") as typeof import("express-session");
-type PgSessionConstructor = new (opts: Record<string, unknown>) => import("express-session").Store;
-type ConnectPgSimple = (session: unknown) => PgSessionConstructor;
-const connectPgSimple = require("connect-pg-simple") as ConnectPgSimple;
-const passport = require("passport") as typeof import("passport");
-
-const PgSession = connectPgSimple(session);
+const ConnectPgSimple = connectPgSimpleFactory(session);
 
 const IS_PROD = process.env.NODE_ENV === "production";
 
@@ -30,15 +22,12 @@ if (IS_PROD && !process.env.SESSION_SECRET) {
 }
 const SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-production";
 
-// Exact origins always allowed
 const ALLOWED_ORIGINS_EXACT: string[] = [
   ...(IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000"]),
   ...(process.env.REPLIT_DEV_DOMAIN ? [`https://${process.env.REPLIT_DEV_DOMAIN}`] : []),
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ];
 
-// Vercel preview deployments: any subdomain of VERCEL_PREVIEW_DOMAIN is allowed
-// e.g. VERCEL_PREVIEW_DOMAIN=pepewife.vercel.app allows pepewife-git-main-user.vercel.app
 const VERCEL_PREVIEW_DOMAIN = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
 
 const isOriginAllowed = (origin: string): boolean => {
@@ -53,7 +42,7 @@ const app: Express = express();
 app.set("trust proxy", 1);
 
 app.use(
-  pinoHttp({
+  pinoHttpMiddleware({
     logger,
     serializers: {
       req(req: IncomingMessage & { id?: unknown }) {
@@ -86,13 +75,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Trust proxy so secure cookies work behind Replit's reverse proxy in prod
-if (IS_PROD) app.set("trust proxy", 1);
-
 app.use(
   session({
-    name: "__pwife_sid",           // custom name to avoid server fingerprinting
-    store: new PgSession({
+    name: "__pwife_sid",
+    store: new ConnectPgSimple({
       pool: pool,
       tableName: "user_sessions",
       createTableIfMissing: true,

@@ -1,12 +1,9 @@
-import { createRequire } from "node:module";
 import { Router } from "express";
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { db } from "@workspace/db";
 import { adminUsers } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
-
-const require = createRequire(import.meta.url);
-const passport = require("passport") as typeof import("passport");
-const { Strategy: GoogleStrategy } = require("passport-google-oauth20") as typeof import("passport-google-oauth20");
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID ?? "";
