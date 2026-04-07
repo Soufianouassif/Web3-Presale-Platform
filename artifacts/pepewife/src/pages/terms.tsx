@@ -16,13 +16,13 @@ export default function Terms() {
         description="PEPEWIFE privacy policy. Learn how we handle your data, what information we collect, and your rights regarding your personal information."
         path="/terms"
       />
-      <nav className="fixed top-0 w-full z-50 border-b-4 border-[#00ff88]" style={{ background: "#0a0a0a" }}>
+      <nav className="fixed top-0 w-full z-50 border-b-4 border-[#1a1a2e]" style={{ background: "linear-gradient(90deg, #FFFDE7, #E8F5E9)" }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer wiggle-hover shrink-0" onClick={() => navigate("/")}>
-                <img src="/logo.png" alt="PEPEWIFE" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#00ff88] shrink-0" />
-                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #00ff88" : "2px 2px 0px #00ff88" }}>PEPEWIFE</span>
+                <img src="/logo.png" alt="PEPEWIFE" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
+                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -35,12 +35,12 @@ export default function Terms() {
         </div>
       </nav>
 
-      <div className="pt-24 pb-20 px-4 pattern-dots" style={{ background: "#0a0a0a" }}>
+      <div className="pt-24 pb-20 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #E3F2FD, #FFFDE7)" }}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <div className="sticker bg-[#00ff88] text-black mb-4 text-lg inline-block" style={{ transform: "rotate(-1deg)" }}>📋</div>
+            <div className="sticker bg-[#42A5F5] text-white mb-4 text-lg inline-block" style={{ transform: "rotate(-1deg)" }}>📋</div>
             <h1 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-3">{t.termsPage.title}</h1>
-            <p className="text-lg text-white/60 font-bold">{t.termsPage.subtitle}</p>
+            <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.termsPage.subtitle}</p>
           </div>
 
           <div className="space-y-6">
@@ -52,9 +52,9 @@ export default function Terms() {
               { title: t.termsPage.s5Title, content: t.termsPage.s5Text },
               { title: t.termsPage.s6Title, content: t.termsPage.s6Text },
             ].map((section, i) => (
-              <div key={i} className="meme-card bg-[#111111] rounded-2xl p-6">
+              <div key={i} className="meme-card bg-white rounded-2xl p-6">
                 <h2 className="font-display text-2xl text-[#1a1a2e] tracking-wider mb-3">{section.title}</h2>
-                <p className="text-white/70 font-bold leading-relaxed whitespace-pre-line">{section.content}</p>
+                <p className="text-[#1a1a2e]/70 font-bold leading-relaxed whitespace-pre-line">{section.content}</p>
               </div>
             ))}
           </div>
@@ -76,8 +76,8 @@ export default function Terms() {
             <button onClick={() => navigate("/terms")} className="text-[#FFD54F] font-display text-lg tracking-wide">{t.footer.terms}</button>
           </div>
           <div className="flex gap-3">
-            <button className="btn-meme w-10 h-10 rounded-full bg-[#111111]/10 text-white/60 hover:text-[#1DA1F2] hover:bg-[#111111]/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
-            <button className="btn-meme w-10 h-10 rounded-full bg-[#111111]/10 text-white/60 hover:text-[#0088cc] hover:bg-[#111111]/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
+            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#1DA1F2] hover:bg-white/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
+            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#0088cc] hover:bg-white/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-5 border-t border-white/10 text-center text-sm text-white/30 font-display tracking-wide">

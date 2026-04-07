@@ -1,0 +1,154 @@
+{
+  "colorScheme": "light",
+  "fonts": [
+    {
+      "family": "Geist",
+      "role": "body"
+    },
+    {
+      "family": "Arial",
+      "role": "body"
+    }
+  ],
+  "colors": {
+    "primary": "#FF0000",
+    "secondary": "#9A050F",
+    "accent": "#006BFF",
+    "background": "#FFFFFF",
+    "textPrimary": "#4D4D4D",
+    "link": "#006BFF"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Geist",
+      "heading": "Geist"
+    },
+    "fontStacks": {
+      "heading": [
+        "Geist",
+        "Arial",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol"
+      ],
+      "body": [
+        "Geist",
+        "Arial",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol"
+      ],
+      "paragraph": [
+        "Geist",
+        "Arial",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol"
+      ]
+    },
+    "fontSizes": {
+      "h1": "40px",
+      "h2": "32px",
+      "body": "12px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "6px"
+  },
+  "components": {
+    "input": {
+      "background": "#FFFFFF",
+      "textColor": "#000000",
+      "borderColor": null,
+      "borderRadius": "6px",
+      "borderRadiusCorners": {
+        "topLeft": "6px",
+        "topRight": "6px",
+        "bottomRight": "6px",
+        "bottomLeft": "6px"
+      },
+      "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, lab(0 0 0 / 0.08) 0px 0px 0px 1px"
+    },
+    "buttonPrimary": {
+      "background": "#171717",
+      "textColor": "#FFFFFF",
+      "borderRadius": "6px",
+      "borderRadiusCorners": {
+        "topLeft": "6px",
+        "topRight": "6px",
+        "bottomRight": "6px",
+        "bottomLeft": "6px"
+      },
+      "shadow": "none"
+    },
+    "buttonSecondary": {
+      "background": "#F2F2F2",
+      "textColor": "#171717",
+      "borderRadius": "6px",
+      "borderRadiusCorners": {
+        "topLeft": "6px",
+        "topRight": "6px",
+        "bottomRight": "6px",
+        "bottomLeft": "6px"
+      },
+      "shadow": "none"
+    }
+  },
+  "images": {
+    "logo": "File saved at: attached_assets/logo.svg",
+    "favicon": "File saved at: attached_assets/favicon.ico",
+    "ogImage": "https://vercel.com/api/docs-og?title=Usage%20%26%20Pricing%20for%20Cron%20Jobs&format=docs&sig=261f27cd971860f8b6a1d689cad3b8cb820149864d9d47644c154e1a24c0be22&category=Compute&subcategory=Cron%20Jobs",
+    "logoHref": "File saved at: attached_assets/logoHref.html",
+    "logoAlt": "VercelLogotype"
+  },
+  "__llm_logo_reasoning": {
+    "selectedIndex": 0,
+    "reasoning": "Selected #0 because it is visible, located in the header, and matches the brand name 'Vercel' from the URL and page context. It links to the homepage, confirming its role as the main brand logo.",
+    "confidence": 0.95,
+    "source": "llm"
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": 0,
+      "text": "Start your free Pro trial",
+      "reasoning": "Button #0 has a dark background (#171717) with white text, making it stand out as a primary CTA. The text 'Start your free Pro trial' is action-oriented, encouraging users to engage with the service."
+    },
+    "secondary": {
+      "index": 1,
+      "text": "Search DocumentationSearch...⌘ K",
+      "reasoning": "Button #1 has a light background (#F2F2F2) and serves a functional purpose ('Search Documentation'), making it a suitable secondary action."
+    },
+    "confidence": 0.95
+  },
+  "personality": {
+    "tone": "modern",
+    "energy": "medium",
+    "targetAudience": "developers and tech professionals"
+  },
+  "designSystem": {
+    "framework": "tailwind",
+    "componentLibrary": ""
+  },
+  "confidence": {
+    "buttons": 0.95,
+    "colors": 0.9,
+    "overall": 0.925
+  },
+  "__llm_metadata": {
+    "logoSelection": {
+      "llmCalled": true,
+      "llmSucceeded": true,
+      "finalSource": "llm",
+      "rawLogoSelection": {
+        "selectedLogoIndex": 0,
+        "selectedLogoReasoning": "Selected #0 because it is visible, located in the header, and matches the brand name 'Vercel' from the URL and page context. It links to the homepage, confirming its role as the main brand logo.",
+        "confidence": 0.95
+      }
+    },
+    "buttonClassification": {
+      "llmCalled": true,
+      "llmSucceeded": true
+    }
+  }
+}

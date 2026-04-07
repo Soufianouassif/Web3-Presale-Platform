@@ -117,7 +117,7 @@ export default function ConnectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#0a0a0a] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#E8F5E9] via-[#FCE4EC] to-[#FFFDE7] relative overflow-hidden">
       <SEOHead
         title="Connect Wallet – PEPEWIFE Presale"
         description="Connect your wallet to participate in the PEPEWIFE presale. Supports Phantom, Solflare, MetaMask, OKX Wallet, and Trust Wallet."
@@ -134,7 +134,7 @@ export default function ConnectPage() {
         <div className="absolute top-5 start-5 sm:top-8 sm:start-8 flex items-center gap-2">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 font-display text-[#1a1a2e] tracking-wider bg-[#111111]/80 backdrop-blur rounded-xl px-4 py-2 border-2 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e] hover:shadow-[4px_4px_0px_#1a1a2e] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all"
+            className="flex items-center gap-2 font-display text-[#1a1a2e] tracking-wider bg-white/80 backdrop-blur rounded-xl px-4 py-2 border-2 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e] hover:shadow-[4px_4px_0px_#1a1a2e] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all"
           >
             <ArrowLeft className="h-4 w-4" /> {t.connect.back}
           </button>
@@ -146,12 +146,12 @@ export default function ConnectPage() {
 
         <div className="w-full max-w-lg">
           {status === "connected" && address && (
-            <div className="mb-4 meme-card bg-[#00ff88]/10 rounded-2xl p-4 border-[#00ff88]/30">
+            <div className="mb-4 meme-card bg-[#4CAF50]/10 rounded-2xl p-4 border-[#4CAF50]/30 backdrop-blur">
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-5 h-5 text-[#4CAF50] shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-display text-[#4CAF50] tracking-wider">{t.connect.connectedAs}</div>
-                  <div className="text-sm font-mono text-white/70 truncate">{shortAddress}</div>
+                  <div className="text-sm font-mono text-[#1a1a2e]/70 truncate">{shortAddress}</div>
                 </div>
                 <button
                   onClick={handleDisconnect}
@@ -169,12 +169,12 @@ export default function ConnectPage() {
             <h1 className="text-4xl sm:text-5xl font-display text-[#1a1a2e] tracking-wider comic-shadow">
               {status === "connected" ? t.connect.switchWallet : t.connect.title}
             </h1>
-            <p className="text-white/60 font-bold mt-2 max-w-sm mx-auto">
+            <p className="text-[#1a1a2e]/60 font-bold mt-2 max-w-sm mx-auto">
               {t.connect.subtitle}
             </p>
           </div>
 
-          <div className="meme-card bg-[#111111] rounded-3xl overflow-hidden">
+          <div className="meme-card bg-white/90 backdrop-blur rounded-3xl overflow-hidden">
             <div className="zigzag-border" />
             <div className="p-5 sm:p-6 space-y-3">
               {wallets.map((w) => {
@@ -200,7 +200,7 @@ export default function ConnectPage() {
                         ? `${w.bg} scale-[0.98]`
                         : hovered === w.id
                         ? `${w.bg} translate-x-[-2px] translate-y-[-2px]`
-                        : "bg-[#111111] border-white/10 shadow-[2px_2px_0px_#1a1a2e20] hover:shadow-[4px_4px_0px_#1a1a2e30]"
+                        : "bg-white border-[#1a1a2e]/10 shadow-[2px_2px_0px_#1a1a2e20] hover:shadow-[4px_4px_0px_#1a1a2e30]"
                     }`}
                     style={{
                       ...(isThisConnected
@@ -223,9 +223,9 @@ export default function ConnectPage() {
                           <span className="sticker bg-[#4CAF50] text-white text-[10px] px-2 py-0.5" style={{ transform: "rotate(-1deg)" }}>{t.connect.connectedWallet}</span>
                         )}
                       </div>
-                      <div className="text-xs text-white/50 font-bold flex items-center gap-2 flex-wrap">
+                      <div className="text-xs text-[#1a1a2e]/50 font-bold flex items-center gap-2 flex-wrap">
                         <span>{t.connect[w.descKey]}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#111111]/5">{networkLabel}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#1a1a2e]/5">{networkLabel}</span>
                       </div>
                     </div>
                     <div className="shrink-0 flex flex-col items-center gap-1">
@@ -238,7 +238,7 @@ export default function ConnectPage() {
                       ) : !isInstalled ? (
                         <Download className="h-5 w-5 text-[#FF4D9D]" />
                       ) : (
-                        <ChevronRight className="h-5 w-5 text-white/30 group-hover:text-white/60 transition-colors" />
+                        <ChevronRight className="h-5 w-5 text-[#1a1a2e]/30 group-hover:text-[#1a1a2e]/60 transition-colors" />
                       )}
                       {!isConnecting && !isThisConnected && (
                         <span className={`text-[9px] font-display tracking-wider ${isInstalled ? "text-[#4CAF50]" : "text-[#FF4D9D]"}`}>
@@ -252,12 +252,12 @@ export default function ConnectPage() {
             </div>
 
             <div className="px-5 sm:px-6 pb-5 sm:pb-6">
-              <div className="meme-card bg-[#ffe000]/10 rounded-2xl p-4 border-[#ffe000] shadow-[3px_3px_0px_#cc9900]">
+              <div className="meme-card bg-[#FFFDE7] rounded-2xl p-4 border-[#FFD54F] shadow-[3px_3px_0px_#F9A825]">
                 <div className="flex items-start gap-3">
-                  <Shield className="h-5 w-5 text-[#ffe000] mt-0.5 shrink-0" />
+                  <Shield className="h-5 w-5 text-[#b8860b] mt-0.5 shrink-0" />
                   <div>
-                    <div className="font-display text-sm text-[#ffe000] tracking-wider mb-1">{t.connect.safuTitle}</div>
-                    <p className="text-xs text-white/50 font-bold leading-relaxed">
+                    <div className="font-display text-sm text-[#b8860b] tracking-wider mb-1">{t.connect.safuTitle}</div>
+                    <p className="text-xs text-[#1a1a2e]/50 font-bold leading-relaxed">
                       {t.connect.safuText}
                     </p>
                   </div>
@@ -267,15 +267,15 @@ export default function ConnectPage() {
           </div>
 
           <div className="mt-6 text-center space-y-3">
-            <p className="text-xs text-white/40 font-bold">
+            <p className="text-xs text-[#1a1a2e]/40 font-bold">
               {t.connect.noWallet} <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" className="text-[#AB47BC] font-display tracking-wide hover:underline inline-flex items-center gap-1">{t.connect.getPhantom} <ExternalLink className="h-3 w-3" /></a>
             </p>
 
-            <div className="flex items-center justify-center gap-4 text-white/30">
+            <div className="flex items-center justify-center gap-4 text-[#1a1a2e]/30">
               <div className="flex items-center gap-1 text-xs font-bold">
                 <Wifi className="h-3 w-3" /> {t.connect.solanaMainnet}
               </div>
-              <div className="w-1 h-1 rounded-full bg-[#111111]/15" />
+              <div className="w-1 h-1 rounded-full bg-[#1a1a2e]/20" />
               <div className="flex items-center gap-1 text-xs font-bold">
                 <Shield className="h-3 w-3" /> {t.connect.secureConnection}
               </div>

@@ -1,0 +1,196 @@
+احذف الستايل القديم بالكامل من ملف CSS الرئيسي واستبدله بهذا الكود كاملاً دون إبقاء أي شيء من القديم:
+
+/* ═══════════════════════════════════════
+   FONTS
+═══════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap');
+
+/* ═══════════════════════════════════════
+   RESET + BASE
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: #0a0a0a;
+  color: #ffffff;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Bangers', cursive;
+  letter-spacing: 0.05em;
+}
+
+/* ═══════════════════════════════════════
+   CSS VARIABLES (الألوان)
+═══════════════════════════════════════ */
+:root {
+  --primary: #00ff88;      /* أخضر ليموني نيون */
+  --secondary: #ffe000;    /* أصفر ذهبي */
+  --background: #0a0a0a;   /* أسود */
+  --card-bg: #111111;
+  --text: #ffffff;
+}
+
+/* ═══════════════════════════════════════
+   شريط متحرك (Marquee Ticker)
+   ضعه مباشرة تحت الـ Navbar
+═══════════════════════════════════════ */
+
+/* HTML للشريط — أضفه في المكان المناسب:
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span>BONKX TO THE MOON 🚀</span>
+    <span>WAGMI 💎🙌</span>
+    <span>1000X INCOMING 📈</span>
+    <span>BUY OR CRY LATER 😭</span>
+    <span>BONKX TO THE MOON 🚀</span>
+    <span>WAGMI 💎🙌</span>
+    <span>1000X INCOMING 📈</span>
+    <span>BUY OR CRY LATER 😭</span>
+    <span>BONKX TO THE MOON 🚀</span>
+    <span>WAGMI 💎🙌</span>
+    <span>1000X INCOMING 📈</span>
+    <span>BUY OR CRY LATER 😭</span>
+  </div>
+</div>
+*/
+
+.ticker-wrap {
+  position: fixed;
+  top: 64px; /* غيّر هذا ليتطابق مع ارتفاع الـ Navbar */
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background-color: var(--secondary);
+  color: #000000;
+  height: 40px;
+  overflow: hidden;
+  border-top: 3px solid #000;
+  border-bottom: 3px solid #000;
+}
+
+.ticker-track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  white-space: nowrap;
+  animation: marquee 15s linear infinite;
+  font-family: 'Bangers', cursive;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+}
+
+.ticker-track span {
+  margin: 0 2rem;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ═══════════════════════════════════════
+   CARDS
+═══════════════════════════════════════ */
+.meme-card {
+  border: 3px solid var(--primary);
+  box-shadow: 4px 4px 0px var(--primary);
+  background: var(--card-bg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.meme-card:hover {
+  transform: scale(1.02) rotate(1deg);
+  box-shadow: 6px 6px 0px var(--primary);
+}
+.meme-card-yellow {
+  border: 3px solid var(--secondary);
+  box-shadow: 4px 4px 0px var(--secondary);
+  background: var(--card-bg);
+  transition: transform 0.2s ease;
+}
+.meme-card-yellow:hover {
+  transform: scale(1.02) rotate(-1deg);
+  box-shadow: 6px 6px 0px var(--secondary);
+}
+
+/* ═══════════════════════════════════════
+   GLOW & BORDERS
+═══════════════════════════════════════ */
+.glow-green  { box-shadow: 0 0 20px rgba(0,255,136,0.6); }
+.glow-yellow { box-shadow: 0 0 20px rgba(255,224,0,0.6); }
+.neon-border {
+  border: 2px solid var(--primary);
+  box-shadow: 0 0 10px rgba(0,255,136,0.5);
+}
+
+/* ═══════════════════════════════════════
+   BACKGROUNDS
+═══════════════════════════════════════ */
+.bg-polka {
+  background-image: radial-gradient(var(--primary) 2px, transparent 2px);
+  background-size: 30px 30px;
+  opacity: 0.15;
+}
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(0,255,136,0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,255,136,0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ═══════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════ */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25%       { transform: rotate(-5deg); }
+  50%       { transform: rotate(5deg); }
+  75%       { transform: rotate(-2deg); }
+}
+.animate-wiggle { animation: wiggle 2s infinite ease-in-out; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-20px); }
+}
+.animate-float { animation: float 4s infinite ease-in-out; }
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(0,255,136,0.4); }
+  50%       { box-shadow: 0 0 30px rgba(0,255,136,0.9); }
+}
+.animate-pulse-glow { animation: pulse-glow 2s infinite ease-in-out; }
+
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.btn-primary {
+  background-color: var(--primary);
+  color: #000;
+  font-family: 'Bangers', cursive;
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+  padding: 0.75rem 2rem;
+  border: 4px solid #000;
+  box-shadow: 5px 5px 0 var(--secondary);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.btn-primary:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--secondary); }
+
+.btn-outline {
+  background: transparent;
+  color: #fff;
+  font-family: 'Bangers', cursive;
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+  padding: 0.75rem 2rem;
+  border: 4px solid #fff;
+  box-shadow: 5px 5px 0 rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.btn-outline:hover { transform: translate(-2px, -2px); }
