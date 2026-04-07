@@ -51,7 +51,7 @@ const ar: Translations = {
     hrs: "ساعات",
     min: "دقائق",
     sec: "ثوان",
-    sold: "0 مباع",
+    sold: "مباع",
     goal: "الهدف: 0 $PWIFE",
     now: "🟢 الآن",
     next: "⬆️ التالي",

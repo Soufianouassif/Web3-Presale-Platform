@@ -58,23 +58,36 @@ export default function Home() {
     tracker.visit("/");
     fetchPresaleState().then(d => { if (d) setPresaleData(d); });
     fetchPublicPresaleConfig().then(cfg => setSiteConfig(cfg));
+
+    // Auto-refresh presale state every 30 seconds
+    const chainInterval = setInterval(() => {
+      fetchPresaleState().then(d => { if (d) setPresaleData(d); });
+    }, 30_000);
+    return () => clearInterval(chainInterval);
   }, []);
 
   useEffect(() => {
     const fetchPrices = () => {
       setPricesLoading(true);
-      fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd")
+      // Fetch SOL price via our API to avoid CORS issues with CoinGecko
+      fetch("/api/sol-price")
         .then(r => r.json())
-        .then(d => {
-          if (d?.solana?.usd)  setSolPrice(d.solana.usd);
+        .then((d: { price?: number }) => {
+          if (d?.price && d.price > 0) setSolPrice(d.price);
           setPricesUpdatedAt(new Date());
         })
-        .catch(() => {})
+        .catch(() => {
+          // Fallback: use on-chain sol_price_usd_e6 if available
+          if (presaleData?.solPriceUsdE6 && presaleData.solPriceUsdE6 > 0n) {
+            setSolPrice(Number(presaleData.solPriceUsdE6) / 1_000_000);
+          }
+        })
         .finally(() => setPricesLoading(false));
     };
     fetchPrices();
-    const interval = setInterval(fetchPrices, 60 * 60 * 1000);
+    const interval = setInterval(fetchPrices, 2 * 60 * 1000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Detect referral code in URL on first load ──────────────────────────────
@@ -376,20 +389,29 @@ export default function Home() {
                 <div className="text-2xl font-nums text-[#1a1a2e] tracking-wider">
                   {presaleData
                     ? `$${totalRaisedUSD >= 1000 ? (totalRaisedUSD / 1000).toFixed(1) + "K" : totalRaisedUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
-                    : "$0"}
+                    : <span className="text-base text-gray-400 animate-pulse">Loading...</span>}
                 </div>
-                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">USD</div>
+                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">USD • SOL ${solPrice.toFixed(0)}</div>
               </div>
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                 <div className="text-xs font-display text-gray-500 tracking-wide font-bold">🐸 $PWIFE Sold</div>
                 <div className="text-2xl font-nums text-[#1a1a2e] tracking-wider">
-                  {totalSold >= 1_000_000_000
-                    ? (totalSold / 1_000_000_000).toFixed(1) + "B"
-                    : totalSold >= 1_000_000
-                      ? (totalSold / 1_000_000).toFixed(1) + "M"
-                      : totalSold.toLocaleString()}
+                  {presaleData
+                    ? (totalSold >= 1_000_000_000
+                        ? (totalSold / 1_000_000_000).toFixed(2) + "B"
+                        : totalSold >= 1_000_000
+                          ? (totalSold / 1_000_000).toFixed(1) + "M"
+                          : totalSold.toLocaleString())
+                    : <span className="text-base text-gray-400 animate-pulse">Loading...</span>}
                 </div>
                 <div className="text-xs text-gray-500 font-display tracking-wide font-bold">tokens</div>
+              </div>
+              <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
+                <div className="text-xs font-display text-gray-500 tracking-wide font-bold">👥 Buyers</div>
+                <div className="text-2xl font-nums text-[#1a1a2e] tracking-wider">
+                  {presaleData ? Number(presaleData.buyersCount).toLocaleString() : <span className="text-base text-gray-400 animate-pulse">—</span>}
+                </div>
+                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">unique wallets</div>
               </div>
               <div className="bg-white rounded-2xl px-5 py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                 <div className="text-xs font-display text-gray-500 tracking-wide font-bold">💎 Stage {currentStage + 1} Price</div>
@@ -458,7 +480,13 @@ export default function Home() {
 
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm font-bold">
-                    <span className="text-[#4CAF50] font-display tracking-wide">🐸 {t.presale.sold}</span>
+                    <span className="text-[#4CAF50] font-display tracking-wide">
+                      🐸 {presaleData
+                        ? (totalSold >= 1_000_000_000
+                            ? (totalSold / 1_000_000_000).toFixed(2) + "B"
+                            : fmt(totalSold))
+                        : "…"} {t.presale.sold}
+                    </span>
                     <span className="text-sm text-[#1a1a2e]/70 font-nums tracking-wide font-bold">{presaleFilled}% — Stage {currentStage + 1}/4</span>
                   </div>
                   {/* شريط المراحل الأربع */}

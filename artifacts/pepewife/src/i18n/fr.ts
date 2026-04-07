@@ -51,7 +51,7 @@ const fr: Translations = {
     hrs: "HRS",
     min: "MIN",
     sec: "SEC",
-    sold: "0 Vendu",
+    sold: "Vendu",
     goal: "Objectif : 0 $PWIFE",
     now: "🟢 ACTUEL",
     next: "⬆️ SUIVANT",

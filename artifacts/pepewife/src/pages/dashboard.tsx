@@ -119,30 +119,35 @@ export default function Dashboard() {
 
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
-  // ── Price feed ───────────────────────────────────────────────────────────────
+  // ── Price feed — via API to avoid CORS ──────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       setPricesLoading(true);
       try {
-        const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd");
+        const r = await fetch("/api/sol-price");
         if (!r.ok) throw new Error();
-        const d = await r.json();
+        const d = await r.json() as { price?: number };
         if (!cancelled) {
-          if (d?.solana?.usd)  setSolPrice(d.solana.usd);
+          if (d?.price && d.price > 0) setSolPrice(d.price);
           setPricesUpdatedAt(new Date());
         }
       } catch { /* keep fallback */ } finally { if (!cancelled) setPricesLoading(false); }
     };
     load();
-    const iv = setInterval(load, 60_000);
+    const iv = setInterval(load, 2 * 60_000);
     return () => { cancelled = true; clearInterval(iv); };
   }, []);
 
-  // ── Presale state + site config ──────────────────────────────────────────────
+  // ── Presale state + site config (auto-refresh every 30s) ─────────────────────
   useEffect(() => {
-    fetchPresaleState().then(s => { if (s) setPresaleData(s); }).catch(() => {});
+    const refresh = () => {
+      fetchPresaleState().then(s => { if (s) setPresaleData(s); }).catch(() => {});
+    };
+    refresh();
     fetchPublicPresaleConfig().then(cfg => setSiteConfig(cfg));
+    const iv = setInterval(refresh, 30_000);
+    return () => clearInterval(iv);
   }, []);
 
   // ── Buyer on-chain data ──────────────────────────────────────────────────────
@@ -456,7 +461,13 @@ export default function Dashboard() {
                         {/* Progress bar */}
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm font-bold">
-                            <span className="text-[#4CAF50] font-display tracking-wide">🐸 {t.presale.sold}</span>
+                            <span className="text-[#4CAF50] font-display tracking-wide">
+                              🐸 {presaleData
+                                ? (totalSold >= 1_000_000_000
+                                    ? (totalSold / 1_000_000_000).toFixed(2) + "B"
+                                    : fmt(totalSold))
+                                : "…"} {t.presale.sold}
+                            </span>
                             <span className="text-[#1a1a2e]/60 font-nums tracking-wide">{presaleFilled}% — Stage {currentStage + 1}/4</span>
                           </div>
                           <div className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">

@@ -49,7 +49,7 @@ const en = {
     hrs: "HRS",
     min: "MIN",
     sec: "SEC",
-    sold: "0 Sold",
+    sold: "Sold",
     goal: "Goal: 0 $PWIFE",
     now: "🟢 NOW",
     next: "⬆️ NEXT",
