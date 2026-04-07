@@ -2,7 +2,7 @@ import { Router } from "express";
 
 const router = Router();
 
-const SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.mainnet-beta.solana.com";
+const SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
 
 // Health-check probe sent by web3.js Connection
 router.get("/rpc", (_req, res) => {

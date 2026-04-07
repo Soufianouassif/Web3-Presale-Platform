@@ -95,9 +95,13 @@ export const USDT_MINT = new PublicKey(
   "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 );
 
-/** RPC endpoint — set VITE_SOLANA_RPC_URL in .env to override */
+/** RPC endpoint — routes through the API proxy to avoid browser CORS.
+ *  Override via VITE_SOLANA_RPC_URL env var for direct RPC if needed. */
 export const SOLANA_ENDPOINT: string =
-  import.meta.env.VITE_SOLANA_RPC_URL || "https://api.devnet.solana.com";
+  import.meta.env.VITE_SOLANA_RPC_URL ||
+  (typeof window !== "undefined"
+    ? `${window.location.origin}/api/rpc`
+    : "https://api.devnet.solana.com");
 
 export const connection = new Connection(SOLANA_ENDPOINT, "confirmed");
 

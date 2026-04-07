@@ -675,7 +675,7 @@ export default function Home() {
                     ) : (
                       <div className="h-10 rounded-xl border-2 border-dashed border-[#1a1a2e]/20 bg-[#FFFDE7] flex items-center px-3">
                         <span className="font-display text-xs text-[#1a1a2e]/40 tracking-wider">
-                          {status === "connecting" ? `⏳ ${t.presale.connectingTo}` : t.presale.connectToSeeLink}
+                          {status === "connecting" ? `⏳ ${t.connect.connectingTo}` : t.presale.connectToSeeLink}
                         </span>
                       </div>
                     )}

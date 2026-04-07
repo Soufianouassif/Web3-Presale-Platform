@@ -1124,6 +1124,7 @@ export default function Dashboard() {
           amount={parseFloat(buyAmount)}
           currency={currency as "SOL" | "USDT_SPL"}
           presaleData={presaleData}
+          tokensEstimate={tokensOut}
           onClose={() => setShowBuyModal(false)}
           onSuccess={(sig) => {
             setDashTxSig(sig);
