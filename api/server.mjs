@@ -1,3 +1,3 @@
-// Vercel Serverless Function entry point.
-// app.mjs is copied here by the build command (see vercel.json) from artifacts/api-server/dist/
-export { default } from './app.mjs';
+// THIS FILE IS REPLACED DURING BUILD by: cp artifacts/api-server/dist/app.mjs api/server.mjs
+// The actual handler is the compiled Express app. See vercel.json buildCommand.
+export {};

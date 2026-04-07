@@ -1,0 +1,288 @@
+Apr 07 02:32:47.41
+GET
+500
+pwifecoin.fun
+/api/referral/stats/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:32:47.41
+GET
+500
+pwifecoin.fun
+/api/referral/code/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:32:47.41
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:32:47.37
+POST
+500
+pwifecoin.fun
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:32:33.22
+GET
+500
+pwifecoin.fun
+/api/referral/stats/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:32:33.22
+GET
+500
+pwifecoin.fun
+/api/referral/code/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:32:33.22
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:32:33.21
+POST
+500
+pwifecoin.fun
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:32:30.66
+POST
+500
+pwifecoin.fun
+/api/track/purchase
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:30:35.89
+GET
+500
+pwifecoin.fun
+/api/referral/code/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:30:35.89
+GET
+500
+pwifecoin.fun
+/api/referral/stats/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue. Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:30:35.88
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:30:35.88
+POST
+500
+pwifecoin.fun
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:28:02.04
+GET
+500
+pwifecoin.fun
+/api/referral/stats/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:28:02.03
+GET
+500
+pwifecoin.fun
+/api/referral/code/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:28:02.03
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:28:02.01
+POST
+500
+pwifecoin.fun
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:27:59.47
+POST
+500
+pwifecoin.fun
+/api/track/purchase
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:27:45.72
+GET
+500
+pwifecoin.fun
+/api/referral/stats/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:27:45.72
+GET
+500
+pwifecoin.fun
+/api/referral/code/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:27:45.70
+POST
+500
+pwifecoin.fun
+/api/track/wallet
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:27:00.40
+POST
+500
+pwifecoin.fun
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:26:21.85
+GET
+500
+pwifecoin.fun
+/api/auth/google
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:26:19.92
+GET
+500
+pwifecoin.fun
+/api/auth/me
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:26:08.92
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:26:08.87
+POST
+500
+pwifecoin.fun
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:25:49.33
+GET
+500
+web3-presale-platform-ap-git-b08651-soufian1122a-4089s-projects.vercel.app
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:25:49.18
+POST
+500
+web3-presale-platform-ap-git-b08651-soufian1122a-4089s-projects.vercel.app
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:25:02.34
+GET
+500
+pwifecoin.fun
+/api/referral/stats/FBp8D4mC6S4ZwsTD2UDqgDKjiUue4KogsFRVKzBfkPfF
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:25:02.34
+GET
+500
+pwifecoin.fun
+/api/referral/code/FBp8D4mC6S4ZwsTD2UDqgDKjiUue4KogsFRVKzBfkPfF
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:25:02.34
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:25:02.31
+POST
+500
+pwifecoin.fun
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:51.31
+GET
+500
+pwifecoin.fun
+/api/referral/stats/FBp8D4mC6S4ZwsTD2UDqgDKjiUue4KogsFRVKzBfkPfF
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:51.30
+GET
+500
+pwifecoin.fun
+/api/referral/code/FBp8D4mC6S4ZwsTD2UDqgDKjiUue4KogsFRVKzBfkPfF
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:51.30
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:51.28
+POST
+500
+pwifecoin.fun
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:48.66
+POST
+500
+pwifecoin.fun
+/api/track/purchase
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:33.75
+GET
+500
+pwifecoin.fun
+/api/referral/stats/FBp8D4mC6S4ZwsTD2UDqgDKjiUue4KogsFRVKzBfkPfF
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:33.75
+GET
+500
+pwifecoin.fun
+/api/referral/code/FBp8D4mC6S4ZwsTD2UDqgDKjiUue4KogsFRVKzBfkPfF
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:33.71
+POST
+500
+pwifecoin.fun
+/api/track/wallet
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:22.14
+GET
+500
+web3-presale-platform-api-server-mpdji5iix.vercel.app
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue. Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:22.14
+POST
+500
+web3-presale-platform-api-server-mpdji5iix.vercel.app
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue. Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:22.01
+GET
+500
+web3-presale-platform-api-server-mpdji5iix.vercel.app
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue. Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:22.00
+POST
+500
+web3-presale-platform-api-server-mpdji5iix.vercel.app
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:21.96
+GET
+500
+web3-presale-platform-api-server-mpdji5iix.vercel.app
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue. Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:21.96
+GET
+500
+web3-presale-platform-api-server-mpdji5iix.vercel.app
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:21.84
+GET
+500
+web3-presale-platform-api-server-mpdji5iix.vercel.app
+/api/referral/leaderboard
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue. Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 07 02:24:21.84
+POST
+500
+web3-presale-platform-api-server-mpdji5iix.vercel.app
+/api/track/visit
+Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue. Cannot find module 'passport' Require stack: - /var/task/api/app.mjs Did you forget to add it to "dependencies" in `package.json`? Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
