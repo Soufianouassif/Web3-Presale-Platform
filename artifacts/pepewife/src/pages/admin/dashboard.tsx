@@ -571,7 +571,7 @@ export default function AdminDashboard() {
                     {/* Stage + Status */}
                     <div className="bg-[#0a0a0f] border border-[#9945FF]/20 rounded-xl p-4">
                       <p className="text-xs text-gray-500 mb-1">Current Stage</p>
-                      <p className="text-2xl font-bold text-[#9945FF]">Stage {chainData.currentStage}</p>
+                      <p className="text-2xl font-bold text-[#9945FF]">Stage {chainData.currentStage + 1}</p>
                       <p className={`text-xs mt-1 font-medium ${chainData.isActive && !chainData.isPaused ? "text-[#39ff14]" : "text-red-400"}`}>
                         {chainData.isActive && !chainData.isPaused ? "● Active" : chainData.isPaused ? "⏸ Paused" : "● Inactive"}
                       </p>
@@ -696,7 +696,7 @@ export default function AdminDashboard() {
                         const sold = Number(stage.tokensSold);
                         const max  = Number(stage.maxTokens);
                         const pct  = max > 0 ? Math.min(100, (sold / max) * 100) : 0;
-                        const isCurrent = i + 1 === chainData.currentStage;
+                        const isCurrent = i === chainData.currentStage;
                         // Use confirmed static prices (matches home + dashboard pages)
                         const CONFIRMED_STAGE_PRICES = [0.00000001, 0.00000002, 0.00000004, 0.00000006];
                         const priceUsd = CONFIRMED_STAGE_PRICES[i] ?? stageTokenPriceUsd(stage.tokensPerRawUsdtScaled);
@@ -802,14 +802,14 @@ export default function AdminDashboard() {
                         variant="danger"
                         onClick={() => doAction("pause", adminApi.pausePresale)}
                         loading={actionLoading === "pause"}
-                        disabled={!config?.isActive}
+                        disabled={(config?.isActive ?? true) === false}
                       />
                       <ControlButton
                         label="▶ Resume Sale"
                         variant="success"
                         onClick={() => doAction("resume", adminApi.resumePresale)}
                         loading={actionLoading === "resume"}
-                        disabled={config?.isActive}
+                        disabled={(config?.isActive ?? true) === true}
                       />
                     </div>
                   </div>

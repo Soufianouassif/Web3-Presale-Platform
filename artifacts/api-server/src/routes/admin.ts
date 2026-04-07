@@ -193,39 +193,51 @@ router.get("/admin/config", async (_req, res) => {
 
 router.post("/admin/presale/pause", async (_req, res) => {
   try {
-    await db.update(presaleConfig).set({ isActive: false, updatedAt: new Date() }).where(eq(presaleConfig.id, 1));
-    res.json({ success: true, message: "Presale paused" });
-  } catch {
-    res.status(500).json({ error: "Failed to pause presale" });
+    await db.insert(presaleConfig)
+      .values({ id: 1, isActive: false, updatedAt: new Date() })
+      .onConflictDoUpdate({ target: presaleConfig.id, set: { isActive: false, updatedAt: new Date() } });
+    res.json({ success: true, message: "Presale paused successfully" });
+  } catch (err) {
+    console.error("pause error", err);
+    res.status(500).json({ success: false, message: "Failed to pause presale" });
   }
 });
 
 router.post("/admin/presale/resume", async (_req, res) => {
   try {
-    await db.update(presaleConfig).set({ isActive: true, updatedAt: new Date() }).where(eq(presaleConfig.id, 1));
-    res.json({ success: true, message: "Presale resumed" });
-  } catch {
-    res.status(500).json({ error: "Failed to resume presale" });
+    await db.insert(presaleConfig)
+      .values({ id: 1, isActive: true, updatedAt: new Date() })
+      .onConflictDoUpdate({ target: presaleConfig.id, set: { isActive: true, updatedAt: new Date() } });
+    res.json({ success: true, message: "Presale resumed successfully" });
+  } catch (err) {
+    console.error("resume error", err);
+    res.status(500).json({ success: false, message: "Failed to resume presale" });
   }
 });
 
 router.post("/admin/presale/claim", async (req, res) => {
   try {
     const { enabled } = req.body as { enabled: boolean };
-    await db.update(presaleConfig).set({ claimEnabled: enabled, updatedAt: new Date() }).where(eq(presaleConfig.id, 1));
-    res.json({ success: true, message: `Claim ${enabled ? "enabled" : "disabled"}` });
-  } catch {
-    res.status(500).json({ error: "Failed to update claim status" });
+    await db.insert(presaleConfig)
+      .values({ id: 1, claimEnabled: enabled, updatedAt: new Date() })
+      .onConflictDoUpdate({ target: presaleConfig.id, set: { claimEnabled: enabled, updatedAt: new Date() } });
+    res.json({ success: true, message: `Claim ${enabled ? "enabled" : "disabled"} successfully` });
+  } catch (err) {
+    console.error("claim error", err);
+    res.status(500).json({ success: false, message: "Failed to update claim status" });
   }
 });
 
 router.post("/admin/presale/staking", async (req, res) => {
   try {
     const { enabled } = req.body as { enabled: boolean };
-    await db.update(presaleConfig).set({ stakingEnabled: enabled, updatedAt: new Date() }).where(eq(presaleConfig.id, 1));
-    res.json({ success: true, message: `Staking ${enabled ? "enabled" : "disabled"}` });
-  } catch {
-    res.status(500).json({ error: "Failed to update staking status" });
+    await db.insert(presaleConfig)
+      .values({ id: 1, stakingEnabled: enabled, updatedAt: new Date() })
+      .onConflictDoUpdate({ target: presaleConfig.id, set: { stakingEnabled: enabled, updatedAt: new Date() } });
+    res.json({ success: true, message: `Staking ${enabled ? "enabled" : "disabled"} successfully` });
+  } catch (err) {
+    console.error("staking error", err);
+    res.status(500).json({ success: false, message: "Failed to update staking status" });
   }
 });
 

@@ -19,7 +19,8 @@ async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error((err as { error?: string }).error ?? "Request failed");
+    const e = err as { error?: string; message?: string };
+    throw new Error(e.error ?? e.message ?? "Request failed");
   }
   return res.json() as Promise<T>;
 }
