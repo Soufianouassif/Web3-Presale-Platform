@@ -13,7 +13,6 @@ import SEOHead from "@/components/seo-head";
 import WalletBuyModal from "@/components/wallet-buy-modal";
 import {
   fetchPresaleState,
-  stageTokenPriceUsd,
   type PresaleState,
 } from "@/lib/presale-contract";
 import {
@@ -28,7 +27,7 @@ import {
   type ReferralStats,
   type LeaderboardEntry,
 } from "@/lib/referral";
-import { tracker } from "@/lib/admin-api";
+import { tracker, fetchPublicPresaleConfig, type PublicPresaleConfig } from "@/lib/admin-api";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,6 +40,7 @@ export default function Home() {
   const [pricesLoading, setPricesLoading] = useState(false);
 
   const [presaleData, setPresaleData] = useState<PresaleState | null>(null);
+  const [siteConfig, setSiteConfig] = useState<PublicPresaleConfig>({ isActive: true, claimEnabled: false, stakingEnabled: false, currentStage: 1 });
   const [txSignature, setTxSignature] = useState<string | null>(null);
   const [showBuyModal, setShowBuyModal] = useState(false);
 
@@ -56,9 +56,8 @@ export default function Home() {
 
   useEffect(() => {
     tracker.visit("/");
-    fetchPresaleState().then(d => {
-      if (d) setPresaleData(d);
-    });
+    fetchPresaleState().then(d => { if (d) setPresaleData(d); });
+    fetchPublicPresaleConfig().then(cfg => setSiteConfig(cfg));
   }, []);
 
   useEffect(() => {
@@ -231,10 +230,9 @@ export default function Home() {
     const amountNum = parseFloat(amount) || 0;
     const stageIdx  = presaleData?.currentStage ?? 0;
     const stage     = stageIdx + 1; // 1-indexed for tracker
-    const FALLBACK_PRICES_NUM = [0.00000001, 0.00000002, 0.00000004, 0.00000006];
-    const pricePerToken = presaleData?.stages[stageIdx]?.tokensPerRawUsdtScaled
-      ? stageTokenPriceUsd(presaleData.stages[stageIdx].tokensPerRawUsdtScaled)
-      : FALLBACK_PRICES_NUM[stageIdx] ?? 0.00000001;
+    // Always use confirmed static prices — consistent with home + dashboard display
+    const CONFIRMED_PRICES = [0.00000001, 0.00000002, 0.00000004, 0.00000006];
+    const pricePerToken = CONFIRMED_PRICES[stageIdx] ?? 0.00000001;
     const solUsd = currency === "SOL" ? amountNum * solPrice : 0;
     const usdAmt = currency === "SOL" ? solUsd : amountNum;
     const tokensEst = pricePerToken > 0 ? usdAmt / pricePerToken : 0;
@@ -353,13 +351,15 @@ export default function Home() {
         <div className="pt-28 pb-24 px-4">
           <div className="max-w-7xl mx-auto" dir="ltr">
             <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-6 animate-pulse text-base" style={{ transform: "rotate(-2deg)" }}>
-              {presaleData
-                ? presaleData.isActive
-                  ? `🔥 STAGE ${presaleData.currentStage + 1}/4 — PRESALE LIVE — APE IN NOW!! 🚀`
-                  : presaleData.isPaused
-                  ? `⏸️ STAGE ${presaleData.currentStage + 1}/4 — PRESALE PAUSED — COMING BACK SOON`
-                  : `✅ PRESALE ENDED — CLAIM YOUR $PWIFE SOON!`
-                : "🔥 STAGE 1 — PRESALE COMING SOON — NGMI IF U MISS THIS!!"}
+              {!siteConfig.isActive
+                ? "⏸️ PRESALE TEMPORARILY PAUSED — COMING BACK SOON"
+                : presaleData
+                  ? presaleData.isActive
+                    ? `🔥 STAGE ${presaleData.currentStage + 1}/4 — PRESALE LIVE — APE IN NOW!! 🚀`
+                    : presaleData.isPaused
+                    ? `⏸️ STAGE ${presaleData.currentStage + 1}/4 — PRESALE PAUSED — COMING BACK SOON`
+                    : `✅ PRESALE ENDED — CLAIM YOUR $PWIFE SOON!`
+                  : "🔥 STAGE 1 — PRESALE COMING SOON — NGMI IF U MISS THIS!!"}
             </div>
             <h1 className="text-5xl lg:text-8xl font-display leading-tight mb-6 text-[#1a1a2e] comic-shadow tracking-wider max-w-3xl">
               {"Be Early..."}<br /><span className="text-[#FF4D9D]" style={{ textShadow: "3px 3px 0px #1a1a2e" }}>{"Or Cry Later 😭"}</span>
@@ -617,7 +617,7 @@ export default function Home() {
                   </div>
                   <button
                     onClick={handleApeIn}
-                    disabled={!!amountError || amount === ""}
+                    disabled={!!amountError || amount === "" || !siteConfig.isActive}
                     className="btn-meme w-full h-14 text-2xl rounded-xl font-display tracking-wider text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
                     style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)" }}
                   >

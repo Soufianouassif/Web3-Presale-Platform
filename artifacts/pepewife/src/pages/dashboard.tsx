@@ -9,13 +9,12 @@ import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
 import { useWallet } from "@/contexts/wallet-context";
 import { useToast } from "@/components/wallet-toast";
-import { tracker } from "@/lib/admin-api";
+import { tracker, fetchPublicPresaleConfig, type PublicPresaleConfig } from "@/lib/admin-api";
 import WalletBuyModal from "@/components/wallet-buy-modal";
 import {
   fetchPresaleState,
   fetchBuyerState,
   fetchBuyerTransactions,
-  stageTokenPriceUsd,
   type PresaleState,
   type BuyerState,
   type BuyerTx,
@@ -40,6 +39,7 @@ export default function Dashboard() {
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [dashTxSig, setDashTxSig] = useState<string | null>(null);
   const [presaleData, setPresaleData] = useState<PresaleState | null>(null);
+  const [siteConfig, setSiteConfig] = useState<PublicPresaleConfig>({ isActive: true, claimEnabled: false, stakingEnabled: false, currentStage: 1 });
   const [solPrice, setSolPrice] = useState<number>(150);
   const [pricesUpdatedAt, setPricesUpdatedAt] = useState<Date | null>(null);
   const [pricesLoading, setPricesLoading] = useState(false);
@@ -139,9 +139,10 @@ export default function Dashboard() {
     return () => { cancelled = true; clearInterval(iv); };
   }, []);
 
-  // ── Presale state ────────────────────────────────────────────────────────────
+  // ── Presale state + site config ──────────────────────────────────────────────
   useEffect(() => {
     fetchPresaleState().then(s => { if (s) setPresaleData(s); }).catch(() => {});
+    fetchPublicPresaleConfig().then(cfg => setSiteConfig(cfg));
   }, []);
 
   // ── Buyer on-chain data ──────────────────────────────────────────────────────
@@ -213,7 +214,7 @@ export default function Dashboard() {
   const STAGE_DATA = STAGE_PRICES_FALLBACK.map((fallbackPrice, i) => {
     const cs = presaleData?.stages[i];
     const tokens = cs ? Number(cs.maxTokens)  : 5_000_000_000_000;
-    const sold   = cs ? Number(cs.tokensSold) : (i === 0 ? 15_000_000_000 : 0);
+    const sold   = cs ? Number(cs.tokensSold) : 0;
     return { stage: i + 1, price: fallbackPrice, tokens, sold, color: STAGE_COLORS[i] };
   });
   const LISTING_PRICE = "$0.061327";
@@ -628,7 +629,7 @@ export default function Dashboard() {
                               if (!buyAmount || !!amountError) return;
                               setShowBuyModal(true);
                             }}
-                            disabled={!!amountError || buyAmount === ""}
+                            disabled={!!amountError || buyAmount === "" || !siteConfig.isActive}
                             className="btn-meme w-full h-14 text-2xl rounded-xl font-display tracking-wider text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
                             style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)" }}
                           >

@@ -104,6 +104,23 @@ export interface AdminUser {
   };
 }
 
+export interface PublicPresaleConfig {
+  isActive: boolean;
+  claimEnabled: boolean;
+  stakingEnabled: boolean;
+  currentStage: number;
+}
+
+export async function fetchPublicPresaleConfig(): Promise<PublicPresaleConfig> {
+  try {
+    const res = await fetch(`${API_BASE}/presale/config`, { credentials: "include" });
+    if (!res.ok) return { isActive: true, claimEnabled: false, stakingEnabled: false, currentStage: 1 };
+    return res.json() as Promise<PublicPresaleConfig>;
+  } catch {
+    return { isActive: true, claimEnabled: false, stakingEnabled: false, currentStage: 1 };
+  }
+}
+
 export const adminApi = {
   getMe: () => fetchApi<AdminUser>("/auth/me"),
   logout: () => fetchApi<{ success: boolean }>("/auth/logout", { method: "POST" }),

@@ -592,9 +592,9 @@ export default function AdminDashboard() {
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
                         SOL
-                        {chainData.solPriceUsdE6 > 0n && (
+                        {(livesolPrice || chainData.solPriceUsdE6 > 0n) && (
                           <span className="ml-1 text-gray-600">
-                            ≈ ${((Number(chainData.totalSolRaised) / 1e9) * (Number(chainData.solPriceUsdE6) / 1e6)).toFixed(2)}
+                            ≈ ${((Number(chainData.totalSolRaised) / 1e9) * (livesolPrice ?? Number(chainData.solPriceUsdE6) / 1e6)).toFixed(2)}
                           </span>
                         )}
                       </p>
@@ -697,8 +697,9 @@ export default function AdminDashboard() {
                         const max  = Number(stage.maxTokens);
                         const pct  = max > 0 ? Math.min(100, (sold / max) * 100) : 0;
                         const isCurrent = i + 1 === chainData.currentStage;
-                        // Price formula: 0.001 / tokensPerRawUsdtScaled (PRICE_SCALE=1000)
-                        const priceUsd = stageTokenPriceUsd(stage.tokensPerRawUsdtScaled);
+                        // Use confirmed static prices (matches home + dashboard pages)
+                        const CONFIRMED_STAGE_PRICES = [0.00000001, 0.00000002, 0.00000004, 0.00000006];
+                        const priceUsd = CONFIRMED_STAGE_PRICES[i] ?? stageTokenPriceUsd(stage.tokensPerRawUsdtScaled);
                         return (
                           <div key={i} className={`rounded-xl p-3 border ${isCurrent ? "border-[#9945FF]/30 bg-[#9945FF]/5" : "border-white/5 bg-[#0a0a0f]"}`}>
                             <div className="flex items-center justify-between mb-2">
