@@ -10,12 +10,6 @@
       "includeFiles": "api/**"
     }
   },
-  "crons": [
-    {
-      "path": "/api/cron/sync-sol-price",
-      "schedule": "*/5 * * * *"
-    }
-  ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/server" },
     { "handle": "filesystem" },
