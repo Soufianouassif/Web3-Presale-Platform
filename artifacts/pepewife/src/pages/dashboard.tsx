@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Menu, X, Twitter, Send, Wallet, Copy, Check, ChevronDown, Shield, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,6 +62,8 @@ export default function Dashboard() {
   const [refStats, setRefStats] = useState<ReferralStats | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [refCopied, setRefCopied] = useState(false);
+  const [refLoading, setRefLoading] = useState(false);
+  const [refLastUpdated, setRefLastUpdated] = useState<Date | null>(null);
 
   const myRefUrl = myRefCode ? buildReferralUrl(myRefCode) : "";
 
@@ -76,16 +78,44 @@ export default function Dashboard() {
     tracker.visit("/dashboard");
   }, []);
 
+  // ── Referral data refresh ────────────────────────────────────────────────
+  const refLoadingRef = React.useRef(false);
+  const refreshReferralData = useCallback(async () => {
+    if (refLoadingRef.current) return;
+    refLoadingRef.current = true;
+    setRefLoading(true);
+    try {
+      const [lb, statsResult, codeResult] = await Promise.all([
+        fetchLeaderboard(),
+        address ? fetchReferralStats(address) : Promise.resolve(null),
+        address ? fetchOrCreateReferralCode(address) : Promise.resolve(null),
+      ]);
+      setLeaderboard(lb);
+      if (statsResult) {
+        setRefStats(statsResult);
+        if (statsResult.code) setMyRefCode(statsResult.code);
+      }
+      if (codeResult) setMyRefCode(codeResult);
+      setRefLastUpdated(new Date());
+    } finally {
+      refLoadingRef.current = false;
+      setRefLoading(false);
+    }
+  }, [address]);
+
   // ── Load referral data when address is available ──────────────────────────
   useEffect(() => {
-    fetchLeaderboard().then(lb => setLeaderboard(lb));
-  }, []);
-
-  useEffect(() => {
-    if (!address) return;
-    fetchOrCreateReferralCode(address).then(code => { if (code) setMyRefCode(code); });
-    fetchReferralStats(address).then(stats => { if (stats) setRefStats(stats); });
+    refreshReferralData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
+
+  // ── تحديث تلقائي كل 30 ثانية عند فتح تاب الإحالة ───────────────────────
+  useEffect(() => {
+    if (activeTab !== "referrals") return;
+    const iv = setInterval(() => refreshReferralData(), 30_000);
+    return () => clearInterval(iv);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, address]);
 
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
@@ -193,6 +223,7 @@ export default function Dashboard() {
   const presaleFilled = Math.round((totalSold / totalTokens) * 100);
 
   const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace(/\$/g, ""));
+
   const amountUSD = !isNaN(amountNum) && buyAmount !== ""
     ? currency === "SOL" ? amountNum * solPrice
     : amountNum
@@ -839,11 +870,26 @@ export default function Dashboard() {
                   <div className="meme-card bg-white rounded-2xl overflow-hidden">
                     <div className="zigzag-border" />
                     <div className="p-5 space-y-5">
-                      <div>
-                        <div className="sticker bg-[#FF4D9D] text-white mb-3 text-sm inline-block" style={{ transform: "rotate(2deg)" }}>{t.presale.referralBanner}</div>
-                        <h3 className="text-3xl font-display text-[#1a1a2e] tracking-wider comic-shadow mb-1">{t.presale.shillEarn}</h3>
-                        <p className="text-[#1a1a2e]/60 font-bold">{t.presale.shillDesc}</p>
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="sticker bg-[#FF4D9D] text-white mb-3 text-sm inline-block" style={{ transform: "rotate(2deg)" }}>{t.presale.referralBanner}</div>
+                          <h3 className="text-3xl font-display text-[#1a1a2e] tracking-wider comic-shadow mb-1">{t.presale.shillEarn}</h3>
+                          <p className="text-[#1a1a2e]/60 font-bold">{t.presale.shillDesc}</p>
+                        </div>
+                        <button
+                          onClick={() => refreshReferralData()}
+                          disabled={refLoading}
+                          className="shrink-0 mt-1 flex items-center gap-1 text-xs font-display text-[#1a1a2e]/40 hover:text-[#FF4D9D] transition-colors tracking-wide disabled:opacity-50"
+                        >
+                          <span className={refLoading ? "animate-spin inline-block" : "inline-block"}>🔄</span>
+                          {t.dashboard.refresh ?? "Refresh"}
+                        </button>
                       </div>
+                      {refLastUpdated && (
+                        <p className="text-[10px] text-[#1a1a2e]/30 font-bold -mt-2">
+                          Updated: {refLastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                        </p>
+                      )}
 
                       {/* Referral link */}
                       <div>

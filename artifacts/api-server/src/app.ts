@@ -8,6 +8,7 @@ import passport from "passport";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import router from "./routes/index.js";
 import { logger } from "./lib/logger.js";
+import { runSolPriceSync } from "./routes/sol-price-sync.js";
 import { pool } from "@workspace/db";
 
 type PinoHttpFactory = (opts?: Record<string, unknown>) => RequestHandler;
@@ -109,5 +110,18 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   logger.error({ err }, "Unhandled error");
   res.status(status).json({ error: message, stack: IS_PROD ? undefined : err.stack });
 });
+
+// ── مزامنة سعر SOL تلقائياً كل 5 دقائق ────────────────────────────────────
+// تعمل فقط عندما يكون ADMIN_KEYPAIR_JSON محدداً في متغيرات البيئة
+if (process.env.ADMIN_KEYPAIR_JSON) {
+  const SYNC_INTERVAL_MS = 5 * 60 * 1_000; // 5 دقائق
+  // تشغيل أول مزامنة عند بدء السيرفر (بعد 10 ثواني للتهيئة)
+  setTimeout(() => runSolPriceSync(), 10_000);
+  // ثم كل 5 دقائق
+  setInterval(() => runSolPriceSync(), SYNC_INTERVAL_MS);
+  logger.info("SOL price auto-sync enabled (every 5 minutes)");
+} else {
+  logger.warn("ADMIN_KEYPAIR_JSON not set — SOL price auto-sync disabled");
+}
 
 export default app;

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { adminApi, type AdminStats } from "@/lib/admin-api";
-import { withdrawSol, withdrawSolWithKeypair, connection, SOL_VAULT_PDA, fetchPresaleState, stageTokenPriceUsd, type PresaleState } from "@/lib/presale-contract";
+import { withdrawSol, withdrawSolWithKeypair, updateSolPrice, connection, SOL_VAULT_PDA, fetchPresaleState, stageTokenPriceUsd, type PresaleState } from "@/lib/presale-contract";
 
 function fmt(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
@@ -354,6 +354,9 @@ export default function AdminDashboard() {
   const [vaultBalance, setVaultBalance] = useState<number | null>(null);
   const [chainLoading, setChainLoading] = useState(false);
   const [chainLastUpdated, setChainLastUpdated] = useState<Date | null>(null);
+  const [livesolPrice, setLiveSolPrice] = useState<number | null>(null);
+  const [syncSolLoading, setSyncSolLoading] = useState(false);
+  const [syncSolWallet, setSyncSolWallet] = useState<string>("");
 
   const showNotification = (msg: string, type: "success" | "error" = "success") => {
     setNotification({ msg, type });
@@ -395,6 +398,48 @@ export default function AdminDashboard() {
     const interval = setInterval(refreshChainData, 30_000);
     return () => clearInterval(interval);
   }, [refreshChainData]);
+
+  // ── جلب سعر SOL اللحظي من CoinGecko ────────────────────────────────────
+  useEffect(() => {
+    const fetchPrice = async () => {
+      try {
+        const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd");
+        const d = await r.json();
+        if (d?.solana?.usd) setLiveSolPrice(d.solana.usd);
+      } catch { /* ignore */ }
+    };
+    fetchPrice();
+    const iv = setInterval(fetchPrice, 60_000);
+    return () => clearInterval(iv);
+  }, []);
+
+  // ── مزامنة سعر SOL مع العقد ──────────────────────────────────────────────
+  const handleSyncSolPrice = async () => {
+    if (!livesolPrice) { showNotification("لم يتم جلب سعر SOL اللحظي بعد", "error"); return; }
+    if (!syncSolWallet) { showNotification("يرجى إدخال عنوان محفظة الأدمن أولاً", "error"); return; }
+    setSyncSolLoading(true);
+    try {
+      await updateSolPrice(syncSolWallet, livesolPrice, "phantom");
+      showNotification(`✅ تم تحديث سعر SOL إلى $${livesolPrice.toFixed(2)} في العقد`, "success");
+      await refreshChainData();
+    } catch (e) {
+      showNotification(`❌ ${(e as Error).message}`, "error");
+    } finally {
+      setSyncSolLoading(false);
+    }
+  };
+
+  const connectAdminPhantom = async () => {
+    try {
+      const provider = (window as any).phantom?.solana ?? (window as any).solana;
+      if (!provider) throw new Error("Phantom wallet not found");
+      const resp = await provider.connect();
+      const addr = resp.publicKey?.toString() ?? provider.publicKey?.toString();
+      if (addr) setSyncSolWallet(addr);
+    } catch (e) {
+      showNotification((e as Error).message, "error");
+    }
+  };
 
   const doAction = async (key: string, fn: () => Promise<{ success: boolean; message: string }>) => {
     setActionLoading(key);
@@ -584,14 +629,50 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* SOL Price */}
-                    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4">
-                      <p className="text-xs text-gray-500 mb-1">SOL Price (contract)</p>
-                      <p className="text-xl font-bold text-blue-400">
-                        {chainData.solPriceUsdE6 > 0n
-                          ? `$${(Number(chainData.solPriceUsdE6) / 1e6).toLocaleString(undefined, { maximumFractionDigits: 2 })}`
-                          : "Not set"}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">USD / SOL on-chain</p>
+                    <div className="bg-[#0a0a0f] border border-white/10 rounded-xl p-4 col-span-full">
+                      <p className="text-xs text-gray-500 mb-2">SOL Price (contract)</p>
+                      <div className="flex flex-wrap items-center gap-4 mb-3">
+                        <div>
+                          <p className="text-xl font-bold text-blue-400">
+                            {chainData.solPriceUsdE6 > 0n
+                              ? `$${(Number(chainData.solPriceUsdE6) / 1e6).toLocaleString(undefined, { maximumFractionDigits: 2 })}`
+                              : "Not set"}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">سعر العقد الحالي</p>
+                        </div>
+                        {livesolPrice && (
+                          <div>
+                            <p className="text-xl font-bold text-green-400">${livesolPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">السعر اللحظي (CoinGecko)</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Sync UI */}
+                      <div className="border-t border-white/10 pt-3 space-y-2">
+                        <p className="text-xs text-gray-400">مزامنة سعر SOL اللحظي مع العقد — يجب التوقيع بمحفظة الأدمن</p>
+                        {!syncSolWallet ? (
+                          <button
+                            onClick={connectAdminPhantom}
+                            className="px-4 py-2 rounded-lg bg-[#9945FF]/20 border border-[#9945FF]/40 text-[#9945FF] text-sm font-medium hover:bg-[#9945FF]/30 transition-all"
+                          >
+                            🔌 ربط محفظة Phantom
+                          </button>
+                        ) : (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-xs text-gray-400 font-mono">{syncSolWallet.slice(0,8)}...{syncSolWallet.slice(-6)}</span>
+                            <button
+                              onClick={handleSyncSolPrice}
+                              disabled={syncSolLoading || !livesolPrice}
+                              className="px-4 py-2 rounded-lg bg-green-500/20 border border-green-500/40 text-green-300 text-sm font-medium hover:bg-green-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                              {syncSolLoading && <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />}
+                              ⚡ مزامنة السعر اللحظي {livesolPrice ? `($${livesolPrice.toFixed(2)})` : ""}
+                            </button>
+                            <button onClick={() => setSyncSolWallet("")} className="text-xs text-gray-600 hover:text-gray-400">قطع الاتصال</button>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {/* Claim status */}

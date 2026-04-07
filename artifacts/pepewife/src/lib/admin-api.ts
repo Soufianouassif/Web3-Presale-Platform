@@ -56,8 +56,10 @@ export interface AdminStats {
       walletAddress: string;
       code: string;
       totalReferrals: number;
-      pendingTokens: number;
-      paidTokens: number;
+      totalRewardTokens: number;
+      totalRewardUsd: number;
+      pendingTokens?: number;
+      paidTokens?: number;
     }[];
   };
 }

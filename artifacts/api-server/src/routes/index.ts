@@ -6,6 +6,7 @@ import adminRouter from "./admin.js";
 import trackerRouter from "./tracker.js";
 import referralRouter from "./referral.js";
 import rpcProxyRouter from "./rpc-proxy.js";
+import solPriceSyncRouter from "./sol-price-sync.js";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(trackerRouter);
 router.use(referralRouter);
 router.use(healthRouter);
 router.use(twitterRouter);
+router.use(solPriceSyncRouter);
 
 export default router;

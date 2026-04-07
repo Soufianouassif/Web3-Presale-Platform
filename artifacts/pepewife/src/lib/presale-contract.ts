@@ -394,6 +394,55 @@ export async function withdrawSolWithKeypair(
 }
 
 // ─────────────────────────────────────────────────────────────
+//  ADMIN: UPDATE SOL PRICE  (update_sol_price instruction)
+//  Accounts: config (mut), authority (signer)
+//  newPriceUsd: SOL price in dollars (e.g. 145.50)
+// ─────────────────────────────────────────────────────────────
+
+export async function updateSolPrice(
+  adminAddress: string,
+  newPriceUsd: number,
+  walletType = "phantom",
+): Promise<{ signature: string }> {
+  const admin = new PublicKey(adminAddress);
+  const discriminator = await getDiscriminator("update_sol_price");
+
+  // Convert USD price to micro-USD (6 decimals): $145.50 → 145_500_000
+  const priceE6 = BigInt(Math.round(newPriceUsd * 1_000_000));
+  const argsBuf = Buffer.alloc(8);
+  argsBuf.writeBigUInt64LE(priceE6, 0);
+  const data = Buffer.concat([discriminator, argsBuf]);
+
+  const ix = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: admin,      isSigner: true,  isWritable: false },
+    ],
+    data,
+  });
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+
+  const provider = getProvider(walletType);
+  const signed = await provider.signTransaction(tx);
+
+  const signature = await sendAndConfirmTx(
+    signed.serialize(),
+    blockhash,
+    lastValidBlockHeight,
+  );
+  return { signature };
+}
+
+// ─────────────────────────────────────────────────────────────
 //  FETCH PRESALE STATE  (for live progress bar / stage data)
 // ─────────────────────────────────────────────────────────────
 
