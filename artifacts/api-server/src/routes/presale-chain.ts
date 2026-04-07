@@ -5,7 +5,7 @@ const router = Router();
 const SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
 const CONFIG_PDA = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
 
-let solPriceCache: { price: number; fetchedAt: number } = { price: 140, fetchedAt: 0 };
+let solPriceCache: { price: number; fetchedAt: number } = { price: 0, fetchedAt: 0 };
 let chainStateCache: { data: unknown; fetchedAt: number } | null = null;
 const PRICE_TTL_MS   = 60 * 1000;        // 1 min
 const CHAIN_TTL_MS   = 15 * 1000;        // 15 sec

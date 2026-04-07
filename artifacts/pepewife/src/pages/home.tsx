@@ -35,7 +35,7 @@ export default function Home() {
   const [currency, setCurrency] = useState<"SOL" | "USDT_SPL">("SOL");
   const [amount, setAmount] = useState("");
   const [copied, setCopied] = useState(false);
-  const [solPrice, setSolPrice] = useState<number>(150);
+  const [solPrice, setSolPrice] = useState<number>(0);
   const [pricesUpdatedAt, setPricesUpdatedAt] = useState<Date | null>(null);
   const [pricesLoading, setPricesLoading] = useState(false);
 
@@ -77,10 +77,7 @@ export default function Home() {
           setPricesUpdatedAt(new Date());
         })
         .catch(() => {
-          // Fallback: use on-chain sol_price_usd_e6 if available
-          if (presaleData?.solPriceUsdE6 && presaleData.solPriceUsdE6 > 0n) {
-            setSolPrice(Number(presaleData.solPriceUsdE6) / 1_000_000);
-          }
+          // Keep last known price on failure — do not use stale on-chain value
         })
         .finally(() => setPricesLoading(false));
     };

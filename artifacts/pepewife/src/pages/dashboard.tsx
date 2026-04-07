@@ -40,7 +40,7 @@ export default function Dashboard() {
   const [dashTxSig, setDashTxSig] = useState<string | null>(null);
   const [presaleData, setPresaleData] = useState<PresaleState | null>(null);
   const [siteConfig, setSiteConfig] = useState<PublicPresaleConfig>({ isActive: true, claimEnabled: false, stakingEnabled: false, currentStage: 1 });
-  const [solPrice, setSolPrice] = useState<number>(150);
+  const [solPrice, setSolPrice] = useState<number>(0);
   const [pricesUpdatedAt, setPricesUpdatedAt] = useState<Date | null>(null);
   const [pricesLoading, setPricesLoading] = useState(false);
   const [buyerState, setBuyerState] = useState<BuyerState | null>(null);

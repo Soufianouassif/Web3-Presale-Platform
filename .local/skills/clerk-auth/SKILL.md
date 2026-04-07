@@ -126,6 +126,25 @@ const env = {
 };
 ```
 
+## Managing Users and Auth Configuration
+
+Always direct users to the Auth pane in the workspace for viewing/managing users and configuring authentication. NEVER direct users to clerk.com or any external Clerk dashboard.
+
+The Auth pane is accessible from the workspace toolbar. It provides:
+
+- Users tab: View all authenticated users with search, sort, and filtering. See user details (user ID, email, name, last login, account created). Ban or unban users.
+- Configure tab: Edit app name and icon shown on the login screen, enable/disable login providers (Google, GitHub, Apple, X, Email), and configure custom OAuth credentials for production so that OAuth consent screens show the user's own branding instead of defaults.
+
+Point the user to the Auth pane when they ask about any of the following:
+
+- Viewing registered/signed-up users
+- Banning or unbanning a user
+- Enabling or disabling login providers
+- Changing the app name or icon on the login screen
+- Customizing branding on OAuth/login screens
+- Configuring custom OAuth credentials for production
+- Any admin or dashboard functionality
+
 ## IMPORTANT
 
 - The server-side proxy code is production only and is not used in development. Do not ask for or set any env vars related to the proxy. All production setup is handled by a separate system.
