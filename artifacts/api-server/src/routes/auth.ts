@@ -117,6 +117,8 @@ router.get("/auth/me", (req, res) => {
 
 router.post("/auth/logout", (req, res) => {
   req.session.destroy(() => {
+    // إزالة الكوكي من المتصفح بشكل صريح
+    res.clearCookie("__pwife_sid", { path: "/" });
     res.json({ success: true });
   });
 });

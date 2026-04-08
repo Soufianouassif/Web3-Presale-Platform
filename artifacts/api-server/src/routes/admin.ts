@@ -1,12 +1,39 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import { db } from "@workspace/db";
 import { pageVisits, walletConnections, purchases, presaleConfig, adminUsers, referralCodes, referrals } from "@workspace/db/schema";
-import { desc, sql, eq, count, inArray } from "drizzle-orm";
+import { desc, sql, eq, count } from "drizzle-orm";
 import { requireAdminAuth } from "../middleware/admin-auth.js";
+import { logger } from "../lib/logger.js";
+
+const SOLANA_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+
+// ── Rate limiter for all admin routes (30 requests / 5 minutes) ───────────
+const adminLimiter = rateLimit({
+  windowMs: 5 * 60 * 1_000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many admin requests, slow down" },
+});
+
+// ── Audit log helper ──────────────────────────────────────────────────────
+function auditLog(
+  req: import("express").Request,
+  action: string,
+  details?: Record<string, unknown>,
+) {
+  const userId = req.session?.userId ?? "unknown";
+  const userEmail = req.session?.userEmail ?? "unknown";
+  const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim()
+    ?? req.socket?.remoteAddress ?? "unknown";
+  logger.info({ audit: true, action, userId, userEmail, ip, ...details }, `ADMIN_ACTION: ${action}`);
+}
 
 const router = Router();
 
 router.use(requireAdminAuth);
+router.use(adminLimiter);
 
 router.get("/admin/stats", async (_req, res) => {
   try {
@@ -191,26 +218,28 @@ router.get("/admin/config", async (_req, res) => {
   }
 });
 
-router.post("/admin/presale/pause", async (_req, res) => {
+router.post("/admin/presale/pause", async (req, res) => {
   try {
     await db.insert(presaleConfig)
       .values({ id: 1, isActive: false, updatedAt: new Date() })
       .onConflictDoUpdate({ target: presaleConfig.id, set: { isActive: false, updatedAt: new Date() } });
+    auditLog(req, "presale.pause");
     res.json({ success: true, message: "Presale paused successfully" });
   } catch (err) {
-    console.error("pause error", err);
+    logger.error({ err }, "presale pause error");
     res.status(500).json({ success: false, message: "Failed to pause presale" });
   }
 });
 
-router.post("/admin/presale/resume", async (_req, res) => {
+router.post("/admin/presale/resume", async (req, res) => {
   try {
     await db.insert(presaleConfig)
       .values({ id: 1, isActive: true, updatedAt: new Date() })
       .onConflictDoUpdate({ target: presaleConfig.id, set: { isActive: true, updatedAt: new Date() } });
+    auditLog(req, "presale.resume");
     res.json({ success: true, message: "Presale resumed successfully" });
   } catch (err) {
-    console.error("resume error", err);
+    logger.error({ err }, "presale resume error");
     res.status(500).json({ success: false, message: "Failed to resume presale" });
   }
 });
@@ -218,12 +247,17 @@ router.post("/admin/presale/resume", async (_req, res) => {
 router.post("/admin/presale/claim", async (req, res) => {
   try {
     const { enabled } = req.body as { enabled: boolean };
+    if (typeof enabled !== "boolean") {
+      res.status(400).json({ success: false, message: "enabled must be a boolean" });
+      return;
+    }
     await db.insert(presaleConfig)
       .values({ id: 1, claimEnabled: enabled, updatedAt: new Date() })
       .onConflictDoUpdate({ target: presaleConfig.id, set: { claimEnabled: enabled, updatedAt: new Date() } });
+    auditLog(req, "presale.claim_toggle", { enabled });
     res.json({ success: true, message: `Claim ${enabled ? "enabled" : "disabled"} successfully` });
   } catch (err) {
-    console.error("claim error", err);
+    logger.error({ err }, "presale claim error");
     res.status(500).json({ success: false, message: "Failed to update claim status" });
   }
 });
@@ -231,26 +265,28 @@ router.post("/admin/presale/claim", async (req, res) => {
 router.post("/admin/presale/staking", async (req, res) => {
   try {
     const { enabled } = req.body as { enabled: boolean };
+    if (typeof enabled !== "boolean") {
+      res.status(400).json({ success: false, message: "enabled must be a boolean" });
+      return;
+    }
     await db.insert(presaleConfig)
       .values({ id: 1, stakingEnabled: enabled, updatedAt: new Date() })
       .onConflictDoUpdate({ target: presaleConfig.id, set: { stakingEnabled: enabled, updatedAt: new Date() } });
+    auditLog(req, "presale.staking_toggle", { enabled });
     res.json({ success: true, message: `Staking ${enabled ? "enabled" : "disabled"} successfully` });
   } catch (err) {
-    console.error("staking error", err);
+    logger.error({ err }, "presale staking error");
     res.status(500).json({ success: false, message: "Failed to update staking status" });
   }
 });
 
-router.post("/admin/presale/withdraw", async (_req, res) => {
-  try {
-    res.json({
-      success: true,
-      message: "Withdrawal initiated. Please complete the transaction on-chain.",
-      note: "This is a record-keeping action. Execute the actual withdrawal via your Solana/EVM wallet.",
-    });
-  } catch {
-    res.status(500).json({ error: "Failed" });
-  }
+router.post("/admin/presale/withdraw", async (req, res) => {
+  auditLog(req, "presale.withdraw_initiated");
+  res.json({
+    success: true,
+    message: "Withdrawal initiated. Please complete the transaction on-chain.",
+    note: "This is a record-keeping action. Execute the actual withdrawal via your Solana/EVM wallet.",
+  });
 });
 
 router.get("/admin/referrals", async (req, res) => {
@@ -322,7 +358,14 @@ router.post("/admin/referrals/mark-paid", async (req, res) => {
   try {
     const { walletAddress } = req.body as { walletAddress?: string };
 
+    // التحقق من صحة عنوان المحفظة إن وُجد
+    if (walletAddress !== undefined && !SOLANA_ADDRESS_RE.test(walletAddress)) {
+      res.status(400).json({ error: "Invalid wallet address format" });
+      return;
+    }
+
     if (walletAddress) {
+      auditLog(req, "referral.mark_paid_single", { walletAddress: walletAddress.slice(0, 8) + "..." });
       await db
         .update(referrals)
         .set({ status: "paid" })
@@ -362,10 +405,11 @@ router.post("/admin/referrals/mark-paid", async (req, res) => {
           .where(eq(referralCodes.walletAddress, rc.walletAddress));
       }
 
+      auditLog(req as import("express").Request, "referral.mark_paid_all", { count: allCodes.length });
       res.json({ success: true, message: "All pending referral rewards marked as paid" });
     }
   } catch (err) {
-    console.error(err);
+    logger.error({ err }, "mark-paid error");
     res.status(500).json({ error: "Failed to mark referrals as paid" });
   }
 });

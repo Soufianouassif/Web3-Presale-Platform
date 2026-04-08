@@ -124,6 +124,8 @@ router.get("/sol-price", chainLimiter, async (_req, res) => {
   }
 });
 
+const IS_PROD = process.env.NODE_ENV === "production";
+
 router.get("/presale/on-chain", chainLimiter, async (_req, res) => {
   try {
     const [state, solPrice] = await Promise.all([
@@ -132,7 +134,10 @@ router.get("/presale/on-chain", chainLimiter, async (_req, res) => {
     ]);
     res.json({ ...state as object, solPriceUsd: solPrice });
   } catch (err) {
-    res.status(502).json({ error: "Failed to fetch on-chain state", detail: String(err) });
+    res.status(502).json({
+      error: "Failed to fetch on-chain state",
+      ...(IS_PROD ? {} : { detail: String(err) }),
+    });
   }
 });
 

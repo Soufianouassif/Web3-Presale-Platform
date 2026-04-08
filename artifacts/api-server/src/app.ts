@@ -1,5 +1,6 @@
 import express, { type Express, type RequestHandler } from "express";
 import cors from "cors";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
 import session from "express-session";
@@ -38,9 +39,27 @@ const isOriginAllowed = (origin: string): boolean => {
   return false;
 };
 
+// ── Startup validation — يفشل السيرفر بوضوح إذا غابت أسرار حساسة ──────────
+const REQUIRED_PROD_VARS = IS_PROD
+  ? (["SESSION_SECRET", "CRON_SECRET"] as const)
+  : ([] as const);
+for (const v of REQUIRED_PROD_VARS) {
+  if (!process.env[v]) {
+    throw new Error(`[STARTUP] Missing required environment variable: ${v}`);
+  }
+}
+
 const app: Express = express();
 
 app.set("trust proxy", 1);
+
+// ── Helmet: HTTP security headers ────────────────────────────────────────────
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // API-only server — no HTML pages to protect
+    crossOriginEmbedderPolicy: false,
+  }),
+);
 
 app.use(
   pinoHttpMiddleware({
@@ -72,8 +91,8 @@ app.use(
   }),
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "64kb" }));
+app.use(express.urlencoded({ extended: true, limit: "64kb" }));
 app.use(cookieParser());
 
 app.use(
