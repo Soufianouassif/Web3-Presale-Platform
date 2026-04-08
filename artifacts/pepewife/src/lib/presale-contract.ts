@@ -710,22 +710,34 @@ interface SolanaSignProvider {
 
 function getProvider(walletType = "phantom"): SolanaSignProvider {
   const w = window as unknown as {
-    solana?: SolanaSignProvider;
-    phantom?: { solana?: SolanaSignProvider };
-    solflare?: SolanaSignProvider;
+    solana?:     SolanaSignProvider & { isPhantom?: boolean };
+    phantom?:    { solana?: SolanaSignProvider & { isPhantom?: boolean } };
+    solflare?:   SolanaSignProvider;
+    backpack?:   SolanaSignProvider;
+    okxwallet?:  { solana?: SolanaSignProvider };
   };
 
   if (walletType === "solflare") {
     if (w.solflare) return w.solflare;
-    throw new Error("Solflare wallet not found. Is it installed?");
+    throw new Error("Solflare not found. Please install Solflare.");
   }
 
-  // phantom or any other Solana wallet
-  const provider = w.phantom?.solana ?? w.solana;
+  if (walletType === "backpack") {
+    if (w.backpack) return w.backpack;
+    throw new Error("Backpack not found. Please install Backpack.");
+  }
+
+  if (walletType === "okx") {
+    if (w.okxwallet?.solana) return w.okxwallet.solana;
+    throw new Error("OKX Wallet not found. Please install OKX Wallet.");
+  }
+
+  // phantom (default)
+  const provider = w.phantom?.solana ?? (w.solana?.isPhantom ? w.solana : undefined);
   if (provider) return provider;
 
-  // last resort — try solflare
-  if (w.solflare) return w.solflare;
+  // last resort: any injected Solana provider
+  if (w.solana) return w.solana;
 
-  throw new Error("No Solana wallet found. Please install Phantom or Solflare.");
+  throw new Error("No Solana wallet found. Please install Phantom, Backpack, or Solflare.");
 }

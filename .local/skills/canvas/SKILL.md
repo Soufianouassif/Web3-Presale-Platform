@@ -1,9 +1,22 @@
 ---
 name: canvas
-description: Create, read, and manipulate shapes on the workspace canvas. Supports geometric shapes, text, notes, iframe embeds, images, and videos.
+description: "Create, read, and manipulate shapes on the canvas. The canvas is the primary surface for showing live UI previews via iframe embeds (using the mockup-sandbox skill), as well as static shapes, text, notes, images, and videos. Use this skill for any canvas operation — reading board state, placing shapes, or managing iframe lifecycle. You must read this skill (0-500 lines) before any canvas operation"
 ---
 
 # Canvas Skill
+
+## IMPORTANT: Place Building Iframes Before Building
+
+When the user's request will produce **new visual content** on the canvas (e.g. "create a landing page", "show me 3 card variants", "mockup a dashboard"), your very first action must be to place building placeholders — before writing any code or setting up servers:
+
+1. Call `getCanvasState()` via `code_execution` to read the board and find empty space.
+2. Call `applyCanvasActions()` to create iframe shapes with `state: "building"` and `componentName` for every element you plan to produce. No URL is needed — the UI shows a building indicator.
+3. Only then proceed with the rest of the work (mockup-sandbox setup, writing code, starting servers, etc.).
+4. As each element becomes ready, update its iframe to `state: "live"` with the real URL.
+
+Do not set up the mockup sandbox first. Do not write component code first. Place the building iframes first, then do everything else. The user sees the placeholders appear on the canvas immediately, giving them instant feedback that work is underway and showing the planned layout.
+
+This does **not** apply to read-only requests (e.g. "what's on the canvas?"), modifications to existing shapes (e.g. "move the card to the right"), or non-iframe work (e.g. "add a text label").
 
 ## Overview
 
@@ -15,10 +28,24 @@ Artifact frames have special constraints - they cannot be deleted or freely resi
 
 You have the following tools:
 
-- **`get_canvas_state`** -- Read what shapes are on the board, their positions, types, and properties.
-- **`apply_canvas_actions`** -- Create, update, delete, move, resize, reorder, align, or distribute shapes.
+Beyond iframes, the canvas also supports static shapes (rectangles, ellipses, text, notes), images, and videos for diagrams, annotations, and layouts.
 
-**Always read the board before making layout-sensitive changes.**
+### Callbacks
+
+You have three callbacks available via `code_execution`:
+
+- **`getCanvasState`** -- Read what shapes are on the board, their positions, types, and properties.
+- **`applyCanvasActions`** -- Create, update, delete, move, resize, reorder, align, or distribute shapes.
+- **`focusCanvasShapes`** -- Pan and zoom the viewport to show specific shapes.
+
+All callbacks are async and must be awaited. Call them directly in `code_execution` -- they are pre-registered.
+
+### Canvas + Mockup Sandbox
+
+For any request that involves showing rendered UI on the canvas, you need both this skill and the **mockup-sandbox** skill working together:
+
+- **mockup-sandbox** sets up the isolated vite dev server, creates the component files, and gives you preview URLs.
+- **canvas** (this skill) places those URLs as iframe shapes on the board, manages layout, and handles the iframe lifecycle.
 
 ## Coordinate System
 
@@ -26,30 +53,217 @@ You have the following tools:
 - Positive `x` goes right, positive `y` goes down.
 - All positions and sizes are in canvas units.
 
-## Supported Shape Types
+## Parameter Schema
 
-- `geo` -- Geometric shapes (rectangles, ellipses). Props: `color`, `fill`, `text`.
-- `text` -- Text labels. Props: `text`, `color`.
-- `note` -- Sticky notes. Props: `text`, `color`.
-- `iframe` -- Embedded web content. Requires `url` (https only). Optional: `componentPath`, `componentName`, `componentProps`.
-- `image` -- Embedded images. Props: `src` (HTTPS image URL), `altText`. For local files, copy to `.canvas/assets/` and use `https://<domain>:5904/<filename>` as `src`.
-- `video` -- Embedded videos. Props: `src` (HTTPS video URL), `altText`. Local files work the same way as images via `.canvas/assets/`.
+### `applyCanvasActions`
 
-## Reading the Board: `get_canvas_state`
+Modify the canvas board by applying an ordered list of actions in a single atomic batch. Always call `getCanvasState` first to see existing shapes and find empty space.
+
+```json
+{
+  "$defs": {
+    "ScribeAlignActionInput": {
+      "properties": {
+        "type": { "const": "align", "description": "Align multiple shapes.", "type": "string" },
+        "shapeIds": { "description": "Target shape ids.", "items": { "type": "string" }, "type": "array" },
+        "alignment": { "description": "Alignment mode.", "enum": ["left", "center-horizontal", "right", "top", "center-vertical", "bottom"], "type": "string" }
+      },
+      "required": ["type", "shapeIds", "alignment"]
+    },
+    "ScribeCreateActionInput": {
+      "properties": {
+        "type": { "const": "create", "description": "Create a shape.", "type": "string" },
+        "shape": { "$ref": "#/$defs/ScribeShapeInput", "description": "Shape payload." },
+        "shapeId": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "Optional deterministic id." }
+      },
+      "required": ["type", "shape"]
+    },
+    "ScribeDeleteActionInput": {
+      "properties": {
+        "type": { "const": "delete", "description": "Delete a shape.", "type": "string" },
+        "shapeId": { "description": "Target shape id.", "type": "string" }
+      },
+      "required": ["type", "shapeId"]
+    },
+    "ScribeDistributeActionInput": {
+      "properties": {
+        "type": { "const": "distribute", "description": "Distribute multiple shapes.", "type": "string" },
+        "shapeIds": { "description": "Target shape ids.", "items": { "type": "string" }, "type": "array" },
+        "direction": { "description": "Distribution axis.", "enum": ["horizontal", "vertical"], "type": "string" }
+      },
+      "required": ["type", "shapeIds", "direction"]
+    },
+    "ScribeMoveActionInput": {
+      "properties": {
+        "type": { "const": "move", "description": "Move a shape.", "type": "string" },
+        "shapeId": { "description": "Target shape id.", "type": "string" },
+        "x": { "description": "Destination x.", "type": "number" },
+        "y": { "description": "Destination y.", "type": "number" }
+      },
+      "required": ["type", "shapeId", "x", "y"]
+    },
+    "ScribeReorderActionInput": {
+      "properties": {
+        "type": { "const": "reorder", "description": "Reorder a shape.", "type": "string" },
+        "shapeId": { "description": "Target shape id.", "type": "string" },
+        "direction": { "description": "Stacking direction.", "enum": ["front", "back"], "type": "string" }
+      },
+      "required": ["type", "shapeId", "direction"]
+    },
+    "ScribeResizeActionInput": {
+      "properties": {
+        "type": { "const": "resize", "description": "Resize a shape.", "type": "string" },
+        "shapeId": { "description": "Target shape id.", "type": "string" },
+        "w": { "description": "Destination width.", "type": "number" },
+        "h": { "description": "Destination height.", "type": "number" }
+      },
+      "required": ["type", "shapeId", "w", "h"]
+    },
+    "ScribeShapeInput": {
+      "properties": {
+        "type": { "description": "Shape type: 'geo' (rectangle/ellipse), 'text' (label), 'note' (sticky note), 'iframe' (embedded web content), 'image' (embedded image), or 'video' (embedded video).", "enum": ["geo", "text", "note", "iframe", "image", "video"], "type": "string" },
+        "x": { "description": "X position on canvas (0 is left).", "type": "number" },
+        "y": { "description": "Y position on canvas (0 is top).", "type": "number" },
+        "w": { "description": "Shape width in canvas units.", "type": "number" },
+        "h": { "description": "Shape height in canvas units.", "type": "number" },
+        "geo": { "anyOf": [{ "enum": ["cloud", "rectangle", "ellipse", "triangle", "diamond", "pentagon", "hexagon", "octagon", "star", "rhombus", "rhombus-2", "oval", "trapezoid", "arrow-right", "arrow-left", "arrow-up", "arrow-down", "x-box", "check-box", "heart"], "type": "string" }, { "type": "null" }], "default": null, "description": "Geometry sub-type for 'geo' shapes." },
+        "color": { "anyOf": [{ "enum": ["black", "grey", "light-violet", "violet", "blue", "light-blue", "yellow", "orange", "green", "light-green", "light-red", "red", "white"], "type": "string" }, { "type": "null" }], "default": null, "description": "Shape color." },
+        "labelColor": { "anyOf": [{ "enum": ["black", "grey", "light-violet", "violet", "blue", "light-blue", "yellow", "orange", "green", "light-green", "light-red", "red", "white"], "type": "string" }, { "type": "null" }], "default": null, "description": "Text label color. Overrides the shape color for text content." },
+        "fill": { "anyOf": [{ "enum": ["none", "semi", "solid", "pattern", "fill", "lined-fill"], "type": "string" }, { "type": "null" }], "default": null, "description": "Fill style." },
+        "text": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "Text content displayed inside the shape." },
+        "url": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "For iframe shapes: the https URL to embed. Optional when creating with state 'building'; required when setting state to 'live'." },
+        "src": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "For image/video shapes: the source URL of the media." },
+        "altText": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "For image/video shapes: alt text describing the media." },
+        "componentPath": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "For iframe shapes: file path shown in the shape title bar." },
+        "componentName": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "For iframe shapes: component name shown in the shape title bar." },
+        "componentProps": { "anyOf": [{ "additionalProperties": true, "type": "object" }, { "type": "null" }], "default": null, "description": "For iframe shapes: extra props to pass." },
+        "state": { "anyOf": [{ "enum": ["building", "modifying", "live"], "type": "string" }, { "type": "null" }], "default": null, "description": "For iframe shapes: lifecycle state. Set 'building' on create, 'modifying' before edits, 'live' when the component is ready." }
+      },
+      "required": ["type", "x", "y", "w", "h"]
+    },
+    "ScribeUpdateActionInput": {
+      "properties": {
+        "type": { "const": "update", "description": "Update a shape.", "type": "string" },
+        "shapeId": { "description": "Target shape id.", "type": "string" },
+        "updates": { "$ref": "#/$defs/ScribeUpdateFieldsInput", "description": "Partial shape update." }
+      },
+      "required": ["type", "shapeId", "updates"]
+    },
+    "ScribeUpdateFieldsInput": {
+      "properties": {
+        "shapeType": { "description": "The type of shape being updated. Always required -- controls how the update is serialized.", "enum": ["geo", "text", "note", "iframe", "image", "video"], "type": "string" },
+        "x": { "anyOf": [{ "type": "number" }, { "type": "null" }], "default": null, "description": "New x position." },
+        "y": { "anyOf": [{ "type": "number" }, { "type": "null" }], "default": null, "description": "New y position." },
+        "w": { "anyOf": [{ "type": "number" }, { "type": "null" }], "default": null, "description": "New width." },
+        "h": { "anyOf": [{ "type": "number" }, { "type": "null" }], "default": null, "description": "New height." },
+        "geo": { "anyOf": [{ "enum": ["cloud", "rectangle", "ellipse", "triangle", "diamond", "pentagon", "hexagon", "octagon", "star", "rhombus", "rhombus-2", "oval", "trapezoid", "arrow-right", "arrow-left", "arrow-up", "arrow-down", "x-box", "check-box", "heart"], "type": "string" }, { "type": "null" }], "default": null, "description": "New geometry sub-type." },
+        "color": { "anyOf": [{ "enum": ["black", "grey", "light-violet", "violet", "blue", "light-blue", "yellow", "orange", "green", "light-green", "light-red", "red", "white"], "type": "string" }, { "type": "null" }], "default": null, "description": "New shape color." },
+        "labelColor": { "anyOf": [{ "enum": ["black", "grey", "light-violet", "violet", "blue", "light-blue", "yellow", "orange", "green", "light-green", "light-red", "red", "white"], "type": "string" }, { "type": "null" }], "default": null, "description": "New text label color." },
+        "fill": { "anyOf": [{ "enum": ["none", "semi", "solid", "pattern", "fill", "lined-fill"], "type": "string" }, { "type": "null" }], "default": null, "description": "New fill style." },
+        "text": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "New text content." },
+        "url": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "New URL for iframe shapes (must be https)." },
+        "src": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "New source URL for image/video shapes." },
+        "altText": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "New alt text for image/video shapes." },
+        "componentPath": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "New component path for iframe shapes." },
+        "componentName": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "description": "New component name for iframe shapes." },
+        "componentProps": { "anyOf": [{ "additionalProperties": true, "type": "object" }, { "type": "null" }], "default": null, "description": "Props to merge into iframe shape props." },
+        "state": { "anyOf": [{ "enum": ["building", "modifying", "live"], "type": "string" }, { "type": "null" }], "default": null, "description": "New lifecycle state for iframe shapes. Set 'modifying' before edits, 'live' when ready." }
+      },
+      "required": ["shapeType"]
+    }
+  },
+  "properties": {
+    "actions": {
+      "description": "Ordered list of canvas actions to apply.",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/ScribeCreateActionInput" },
+          { "$ref": "#/$defs/ScribeUpdateActionInput" },
+          { "$ref": "#/$defs/ScribeDeleteActionInput" },
+          { "$ref": "#/$defs/ScribeMoveActionInput" },
+          { "$ref": "#/$defs/ScribeResizeActionInput" },
+          { "$ref": "#/$defs/ScribeReorderActionInput" },
+          { "$ref": "#/$defs/ScribeAlignActionInput" },
+          { "$ref": "#/$defs/ScribeDistributeActionInput" }
+        ]
+      },
+      "type": "array"
+    }
+  },
+  "required": ["actions"]
+}
+```
+
+### `getCanvasState`
+
+Read the current state of the canvas board. Returns shapes at three detail levels based on distance from the viewport or focus area.
+
+```json
+{
+  "$defs": {
+    "FocusAreaInput": {
+      "properties": {
+        "x": { "description": "Left edge x coordinate.", "type": "number" },
+        "y": { "description": "Top edge y coordinate.", "type": "number" },
+        "w": { "description": "Width of the region.", "type": "number" },
+        "h": { "description": "Height of the region.", "type": "number" }
+      },
+      "required": ["x", "y", "w", "h"]
+    }
+  },
+  "properties": {
+    "focus_area": {
+      "anyOf": [{ "$ref": "#/$defs/FocusAreaInput" }, { "type": "null" }],
+      "default": null,
+      "description": "Optional region to zoom into. Shapes inside get full detail. If omitted, uses the current user viewport."
+    }
+  }
+}
+```
+
+**Response fields:**
+
+- **focusedShapes** -- Full detail for shapes inside the viewport/focus area. Geo/text/note shapes include color, fill, text. Iframe shapes include `url`, `componentName`, `componentPath`, `state`. Image shapes include `src`, `altText`, `filepath`. Video shapes include `src`, `altText`.
+- **blurryShapes** -- Position and basic info for shapes farther away. Iframe shapes include `componentName` and `state`. Image shapes include `src` and `filepath`. Video shapes include `src`.
+- **peripheralClusters** -- Aggregated counts for distant shape groups.
+- **summary** -- Quick text description of everything on the canvas.
+- **viewport** -- The current visible region `{ x, y, w, h }`.
+
+### `focusCanvasShapes`
+
+Pan and zoom the user's canvas viewport to center on specific shapes. Only call after the user asks to see your work.
+
+```json
+{
+  "properties": {
+    "shape_ids": { "description": "List of shape IDs to focus on.", "items": { "type": "string" }, "type": "array" },
+    "animate_ms": { "anyOf": [{ "type": "number" }, { "type": "null" }], "default": null, "description": "Optional animation duration in milliseconds for the viewport transition. Use 500 for smooth transitions." },
+    "padding": { "anyOf": [{ "type": "number" }, { "type": "null" }], "default": null, "description": "Optional padding around the focused shapes in canvas units." }
+  },
+  "required": ["shape_ids"]
+}
+```
+
+## Reading the Board: `getCanvasState`
 
 Returns shapes at three detail levels:
 
-- **focusedShapes** -- Full detail for shapes near the viewport or focus area. Geo/text/note shapes include color, fill, text. Iframe shapes include `url`, `componentName`, `componentPath`. Image shapes include `src`, `altText`, and `filepath` (local file path in `.canvas/assets/`, if applicable). Video shapes include `src` and `altText`.
-- **blurryShapes** -- Position and basic info for shapes farther away. Iframe shapes include only `componentName`. Image shapes include `src` and `filepath`. Video shapes include `src`.
+- **focusedShapes** -- Full detail for shapes near the viewport or focus area. Geo/text/note shapes include color, fill, text. Iframe shapes include `url`, `componentName`, `componentPath`, and `state`. Image shapes include `src`, `altText`, and `filepath` (local file path in `.canvas/assets/`, if applicable). Video shapes include `src` and `altText`.
+- **blurryShapes** -- Position and basic info for shapes farther away. Iframe shapes include `componentName` and `state`. Image shapes include `src` and `filepath`. Video shapes include `src`.
 - **peripheralClusters** -- Aggregated counts for distant shape groups.
 - **summary** -- Quick text description of everything on the canvas.
+- **viewport** -- The current visible region `{x, y, w, h}`.
 
-Pass an optional `focus_area` (`{x, y, w, h}`) to zoom into a specific region.
+Pass an optional `focusArea` (`{x, y, w, h}`) to zoom into a specific region.
 
-Example call with no arguments (uses current viewport):
+```javascript
+// Read with current viewport
+const state = await getCanvasState();
+console.log(state.summary);
+console.log(JSON.stringify(state.focusedShapes, null, 2));
 
-```json
-{"focus_area": null}
+// Read a specific region
+const region = await getCanvasState({ focusArea: { x: 0, y: 0, w: 2000, h: 1500 } });
 ```
 
 Example response:
@@ -57,86 +271,78 @@ Example response:
 ```json
 {
   "focusedShapes": [
-    {
-      "shapeId": "box-1",
-      "shapeType": "geo",
-      "x": 100, "y": 100, "w": 200, "h": 150,
-      "color": "blue", "fill": "solid", "text": "Frontend"
-    },
-    {
-      "shapeId": "preview-1",
-      "shapeType": "iframe",
-      "x": 400, "y": 100, "w": 1280, "h": 720,
-      "url": "https://<resolved-domain>.replit.dev/preview/hello-world/Card",
-      "componentName": "Card",
-      "componentPath": "mockup/src/components/mockups/hello-world/Card.tsx"
-    }
+    { "shapeId": "preview-1", "shapeType": "iframe", "x": 400, "y": 100, "w": 1280, "h": 720,
+      "url": "https://example.replit.dev/preview/hello-world/Card",
+      "componentName": "Card", "state": "live" }
   ],
-  "blurryShapes": [
-    {
-      "shapeId": "distant-iframe",
-      "shapeType": "iframe",
-      "x": 5000, "y": 100, "w": 1280, "h": 720,
-      "componentName": "Sidebar"
-    }
-  ],
+  "blurryShapes": [...],
   "peripheralClusters": [],
-  "viewport": {"x": 0, "y": 0, "w": 1920, "h": 1080},
-  "summary": "2 shapes on canvas.",
-  "focusedOmittedCount": 0,
-  "blurryOmittedCount": 0
+  "viewport": { "x": 0, "y": 0, "w": 1920, "h": 1080 },
+  "summary": "1 shape on canvas."
 }
 ```
 
-Focused iframe shapes include `url`, `componentName`, and `componentPath`. Blurry iframe shapes only include `componentName` (no URL or path). Focused image shapes include `src`, `altText`, and `filepath`. Focused video shapes include `src` and `altText`. Blurry image shapes include `src` and `filepath`. Blurry video shapes include `src`.
-
-## Modifying the Board: `apply_canvas_actions`
+## Modifying the Board: `applyCanvasActions`
 
 Send an ordered list of actions. Each action has a `type` field. Results are returned per-action with generated `shapeId` values.
 
-### Create
-
-Set a `shapeId` so you can reference the shape later.
-
-```json
-{
-  "type": "create",
-  "shapeId": "my-box",
-  "shape": {
-    "type": "geo",
-    "x": 100, "y": 100, "w": 200, "h": 150,
-    "color": "blue", "fill": "solid", "text": "Hello"
-  }
-}
+```javascript
+const result = await applyCanvasActions({ actions: [
+  // ... action objects
+] });
+console.log(JSON.stringify(result, null, 2));
 ```
 
 ### Create Iframe
 
-Embed live web content. The `url` **must** use `https://`.
+Embed live web content. Use the `state` field to manage the iframe lifecycle:
+
+- `"building"` -- Set on create when the component or server isn't ready yet. URL is **optional** in this state -- the UI shows a building indicator.
+- `"modifying"` -- Set before editing an existing component's backing file.
+- `"live"` -- Set when the component is ready to display. URL is **required** in this state.
+
+Create the iframe immediately with `state: "building"`, then update it to `"live"` once the URL is available:
+
+```javascript
+// 1. Create iframe immediately -- no URL needed yet
+await applyCanvasActions({ actions: [
+  {
+    type: "create",
+    shapeId: "app-preview",
+    shape: {
+      type: "iframe",
+      x: 0, y: 0, w: 1280, h: 720,
+      state: "building",
+      componentName: "App Preview"
+    }
+  }
+] });
+
+// 2. ... build the component / start the server ...
+
+// 3. Update to live once the URL is ready
+await applyCanvasActions({ actions: [
+  {
+    type: "update",
+    shapeId: "app-preview",
+    updates: {
+      shapeType: "iframe",
+      state: "live",
+      url: "https://<resolved-domain>.replit.dev"
+    }
+  }
+] });
+```
 
 To get the URL for a Replit dev server, run `echo $REPLIT_DOMAINS` in the shell to get the domain, then construct the full URL. For the main app on port 5000, no port suffix is needed. For other ports, append `:<port>`.
 
-**Always resolve the actual domain first** -- do not pass literal template strings as the iframe URL.
-
-```json
-{
-  "type": "create",
-  "shapeId": "app-preview",
-  "shape": {
-    "type": "iframe",
-    "x": 0, "y": 0, "w": 1280, "h": 720,
-    "url": "https://<resolved-domain>.replit.dev",
-    "componentName": "App Preview"
-  }
-}
-```
-
-- `url` -- **Required.** Must be `https`. This is what actually loads content.
+- `url` -- Full `https://` URL to embed. Required when `state` is `"live"`.
+- `state` -- Lifecycle state. Always set this on create and when transitioning.
 - `componentPath` -- File path shown in the title bar (metadata label only).
 - `componentName` -- Display name shown in the title bar (metadata label only).
 - `componentProps` -- Extra props dict merged into shape props.
 
-**To embed individual React components** (not just the full app), you need a component preview server that renders each component at its own URL. Use the **mockup-sandbox** skill to set it up.
+**To embed individual React components** (not just the full app), use the **mockup-sandbox** skill. It sets up a vite preview server where each component gets its own route at `/preview/{folder}/{ComponentName}`. Embed these URLs as iframe shapes. For example, a pricing card component at `mockup/client/src/components/mockups/pricing/Card.tsx` would be embedded with URL `https://<domain>:8000/preview/pricing/Card`.
 
 ### Create Image
 
@@ -144,159 +350,57 @@ Embed an image on the canvas.
 
 From an external URL:
 
-```json
-{
-  "type": "create",
-  "shapeId": "hero-image",
-  "shape": {
-    "type": "image",
-    "x": 0, "y": 0, "w": 800, "h": 600,
-    "src": "https://example.com/hero.png",
-    "altText": "Hero banner image"
+```javascript
+await applyCanvasActions({ actions: [
+  {
+    type: "create",
+    shapeId: "hero-image",
+    shape: {
+      type: "image",
+      x: 0, y: 0, w: 800, h: 600,
+      src: "https://example.com/hero.png",
+      altText: "Hero banner image"
+    }
   }
-}
+] });
 ```
 
 From a local file (copy to `.canvas/assets/`, resolve domain, use port 5904):
 
-```bash
-mkdir -p .canvas/assets
-cp assets/hero.png .canvas/assets/hero.png
-echo $REPLIT_DOMAINS  # e.g. abc123.replit.dev
-```
+```javascript
+// First, in a shell: mkdir -p .canvas/assets && cp assets/hero.png .canvas/assets/hero.png
+// Then resolve domain: echo $REPLIT_DOMAINS  (e.g. abc123.replit.dev)
 
-```json
-{
-  "type": "create",
-  "shapeId": "hero-image",
-  "shape": {
-    "type": "image",
-    "x": 0, "y": 0, "w": 800, "h": 600,
-    "src": "https://<resolved-domain>:5904/hero.png",
-    "altText": "Hero banner image"
+await applyCanvasActions({ actions: [
+  {
+    type: "create",
+    shapeId: "hero-image",
+    shape: {
+      type: "image",
+      x: 0, y: 0, w: 800, h: 600,
+      src: "https://<resolved-domain>:5904/hero.png",
+      altText: "Hero banner image"
+    }
   }
-}
+] });
 ```
 
-### Create Video
+## Focusing the Viewport: `focusCanvasShapes`
 
-Embed a video on the canvas. Local files work the same way as images via `.canvas/assets/`.
-
-From an external URL:
-
-```json
-{
-  "type": "create",
-  "shapeId": "demo-video",
-  "shape": {
-    "type": "video",
-    "x": 0, "y": 0, "w": 1280, "h": 720,
-    "src": "https://example.com/demo.mp4",
-    "altText": "Product demo video"
-  }
-}
-```
-
-From a local file:
-
-```bash
-cp assets/demo.mp4 .canvas/assets/demo.mp4
-```
-
-```json
-{
-  "type": "create",
-  "shapeId": "demo-video",
-  "shape": {
-    "type": "video",
-    "x": 0, "y": 0, "w": 1280, "h": 720,
-    "src": "https://<resolved-domain>:5904/demo.mp4",
-    "altText": "Product demo video"
-  }
-}
-```
-
-### Update
-
-Only include the fields you want to change. Always set `shapeType` to the shape's type (from get_canvas_state).
-
-```json
-{
-  "type": "update",
-  "shapeId": "my-box",
-  "updates": {"shapeType": "geo", "color": "red", "text": "Updated"}
-}
-```
-
-### Delete
-
-```json
-{"type": "delete", "shapeId": "my-box"}
-```
-
-### Move
-
-```json
-{"type": "move", "shapeId": "my-box", "x": 300, "y": 200}
-```
-
-### Resize
-
-```json
-{"type": "resize", "shapeId": "my-box", "w": 400, "h": 300}
-```
-
-### Reorder (Z-index)
-
-Direction: `"front"` or `"back"`.
-
-```json
-{"type": "reorder", "shapeId": "my-box", "direction": "front"}
-```
-
-### Align
-
-Align multiple shapes. Options: `"left"`, `"center-horizontal"`, `"right"`, `"top"`, `"center-vertical"`, `"bottom"`.
-
-```json
-{
-  "type": "align",
-  "shapeIds": ["box-1", "box-2", "box-3"],
-  "alignment": "center-horizontal"
-}
-```
-
-### Distribute
-
-Evenly space shapes. Direction: `"horizontal"` or `"vertical"`.
-
-```json
-{
-  "type": "distribute",
-  "shapeIds": ["box-1", "box-2", "box-3"],
-  "direction": "horizontal"
-}
-```
+Pan and zoom the user's canvas viewport to center on specific shapes. **Only call after the user asks to see your work** -- don't auto-focus after creating or updating shapes. Finish your work and ask the user if they'd like to see it. Moving the viewport while the user is working is disorienting.
 
 ## Iframe Rules & Gotchas
 
+- **Use `state` for lifecycle** -- Set `"building"` on create (URL optional), `"modifying"` before edits, `"live"` when ready (URL required).
 - **URL must be `https`** -- `http` and `about:blank` are rejected.
 - **Resolve the domain first** -- run `echo $REPLIT_DOMAINS` in the shell, then build the URL from the result. Never pass a literal template string as the URL.
 - **Port rules:** no port suffix = port 5000 (main app). For other servers, append `:<port>`.
 - **External sites may block embedding** -- sites with `X-Frame-Options: DENY` or restrictive CSP headers will show a blank iframe. Replit dev URLs work fine.
-- **For component previews, use the mockup sandbox** -- do not embed the main app's dev server URL to preview individual components. The main app URL shows the entire app with navigation, layout, and routing — not an isolated component. Use the mockup-sandbox skill to set up a preview server, then embed `/preview/{folder}/{Component}` URLs. This gives you isolated components that can be iterated on independently.
-
-### Placeholder Workflow
-
-Since iframe URLs must be `https` (no `about:blank`), to plan a layout before you have real URLs:
-
-1. Create `geo` shapes at the desired positions with labels describing what goes there.
-2. Once you have the real URLs, delete the `geo` shapes.
-3. Create `iframe` shapes at the same positions with the actual URLs.
+- **Never embed the main app URL for component previews** -- the main app URL shows the entire app with navigation, layout, and routing -- not an isolated component. Use the **mockup-sandbox** skill to set up a preview server, then embed `/preview/{folder}/{Component}` URLs. This gives you isolated components that can be iterated on independently. The mockup sandbox runs on port 8000 (append `:8000` to the domain).
 
 ## Typical Workflow
 
-1. Call `get_canvas_state` to see what's on the board.
+1. Call `getCanvasState()` to see what's on the board.
 2. Use the `summary` and `focusedShapes` to understand positions and IDs.
 3. Call `apply_canvas_actions` with a batch of changes.
 4. **CRITICAL — Present the result.** After your final canvas action, you MUST call `presentArtifact({ artifactId, shapeIds: [...] })` with the IDs of all shapes you created or modified. This is how the user finds your work — without it, they cannot navigate to the shapes. Do NOT skip this step. Do NOT ask the user if they want to focus — just present.
@@ -319,7 +423,19 @@ Since iframe URLs must be `https` (no `about:blank`), to plan a layout before yo
 6. **Label iframes** -- Set `componentPath` and `componentName` so users can identify embedded content.
 7. **Use focus_area** -- For large boards, pass a region to `get_canvas_state` to get detail where you need it.
 
-### Viewport Presets
+### Iframe Sizing
+
+Size the iframe to fit the content -- don't put small components in huge iframes (they look lost in whitespace) and don't put full pages in tiny ones.
+
+**Content-aware defaults:**
+
+- **Cards, forms, small components:** Use a snug frame that fits the content (e.g. 400 x 500 for a card). Center the component in the page with `flex items-center justify-center min-h-screen`.
+- **Full-page mockups (desktop):** 1280 x 900 -- shows hero + start of next section, user scrolls within the iframe.
+- **Full-page mockups (full view):** 1280 x 2400 -- shows entire page without scrolling (screenshot-style review).
+- **Multi-page app (desktop):** 1280 x 800 -- standard app viewport.
+- **Multi-page app (mobile):** 390 x 844 -- iPhone viewport.
+
+**Responsive comparison presets** -- when showing the same component at multiple screen widths, arrange in a row with ~50px gutters:
 
 - Mobile: 390 x 844
 - Tablet: 768 x 1024

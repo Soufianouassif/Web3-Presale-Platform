@@ -135,8 +135,11 @@ export default function Home() {
       : "";
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
+    // نقبل الفاصلة (,) ونحوّلها لنقطة (.) تلقائياً
+    const val = e.target.value.replace(",", ".");
+    // نمنع أي حرف غير الأرقام والنقطة
     if (/[^0-9.]/.test(val)) return;
+    // نمنع أكثر من نقطة عشرية واحدة
     if ((val.match(/\./g) || []).length > 1) return;
     setAmount(val);
   };

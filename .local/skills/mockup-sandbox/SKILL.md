@@ -105,7 +105,7 @@ Example -- a pricing card is a "Card / Panel", so use a snug iframe (see [Iframe
 ```
 ### Step 4: Layout and focus
 
-Before embedding iframes, call `get_canvas_state` to see what already exists on the board and find empty space. Then place your iframes in an unoccupied region.
+Before embedding iframes, call `getCanvasState()` to see what already exists on the board and find empty space. Then place your iframes in an unoccupied region.
 
 If an iframe is created while the workflow is still booting, rely on the canvas host's iframe retry behavior plus the dev server's automatic 404 rescan to recover. Do not ask the user to refresh the whole board.
 

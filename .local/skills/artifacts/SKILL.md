@@ -10,7 +10,7 @@ description: "Use when creating or updating the artifact.toml for artifacts such
 
 An **artifact** is a runnable project that the agent creates for the user. It is the primary unit of output the agent delivers.
 
-Each artifact is a workspace package under `artifacts/<slug>/` in the monorepo. Calling `createArtifact()` runs the shared bootstrap flow for the chosen artifact type, scaffolds the project files, writes an `artifact.toml` with metadata, allocates service ports, and wires the artifact into `.replit` so it can be previewed and deployed. Dependency installation begins in the background and may still be running when `createArtifact()` returns.
+Each artifact is a workspace package under `artifacts/<slug>/` in the monorepo. Calling `createArtifact()` runs the shared bootstrap flow for the chosen artifact type, scaffolds the project files, writes an `artifact.toml` with metadata so it can be previewed, and allocates service ports. Dependency installation begins in the background and may still be running when `createArtifact()` returns.
 
 When the user asks you to "build a website" or "create an app", you are creating an artifact. Call `createArtifact()` once, then continue implementation.
 
