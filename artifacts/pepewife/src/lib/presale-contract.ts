@@ -398,6 +398,124 @@ export async function withdrawSolWithKeypair(
 }
 
 // ─────────────────────────────────────────────────────────────
+//  ADMIN: PAUSE / RESUME SALE
+//  Anchor instruction names: "pause" / "resume"
+//  Accounts: config (mut, has_one=authority), authority (signer)
+//  ✅ مدعومة بالفعل في العقد (contracts/programs/pepewife-presale)
+// ─────────────────────────────────────────────────────────────
+
+async function buildPauseResumeIx(
+  admin: PublicKey,
+  instructionName: "pause" | "resume",
+): Promise<TransactionInstruction> {
+  const discriminator = await getDiscriminator(instructionName);
+  return new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: admin,      isSigner: true,  isWritable: false },
+    ],
+    data: discriminator,
+  });
+}
+
+/** إيقاف البريسيل على البلوكتشين — باستخدام ملف الـ Keypair */
+export async function pauseSaleWithKeypair(
+  keypairBytes: number[],
+  onSigned?: () => void,
+): Promise<{ signature: string }> {
+  const keypair = Keypair.fromSecretKey(new Uint8Array(keypairBytes));
+  const admin   = keypair.publicKey;
+
+  const ix = await buildPauseResumeIx(admin, "pause");
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+
+  tx.sign(keypair);
+  onSigned?.();
+
+  const signature = await sendAndConfirmTx(tx.serialize(), blockhash, lastValidBlockHeight);
+  return { signature };
+}
+
+/** استئناف البريسيل على البلوكتشين — باستخدام ملف الـ Keypair */
+export async function resumeSaleWithKeypair(
+  keypairBytes: number[],
+  onSigned?: () => void,
+): Promise<{ signature: string }> {
+  const keypair = Keypair.fromSecretKey(new Uint8Array(keypairBytes));
+  const admin   = keypair.publicKey;
+
+  const ix = await buildPauseResumeIx(admin, "resume");
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+
+  tx.sign(keypair);
+  onSigned?.();
+
+  const signature = await sendAndConfirmTx(tx.serialize(), blockhash, lastValidBlockHeight);
+  return { signature };
+}
+
+/** إيقاف البريسيل على البلوكتشين — باستخدام محفظة متصلة */
+export async function pauseSale(
+  adminAddress: string,
+  walletType = "phantom",
+): Promise<{ signature: string }> {
+  const admin = new PublicKey(adminAddress);
+  const ix    = await buildPauseResumeIx(admin, "pause");
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+
+  const provider = getProvider(walletType);
+  const signed   = await provider.signTransaction(tx);
+  const signature = await sendAndConfirmTx(signed.serialize(), blockhash, lastValidBlockHeight);
+  return { signature };
+}
+
+/** استئناف البريسيل على البلوكتشين — باستخدام محفظة متصلة */
+export async function resumeSale(
+  adminAddress: string,
+  walletType = "phantom",
+): Promise<{ signature: string }> {
+  const admin = new PublicKey(adminAddress);
+  const ix    = await buildPauseResumeIx(admin, "resume");
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+
+  const provider = getProvider(walletType);
+  const signed   = await provider.signTransaction(tx);
+  const signature = await sendAndConfirmTx(signed.serialize(), blockhash, lastValidBlockHeight);
+  return { signature };
+}
+
+// ─────────────────────────────────────────────────────────────
 //  ADMIN: UPDATE SOL PRICE  (update_sol_price instruction)
 //  Accounts: config (mut), authority (signer)
 //  newPriceUsd: SOL price in dollars (e.g. 145.50)

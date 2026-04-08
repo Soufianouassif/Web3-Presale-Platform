@@ -189,8 +189,15 @@ export default function Home() {
     : 0;
 
   const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace(/\$/g, ""));
+
+  // سعر SOL المخزون في العقد (يُستخدم في حساب التوكنز على السلسلة)
+  // هذا هو السعر الحقيقي الذي يستخدمه العقد — ليس سعر السوق
+  const chainSolPrice = presaleData && presaleData.solPriceUsdE6 > 0n
+    ? Number(presaleData.solPriceUsdE6) / 1_000_000
+    : solPrice; // fallback لسعر السوق لو لم تُحمَّل البيانات بعد
+
   const amountUSD = !isNaN(amountNum) && amount !== ""
-    ? currency === "SOL" ? amountNum * solPrice : amountNum
+    ? currency === "SOL" ? amountNum * chainSolPrice : amountNum
     : 0;
   const tokensOut = stagePrice > 0 && amountUSD > 0 ? Math.floor(amountUSD / stagePrice) : 0;
 
@@ -247,7 +254,7 @@ export default function Home() {
     const stage     = stageIdx + 1; // 1-indexed for tracker
     const cs = presaleData?.stages[stageIdx];
     const pricePerToken = cs ? stageTokenPriceUsd(cs.tokensPerRawUsdtScaled) : 0.00000001;
-    const solUsd = currency === "SOL" ? amountNum * solPrice : 0;
+    const solUsd = currency === "SOL" ? amountNum * chainSolPrice : 0;
     const usdAmt = currency === "SOL" ? solUsd : amountNum;
     const tokensEst = pricePerToken > 0 ? usdAmt / pricePerToken : 0;
 

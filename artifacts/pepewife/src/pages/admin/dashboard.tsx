@@ -4,6 +4,7 @@ import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { adminApi, type AdminStats } from "@/lib/admin-api";
 import {
   withdrawSol, withdrawSolWithKeypair, updateSolPrice,
+  pauseSaleWithKeypair, resumeSaleWithKeypair,
   connection, SOL_VAULT_PDA, fetchPresaleState,
   stageTokenPriceUsd, type PresaleState,
 } from "@/lib/presale-contract";
@@ -85,10 +86,121 @@ function SectionCard({ children, title, action }: { children: React.ReactNode; t
   );
 }
 
+// ─── On-Chain Pause / Resume Panel ───────────────────────────────────────────
+const PRESALE_AUTHORITY = "6dSw3tPGZtiykZXoSx4uPb6jPc95WAV39fHbN1QG7Aci";
+
+function ChainPausePanel({
+  showNotification,
+  chainData,
+  onRefresh,
+}: {
+  showNotification: (msg: string, type?: "success" | "error") => void;
+  chainData: PresaleState | null;
+  onRefresh: () => void;
+}) {
+  const [keypairBytes, setKeypairBytes] = useState<number[] | null>(null);
+  const [fileAddr,     setFileAddr]     = useState("");
+  const [loading,      setLoading]      = useState<"pause" | "resume" | null>(null);
+
+  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      try {
+        const bytes = JSON.parse(ev.target?.result as string) as number[];
+        if (!Array.isArray(bytes) || bytes.length !== 64)
+          throw new Error("Keypair غير صالح: يجب أن يكون 64 byte");
+        setKeypairBytes(bytes);
+        const { Keypair } = await import("@solana/web3.js");
+        const kp = Keypair.fromSecretKey(new Uint8Array(bytes));
+        setFileAddr(kp.publicKey.toBase58());
+      } catch (err) {
+        showNotification((err as Error).message, "error");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  async function handleChainAction(action: "pause" | "resume") {
+    if (!keypairBytes) { showNotification("ارفع ملف الـ Keypair أولاً", "error"); return; }
+    if (fileAddr !== PRESALE_AUTHORITY) {
+      showNotification(`خطأ: هذا ليس keypair الأدمن (${PRESALE_AUTHORITY.slice(0, 8)}...)`, "error");
+      return;
+    }
+    setLoading(action);
+    try {
+      const fn = action === "pause" ? pauseSaleWithKeypair : resumeSaleWithKeypair;
+      const { signature } = await fn(keypairBytes);
+      showNotification(
+        `✅ ${action === "pause" ? "تم إيقاف" : "تم استئناف"} البريسيل على البلوكتشين — ${signature.slice(0, 12)}...`,
+        "success",
+      );
+      onRefresh();
+    } catch (err) {
+      const msg = (err as Error).message;
+      showNotification(`❌ ${msg}`, "error");
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  const isPaused = chainData?.isPaused ?? false;
+
+  return (
+    <div className="space-y-4">
+      {/* حالة العقد */}
+      <div className={`flex items-center gap-3 p-3 rounded-xl border ${isPaused ? "bg-red-500/10 border-red-500/30" : "bg-[#39ff14]/10 border-[#39ff14]/30"}`}>
+        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isPaused ? "bg-red-500" : "bg-[#39ff14] animate-pulse"}`} />
+        <span className="text-sm font-semibold">
+          حالة العقد: <span className={isPaused ? "text-red-400" : "text-[#39ff14]"}>{isPaused ? "⏸ موقوف" : "▶ نشط"}</span>
+        </span>
+      </div>
+
+      {/* رفع الـ keypair */}
+      <div>
+        <p className="text-xs text-gray-500 mb-2 uppercase tracking-wider">ملف Keypair (للتوقيع على السلسلة)</p>
+        <label className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition-colors">
+          <span className="text-lg">📁</span>
+          <div className="text-sm">
+            {fileAddr
+              ? <span className="text-[#39ff14] font-mono text-xs">{fileAddr.slice(0, 12)}...{fileAddr.slice(-6)}</span>
+              : <span className="text-gray-400">اضغط لرفع keypair.json</span>}
+          </div>
+          <input type="file" accept=".json" className="hidden" onChange={handleFile} />
+        </label>
+      </div>
+
+      {/* الأزرار */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => handleChainAction("pause")}
+          disabled={loading !== null || isPaused}
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium bg-red-500/20 hover:bg-red-500/30 border-red-500/40 text-red-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        >
+          {loading === "pause" && <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />}
+          ⏸ إيقاف على السلسلة
+        </button>
+        <button
+          onClick={() => handleChainAction("resume")}
+          disabled={loading !== null || !isPaused}
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium bg-[#39ff14]/20 hover:bg-[#39ff14]/30 border-[#39ff14]/40 text-[#39ff14] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        >
+          {loading === "resume" && <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />}
+          ▶ استئناف على السلسلة
+        </button>
+      </div>
+
+      <p className="text-xs text-gray-600 leading-relaxed">
+        ✅ العقد يدعم هذه التعليمات مباشرةً (pause / resume).
+      </p>
+    </div>
+  );
+}
+
 // ─── Withdraw Panel ───────────────────────────────────────────────────────────
 type WithdrawStep = "idle" | "connecting" | "signing" | "confirming" | "success" | "error";
 type WithdrawMethod = "file" | "phantom";
-const PRESALE_AUTHORITY = "6dSw3tPGZtiykZXoSx4uPb6jPc95WAV39fHbN1QG7Aci";
 const spinning = <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin inline-block" />;
 
 function WithdrawPanel({ showNotification }: { showNotification: (msg: string, type?: "success" | "error") => void }) {
@@ -589,6 +701,32 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* On-Chain Pause / Resume */}
+      <div className="grid lg:grid-cols-2 gap-5">
+        <SectionCard title="⛓ إيقاف/استئناف على البلوكتشين">
+          <p className="text-xs text-gray-500 mb-4">يُوقف الشراء مباشرة في العقد الذكي — لا يمكن لأحد الشراء حتى لو تجاوز الموقع</p>
+          <ChainPausePanel showNotification={showNotification} chainData={chainData} onRefresh={refreshChain} />
+        </SectionCard>
+
+        {/* Contract Info */}
+        <SectionCard title="📋 معلومات العقد الذكي">
+          <p className="text-xs text-gray-500 mb-3">العقد يدعم الإيقاف والاستئناف مباشرةً — لا يلزم أي تعديل:</p>
+          <div className="bg-black/40 rounded-xl p-3 font-mono text-xs text-[#39ff14] overflow-x-auto space-y-1 border border-white/10">
+            <p className="text-gray-400">// contracts/programs/pepewife-presale/src/instructions/admin.rs</p>
+            <p>pub fn pause(ctx: Context{"<"}AdminOnly{">"}) {"→"} Result{"<()>"} {"{"}</p>
+            <p className="pl-4">ctx.accounts.config.is_paused = true;</p>
+            <p className="pl-4">Ok(())</p>
+            <p>{"}"}</p>
+            <p className="mt-1">pub fn resume(ctx: Context{"<"}AdminOnly{">"}) {"→"} Result{"<()>"} {"{"}</p>
+            <p className="pl-4">ctx.accounts.config.is_paused = false;</p>
+            <p className="pl-4">Ok(())</p>
+            <p>{"}"}</p>
+            <p className="mt-2 text-gray-400">// buy_with_sol.rs + buy_with_usdt.rs يتحققان:</p>
+            <p>require!(!config.is_paused, PresaleError::Paused);</p>
+          </div>
+        </SectionCard>
+      </div>
 
       <div className="grid lg:grid-cols-2 gap-5">
         {/* UI Controls */}
