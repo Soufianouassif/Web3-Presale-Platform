@@ -697,9 +697,7 @@ export default function AdminDashboard() {
                         const max  = Number(stage.maxTokens);
                         const pct  = max > 0 ? Math.min(100, (sold / max) * 100) : 0;
                         const isCurrent = i === chainData.currentStage;
-                        // Use confirmed static prices (matches home + dashboard pages)
-                        const CONFIRMED_STAGE_PRICES = [0.00000001, 0.00000002, 0.00000004, 0.00000006];
-                        const priceUsd = CONFIRMED_STAGE_PRICES[i] ?? stageTokenPriceUsd(stage.tokensPerRawUsdtScaled);
+                        const priceUsd = stageTokenPriceUsd(stage.tokensPerRawUsdtScaled);
                         return (
                           <div key={i} className={`rounded-xl p-3 border ${isCurrent ? "border-[#9945FF]/30 bg-[#9945FF]/5" : "border-white/5 bg-[#0a0a0f]"}`}>
                             <div className="flex items-center justify-between mb-2">

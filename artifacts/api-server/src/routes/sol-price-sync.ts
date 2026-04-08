@@ -87,7 +87,7 @@ export async function runSolPriceSync(): Promise<void> {
   }
 }
 
-router.post("/api/cron/sync-sol-price", async (_req, res) => {
+router.post("/cron/sync-sol-price", async (_req, res) => {
   if (!process.env.ADMIN_KEYPAIR_JSON) {
     res.status(503).json({ ok: false, error: "ADMIN_KEYPAIR_JSON not configured" });
     return;
@@ -103,7 +103,7 @@ router.post("/api/cron/sync-sol-price", async (_req, res) => {
   }
 });
 
-router.get("/api/cron/sync-sol-price/status", (_req, res) => {
+router.get("/cron/sync-sol-price/status", (_req, res) => {
   res.json({ lastSyncAt, lastPrice });
 });
 

@@ -13,6 +13,7 @@ import SEOHead from "@/components/seo-head";
 import WalletBuyModal from "@/components/wallet-buy-modal";
 import {
   fetchPresaleState,
+  stageTokenPriceUsd,
   type PresaleState,
 } from "@/lib/presale-contract";
 import {
@@ -163,15 +164,16 @@ export default function Home() {
     );
   };
 
-  // ⚠️ Prices are ALWAYS static — on-chain tokensPerRawUsdtScaled uses a
-  // different internal scale than expected; we use the confirmed values here.
-  const STAGE_PRICES_FALLBACK = ["$0.00000001", "$0.00000002", "$0.00000004", "$0.00000006"];
+  const STAGE_FALLBACK_PRICES = ["$0.00000001", "$0.00000002", "$0.00000004", "$0.00000006"];
   const STAGE_COLORS = ["#4CAF50", "#FF4D9D", "#FFD54F", "#42A5F5"];
-  const STAGE_DATA = STAGE_PRICES_FALLBACK.map((fallbackPrice, i) => {
+  const STAGE_DATA = STAGE_FALLBACK_PRICES.map((fallbackPrice, i) => {
     const cs = presaleData?.stages[i];
     const tokens = cs ? Number(cs.maxTokens)  : 5_000_000_000_000;
     const sold   = cs ? Number(cs.tokensSold) : 0;
-    return { stage: i + 1, price: fallbackPrice, tokens, sold, color: STAGE_COLORS[i] };
+    const price  = cs
+      ? `$${stageTokenPriceUsd(cs.tokensPerRawUsdtScaled).toFixed(10).replace(/\.?0+$/, "")}`
+      : fallbackPrice;
+    return { stage: i + 1, price, tokens, sold, color: STAGE_COLORS[i] };
   });
   const LISTING_PRICE = "$0.061327";
   const currentStage = presaleData ? presaleData.currentStage : 0;
@@ -240,9 +242,8 @@ export default function Home() {
     const amountNum = parseFloat(amount) || 0;
     const stageIdx  = presaleData?.currentStage ?? 0;
     const stage     = stageIdx + 1; // 1-indexed for tracker
-    // Always use confirmed static prices — consistent with home + dashboard display
-    const CONFIRMED_PRICES = [0.00000001, 0.00000002, 0.00000004, 0.00000006];
-    const pricePerToken = CONFIRMED_PRICES[stageIdx] ?? 0.00000001;
+    const cs = presaleData?.stages[stageIdx];
+    const pricePerToken = cs ? stageTokenPriceUsd(cs.tokensPerRawUsdtScaled) : 0.00000001;
     const solUsd = currency === "SOL" ? amountNum * solPrice : 0;
     const usdAmt = currency === "SOL" ? solUsd : amountNum;
     const tokensEst = pricePerToken > 0 ? usdAmt / pricePerToken : 0;

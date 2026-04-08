@@ -99,6 +99,4 @@ No OpenAPI, no codegen. Launch the design subagent immediately.
 
 ## SEO
 
-- Ensure every page has a unique, descriptive title tag (e.g., "Product Name - Category | Site Name")
-- Add meta descriptions that summarize page content concisely
-- Implement Open Graph tags for better social media sharing appearance
+There is a full SEO implementation guide in `references/seo.md`. Read it when building or optimizing pages for search engine visibility. At minimum, ensure every page has a unique title tag, meta description, and Open Graph tags.
