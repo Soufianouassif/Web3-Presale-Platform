@@ -88,10 +88,19 @@ router.get(
   (req, res) => {
     const user = req.user as { id: number; email: string } | undefined;
     if (user) {
-      req.session.userId = user.id;
-      req.session.userEmail = user.email;
+      // إعادة توليد session ID لمنع Session Fixation
+      req.session.regenerate((err) => {
+        if (err) {
+          res.redirect("/admin?error=session_error");
+          return;
+        }
+        req.session.userId = user.id;
+        req.session.userEmail = user.email;
+        res.redirect("/admin/dashboard");
+      });
+    } else {
+      res.redirect("/admin?error=unauthorized");
     }
-    res.redirect("/admin/dashboard");
   },
 );
 

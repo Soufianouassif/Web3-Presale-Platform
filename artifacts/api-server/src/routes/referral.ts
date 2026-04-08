@@ -1,7 +1,8 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import { db, pool } from "@workspace/db";
 import { referralCodes, referrals, purchases } from "@workspace/db/schema";
-import { eq, desc, sql, and } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 
 const router = Router();
 
@@ -23,46 +24,40 @@ function generateCode(): string {
   return code;
 }
 
-// ─── Rate limiter (in-memory, per IP, max 10 req/min for code creation) ───────
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-function checkRateLimit(ip: string, limit = 10, windowMs = 60_000): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-  if (entry.count >= limit) return false;
-  entry.count++;
-  return true;
-}
-// Clean stale entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, val] of rateLimitMap.entries()) {
-    if (now > val.resetAt) rateLimitMap.delete(key);
-  }
-}, 5 * 60_000);
+// ─── Rate limiters (express-rate-limit — persistent across process lifetime) ──
+const codeLimiter = rateLimit({
+  windowMs: 60 * 1_000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" },
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 1_000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" },
+});
+
+const readLimiter = rateLimit({
+  windowMs: 60 * 1_000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" },
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/referral/code/:wallet
 // Returns the referral code for a wallet (creates one if it doesn't exist).
 // ─────────────────────────────────────────────────────────────────────────────
-router.get("/referral/code/:wallet", async (req, res) => {
+router.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
   const { wallet } = req.params;
 
   if (!isValidSolanaAddress(wallet)) {
     res.status(400).json({ error: "Invalid wallet address" });
-    return;
-  }
-
-  const ip =
-    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ??
-    req.socket?.remoteAddress ??
-    "unknown";
-
-  if (!checkRateLimit(ip, 20, 60_000)) {
-    res.status(429).json({ error: "Too many requests. Please wait a moment." });
     return;
   }
 
@@ -117,7 +112,7 @@ router.get("/referral/code/:wallet", async (req, res) => {
 //  4. Prevent double-referral (buyer can only be referred once)
 //  5. Atomic update of reward counters
 // ─────────────────────────────────────────────────────────────────────────────
-router.post("/referral/register", async (req, res) => {
+router.post("/referral/register", registerLimiter, async (req, res) => {
   const { referrerCode, buyerWallet, purchaseId, amountUsd, amountTokens } =
     req.body as {
       referrerCode?: string;
@@ -140,7 +135,30 @@ router.post("/referral/register", async (req, res) => {
   // Sanitise code
   const code = referrerCode.trim().slice(0, 16);
 
+  // ── purchaseId إلزامي ويجب أن يكون موجوداً في DB ────────────────────────────
+  if (!purchaseId || !Number.isInteger(purchaseId) || purchaseId <= 0) {
+    res.status(400).json({ error: "Valid purchaseId is required" });
+    return;
+  }
+
   try {
+    // ── 0. تحقق من وجود purchaseId في DB ومطابقته للمحفظة ───────────────────
+    const purchaseRow = await db
+      .select({ id: purchases.id, walletAddress: purchases.walletAddress })
+      .from(purchases)
+      .where(eq(purchases.id, purchaseId))
+      .limit(1);
+
+    if (purchaseRow.length === 0) {
+      res.status(400).json({ error: "Purchase not found" });
+      return;
+    }
+
+    if (purchaseRow[0].walletAddress.toLowerCase() !== buyerWallet.toLowerCase()) {
+      res.status(400).json({ error: "Purchase does not belong to this wallet" });
+      return;
+    }
+
     // ── 1. Resolve code → referrerWallet ─────────────────────────────────────
     const codeRow = await db
       .select()
@@ -228,7 +246,7 @@ router.post("/referral/register", async (req, res) => {
 // GET /api/referral/stats/:wallet
 // Returns full referral stats for a wallet.
 // ─────────────────────────────────────────────────────────────────────────────
-router.get("/referral/stats/:wallet", async (req, res) => {
+router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
   const { wallet } = req.params;
 
   if (!isValidSolanaAddress(wallet)) {
@@ -304,7 +322,7 @@ router.get("/referral/stats/:wallet", async (req, res) => {
 // GET /api/referral/leaderboard
 // Top 10 referrers by total reward tokens.
 // ─────────────────────────────────────────────────────────────────────────────
-router.get("/referral/leaderboard", async (_req, res) => {
+router.get("/referral/leaderboard", readLimiter, async (_req, res) => {
   try {
     const top = await db
       .select({
@@ -335,7 +353,7 @@ router.get("/referral/leaderboard", async (_req, res) => {
 // Validates a referral code and returns the masked referrer wallet.
 // Used by the frontend when a visitor lands with ?ref=CODE.
 // ─────────────────────────────────────────────────────────────────────────────
-router.get("/referral/resolve/:code", async (req, res) => {
+router.get("/referral/resolve/:code", readLimiter, async (req, res) => {
   const code = req.params.code.trim().slice(0, 16);
 
   try {

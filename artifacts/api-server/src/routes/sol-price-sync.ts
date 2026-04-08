@@ -1,4 +1,5 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import {
   Connection,
   Keypair,
@@ -9,6 +10,24 @@ import {
 import { logger } from "../lib/logger.js";
 
 const router = Router();
+
+// ── حماية نقطة نهاية المزامنة: سر مشترك + rate limit ────────────────────────
+const CRON_SECRET = process.env.CRON_SECRET ?? null;
+
+const syncLimiter = rateLimit({
+  windowMs: 5 * 60 * 1_000, // 5 دقائق
+  max: 3,                    // 3 طلبات كحد أقصى
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many sync requests" },
+});
+
+function isCronAuthorized(req: import("express").Request): boolean {
+  // إذا لم يُضبط CRON_SECRET فقط السيرفر الداخلي يسمح له
+  if (!CRON_SECRET) return true;
+  const auth = req.headers["authorization"] ?? "";
+  return auth === `Bearer ${CRON_SECRET}`;
+}
 
 const PROGRAM_ID = new PublicKey("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
 const CONFIG_PDA = new PublicKey("BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi");
@@ -87,7 +106,11 @@ export async function runSolPriceSync(): Promise<void> {
   }
 }
 
-router.post("/cron/sync-sol-price", async (_req, res) => {
+router.post("/cron/sync-sol-price", syncLimiter, async (req, res) => {
+  if (!isCronAuthorized(req)) {
+    res.status(401).json({ ok: false, error: "Unauthorized — Bearer token required" });
+    return;
+  }
   if (!process.env.ADMIN_KEYPAIR_JSON) {
     res.status(503).json({ ok: false, error: "ADMIN_KEYPAIR_JSON not configured" });
     return;

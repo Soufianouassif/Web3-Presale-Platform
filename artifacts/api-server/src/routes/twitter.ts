@@ -1,10 +1,29 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 
 const router = Router();
 
-router.get("/twitter/timeline/:username", async (req, res) => {
+// ── Validate Twitter username (alphanumeric + underscore, 1-50 chars) ─────────
+const USERNAME_RE = /^[A-Za-z0-9_]{1,50}$/;
+
+const twitterLimiter = rateLimit({
+  windowMs: 60 * 1_000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" },
+});
+
+router.get("/twitter/timeline/:username", twitterLimiter, async (req, res) => {
   try {
     const { username } = req.params;
+
+    // منع SSRF: التحقق من صحة اسم المستخدم قبل إدراجه في الـ URL
+    if (!USERNAME_RE.test(username)) {
+      res.status(400).json({ error: "Invalid username" });
+      return;
+    }
+
     const url = `https://syndication.twitter.com/srv/timeline-profile/screen-name/${username}?dnt=true&lang=en&showReplies=false`;
 
     const response = await fetch(url, {

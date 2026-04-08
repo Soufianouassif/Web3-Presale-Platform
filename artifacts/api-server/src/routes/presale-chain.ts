@@ -1,6 +1,15 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 
 const router = Router();
+
+const chainLimiter = rateLimit({
+  windowMs: 60 * 1_000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" },
+});
 
 const SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
 const CONFIG_PDA = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
@@ -106,7 +115,7 @@ async function fetchPresaleChainState() {
   return data;
 }
 
-router.get("/sol-price", async (_req, res) => {
+router.get("/sol-price", chainLimiter, async (_req, res) => {
   try {
     const price = await fetchSolPrice();
     res.json({ price, currency: "USD", updatedAt: new Date().toISOString() });
@@ -115,7 +124,7 @@ router.get("/sol-price", async (_req, res) => {
   }
 });
 
-router.get("/presale/on-chain", async (_req, res) => {
+router.get("/presale/on-chain", chainLimiter, async (_req, res) => {
   try {
     const [state, solPrice] = await Promise.all([
       fetchPresaleChainState(),

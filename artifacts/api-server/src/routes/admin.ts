@@ -138,8 +138,8 @@ router.get("/admin/stats", async (_req, res) => {
 
 router.get("/admin/buyers", async (req, res) => {
   try {
-    const page = Number(req.query.page ?? 1);
-    const limit = Number(req.query.limit ?? 50);
+    const page = Math.max(1, Number(req.query.page ?? 1) || 1);
+    const limit = Math.min(200, Math.max(1, Number(req.query.limit ?? 50) || 50));
     const offset = (page - 1) * limit;
 
     const buyers = await db
@@ -255,8 +255,8 @@ router.post("/admin/presale/withdraw", async (_req, res) => {
 
 router.get("/admin/referrals", async (req, res) => {
   try {
-    const page = Number(req.query.page ?? 1);
-    const limit = Number(req.query.limit ?? 50);
+    const page = Math.max(1, Number(req.query.page ?? 1) || 1);
+    const limit = Math.min(200, Math.max(1, Number(req.query.limit ?? 50) || 50));
     const offset = (page - 1) * limit;
     const statusFilter = req.query.status as string | undefined;
 
