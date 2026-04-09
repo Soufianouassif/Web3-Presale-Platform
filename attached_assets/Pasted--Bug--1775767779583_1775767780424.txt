@@ -1,0 +1,277 @@
+أريد الآن تنفيذ إصلاح شامل ونهائي للمشروع بالكامل، لأن المشكل لم يعد Bug بسيط، بل هو مزيج من:
+
+- نظام إحالة غير مكتمل أو غير مربوط end-to-end
+- واجهات قد تكون static أو mock
+- اعتماد سابق على client values
+- وجود DEV MODE
+- احتمال mismatch في قاعدة البيانات بين Replit و Vercel (Neon)
+- ضرورة ربط النظام بالبلوكشين الحقيقي (Devnet)
+- الحاجة إلى أمان Production حقيقي
+
+مهم جداً:
+- لا أريد إصلاح جزئي
+- لا أريد افتراض أن النظام يعمل
+- أريد إعادة بناء وربط كل شيء end-to-end
+- أريد إثبات عملي أن كل شيء يعمل فعلاً
+
+━━━━━━━━━━━━━━━━━━
+🎯 الهدف النهائي
+━━━━━━━━━━━━━━━━━━
+
+أريد نظام كامل يعمل بهذا التسلسل الحقيقي:
+
+ref link → stored → purchase (Devnet) → verifyTransaction → save purchase → create referral → calculate reward → update DB → show in referrer dashboard → show in admin dashboard
+
+وأريد:
+- بدون mock data
+- بدون client trust
+- بدون DEV MODE
+- بدون DB mismatch
+
+━━━━━━━━━━━━━━━━━━
+🧩 المرحلة 1 — توحيد قاعدة البيانات (أهم خطوة)
+━━━━━━━━━━━━━━━━━━
+
+افحص وحدد بدقة:
+
+- DATABASE_URL في Replit
+- DATABASE_URL في Vercel
+- هل كلاهما يستعمل Neon أم لا
+- هل هناك DB مدمجة داخل Replit تُستعمل بدون قصد
+
+المطلوب:
+
+1. توحيد source of truth:
+   → كل البيئات تستعمل Neon database
+
+2. إزالة أي fallback لقاعدة محلية
+
+3. التأكد أن:
+   - purchases
+   - referrals
+   - referral_codes
+   - users
+
+كلها موجودة في Neon وبنفس schema
+
+4. تطبيق migrations على Neon
+
+5. التأكد أن:
+   - backend يكتب في Neon
+   - dashboard يقرأ من Neon
+
+━━━━━━━━━━━━━━━━━━
+🧩 المرحلة 2 — بناء نظام الإحالة من الصفر
+━━━━━━━━━━━━━━━━━━
+
+لا تفترض أن النظام موجود.
+
+ابنِ:
+
+1. referral_codes
+- wallet
+- code (unique)
+- totals
+
+2. referrals
+- referrer_wallet
+- referred_wallet
+- purchase_id
+- reward_tokens
+- reward_usd
+- status
+
+3. endpoint:
+GET /api/referral/code/:wallet
+
+4. frontend:
+- capture ?ref=CODE
+- store in localStorage
+- keep until purchase
+
+5. عند الشراء:
+- إرسال referralCode
+
+6. backend:
+- validate code
+- block self-referral
+- block duplicate referral
+- create referral
+- calculate reward
+- update totals
+
+━━━━━━━━━━━━━━━━━━
+🧩 المرحلة 3 — إزالة أي Static أو Mock Data
+━━━━━━━━━━━━━━━━━━
+
+افحص:
+
+- dashboards
+- admin
+- referral UI
+
+احذف:
+- mockData
+- dummyData
+- hardcoded values
+
+استبدلها بـ:
+- API real data
+- DB queries
+
+إذا لا توجد بيانات:
+→ empty state فقط
+
+━━━━━━━━━━━━━━━━━━
+🧩 المرحلة 4 — ربط Devnet الحقيقي
+━━━━━━━━━━━━━━━━━━
+
+أريد:
+
+- SOLANA_NETWORK=devnet
+- RPC devnet
+- Program ID صحيح
+- frontend wallet devnet
+
+إلغاء:
+
+- DEV MODE
+- skip verification
+
+verifyTransaction يجب أن يتحقق من:
+
+- tx موجود
+- tx ناجحة
+- signer صحيح
+- program صحيح
+- amount حقيقي
+
+━━━━━━━━━━━━━━━━━━
+🧩 المرحلة 5 — منع الاعتماد على client
+━━━━━━━━━━━━━━━━━━
+
+لا تستعمل:
+
+- amountUsd من frontend
+- amountTokens من frontend
+
+استعمل فقط:
+
+- blockchain data
+- أو server calculation
+
+reward = server only
+
+━━━━━━━━━━━━━━━━━━
+🧩 المرحلة 6 — Anti-Fraud
+━━━━━━━━━━━━━━━━━━
+
+أضف:
+
+- replay protection (txHash unique)
+- mismatch detection
+- reject fake tx
+- reject wrong wallet
+- reject duplicate referral
+- block self-referral
+
+━━━━━━━━━━━━━━━━━━
+🧩 المرحلة 7 — Session & Admin Security
+━━━━━━━━━━━━━━━━━━
+
+تأكد:
+
+- session secure
+- admin protected
+- requireRecentAuth
+- no admin access بدون role
+- logs لكل access
+
+━━━━━━━━━━━━━━━━━━
+🧩 المرحلة 8 — Logging شامل
+━━━━━━━━━━━━━━━━━━
+
+أضف logs:
+
+[REF_CAPTURE]
+[PURCHASE]
+[TX_VERIFY]
+[REFERRAL]
+[REWARD]
+[DB_WRITE]
+[ADMIN_VIEW]
+
+━━━━━━━━━━━━━━━━━━
+🧩 المرحلة 9 — Dashboard ديناميكي
+━━━━━━━━━━━━━━━━━━
+
+Referrer Dashboard:
+
+- total referrals
+- rewards
+- history
+
+Admin Dashboard:
+
+- all referrals
+- stats
+- rewards
+- wallets
+
+كلها من DB فقط
+
+━━━━━━━━━━━━━━━━━━
+🧩 المرحلة 10 — اختبار End-to-End
+━━━━━━━━━━━━━━━━━━
+
+أريد إثبات:
+
+1. wallet A → referral link
+2. wallet B → يدخل
+3. purchase devnet
+4. verifyTransaction
+5. DB save
+6. referral created
+7. reward created
+8. dashboard updated
+9. admin updated
+
+━━━━━━━━━━━━━━━━━━
+🧩 المرحلة 11 — التقرير النهائي
+━━━━━━━━━━━━━━━━━━
+
+أريد:
+
+1. هل النظام كان مكسور أم غير مكتمل؟
+2. هل كان هناك DB mismatch؟
+3. ما الذي تم توحيده؟
+4. ما الملفات المعدلة؟
+5. ما endpoints المستخدمة؟
+6. هل أصبح النظام dynamic؟
+7. هل verifyTransaction إجباري؟
+8. هل reward server-side؟
+9. كيف أختبر بنفسي؟
+
+━━━━━━━━━━━━━━━━━━
+⚠️ قواعد صارمة
+━━━━━━━━━━━━━━━━━━
+
+- لا تفترض أن أي شيء يعمل
+- لا تقل "تم الإصلاح" بدون إثبات
+- لا تترك DEV MODE
+- لا تستعمل client values
+- لا تترك mock data
+- لا تترك DB mismatch
+- أصلح root cause بالكامل
+
+━━━━━━━━━━━━━━━━━━
+🔥 ملاحظة نهائية
+━━━━━━━━━━━━━━━━━━
+
+أريد اعتبار Devnet بيئة حقيقية، وليس mock.
+
+أي purchase:
+→ يجب أن يمر عبر blockchain verification
+→ أو يُرفض
+
+ولا أريد أي نجاح وهمي في الواجهة.

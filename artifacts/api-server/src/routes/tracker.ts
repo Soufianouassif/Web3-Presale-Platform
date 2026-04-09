@@ -211,14 +211,36 @@ async function verifyTransaction(
   logger.info(logCtx, `[TX_VERIFY] Checking tx on ${SOLANA_NETWORK}`);
 
   try {
-    const tx = await getConnection().getTransaction(txHash, {
-      commitment: "confirmed",
-      maxSupportedTransactionVersion: 0,
-    });
+    // ── Retry logic: devnet RPC is slow/unreliable. Retry up to 5× with delay ──
+    const MAX_ATTEMPTS = 5;
+    const RETRY_DELAY_MS = 3_000; // 3 seconds between attempts
+    let tx = null;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      tx = await getConnection().getTransaction(txHash, {
+        commitment: "confirmed",
+        maxSupportedTransactionVersion: 0,
+      });
+
+      if (tx) {
+        if (attempt > 1) {
+          logger.info({ ...logCtx, attempt }, `[TX_VERIFY] Transaction found on attempt ${attempt}`);
+        }
+        break;
+      }
+
+      if (attempt < MAX_ATTEMPTS) {
+        logger.warn(
+          { ...logCtx, attempt, nextAttemptInMs: RETRY_DELAY_MS },
+          `[TX_VERIFY] Transaction not found (attempt ${attempt}/${MAX_ATTEMPTS}) — retrying...`,
+        );
+        await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+      }
+    }
 
     if (!tx) {
-      logger.warn({ ...logCtx }, `[TX_VERIFY] Transaction not found on ${SOLANA_NETWORK}`);
-      return { valid: false, reason: `Transaction not found on ${SOLANA_NETWORK}` };
+      logger.warn({ ...logCtx, totalAttempts: MAX_ATTEMPTS }, `[TX_VERIFY] Transaction not found on ${SOLANA_NETWORK} after ${MAX_ATTEMPTS} attempts`);
+      return { valid: false, reason: `Transaction not found on ${SOLANA_NETWORK} after ${MAX_ATTEMPTS} attempts` };
     }
 
     if (tx.meta?.err !== null) {
