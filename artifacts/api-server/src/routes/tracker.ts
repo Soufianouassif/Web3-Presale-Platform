@@ -7,8 +7,14 @@ import { eq } from "drizzle-orm";
 
 const router = Router();
 
-const SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
-const connection = new Connection(SOLANA_RPC, "confirmed");
+const SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
+
+// Lazy singleton — لا يُنشأ عند تحميل الملف بل عند أول استخدام
+let _connection: Connection | null = null;
+function getConnection(): Connection {
+  if (!_connection) _connection = new Connection(SOLANA_RPC, "confirmed");
+  return _connection;
+}
 
 // Program ID للعقد الذكي — لا نقبل معاملات من عقود أخرى
 const PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
@@ -62,7 +68,7 @@ async function verifyTransaction(txHash: string, expectedWallet: string): Promis
   reason?: string;
 }> {
   try {
-    const tx = await connection.getTransaction(txHash, {
+    const tx = await getConnection().getTransaction(txHash, {
       commitment: "confirmed",
       maxSupportedTransactionVersion: 0,
     });

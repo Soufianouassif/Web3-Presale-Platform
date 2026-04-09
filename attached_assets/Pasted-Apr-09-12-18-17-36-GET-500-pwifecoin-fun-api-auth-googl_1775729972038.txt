@@ -1,0 +1,486 @@
+Apr 09 12:18:17.36
+GET
+500
+pwifecoin.fun
+/api/auth/google
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:18:15.18
+GET
+500
+pwifecoin.fun
+/api/auth/me
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:15:08.38
+GET
+500
+pwifecoin.fun
+/api/auth/google
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:14:47.42
+GET
+500
+pwifecoin.fun
+/api/auth/me
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:14:38.14
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:14:38.11
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:14:38.11
+GET
+500
+pwifecoin.fun
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:14:38.08
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:13:57.76
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:57.76
+GET
+500
+pwifecoin.fun
+/api/referral/code/FBp8D4mC6S4ZwsTD2UDqgDKjiUue4KogsFRVKzBfkPfF
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:57.75
+GET
+500
+pwifecoin.fun
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:57.75
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:57.75
+GET
+500
+pwifecoin.fun
+/api/referral/stats/FBp8D4mC6S4ZwsTD2UDqgDKjiUue4KogsFRVKzBfkPfF
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:57.75
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:57.73
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:33.98
+GET
+500
+pwifecoin.fun
+/api/referral/stats/FBp8D4mC6S4ZwsTD2UDqgDKjiUue4KogsFRVKzBfkPfF
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:33.94
+GET
+500
+pwifecoin.fun
+/api/referral/code/FBp8D4mC6S4ZwsTD2UDqgDKjiUue4KogsFRVKzBfkPfF
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:33.92
+POST
+500
+pwifecoin.fun
+/api/track/wallet
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:03.82
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:03.82
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:03.81
+GET
+500
+pwifecoin.fun
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:11:03.69
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:10:54.30
+GET
+500
+web3-presale-platform-api-server-bj5s67521.vercel.app
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue. TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:10:54.28
+GET
+500
+web3-presale-platform-api-server-bj5s67521.vercel.app
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:10:54.28
+GET
+500
+web3-presale-platform-api-server-bj5s67521.vercel.app
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue. TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:10:54.28
+POST
+500
+web3-presale-platform-api-server-bj5s67521.vercel.app
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:10:54.12
+GET
+500
+web3-presale-platform-api-server-bj5s67521.vercel.app
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:10:54.12
+GET
+500
+web3-presale-platform-api-server-bj5s67521.vercel.app
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:10:54.12
+GET
+500
+web3-presale-platform-api-server-bj5s67521.vercel.app
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:10:54.12
+POST
+500
+web3-presale-platform-api-server-bj5s67521.vercel.app
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:45.05
+GET
+500
+pwifecoin.fun
+/api/auth/google
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:42.91
+GET
+500
+pwifecoin.fun
+/api/auth/me
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:32.46
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:32.45
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:32.45
+GET
+500
+pwifecoin.fun
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:32.44
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:27.84
+GET
+500
+pwifecoin.fun
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:27.84
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:27.84
+GET
+500
+pwifecoin.fun
+/api/referral/code/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:27.84
+GET
+500
+pwifecoin.fun
+/api/referral/stats/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:27.84
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:27.81
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:18.24
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:18.23
+GET
+500
+pwifecoin.fun
+/api/referral/stats/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:18.23
+GET
+500
+pwifecoin.fun
+/api/referral/code/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:18.22
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:18.22
+GET
+500
+pwifecoin.fun
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:18.21
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:14.14
+GET
+500
+pwifecoin.fun
+/api/referral/code/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:14.14
+GET
+500
+pwifecoin.fun
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:14.12
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:14.12
+GET
+500
+pwifecoin.fun
+/api/referral/stats/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:14.11
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:14.07
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:07.17
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:07.17
+POST
+500
+pwifecoin.fun
+/api/track/wallet
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:00.55
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:00.53
+GET
+500
+pwifecoin.fun
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:00.53
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:00.48
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:09:00.46
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:08:10.60
+GET
+500
+pwifecoin.fun
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue. TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:08:10.59
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:08:10.59
+GET
+500
+pwifecoin.fun
+/api/referral/code/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:08:10.59
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:08:10.59
+GET
+500
+pwifecoin.fun
+/api/referral/stats/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:08:10.56
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue. TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:08:03.63
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:08:03.62
+POST
+500
+pwifecoin.fun
+/api/track/wallet
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:08:01.70
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:07:54.90
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:07:54.90
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:07:54.90
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:07:54.90
+GET
+500
+pwifecoin.fun
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:07:00.68
+GET
+500
+pwifecoin.fun
+/api/referral/stats/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:07:00.68
+GET
+500
+pwifecoin.fun
+/api/referral/code/7qDRK95gU2ytyaZXZS7pViJPTj1FPskMUPGg5TcNBBE4
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:07:00.67
+POST
+500
+pwifecoin.fun
+/api/track/wallet
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:06:22.94
+GET
+500
+pwifecoin.fun
+/api/referral/leaderboard
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue. TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:06:22.92
+GET
+500
+pwifecoin.fun
+/api/presale/config
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue. TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:06:22.92
+GET
+500
+pwifecoin.fun
+/api/sol-price
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Apr 09 12:06:22.91
+POST
+500
+pwifecoin.fun
+/api/track/visit
+TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue. TypeError: Endpoint URL must start with `http:` or `https:`. at assertEndpointUrl (file:///var/task/api/server.mjs:64723:15) at new Connection4 (file:///var/task/api/server.mjs:65543:29) at file:///var/task/api/server.mjs:83188:18 at ModuleJob.run (node:internal/modules/esm/module_job:413:25) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26) at async d (/opt/rust/nodejs.js:17:25185) Node.js process exited with exit status: 1. The logs above can help with debugging the issue.

@@ -11,7 +11,7 @@ const chainLimiter = rateLimit({
   message: { error: "Too many requests" },
 });
 
-const SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+const SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 const CONFIG_PDA = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
 
 let solPriceCache: { price: number; fetchedAt: number } = { price: 0, fetchedAt: 0 };

@@ -24215,7 +24215,7 @@ var require_req = __commonJS({
       value: {}
     });
     function reqSerializer(req) {
-      const connection2 = req.info || req.socket;
+      const connection = req.info || req.socket;
       const _req = Object.create(pinoReqProto);
       _req.id = typeof req.id === "function" ? req.id() : req.id || (req.info ? req.info.id : void 0);
       _req.method = req.method;
@@ -24232,8 +24232,8 @@ var require_req = __commonJS({
         _req.params = req.params;
       }
       _req.headers = req.headers;
-      _req.remoteAddress = connection2 && connection2.remoteAddress;
-      _req.remotePort = connection2 && connection2.remotePort;
+      _req.remoteAddress = connection && connection.remoteAddress;
+      _req.remotePort = connection && connection.remotePort;
       _req.raw = req.raw || req;
       return _req;
     }
@@ -31982,23 +31982,23 @@ var require_query = __commonJS({
           this._result.addRow(row);
         }
       }
-      handleCommandComplete(msg, connection2) {
+      handleCommandComplete(msg, connection) {
         this._checkForMultirow();
         this._result.addCommandComplete(msg);
         if (this.rows) {
-          connection2.sync();
+          connection.sync();
         }
       }
       // if a named prepared statement is created with empty query text
       // the backend will send an emptyQuery message but *not* a command complete message
       // since we pipeline sync immediately after execute we don't need to do anything here
       // unless we have rows specified, in which case we did not pipeline the initial sync call
-      handleEmptyQuery(connection2) {
+      handleEmptyQuery(connection) {
         if (this.rows) {
-          connection2.sync();
+          connection.sync();
         }
       }
-      handleError(err, connection2) {
+      handleError(err, connection) {
         if (this._canceledDueToError) {
           err = this._canceledDueToError;
           this._canceledDueToError = false;
@@ -32023,11 +32023,11 @@ var require_query = __commonJS({
         }
         this.emit("end", this._results);
       }
-      submit(connection2) {
+      submit(connection) {
         if (typeof this.text !== "string" && typeof this.name !== "string") {
           return new Error("A query must have either text or a name. Supplying neither is unsupported.");
         }
-        const previous = connection2.parsedStatements[this.name];
+        const previous = connection.parsedStatements[this.name];
         if (this.text && previous && this.text !== previous) {
           return new Error(`Prepared statements must be unique - '${this.name}' was used for a different statement`);
         }
@@ -32035,45 +32035,45 @@ var require_query = __commonJS({
           return new Error("Query values must be an array");
         }
         if (this.requiresPreparation()) {
-          connection2.stream.cork && connection2.stream.cork();
+          connection.stream.cork && connection.stream.cork();
           try {
-            this.prepare(connection2);
+            this.prepare(connection);
           } finally {
-            connection2.stream.uncork && connection2.stream.uncork();
+            connection.stream.uncork && connection.stream.uncork();
           }
         } else {
-          connection2.query(this.text);
+          connection.query(this.text);
         }
         return null;
       }
-      hasBeenParsed(connection2) {
-        return this.name && connection2.parsedStatements[this.name];
+      hasBeenParsed(connection) {
+        return this.name && connection.parsedStatements[this.name];
       }
-      handlePortalSuspended(connection2) {
-        this._getRows(connection2, this.rows);
+      handlePortalSuspended(connection) {
+        this._getRows(connection, this.rows);
       }
-      _getRows(connection2, rows) {
-        connection2.execute({
+      _getRows(connection, rows) {
+        connection.execute({
           portal: this.portal,
           rows
         });
         if (!rows) {
-          connection2.sync();
+          connection.sync();
         } else {
-          connection2.flush();
+          connection.flush();
         }
       }
       // http://developer.postgresql.org/pgdocs/postgres/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY
-      prepare(connection2) {
-        if (!this.hasBeenParsed(connection2)) {
-          connection2.parse({
+      prepare(connection) {
+        if (!this.hasBeenParsed(connection)) {
+          connection.parse({
             text: this.text,
             name: this.name,
             types: this.types
           });
         }
         try {
-          connection2.bind({
+          connection.bind({
             portal: this.portal,
             statement: this.name,
             values: this.values,
@@ -32081,19 +32081,19 @@ var require_query = __commonJS({
             valueMapper: utils.prepareValue
           });
         } catch (err) {
-          this.handleError(err, connection2);
+          this.handleError(err, connection);
           return;
         }
-        connection2.describe({
+        connection.describe({
           type: "P",
           name: this.portal || ""
         });
-        this._getRows(connection2, this.rows);
+        this._getRows(connection, this.rows);
       }
-      handleCopyInResponse(connection2) {
-        connection2.sendCopyFail("No source stream defined");
+      handleCopyInResponse(connection) {
+        connection.sendCopyFail("No source stream defined");
       }
-      handleCopyData(msg, connection2) {
+      handleCopyData(msg, connection) {
       }
     };
     module.exports = Query2;
@@ -62407,8 +62407,8 @@ var require_index_cjs = __commonJS({
        *
        * @returns {Promise<number | null>} The estimated fee for the transaction
        */
-      async getEstimatedFee(connection2) {
-        return (await connection2.getFeeForMessage(this.compileMessage())).value;
+      async getEstimatedFee(connection) {
+        return (await connection.getFeeForMessage(this.compileMessage())).value;
       }
       /**
        * Specify the public keys which will be used to sign the Transaction.
@@ -62912,10 +62912,10 @@ Message: ${transactionMessage}.
         }
         return cachedLogs;
       }
-      async getLogs(connection2) {
+      async getLogs(connection) {
         if (!Array.isArray(this.transactionLogs)) {
           this.transactionLogs = new Promise((resolve, reject) => {
-            connection2.getTransaction(this.signature).then((tx) => {
+            connection.getTransaction(this.signature).then((tx) => {
               if (tx && tx.meta && tx.meta.logMessages) {
                 const logs = tx.meta.logMessages;
                 this.transactionLogs = logs;
@@ -62961,17 +62961,17 @@ Message: ${transactionMessage}.
         this.name = "SolanaJSONRPCError";
       }
     };
-    async function sendAndConfirmTransaction(connection2, transaction, signers, options) {
+    async function sendAndConfirmTransaction(connection, transaction, signers, options) {
       const sendOptions = options && {
         skipPreflight: options.skipPreflight,
         preflightCommitment: options.preflightCommitment || options.commitment,
         maxRetries: options.maxRetries,
         minContextSlot: options.minContextSlot
       };
-      const signature2 = await connection2.sendTransaction(transaction, signers, sendOptions);
+      const signature2 = await connection.sendTransaction(transaction, signers, sendOptions);
       let status;
       if (transaction.recentBlockhash != null && transaction.lastValidBlockHeight != null) {
-        status = (await connection2.confirmTransaction({
+        status = (await connection.confirmTransaction({
           abortSignal: options?.abortSignal,
           signature: signature2,
           blockhash: transaction.recentBlockhash,
@@ -62982,7 +62982,7 @@ Message: ${transactionMessage}.
           nonceInstruction
         } = transaction.nonceInfo;
         const nonceAccountPubkey = nonceInstruction.keys[0].pubkey;
-        status = (await connection2.confirmTransaction({
+        status = (await connection.confirmTransaction({
           abortSignal: options?.abortSignal,
           minContextSlot: transaction.minNonceContextSlot,
           nonceAccountPubkey,
@@ -62993,7 +62993,7 @@ Message: ${transactionMessage}.
         if (options?.abortSignal != null) {
           console.warn("sendAndConfirmTransaction(): A transaction with a deprecated confirmation strategy was supplied along with an `abortSignal`. Only transactions having `lastValidBlockHeight` or a combination of `nonceInfo` and `minNonceContextSlot` are abortable.");
         }
-        status = (await connection2.confirmTransaction(signature2, options && options.commitment)).value;
+        status = (await connection.confirmTransaction(signature2, options && options.commitment)).value;
       }
       if (status.err) {
         if (signature2 != null) {
@@ -63740,10 +63740,10 @@ Message: ${transactionMessage}.
        * @param data Program octets
        * @return true if program was loaded successfully, false if program was already loaded
        */
-      static async load(connection2, payer, program, programId, data) {
+      static async load(connection, payer, program, programId, data) {
         {
-          const balanceNeeded = await connection2.getMinimumBalanceForRentExemption(data.length);
-          const programInfo = await connection2.getAccountInfo(program.publicKey, "confirmed");
+          const balanceNeeded = await connection.getMinimumBalanceForRentExemption(data.length);
+          const programInfo = await connection.getAccountInfo(program.publicKey, "confirmed");
           let transaction = null;
           if (programInfo !== null) {
             if (programInfo.executable) {
@@ -63782,7 +63782,7 @@ Message: ${transactionMessage}.
             }));
           }
           if (transaction !== null) {
-            await sendAndConfirmTransaction(connection2, transaction, [payer, program], {
+            await sendAndConfirmTransaction(connection, transaction, [payer, program], {
               commitment: "confirmed"
             });
           }
@@ -63812,10 +63812,10 @@ Message: ${transactionMessage}.
             programId,
             data: data2
           });
-          transactions.push(sendAndConfirmTransaction(connection2, transaction, [payer, program], {
+          transactions.push(sendAndConfirmTransaction(connection, transaction, [payer, program], {
             commitment: "confirmed"
           }));
-          if (connection2._rpcEndpoint.includes("solana.com")) {
+          if (connection._rpcEndpoint.includes("solana.com")) {
             const REQUESTS_PER_SECOND = 4;
             await sleep(1e3 / REQUESTS_PER_SECOND);
           }
@@ -63844,13 +63844,13 @@ Message: ${transactionMessage}.
             data: data2
           });
           const deployCommitment = "processed";
-          const finalizeSignature = await connection2.sendTransaction(transaction, [payer, program], {
+          const finalizeSignature = await connection.sendTransaction(transaction, [payer, program], {
             preflightCommitment: deployCommitment
           });
           const {
             context,
             value
-          } = await connection2.confirmTransaction({
+          } = await connection.confirmTransaction({
             signature: finalizeSignature,
             lastValidBlockHeight: transaction.lastValidBlockHeight,
             blockhash: transaction.recentBlockhash
@@ -63860,7 +63860,7 @@ Message: ${transactionMessage}.
           }
           while (true) {
             try {
-              const currentSlot = await connection2.getSlot({
+              const currentSlot = await connection.getSlot({
                 commitment: deployCommitment
               });
               if (currentSlot > context.slot) {
@@ -63896,8 +63896,8 @@ Message: ${transactionMessage}.
        * @param loaderProgramId The program id of the BPF loader to use
        * @return true if program was loaded successfully, false if program was already loaded
        */
-      static load(connection2, payer, program, elf, loaderProgramId) {
-        return Loader.load(connection2, payer, program, loaderProgramId, elf);
+      static load(connection, payer, program, elf, loaderProgramId) {
+        return Loader.load(connection, payer, program, loaderProgramId, elf);
       }
     };
     function getDefaultExportFromCjs(x) {
@@ -70097,7 +70097,7 @@ Message: ${transactionMessage}.
       }
       return url;
     }
-    async function sendAndConfirmRawTransaction(connection2, rawTransaction, confirmationStrategyOrConfirmOptions, maybeConfirmOptions) {
+    async function sendAndConfirmRawTransaction(connection, rawTransaction, confirmationStrategyOrConfirmOptions, maybeConfirmOptions) {
       let confirmationStrategy;
       let options;
       if (confirmationStrategyOrConfirmOptions && Object.prototype.hasOwnProperty.call(confirmationStrategyOrConfirmOptions, "lastValidBlockHeight")) {
@@ -70114,9 +70114,9 @@ Message: ${transactionMessage}.
         preflightCommitment: options.preflightCommitment || options.commitment,
         minContextSlot: options.minContextSlot
       };
-      const signature2 = await connection2.sendRawTransaction(rawTransaction, sendOptions);
+      const signature2 = await connection.sendRawTransaction(rawTransaction, sendOptions);
       const commitment = options && options.commitment;
-      const confirmationPromise = confirmationStrategy ? connection2.confirmTransaction(confirmationStrategy, commitment) : connection2.confirmTransaction(signature2, commitment);
+      const confirmationPromise = confirmationStrategy ? connection.confirmTransaction(confirmationStrategy, commitment) : connection.confirmTransaction(signature2, commitment);
       const status = (await confirmationPromise).value;
       if (status.err) {
         if (signature2 != null) {
@@ -81610,11 +81610,11 @@ function drizzle(...params) {
     return construct(instance, params[1]);
   }
   if (isConfig(params[0])) {
-    const { connection: connection2, client, ...drizzleConfig } = params[0];
+    const { connection, client, ...drizzleConfig } = params[0];
     if (client) return construct(client, drizzleConfig);
-    const instance = typeof connection2 === "string" ? new esm_default.Pool({
-      connectionString: connection2
-    }) : new esm_default.Pool(connection2);
+    const instance = typeof connection === "string" ? new esm_default.Pool({
+      connectionString: connection
+    }) : new esm_default.Pool(connection);
     return construct(instance, drizzleConfig);
   }
   return construct(params[0], params[1]);
@@ -83184,8 +83184,12 @@ var admin_default = router4;
 var import_express5 = __toESM(require_express2(), 1);
 var import_web3 = __toESM(require_index_cjs(), 1);
 var router5 = (0, import_express5.Router)();
-var SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
-var connection = new import_web3.Connection(SOLANA_RPC, "confirmed");
+var SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
+var _connection = null;
+function getConnection() {
+  if (!_connection) _connection = new import_web3.Connection(SOLANA_RPC, "confirmed");
+  return _connection;
+}
 var PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
 var ALLOWED_WALLET_TYPES = /* @__PURE__ */ new Set(["phantom", "solflare", "backpack", "okx", "unknown"]);
 var SOLANA_ADDRESS_RE2 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
@@ -83220,7 +83224,7 @@ var purchaseLimiter = rate_limit_default({
 });
 async function verifyTransaction(txHash, expectedWallet) {
   try {
-    const tx = await connection.getTransaction(txHash, {
+    const tx = await getConnection().getTransaction(txHash, {
       commitment: "confirmed",
       maxSupportedTransactionVersion: 0
     });
@@ -83611,7 +83615,7 @@ var referral_default = router6;
 // src/routes/rpc-proxy.ts
 var import_express7 = __toESM(require_express2(), 1);
 var router7 = (0, import_express7.Router)();
-var SOLANA_RPC2 = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+var SOLANA_RPC2 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 var ALLOWED_METHODS = /* @__PURE__ */ new Set([
   "getAccountInfo",
   "getBalance",
@@ -83686,7 +83690,7 @@ function isCronAuthorized(req) {
 }
 var PROGRAM_ID = new import_web32.PublicKey("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
 var CONFIG_PDA = new import_web32.PublicKey("BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi");
-var SOLANA_RPC3 = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+var SOLANA_RPC3 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 async function getDiscriminator2(name) {
   const encoder = new TextEncoder();
   const data = encoder.encode(`global:${name}`);
@@ -83711,7 +83715,7 @@ async function syncSolPriceOnChain(priceUsd) {
   if (!Array.isArray(bytes) || bytes.length !== 64)
     throw new Error("ADMIN_KEYPAIR_JSON must be a JSON array of 64 numbers");
   const keypair = import_web32.Keypair.fromSecretKey(new Uint8Array(bytes));
-  const connection2 = new import_web32.Connection(SOLANA_RPC3, "confirmed");
+  const connection = new import_web32.Connection(SOLANA_RPC3, "confirmed");
   const discriminator = await getDiscriminator2("update_sol_price");
   const priceE6 = BigInt(Math.round(priceUsd * 1e6));
   const argsBuf = Buffer.alloc(8);
@@ -83727,12 +83731,12 @@ async function syncSolPriceOnChain(priceUsd) {
   const tx = new import_web32.Transaction();
   tx.feePayer = keypair.publicKey;
   tx.add(ix);
-  const { blockhash, lastValidBlockHeight } = await connection2.getLatestBlockhash("confirmed");
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
   tx.recentBlockhash = blockhash;
   tx.lastValidBlockHeight = lastValidBlockHeight;
   tx.sign(keypair);
-  const sig = await connection2.sendRawTransaction(tx.serialize(), { skipPreflight: false });
-  await connection2.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
+  const sig = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false });
+  await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
   return sig;
 }
 var lastSyncAt = null;
@@ -83782,7 +83786,7 @@ var chainLimiter = rate_limit_default({
   legacyHeaders: false,
   message: { error: "Too many requests" }
 });
-var SOLANA_RPC4 = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+var SOLANA_RPC4 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 var CONFIG_PDA2 = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
 var solPriceCache = { price: 0, fetchedAt: 0 };
 var chainStateCache = null;

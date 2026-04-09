@@ -3,7 +3,7 @@ import rateLimit from "express-rate-limit";
 
 const router = Router();
 
-const SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+const SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 
 // ── الطرق المسموح بها فقط (قراءة فقط + إرسال معاملات) ──────────────────
 const ALLOWED_METHODS = new Set([

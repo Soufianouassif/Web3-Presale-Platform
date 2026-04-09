@@ -39,7 +39,7 @@ function isCronAuthorized(req: import("express").Request): boolean {
 
 const PROGRAM_ID = new PublicKey("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
 const CONFIG_PDA = new PublicKey("BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi");
-const SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+const SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 
 async function getDiscriminator(name: string): Promise<Buffer> {
   const encoder = new TextEncoder();

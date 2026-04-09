@@ -1,0 +1,22 @@
+FUNCTION_INVOCATION_FAILED
+Last updated February 9, 2026
+The FUNCTION_INVOCATION_FAILED error occurs when a function invocation fails. This could be due to an error within the function itself, or an issue with the environment in which the function is running.
+
+500
+FUNCTION_INVOCATION_FAILED:
+
+Internal Server Error
+
+Possible causes
+The runtime process (Node.js, Bun, Python, etc.) has crashed.
+Node.js or Bun threw an unhandled rejection/uncaught exception.
+Troubleshoot
+AI Assistance
+I'm encountering an error and reviewing the docs at https://vercel.com/docs/errors/FUNCTION_INVOCATION_FAILED.md to understand what's happening. Please help me resolve this by: 1. **Suggest the fix**: Analyze my codebase context and propose what needs to be changed to resolve this error. If you do not have access to my codebase, ask me for the codebase and try to fix the error based on the information you have. 2. **Explain the root cause**: Break down why this error occurred: - What was the code actually doing vs. what it needed to do? - What conditions triggered this specific error? - What misconception or oversight led to this? 3. **Teach the concept**: Help me understand the underlying principle: - Why does this error exist and what is it protecting me from? - What's the correct mental model for this concept? - How does this fit into the broader framework/language design? 4. **Show warning signs**: Help me recognize this pattern in the future: - What should I look out for that might cause this again? - Are there similar mistakes I might make in related scenarios? - What code smells or patterns indicate this issue? 5. **Discuss alternatives**: Explain if there are different valid approaches and their trade-offs My goal is to fix the immediate issue while building lasting understanding so I can avoid and resolve similar errors independently in the future.
+
+To troubleshoot this error, follow these steps:
+
+Check application logs: Review the application logs to identify any specific errors related to the function invocation. They can be found under the Logs tab
+Review function code: Ensure that the code for the function is correct and does not contain any errors or infinite loops. Use a try/catch block to catch any errors that might be occurring within the function code
+Check for unhandled exceptions: Look for any unhandled exceptions within the function code that might be causing the invocation to fail
+Verify function configuration: Double-check the function configuration to ensure that it's set up correctly, including any environment variables or other settings
