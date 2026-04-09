@@ -26,7 +26,6 @@ const SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-pr
 
 const ALLOWED_ORIGINS_EXACT: string[] = [
   ...(IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000"]),
-  ...(process.env.REPLIT_DEV_DOMAIN ? [`https://${process.env.REPLIT_DEV_DOMAIN}`] : []),
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ];
 
