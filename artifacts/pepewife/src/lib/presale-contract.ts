@@ -105,6 +105,13 @@ export const SOLANA_ENDPOINT: string =
 
 export const connection = new Connection(SOLANA_ENDPOINT, "confirmed");
 
+/** Returns a Solana Explorer transaction URL for the current network. */
+export function buildExplorerUrl(signature: string): string {
+  const isDevnet = SOLANA_ENDPOINT.includes("devnet");
+  const cluster = isDevnet ? "?cluster=devnet" : "";
+  return `https://explorer.solana.com/tx/${signature}${cluster}`;
+}
+
 // ─────────────────────────────────────────────────────────────
 //  VAULT PDAs  (derived deterministically from program ID)
 //  sol_vault  : seeds = [b"sol_vault"]  — holds buyer SOL

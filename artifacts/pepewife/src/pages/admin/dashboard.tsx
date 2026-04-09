@@ -6,7 +6,7 @@ import {
   withdrawSol, withdrawSolWithKeypair, updateSolPrice,
   pauseSaleWithKeypair, resumeSaleWithKeypair,
   connection, SOL_VAULT_PDA, fetchPresaleState,
-  stageTokenPriceUsd, type PresaleState,
+  stageTokenPriceUsd, buildExplorerUrl, type PresaleState,
 } from "@/lib/presale-contract";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -315,7 +315,7 @@ function WithdrawPanel({ showNotification }: { showNotification: (msg: string, t
       {step === "success" && (
         <div className="p-4 bg-[#39ff14]/10 border border-[#39ff14]/20 rounded-xl space-y-1">
           <p className="text-[#39ff14] text-sm font-medium">✅ Withdrawn {withdrawn} SOL</p>
-          <a href={`https://explorer.solana.com/tx/${txSig}?cluster=devnet`} target="_blank" rel="noreferrer"
+          <a href={buildExplorerUrl(txSig)} target="_blank" rel="noreferrer"
             className="text-xs text-blue-400 hover:underline font-mono">{txSig.slice(0, 20)}…</a>
         </div>
       )}

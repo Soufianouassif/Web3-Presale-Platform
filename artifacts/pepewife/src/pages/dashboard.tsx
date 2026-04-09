@@ -19,6 +19,7 @@ import {
   type PresaleState,
   type BuyerState,
   type BuyerTx,
+  buildExplorerUrl,
 } from "@/lib/presale-contract";
 import {
   fetchOrCreateReferralCode,
@@ -614,9 +615,14 @@ export default function Dashboard() {
                               </span>
                             </div>
                             {tokensOut > 0 && currency === "SOL" && (
-                              <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
-                                1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
-                              </p>
+                              <>
+                                <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
+                                  1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
+                                </p>
+                                <p className="text-[9px] text-[#FF9800]/70 font-bold mt-0.5 text-end">
+                                  ⚠ Estimate only — final token amount is calculated on-chain at execution time
+                                </p>
+                              </>
                             )}
                             {tokensOut > 0 && currency === "USDT_SPL" && (
                               <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
@@ -630,7 +636,7 @@ export default function Dashboard() {
                               <Check className="h-4 w-4 text-[#4CAF50] shrink-0 mt-0.5" />
                               <div className="min-w-0">
                                 <p className="text-xs font-display text-[#1a4a1e] tracking-wide font-bold">Purchase confirmed! 🎉</p>
-                                <a href={`https://explorer.solana.com/tx/${dashTxSig}?cluster=devnet`} target="_blank" rel="noreferrer" className="text-[10px] text-[#4CAF50] underline break-all flex items-center gap-1 mt-0.5">
+                                <a href={buildExplorerUrl(dashTxSig)} target="_blank" rel="noreferrer" className="text-[10px] text-[#4CAF50] underline break-all flex items-center gap-1 mt-0.5">
                                   {dashTxSig.slice(0, 16)}…<ExternalLink className="h-3 w-3 shrink-0" />
                                 </a>
                               </div>
@@ -1082,7 +1088,7 @@ export default function Dashboard() {
                                   <div className="text-[10px] text-[#1a1a2e]/40 font-bold">{date}</div>
                                 </div>
                                 <a
-                                  href={`https://explorer.solana.com/tx/${tx.signature}?cluster=devnet`}
+                                  href={buildExplorerUrl(tx.signature)}
                                   target="_blank"
                                   rel="noreferrer"
                                   className="shrink-0 bg-[#4CAF50]/10 hover:bg-[#4CAF50]/20 border border-[#4CAF50]/30 text-[#0a9060] rounded-lg px-2 py-1 text-[10px] font-display tracking-wide flex items-center gap-1 transition-colors"

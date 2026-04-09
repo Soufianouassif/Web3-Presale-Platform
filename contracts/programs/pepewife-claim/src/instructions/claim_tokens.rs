@@ -85,7 +85,7 @@ pub fn handle_claim_vesting(ctx: Context<ClaimTokens>) -> Result<()> {
     let record = &mut ctx.accounts.claim_record;
     require!(record.total_tokens > 0, ClaimError::ZeroAllocation);
     // Must have claimed TGE first
-    require!(record.tge_claimed > 0, ClaimError::TgeAlreadyClaimed);
+    require!(record.tge_claimed > 0, ClaimError::TgeNotYetClaimed);
     require!(
         record.months_claimed < config.vesting_months,
         ClaimError::VestingComplete

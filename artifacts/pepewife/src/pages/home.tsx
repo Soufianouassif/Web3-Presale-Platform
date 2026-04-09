@@ -14,6 +14,7 @@ import WalletBuyModal from "@/components/wallet-buy-modal";
 import {
   fetchPresaleState,
   stageTokenPriceUsd,
+  buildExplorerUrl,
   type PresaleState,
 } from "@/lib/presale-contract";
 import {
@@ -242,23 +243,23 @@ export default function Home() {
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
   // ── Modal buy success ─────────────────────────────────────────────
-  const handleBuySuccess = (sig: string) => {
+  const handleBuySuccess = async (sig: string) => {
     setTxSignature(sig);
     setAmount("");
     fetchPresaleState().then(d => { if (d) setPresaleData(d); });
 
-    // Track the purchase (fire-and-forget) with referral code if present
     const refCode = getStoredReferralCode();
     const amountNum = parseFloat(amount) || 0;
     const stageIdx  = presaleData?.currentStage ?? 0;
-    const stage     = stageIdx + 1; // 1-indexed for tracker
+    const stage     = stageIdx + 1;
     const cs = presaleData?.stages[stageIdx];
     const pricePerToken = cs ? stageTokenPriceUsd(cs.tokensPerRawUsdtScaled) : 0.00000001;
     const solUsd = currency === "SOL" ? amountNum * chainSolPrice : 0;
     const usdAmt = currency === "SOL" ? solUsd : amountNum;
     const tokensEst = pricePerToken > 0 ? usdAmt / pricePerToken : 0;
 
-    tracker.purchase({
+    // await the tracking call so we can show errors and only clear ref code on success
+    const result = await tracker.purchase({
       walletAddress: address ?? "",
       network: "solana",
       amountUsd: usdAmt,
@@ -268,8 +269,13 @@ export default function Home() {
       referralCode: refCode ?? undefined,
     });
 
-    // After a confirmed referral is registered, clear it so it won't double-count
-    if (refCode) clearStoredReferralCode();
+    if (result.success) {
+      // Clear the referral code only after it was successfully registered
+      if (refCode) clearStoredReferralCode();
+    } else {
+      // Log for debugging — the purchase TX itself succeeded on-chain
+      console.warn("[Tracker] Purchase tracking failed:", result.error, result.reason);
+    }
 
     setTimeout(() => {
       setShowBuyModal(false);
@@ -666,7 +672,7 @@ export default function Home() {
                       <div className="min-w-0">
                         <p className="text-xs font-display text-[#1a4a1e] tracking-wide font-bold">Transaction confirmed! 🎉</p>
                         <a
-                          href={`https://explorer.solana.com/tx/${txSignature}?cluster=devnet`}
+                          href={buildExplorerUrl(txSignature)}
                           target="_blank" rel="noreferrer"
                           className="text-xs text-[#4CAF50] underline break-all flex items-center gap-1 mt-0.5 font-sans"
                         >

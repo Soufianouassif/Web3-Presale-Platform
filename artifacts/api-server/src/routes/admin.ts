@@ -366,47 +366,22 @@ router.post("/admin/referrals/mark-paid", async (req, res) => {
 
     if (walletAddress) {
       auditLog(req, "referral.mark_paid_single", { walletAddress: walletAddress.slice(0, 8) + "..." });
-      await db
+      const result = await db
         .update(referrals)
         .set({ status: "paid" })
-        .where(sql`${referrals.referrerWallet} = ${walletAddress} AND ${referrals.status} = 'pending'`);
+        .where(sql`${referrals.referrerWallet} = ${walletAddress} AND ${referrals.status} = 'pending'`)
+        .returning({ id: referrals.id });
 
-      const [referrerCode] = await db
-        .select({ pendingTokens: referralCodes.pendingTokens, paidTokens: referralCodes.paidTokens })
-        .from(referralCodes)
-        .where(eq(referralCodes.walletAddress, walletAddress))
-        .limit(1);
-
-      if (referrerCode) {
-        const newPaid = Number(referrerCode.paidTokens) + Number(referrerCode.pendingTokens);
-        await db
-          .update(referralCodes)
-          .set({ paidTokens: String(newPaid), pendingTokens: "0" })
-          .where(eq(referralCodes.walletAddress, walletAddress));
-      }
-
-      res.json({ success: true, message: `Rewards marked as paid for ${walletAddress.slice(0, 8)}...` });
+      res.json({ success: true, message: `Rewards marked as paid for ${walletAddress.slice(0, 8)}...`, updated: result.length });
     } else {
-      await db
+      const result = await db
         .update(referrals)
         .set({ status: "paid" })
-        .where(eq(referrals.status, "pending"));
+        .where(eq(referrals.status, "pending"))
+        .returning({ id: referrals.id });
 
-      const allCodes = await db
-        .select({ walletAddress: referralCodes.walletAddress, pendingTokens: referralCodes.pendingTokens, paidTokens: referralCodes.paidTokens })
-        .from(referralCodes)
-        .where(sql`${referralCodes.pendingTokens}::numeric > 0`);
-
-      for (const rc of allCodes) {
-        const newPaid = Number(rc.paidTokens) + Number(rc.pendingTokens);
-        await db
-          .update(referralCodes)
-          .set({ paidTokens: String(newPaid), pendingTokens: "0" })
-          .where(eq(referralCodes.walletAddress, rc.walletAddress));
-      }
-
-      auditLog(req as import("express").Request, "referral.mark_paid_all", { count: allCodes.length });
-      res.json({ success: true, message: "All pending referral rewards marked as paid" });
+      auditLog(req as import("express").Request, "referral.mark_paid_all", { count: result.length });
+      res.json({ success: true, message: "All pending referral rewards marked as paid", updated: result.length });
     }
   } catch (err) {
     logger.error({ err }, "mark-paid error");

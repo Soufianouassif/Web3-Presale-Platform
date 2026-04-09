@@ -115,7 +115,7 @@ app.use(
       httpOnly: true,
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: IS_PROD ? "none" : "lax",
+      sameSite: "lax",
     },
   }),
 );

@@ -171,7 +171,7 @@ export const tracker = {
       body: JSON.stringify({ walletAddress, walletType, network }),
     }).catch(() => {});
   },
-  purchase: (data: {
+  purchase: async (data: {
     walletAddress: string;
     walletType?: string;
     network: string;
@@ -180,12 +180,21 @@ export const tracker = {
     txHash?: string;
     stage?: number;
     referralCode?: string;
-  }) => {
-    fetch(`${API_BASE}/track/purchase`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }).catch(() => {});
+  }): Promise<{ success: boolean; error?: string; reason?: string }> => {
+    try {
+      const res = await fetch(`${API_BASE}/track/purchase`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json() as { success?: boolean; error?: string; reason?: string; purchaseId?: number };
+      if (!res.ok) {
+        return { success: false, error: json.error, reason: json.reason };
+      }
+      return { success: true };
+    } catch {
+      return { success: false, error: "Network error" };
+    }
   },
 };

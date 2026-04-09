@@ -3,7 +3,7 @@ import { X, Loader2, CheckCircle2, XCircle, ExternalLink, Download, Shield, Arro
 import { useWallet } from "@/contexts/wallet-context";
 import { useLanguage } from "@/i18n/context";
 import { getInstallUrl, type WalletType } from "@/lib/wallet";
-import { buyWithSol, buyWithUsdt, type PresaleState } from "@/lib/presale-contract";
+import { buyWithSol, buyWithUsdt, buildExplorerUrl, type PresaleState } from "@/lib/presale-contract";
 
 // ─── Wallet definitions (Solana only) ───────────────────────────────────────
 const WALLETS: {
@@ -140,9 +140,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
   // ── Helpers ────────────────────────────────────────────────────────────────
   const walletMeta = WALLETS.find(w => w.id === selectedWallet);
   const currencyLabel = currency === "SOL" ? "SOL" : "USDT";
-  const explorerUrl = signature
-    ? `https://explorer.solana.com/tx/${signature}?cluster=devnet`
-    : "";
+  const explorerUrl = signature ? buildExplorerUrl(signature) : "";
 
   // Close on backdrop click only when not in the middle of signing
   const handleBackdrop = () => {

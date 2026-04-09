@@ -1,1 +1,1 @@
-console.log("Hello from @workspace/scripts");
+console.log("@workspace/scripts — utility scripts for PEPEWIFE presale");

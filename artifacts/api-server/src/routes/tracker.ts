@@ -63,10 +63,23 @@ const purchaseLimiter = rateLimit({
 });
 
 // ── التحقق من المعاملة على البلوكتشين ────────────────────────────────────
+// يتحقق من ثلاثة شروط:
+//   1. المعاملة موجودة ونجحت
+//   2. المحفظة هي الموقِّع الأول
+//   3. سجلات البرنامج تحتوي على "SOL_BUY" أو "USDT_BUY" (إخراج msg!() من العقد)
+//
+// في بيئة التطوير (NODE_ENV=development): يتم تخطي التحقق من البلوكتشين
+// للسماح بالاختبار بدون الحاجة لعقد حقيقي على devnet.
 async function verifyTransaction(txHash: string, expectedWallet: string): Promise<{
   valid: boolean;
   reason?: string;
 }> {
+  // ── وضع التطوير: تخطي التحقق من البلوكتشين ─────────────────────────
+  if (process.env.NODE_ENV === "development") {
+    console.info(`[TX_VERIFY] DEV MODE — skipping on-chain check for ${txHash.slice(0, 16)}… wallet=${expectedWallet.slice(0, 8)}…`);
+    return { valid: true };
+  }
+
   try {
     const tx = await getConnection().getTransaction(txHash, {
       commitment: "confirmed",
@@ -77,26 +90,38 @@ async function verifyTransaction(txHash: string, expectedWallet: string): Promis
       return { valid: false, reason: "Transaction not found on-chain" };
     }
 
-    // تحقق من أن المعاملة نجحت
+    // 1. المعاملة يجب أن تكون ناجحة
     if (tx.meta?.err !== null) {
       return { valid: false, reason: "Transaction failed on-chain" };
     }
 
-    // تحقق من أن المعاملة تتضمن برنامجنا
+    // 2. التحقق من الموقِّع — المحفظة يجب أن تكون الحساب الأول
     const accountKeys =
       "accountKeys" in tx.transaction.message
         ? tx.transaction.message.accountKeys.map((k) => k.toString())
         : tx.transaction.message.staticAccountKeys.map((k) => k.toString());
 
-    const involvesProgram = accountKeys.includes(PRESALE_PROGRAM_ID);
-    if (!involvesProgram) {
-      return { valid: false, reason: "Transaction does not involve presale program" };
-    }
-
-    // تحقق من أن المحفظة موقّعة على المعاملة
     const signerKey = accountKeys[0];
     if (signerKey !== expectedWallet) {
       return { valid: false, reason: "Wallet mismatch in transaction" };
+    }
+
+    // 3. التحقق من سجلات البرنامج — يجب أن يحتوي على SOL_BUY أو USDT_BUY
+    //    هذا يثبت أن تعليمة شراء فعلية نُفِّذت من عقدنا (وليس مجرد استدعاء للبرنامج)
+    const logs = tx.meta?.logMessages ?? [];
+    const hasValidPurchaseLog = logs.some(
+      (log) => log.includes("SOL_BUY") || log.includes("USDT_BUY"),
+    );
+
+    if (!hasValidPurchaseLog) {
+      // Fallback: تحقق على الأقل من وجود البرنامج في الحسابات
+      const involvesProgram = accountKeys.includes(PRESALE_PROGRAM_ID);
+      if (!involvesProgram) {
+        return { valid: false, reason: "Transaction does not involve presale program" };
+      }
+      // إذا كان البرنامج موجوداً لكن لا يوجد سجل شراء (مثلاً: devnet بدون logMessages)
+      // نقبل المعاملة مع تسجيل تحذير
+      console.warn(`[TX_VERIFY] No purchase log found for ${txHash.slice(0, 16)}… — accepted via program check`);
     }
 
     return { valid: true };

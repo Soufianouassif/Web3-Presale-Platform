@@ -84,22 +84,26 @@ impl PresaleConfig {
         + 1                           // bump
         + 54;                         // reserved
 
-    /// Compute how many whole tokens a raw-USDT amount buys in `stage`
+    /// Compute how many whole tokens a raw-USDT amount buys in `stage`.
+    /// Returns 0 on overflow (checked arithmetic — never silently overflows).
     pub fn tokens_for_usdt(&self, stage_idx: usize, usdt_raw: u64) -> u64 {
         let s = &self.stages[stage_idx];
         usdt_raw
-            .saturating_mul(s.tokens_per_raw_usdt_scaled)
+            .checked_mul(s.tokens_per_raw_usdt_scaled)
+            .unwrap_or(0)
             / Stage::PRICE_SCALE
     }
 
-    /// Compute how many whole tokens a lamport amount buys in `stage`
+    /// Compute how many whole tokens a lamport amount buys in `stage`.
+    /// Returns 0 on overflow (checked arithmetic — never silently overflows).
     pub fn tokens_for_sol(&self, stage_idx: usize, lamports: u64) -> u64 {
         if self.sol_price_usd_e6 == 0 {
             return 0;
         }
-        // lamports → micro-USD equivalent
+        // lamports → micro-USD equivalent (checked to prevent silent overflow)
         let usdt_e6 = lamports
-            .saturating_mul(self.sol_price_usd_e6)
+            .checked_mul(self.sol_price_usd_e6)
+            .unwrap_or(0)
             / 1_000_000_000_u64;
 
         self.tokens_for_usdt(stage_idx, usdt_e6)

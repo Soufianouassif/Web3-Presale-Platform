@@ -23,28 +23,28 @@ export interface LeaderboardEntry {
 
 // ── Storage keys ───────────────────────────────────────────────────────────────
 const REF_CODE_KEY = "pwife_ref_code";
-const REF_BANNER_KEY = "pwife_ref_dismissed";
 
 // ── Detect ?ref=CODE in URL and persist it ─────────────────────────────────────
+// يُخزَّن في localStorage حتى يبقى بعد إغلاق المتصفح وفتح تبويبات جديدة
 export function captureReferralFromUrl(): string | null {
   if (typeof window === "undefined") return null;
   const params = new URLSearchParams(window.location.search);
   const code = params.get("ref");
   if (code && /^[1-9A-HJ-NP-Za-km-z]{6,16}$/.test(code)) {
-    sessionStorage.setItem(REF_CODE_KEY, code);
+    localStorage.setItem(REF_CODE_KEY, code);
     return code;
   }
-  return sessionStorage.getItem(REF_CODE_KEY);
+  return localStorage.getItem(REF_CODE_KEY);
 }
 
 export function getStoredReferralCode(): string | null {
   if (typeof window === "undefined") return null;
-  return sessionStorage.getItem(REF_CODE_KEY);
+  return localStorage.getItem(REF_CODE_KEY);
 }
 
 export function clearStoredReferralCode(): void {
   if (typeof window === "undefined") return;
-  sessionStorage.removeItem(REF_CODE_KEY);
+  localStorage.removeItem(REF_CODE_KEY);
 }
 
 // ── API helpers ────────────────────────────────────────────────────────────────

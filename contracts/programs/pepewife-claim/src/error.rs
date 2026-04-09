@@ -11,6 +11,9 @@ pub enum ClaimError {
     #[msg("TGE already claimed")]
     TgeAlreadyClaimed,
 
+    #[msg("TGE must be claimed before vesting")]
+    TgeNotYetClaimed,
+
     #[msg("No new vesting months unlocked")]
     NoVestingUnlocked,
 

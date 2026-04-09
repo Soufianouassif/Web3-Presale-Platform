@@ -54,7 +54,7 @@ const readLimiter = rateLimit({
 // Returns the referral code for a wallet (creates one if it doesn't exist).
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
-  const { wallet } = req.params;
+  const wallet = String(req.params.wallet);
 
   if (!isValidSolanaAddress(wallet)) {
     res.status(400).json({ error: "Invalid wallet address" });
@@ -247,7 +247,7 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
 // Returns full referral stats for a wallet.
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
-  const { wallet } = req.params;
+  const wallet = String(req.params.wallet);
 
   if (!isValidSolanaAddress(wallet)) {
     res.status(400).json({ error: "Invalid wallet address" });
@@ -354,7 +354,7 @@ router.get("/referral/leaderboard", readLimiter, async (_req, res) => {
 // Used by the frontend when a visitor lands with ?ref=CODE.
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/referral/resolve/:code", readLimiter, async (req, res) => {
-  const code = req.params.code.trim().slice(0, 16);
+  const code = String(req.params.code).trim().slice(0, 16);
 
   try {
     const row = await db

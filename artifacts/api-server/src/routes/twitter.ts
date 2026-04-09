@@ -16,7 +16,7 @@ const twitterLimiter = rateLimit({
 
 router.get("/twitter/timeline/:username", twitterLimiter, async (req, res) => {
   try {
-    const { username } = req.params;
+    const username = String(req.params.username);
 
     // منع SSRF: التحقق من صحة اسم المستخدم قبل إدراجه في الـ URL
     if (!USERNAME_RE.test(username)) {
