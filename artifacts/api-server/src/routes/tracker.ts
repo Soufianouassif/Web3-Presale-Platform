@@ -189,6 +189,7 @@ interface VerifyResult {
   valid: boolean;
   reason?: string;
   onChain?: OnChainAmounts;
+  isTimeout?: boolean; // true = network/timeout failure (tx may be real), false = security failure
 }
 
 // ── verifyTransaction ──────────────────────────────────────────────────────
@@ -240,7 +241,7 @@ async function verifyTransaction(
 
     if (!tx) {
       logger.warn({ ...logCtx, totalAttempts: MAX_ATTEMPTS }, `[TX_VERIFY] Transaction not found on ${SOLANA_NETWORK} after ${MAX_ATTEMPTS} attempts`);
-      return { valid: false, reason: `Transaction not found on ${SOLANA_NETWORK} after ${MAX_ATTEMPTS} attempts` };
+      return { valid: false, isTimeout: true, reason: `Transaction not found on ${SOLANA_NETWORK} after ${MAX_ATTEMPTS} attempts` };
     }
 
     if (tx.meta?.err !== null) {
@@ -363,7 +364,7 @@ async function verifyTransaction(
       { err, ...logCtx },
       `[TX_VERIFY] Unexpected error during ${SOLANA_NETWORK} verification`,
     );
-    return { valid: false, reason: `Verification error: ${String(err)}` };
+    return { valid: false, isTimeout: true, reason: `Verification error: ${String(err)}` };
   }
 }
 
@@ -560,6 +561,59 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
       const stageIndex = Math.max(0, Math.min(3, (stage ?? 1) - 1));
       const verification = await verifyTransaction(txHash, walletAddress, stageIndex, network);
 
+      if (!verification.valid && verification.isTimeout) {
+        // ── Devnet timeout / RPC unreachable ─────────────────────────────
+        // The frontend already confirmed the tx on-chain via confirmTransaction().
+        // Save with client-provided amounts and flag for admin review.
+        logger.warn(
+          {
+            txHash:  txHash.slice(0, 16) + "…",
+            reason:  verification.reason,
+            ip,
+            network: SOLANA_NETWORK,
+            alert:   true,
+            alertType: "TIMEOUT_UNVERIFIED_PURCHASE",
+          },
+          "[PURCHASE] ⚠ Devnet timeout — saving with client amounts for admin review",
+        );
+
+        const safeWalletType = walletType && ALLOWED_WALLET_TYPES.has(walletType.toLowerCase())
+          ? walletType.toLowerCase() : "unknown";
+
+        const [purchase] = await db
+          .insert(purchases)
+          .values({
+            walletAddress,
+            walletType:          safeWalletType,
+            network:             SOLANA_NETWORK,
+            amountUsd:           String(safeClientUsd),
+            amountTokens:        String(safeClientTokens),
+            txHash,
+            stage:               stage ?? 1,
+            verificationStatus:  "TIMEOUT_UNVERIFIED",
+          })
+          .returning({ id: purchases.id });
+
+        logger.info(
+          { purchaseId: purchase?.id, wallet: walletAddress.slice(0, 8) + "…", clientUsd: safeClientUsd },
+          "[PURCHASE] ✓ Saved as TIMEOUT_UNVERIFIED — needs manual review",
+        );
+
+        if (referralCode) {
+          logger.warn(
+            { referralCode, purchaseId: purchase?.id },
+            "[REFERRAL] Skipped for TIMEOUT_UNVERIFIED purchase — needs manual admin review",
+          );
+        }
+
+        res.json({
+          success:    true,
+          purchaseId: purchase?.id,
+          note:       "Saved pending on-chain verification",
+        });
+        return;
+      }
+
       if (!verification.valid) {
         logger.warn(
           {
@@ -567,6 +621,7 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
             reason: verification.reason,
             ip,
             network: SOLANA_NETWORK,
+            security: true,
           },
           "[PURCHASE] Rejected: TX_VERIFICATION_FAILED",
         );

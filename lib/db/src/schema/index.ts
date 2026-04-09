@@ -29,6 +29,7 @@ export const purchases = pgTable("purchases", {
   amountTokens: decimal("amount_tokens", { precision: 18, scale: 6 }).notNull().default("0"),
   txHash: text("tx_hash"),
   stage: integer("stage").default(1),
+  verificationStatus: text("verification_status").default("VERIFIED"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
