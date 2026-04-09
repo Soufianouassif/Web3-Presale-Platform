@@ -12,7 +12,7 @@ const router = Router();
 // SOLANA_NETWORK must be set in env ("devnet" | "mainnet").
 // Defaults to "devnet" — explicitly set this to "mainnet" only for production.
 const SOLANA_NETWORK    = (process.env.SOLANA_NETWORK ?? "devnet").toLowerCase();
-const SOLANA_RPC        = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+const SOLANA_RPC        = process.env.SOLANA_RPC_URL || process.env.SOLANA_RPC || "https://api.devnet.solana.com";
 const PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
 const CONFIG_PDA         = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
 
