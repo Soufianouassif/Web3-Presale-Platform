@@ -118,7 +118,7 @@ export function buildExplorerUrl(signature: string): string {
 export const USDT_MINT = new PublicKey(
   import.meta.env.VITE_STABLE_MINT ||
   (IS_DEVNET
-    ? "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"  // USDC devnet
+    ? "8PieQJ43S4PpVWQaBZp4TaHFZGoAA9FsDzYbPftVfo6X"  // devnet test token
     : "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB") // USDT mainnet
 );
 

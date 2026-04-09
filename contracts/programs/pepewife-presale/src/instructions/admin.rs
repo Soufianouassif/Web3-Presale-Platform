@@ -1,4 +1,6 @@
 use anchor_lang::prelude::*;
+use anchor_spl::token::{Mint, Token, TokenAccount};
+use anchor_spl::associated_token::AssociatedToken;
 use crate::state::PresaleConfig;
 use crate::error::PresaleError;
 
@@ -95,5 +97,56 @@ pub fn handle_set_claim_time(
 ) -> Result<()> {
     ctx.accounts.config.claim_opens_at = new_claim_opens_at;
     msg!("Claim opens at {}", new_claim_opens_at);
+    Ok(())
+}
+
+// ──────────────────────────────────────────────────────────
+//  UpdateUsdtMint — swap the accepted stablecoin mint
+//  (useful for devnet testing or migrating to a new token)
+// ──────────────────────────────────────────────────────────
+#[derive(Accounts)]
+pub struct UpdateUsdtMint<'info> {
+    #[account(
+        mut,
+        seeds = [b"presale_config"],
+        bump = config.bump,
+        has_one = authority @ PresaleError::Unauthorized,
+    )]
+    pub config: Account<'info, PresaleConfig>,
+
+    pub authority: Signer<'info>,
+
+    /// The new token mint that will be accepted for USDT purchases
+    pub new_mint: Account<'info, Mint>,
+
+    /// vault_auth PDA — owns the treasury ATA (seeds = [b"vault_auth"])
+    #[account(seeds = [b"vault_auth"], bump = config.vault_auth_bump)]
+    pub vault_auth: SystemAccount<'info>,
+
+    /// New treasury ATA for the new mint, owned by vault_auth PDA
+    #[account(
+        init_if_needed,
+        payer = authority,
+        associated_token::mint      = new_mint,
+        associated_token::authority = vault_auth,
+    )]
+    pub new_treasury_ata: Account<'info, TokenAccount>,
+
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub system_program: Program<'info, System>,
+}
+
+pub fn handle_update_usdt_mint(ctx: Context<UpdateUsdtMint>) -> Result<()> {
+    let config = &mut ctx.accounts.config;
+    let old_mint = config.usdt_mint;
+    config.usdt_mint          = ctx.accounts.new_mint.key();
+    config.usdt_treasury_ata  = ctx.accounts.new_treasury_ata.key();
+    msg!(
+        "usdt_mint updated: {} → {}  new_treasury_ata={}",
+        old_mint,
+        config.usdt_mint,
+        config.usdt_treasury_ata,
+    );
     Ok(())
 }

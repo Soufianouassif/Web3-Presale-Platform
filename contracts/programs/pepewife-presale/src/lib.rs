@@ -101,4 +101,11 @@ pub mod pepewife_presale {
     pub fn set_claim_time(ctx: Context<UpdateSolPrice>, new_claim_opens_at: i64) -> Result<()> {
         handle_set_claim_time(ctx, new_claim_opens_at)
     }
+
+    /// Admin: change the accepted stablecoin mint + create a new vault ATA for it.
+    /// Use this on devnet to switch to a different test token,
+    /// or on mainnet to migrate from one stablecoin to another.
+    pub fn update_usdt_mint(ctx: Context<UpdateUsdtMint>) -> Result<()> {
+        handle_update_usdt_mint(ctx)
+    }
 }
