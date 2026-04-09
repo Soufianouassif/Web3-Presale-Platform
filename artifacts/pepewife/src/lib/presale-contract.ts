@@ -71,7 +71,7 @@ async function sendAndConfirmTx(
     }
     throw new Error(
       `Transaction not confirmed within 90 s. Signature: ${signature.slice(0, 20)}… — ` +
-      `check https://explorer.solana.com/tx/${signature}${SOLANA_ENDPOINT.includes("devnet") ? "?cluster=devnet" : ""}`,
+      `check https://explorer.solana.com/tx/${signature}${IS_DEVNET ? "?cluster=devnet" : ""}`,
     );
   } finally {
     clearInterval(resendTimer);
@@ -90,11 +90,6 @@ export const CONFIG_PDA = new PublicKey(
   "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi"
 );
 
-/** Mainnet USDT-SPL mint */
-export const USDT_MINT = new PublicKey(
-  "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
-);
-
 /** RPC endpoint — routes through the API proxy to avoid browser CORS.
  *  Override via VITE_SOLANA_RPC_URL env var for direct RPC if needed. */
 export const SOLANA_ENDPOINT: string =
@@ -103,14 +98,29 @@ export const SOLANA_ENDPOINT: string =
     ? `${window.location.origin}/api/rpc`
     : "https://api.devnet.solana.com");
 
+export const IS_DEVNET = SOLANA_ENDPOINT.includes("devnet");
+
 export const connection = new Connection(SOLANA_ENDPOINT, "confirmed");
 
 /** Returns a Solana Explorer transaction URL for the current network. */
 export function buildExplorerUrl(signature: string): string {
-  const isDevnet = SOLANA_ENDPOINT.includes("devnet");
-  const cluster = isDevnet ? "?cluster=devnet" : "";
+  const cluster = IS_DEVNET ? "?cluster=devnet" : "";
   return `https://explorer.solana.com/tx/${signature}${cluster}`;
 }
+
+/**
+ * Stablecoin mint used for purchases:
+ *  - Devnet  → USDC devnet  (4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU)
+ *  - Mainnet → USDT mainnet (Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB)
+ *
+ * Override with VITE_STABLE_MINT env var for a custom mint address.
+ */
+export const USDT_MINT = new PublicKey(
+  import.meta.env.VITE_STABLE_MINT ||
+  (IS_DEVNET
+    ? "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"  // USDC devnet
+    : "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB") // USDT mainnet
+);
 
 // ─────────────────────────────────────────────────────────────
 //  VAULT PDAs  (derived deterministically from program ID)

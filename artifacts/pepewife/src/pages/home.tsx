@@ -136,8 +136,8 @@ export default function Home() {
       : "";
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // نقبل الفاصلة (,) ونحوّلها لنقطة (.) تلقائياً
-    const val = e.target.value.replace(",", ".");
+    // استبدل كل الفواصل (,) بنقاط (.) — يدعم لوحات المفاتيح التي تستخدم الفاصلة كفاصل عشري
+    const val = e.target.value.replace(/,/g, ".");
     // نمنع أي حرف غير الأرقام والنقطة
     if (/[^0-9.]/.test(val)) return;
     // نمنع أكثر من نقطة عشرية واحدة
