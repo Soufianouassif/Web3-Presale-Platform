@@ -87,10 +87,7 @@ export default function Dashboard() {
   }, []);
 
   // ── Referral data refresh ────────────────────────────────────────────────
-  const refLoadingRef = React.useRef(false);
   const refreshReferralData = useCallback(async () => {
-    if (refLoadingRef.current) return;
-    refLoadingRef.current = true;
     setRefLoading(true);
     try {
       const [lb, statsResult, codeResult] = await Promise.all([
@@ -106,7 +103,6 @@ export default function Dashboard() {
       if (codeResult) setMyRefCode(codeResult);
       setRefLastUpdated(new Date());
     } finally {
-      refLoadingRef.current = false;
       setRefLoading(false);
     }
   }, [address]);
@@ -117,9 +113,10 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
-  // ── تحديث تلقائي كل 30 ثانية عند فتح تاب الإحالة ───────────────────────
+  // ── تحديث فوري + تلقائي كل 30 ثانية عند فتح تاب الإحالة ────────────────
   useEffect(() => {
     if (activeTab !== "referrals") return;
+    refreshReferralData();
     const iv = setInterval(() => refreshReferralData(), 30_000);
     return () => clearInterval(iv);
     // eslint-disable-next-line react-hooks/exhaustive-deps

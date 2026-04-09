@@ -15,6 +15,7 @@ import {
   fetchPresaleState,
   stageTokenPriceUsd,
   buildExplorerUrl,
+  IS_DEVNET,
   type PresaleState,
 } from "@/lib/presale-contract";
 import {
@@ -243,7 +244,7 @@ export default function Home() {
   const handleCopy = () => { setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
   // ── Modal buy success ─────────────────────────────────────────────
-  const handleBuySuccess = async (sig: string) => {
+  const handleBuySuccess = async (sig: string): Promise<{ verified: boolean; error?: string }> => {
     setTxSignature(sig);
 
     // اقرأ القيم قبل التنظيف (React state updates are async, closure has old values)
@@ -260,18 +261,17 @@ export default function Home() {
     const stage     = stageIdx + 1;
     const cs = presaleData?.stages[stageIdx];
     const pricePerToken = cs ? stageTokenPriceUsd(cs.tokensPerRawUsdtScaled) : 0.00000001;
-    // استخدم solPrice كـ fallback إذا لم يكن chainSolPrice محمّلاً
     const effectiveSolPrice = chainSolPrice > 0 ? chainSolPrice : (solPrice > 0 ? solPrice : 150);
     const solUsd = capturedCurrency === "SOL" ? amountNum * effectiveSolPrice : 0;
     const usdAmt = capturedCurrency === "SOL" ? solUsd : amountNum;
     const tokensEst = pricePerToken > 0 ? usdAmt / pricePerToken : 0;
+    const networkField = IS_DEVNET ? "devnet" : "mainnet";
 
-    console.log("[BuySuccess] Computed: usdAmt=", usdAmt, "tokensEst=", tokensEst, "solPrice=", effectiveSolPrice, "pricePerToken=", pricePerToken);
+    console.log("[BuySuccess] Computed: usdAmt=", usdAmt, "tokensEst=", tokensEst, "solPrice=", effectiveSolPrice, "pricePerToken=", pricePerToken, "network=", networkField);
 
-    // await the tracking call so we can show errors and only clear ref code on success
     const result = await tracker.purchase({
       walletAddress: address ?? "",
-      network: "solana",
+      network: networkField,
       amountUsd: usdAmt,
       amountTokens: tokensEst,
       txHash: sig,
@@ -281,20 +281,20 @@ export default function Home() {
 
     if (result.success) {
       console.log("[BuySuccess] ✓ Tracked successfully, purchaseId=", result.purchaseId);
-      // Clear the referral code only after it was successfully registered
       if (refCode) {
         console.log("[BuySuccess] Clearing referral code from localStorage");
         clearStoredReferralCode();
       }
+      // Navigate to dashboard after a short delay
+      setTimeout(() => {
+        setShowBuyModal(false);
+        navigate("/dashboard");
+      }, 2500);
+      return { verified: true };
     } else {
-      // Log for debugging — the purchase TX itself succeeded on-chain
       console.warn("[BuySuccess] ✗ Purchase tracking failed:", result.error, result.reason);
+      return { verified: false, error: result.error ?? result.reason ?? "Verification failed" };
     }
-
-    setTimeout(() => {
-      setShowBuyModal(false);
-      navigate("/dashboard");
-    }, 2500);
   };
 
   // ── APE IN handler — open the wallet/buy modal ─────────────────────
