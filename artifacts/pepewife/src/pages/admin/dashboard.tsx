@@ -1283,6 +1283,10 @@ export default function AdminDashboard() {
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 hover:text-white hover:bg-white/5 transition-all">
                 <span>📋</span><span>All Referrals</span>
               </button>
+              <button onClick={() => setLocation("/admin/sessions")}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 hover:text-red-400 hover:bg-red-950/20 transition-all">
+                <span>🔐</span><span>Active Sessions</span>
+              </button>
             </div>
           </nav>
         </aside>

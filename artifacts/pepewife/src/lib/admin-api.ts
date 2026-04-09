@@ -19,7 +19,11 @@ async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
-    const e = err as { error?: string; message?: string };
+    const e = err as { error?: string; message?: string; code?: string; loginAgeMinutes?: number };
+    if (e.code === "REAUTH_REQUIRED") {
+      const age = e.loginAgeMinutes !== undefined ? ` (logged in ${e.loginAgeMinutes}m ago)` : "";
+      throw new Error(`🔐 Re-login required for this action${age}. Please log out and log back in.`);
+    }
     throw new Error(e.error ?? e.message ?? "Request failed");
   }
   return res.json() as Promise<T>;
@@ -151,7 +155,31 @@ export const adminApi = {
       method: "POST",
       body: JSON.stringify(walletAddress ? { walletAddress } : {}),
     }),
+  getSessions: () => fetchApi<{ sessions: SessionInfo[]; total: number }>("/admin/sessions"),
+  terminateSession: (sid: string) =>
+    fetchApi<{ success: boolean; terminated: string }>(`/admin/sessions/${sid}`, { method: "DELETE" }),
+  purgeOtherSessions: () =>
+    fetchApi<{ success: boolean; terminated: number }>("/admin/sessions/purge", { method: "POST" }),
 };
+
+export interface SessionInfo {
+  sid: string;
+  userId?: number;
+  userEmail?: string;
+  loginAt?: number;
+  lastActivity?: number;
+  loginIp?: string;
+  userAgent?: string;
+  suspicious?: boolean;
+  suspiciousReason?: string;
+  securityLevel?: number;
+  ipChangeCount?: number;
+  uaChangeCount?: number;
+  ipHistory?: string[];
+  requestCount?: number;
+  expiresAt: string;
+  isCurrent: boolean;
+}
 
 export const tracker = {
   visit: (page: string) => {

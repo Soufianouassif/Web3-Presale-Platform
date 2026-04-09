@@ -3,8 +3,10 @@ import rateLimit from "express-rate-limit";
 import { db } from "@workspace/db";
 import { pageVisits, walletConnections, purchases, presaleConfig, adminUsers, referralCodes, referrals } from "@workspace/db/schema";
 import { desc, sql, eq, count } from "drizzle-orm";
-import { requireAdminAuth } from "../middleware/admin-auth.js";
+import { requireAdminAuth, requireRecentAuth } from "../middleware/admin-auth.js";
 import { logger } from "../lib/logger.js";
+
+const REAUTH_WINDOW_MINUTES = 15;
 
 const SOLANA_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
@@ -218,7 +220,7 @@ router.get("/admin/config", async (_req, res) => {
   }
 });
 
-router.post("/admin/presale/pause", async (req, res) => {
+router.post("/admin/presale/pause", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   try {
     await db.insert(presaleConfig)
       .values({ id: 1, isActive: false, updatedAt: new Date() })
@@ -231,7 +233,7 @@ router.post("/admin/presale/pause", async (req, res) => {
   }
 });
 
-router.post("/admin/presale/resume", async (req, res) => {
+router.post("/admin/presale/resume", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   try {
     await db.insert(presaleConfig)
       .values({ id: 1, isActive: true, updatedAt: new Date() })
@@ -244,7 +246,7 @@ router.post("/admin/presale/resume", async (req, res) => {
   }
 });
 
-router.post("/admin/presale/claim", async (req, res) => {
+router.post("/admin/presale/claim", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   try {
     const { enabled } = req.body as { enabled: boolean };
     if (typeof enabled !== "boolean") {
@@ -262,7 +264,7 @@ router.post("/admin/presale/claim", async (req, res) => {
   }
 });
 
-router.post("/admin/presale/staking", async (req, res) => {
+router.post("/admin/presale/staking", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   try {
     const { enabled } = req.body as { enabled: boolean };
     if (typeof enabled !== "boolean") {
@@ -280,7 +282,7 @@ router.post("/admin/presale/staking", async (req, res) => {
   }
 });
 
-router.post("/admin/presale/withdraw", async (req, res) => {
+router.post("/admin/presale/withdraw", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   auditLog(req, "presale.withdraw_initiated");
   res.json({
     success: true,
@@ -295,6 +297,7 @@ router.get("/admin/referrals", async (req, res) => {
     const limit = Math.min(200, Math.max(1, Number(req.query.limit ?? 50) || 50));
     const offset = (page - 1) * limit;
     const statusFilter = req.query.status as string | undefined;
+    logger.info({ page, limit, statusFilter: statusFilter ?? "all", source: "DB_QUERY" }, "[ADMIN_REFERRALS] Querying referrals from DB");
 
     const whereClause = statusFilter && ["pending", "paid"].includes(statusFilter)
       ? eq(referrals.status, statusFilter)
@@ -335,6 +338,7 @@ router.get("/admin/referrals", async (req, res) => {
       ? await db.select({ total: count() }).from(referrals).where(whereClause)
       : await db.select({ total: count() }).from(referrals);
 
+    logger.info({ rowCount: rows.length, total: Number(total), source: "DB_READ" }, "[ADMIN_REFERRALS] ✓ Returned from DB");
     res.json({
       referrals: rows.map((r) => ({
         ...r,
@@ -349,12 +353,12 @@ router.get("/admin/referrals", async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
+    logger.error({ err }, "[ADMIN_REFERRALS] DB error");
     res.status(500).json({ error: "Failed to fetch referrals" });
   }
 });
 
-router.post("/admin/referrals/mark-paid", async (req, res) => {
+router.post("/admin/referrals/mark-paid", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   try {
     const { walletAddress } = req.body as { walletAddress?: string };
 

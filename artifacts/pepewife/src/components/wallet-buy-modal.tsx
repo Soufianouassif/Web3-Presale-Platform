@@ -26,7 +26,8 @@ type ModalStep =
   | "connecting"   // waiting for wallet extension
   | "confirm"      // wallet connected — confirm the tx
   | "signing"      // waiting for user approval in wallet
-  | "success"      // tx confirmed
+  | "verifying"    // tx sent — waiting for backend on-chain verification
+  | "success"      // backend confirmed purchase on devnet
   | "error";       // something went wrong
 
 interface Props {
@@ -35,7 +36,8 @@ interface Props {
   presaleData: PresaleState | null;
   tokensEstimate: number;
   onClose: () => void;
-  onSuccess: (signature: string) => void;
+  /** Called after tx is on-chain. Must verify with backend. Returns {verified, error?}. */
+  onSuccess: (signature: string) => Promise<{ verified: boolean; error?: string }>;
   disableWalletSwitch?: boolean;
 }
 
@@ -49,9 +51,11 @@ function friendlyError(msg: string): string {
   if (m.includes("insufficient") || m.includes("balance"))
     return "Insufficient balance to complete this purchase.";
   if (m.includes("block height") || m.includes("blockhash") || m.includes("expired"))
-    return "Transaction timed out — but your SOL may already be deducted. Check Solana Explorer for your signature to confirm the purchase went through.";
+    return "Transaction timed out — but your SOL may already be deducted. Check Solana Explorer for your tx hash to confirm.";
   if (m.includes("network") || m.includes("timeout") || m.includes("failed to fetch"))
     return "Network error. Check your connection and try again.";
+  if (m.includes("verification failed") || m.includes("not found on") || m.includes("signer mismatch") || m.includes("program"))
+    return msg.length > 160 ? msg.slice(0, 160) + "…" : msg;
   return msg.length > 120 ? msg.slice(0, 120) + "…" : msg;
 }
 
@@ -119,32 +123,44 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
 
     setStep("signing");
     try {
+      // Step 1: send transaction on-chain
+      let sig: string;
       if (currency === "SOL") {
         const result = await buyWithSol(address, amount, selectedWallet);
-        setSignature(result.signature);
-        setStep("success");
-        onSuccess(result.signature);
+        sig = result.signature;
       } else {
         const result = await buyWithUsdt(address, amount, selectedWallet);
-        setSignature(result.signature);
+        sig = result.signature;
+      }
+      setSignature(sig);
+
+      // Step 2: wait for backend on-chain verification (devnet)
+      setStep("verifying");
+      const verifyResult = await onSuccess(sig);
+
+      if (verifyResult.verified) {
         setStep("success");
-        onSuccess(result.signature);
+      } else {
+        // Backend rejected — show exact reason so user understands what happened
+        const reason = verifyResult.error ?? "Purchase could not be verified on Devnet.";
+        setErrorMsg(reason);
+        setStep("error");
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setErrorMsg(friendlyError(msg));
       setStep("error");
     }
-  }, [address, selectedWallet, currency, amount, presaleData, onSuccess]);
+  }, [address, selectedWallet, currency, amount, onSuccess]);
 
   // ── Helpers ────────────────────────────────────────────────────────────────
   const walletMeta = WALLETS.find(w => w.id === selectedWallet);
   const currencyLabel = currency === "SOL" ? "SOL" : "USDT";
   const explorerUrl = signature ? buildExplorerUrl(signature) : "";
 
-  // Close on backdrop click only when not in the middle of signing
+  // Close on backdrop click only when not in the middle of signing / verifying
   const handleBackdrop = () => {
-    if (step === "signing" || step === "connecting") return;
+    if (step === "signing" || step === "connecting" || step === "verifying") return;
     onClose();
   };
 
@@ -164,7 +180,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
         <div className="zigzag-border" />
 
         {/* Close button */}
-        {step !== "signing" && step !== "connecting" && (
+        {step !== "signing" && step !== "connecting" && step !== "verifying" && (
           <button
             onClick={onClose}
             className="absolute top-4 end-4 z-10 w-8 h-8 rounded-full bg-[#1a1a2e] text-white flex items-center justify-center hover:bg-[#FF4D9D] transition-colors"
@@ -347,19 +363,46 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
           </div>
         )}
 
+        {/* ── VERIFYING (backend on-chain check) ───────────────────── */}
+        {step === "verifying" && (
+          <div className="p-8 flex flex-col items-center gap-5 text-center">
+            <Loader2 className="h-14 w-14 text-[#4CAF50] animate-spin" />
+            <div>
+              <h3 className="font-display text-2xl text-[#1a1a2e] tracking-wider">Verifying on Devnet…</h3>
+              <p className="text-sm text-[#1a1a2e]/50 font-bold mt-1">
+                Transaction sent. Server is checking it on-chain.
+              </p>
+            </div>
+            {signature && (
+              <a
+                href={buildExplorerUrl(signature)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-xs font-mono text-[#1a1a2e]/40 hover:text-[#FF4D9D] transition-colors"
+              >
+                <ExternalLink className="h-3 w-3" />
+                {signature.slice(0, 16)}…{signature.slice(-8)}
+              </a>
+            )}
+            <div className="bg-[#E8F5E9] border-2 border-[#4CAF50]/30 rounded-xl p-3 w-full text-xs text-[#1a1a2e]/50 font-bold text-center">
+              🔍 Do not close — waiting for Devnet verification.
+            </div>
+          </div>
+        )}
+
         {/* ── SUCCESS ─────────────────────────────────────────────────── */}
         {step === "success" && (
           <div className="p-8 flex flex-col items-center gap-5 text-center">
             <CheckCircle2 className="h-16 w-16 text-[#4CAF50]" />
             <div>
               <div className="sticker bg-[#4CAF50] text-white mb-3 inline-block text-sm" style={{ transform: "rotate(-2deg)" }}>
-                Purchase Complete!
+                Purchase Verified ✓
               </div>
               <h3 className="font-display text-3xl text-[#1a1a2e] tracking-wider comic-shadow">
                 You're in! 🐸
               </h3>
               <p className="text-sm text-[#1a1a2e]/50 font-bold mt-2">
-                Your $PWIFE tokens are secured. Track them in your dashboard.
+                On-chain verified. Your $PWIFE tokens are secured.
               </p>
             </div>
 

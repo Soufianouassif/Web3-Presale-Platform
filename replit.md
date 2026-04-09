@@ -134,6 +134,41 @@ React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
   - Provider event listeners for account changes, disconnects, chain switches
   - Dashboard route guard: redirects to /connect if wallet not connected
   - Error handling: USER_REJECTED, WRONG_NETWORK, NOT_INSTALLED, CONNECTION_FAILED with i18n error messages
+- **Devnet Purchase Verification** (100% on-chain, no bypasses):
+  - `REQUIRE_ONCHAIN_VERIFICATION` defaults to `true` — on-chain check is MANDATORY at all times
+  - `SOLANA_NETWORK` defaults to `"devnet"` — server uses this for USDT mint selection (never trusts client)
+  - `IS_DEV` / DEV MODE bypass removed entirely from `tracker.ts` — no more `if (IS_DEV) return { valid:true }`
+  - USDT mint selection is server-side only: `devnet → 8PieQJ43...`, `mainnet → Es9vMFrz...`
+  - `network: "solana"` hardcoded bug fixed → frontend now sends `IS_DEVNET ? "devnet" : "mainnet"`
+  - `IS_DEVNET` bug fixed in `presale-contract.ts`: checks `VITE_SOLANA_NETWORK` env first, then endpoint URL
+  - Frontend `.env` has `VITE_SOLANA_NETWORK=devnet` ensuring IS_DEVNET is always correct via proxy
+  - `crossCheck` client-value fallback removed → replaced by `logAmountComparison` (comparison only, no return)
+  - If server can't extract USD from TX (`estimatedUsd <= 0`) → purchase REJECTED (no fallback)
+  - If stage price PDA unavailable → `acceptedTokens = 0` (never from client); logged as `TOKENS_PENDING`
+  - DEV MODE else-block removed → if `valid=true` but no `onChain` data → 500 INTERNAL_ERROR
+  - Network stored in DB is always server-side `SOLANA_NETWORK`, not client-provided field
+  - Modal now has "verifying" step (spinner + "Verifying on Devnet…") after TX sent
+  - Modal waits for backend verification before showing success; shows error with reason if backend rejects
+  - `onSuccess` prop: `(sig: string) => Promise<{ verified: boolean; error?: string }>`
+  - All purchase logs include `[DEVNET]` network label for clarity
+  - Boot-time log: `[TRACKER] Network configuration loaded` shows RPC/network/mints/verification flag
+  - Referral rewards calculated from `acceptedTokens/acceptedUsd` (server-verified values only)
+- **Admin Session Management** (`/admin/sessions`):
+  - Lists all active admin sessions from DB (`user_sessions` table) with full metadata
+  - Shows: IP, User-Agent, login time, last activity, security level, suspicious flag, IP history
+  - Actions: Terminate single session (DELETE /admin/sessions/:sid), Purge all other sessions (POST /admin/sessions/purge)
+  - Both kill actions require `requireRecentAuth(15)` — fresh login within 15 min
+  - Sidebar link in admin dashboard → `/admin/sessions` page with auto-refresh every 20s
+- **Enterprise Session Security** (`artifacts/api-server/src/middleware/admin-auth.ts`):
+  - **Dual-change termination**: If both IP AND User-Agent change simultaneously → session destroyed immediately (DUAL_CHANGE_ATTACK)
+  - **Rapid IP switching**: 5+ unique IPs in one session → terminated (RAPID_IP_SWITCHING)
+  - **UA manipulation**: UA changes 2+ times → terminated (UA_MANIPULATION)
+  - **Threat Levels**: 0=CLEAN, 1=WATCH, 2=FLAGGED (requireRecentAuth(10) auto-applied), 3=TERMINATED
+  - **IP History**: Last 10 unique IPs tracked per session; shown in sessions UI
+  - **Security alerts**: `securityAlert(type, req, extra)` emits structured logs with `security:true, alert:true` for SIEM pickup
+  - **Session fields**: `securityLevel`, `sessionSuspicious`, `suspiciousReason`, `ipChangeCount`, `uaChangeCount`, `ipHistory`, `requestCount`, `lastRequestAt`
+  - **`/auth/me` response** includes `security` block: `{ level, suspicious, suspiciousReason, ipChangeCount, uaChangeCount, requestCount, loginAgeMinutes }`
+  - **Auth login** initializes all security fields on session creation (clean slate per login)
 - **Referral System** (off-chain DB tracking + TGE on-chain payout):
   - `src/lib/referral.ts` — all referral API calls: `fetchOrCreateReferralCode`, `fetchReferralStats`, `fetchLeaderboard`, `buildReferralUrl`, `captureReferralFromUrl`, `getStoredReferralCode`, `clearStoredReferralCode`, `formatTokens`
   - URL detection: `?ref=CODE` captured via `captureReferralFromUrl()` on page load, stored in `sessionStorage`

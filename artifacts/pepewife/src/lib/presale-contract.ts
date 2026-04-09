@@ -98,7 +98,12 @@ export const SOLANA_ENDPOINT: string =
     ? `${window.location.origin}/api/rpc`
     : "https://api.devnet.solana.com");
 
-export const IS_DEVNET = SOLANA_ENDPOINT.includes("devnet");
+// IS_DEVNET: check explicit VITE_SOLANA_NETWORK first (reliable),
+// then fall back to endpoint URL inspection.
+// This prevents the /api/rpc proxy path from incorrectly returning false.
+export const IS_DEVNET =
+  import.meta.env.VITE_SOLANA_NETWORK === "devnet" ||
+  SOLANA_ENDPOINT.includes("devnet");
 
 export const connection = new Connection(SOLANA_ENDPOINT, "confirmed");
 

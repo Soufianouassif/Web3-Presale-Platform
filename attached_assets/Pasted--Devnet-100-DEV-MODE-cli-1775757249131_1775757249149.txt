@@ -1,0 +1,219 @@
+أريد الآن تحويل نظام التحقق من الشراء والإحالة ليعتمد على Devnet الحقيقي 100% بدل أي DEV MODE أو client-side fallback.
+
+مهم جداً:
+- لا أريد أي bypass
+- لا أريد skip للـ blockchain verification
+- لا أريد أن يقبل النظام أي شراء أو إحالة بدون التحقق الحقيقي من المعاملة على Devnet
+- لا تكسر منطق الشراء الحالي
+- لا تكسر الواجهة
+- اجعل النظام مناسباً للاختبار الحقيقي قبل الإطلاق
+
+━━━━━━━━━━━━━━━━━━
+الهدف
+━━━━━━━━━━━━━━━━━━
+
+أريد أن يصبح flow الشراء كالتالي:
+
+1. المستخدم يشتري على Devnet
+2. يتم إنشاء txHash حقيقي
+3. backend يتحقق من المعاملة على Devnet
+4. يستخرج القيم الحقيقية من البلوكشين
+5. يسجل purchase بالقيم الموثوقة فقط
+6. يحسب reward من القيم الموثوقة فقط
+7. يرفض أي txHash مزيف أو غير مطابق أو مكرر
+
+━━━━━━━━━━━━━━━━━━
+المرحلة 1 — تعطيل DEV MODE بالكامل
+━━━━━━━━━━━━━━━━━━
+
+ابحث في جميع ملفات backend عن أي منطق مثل:
+- DEV MODE
+- skip verification
+- use client-provided amounts
+- fallback to client values
+- if NODE_ENV !== 'production'
+- verification bypass
+
+المطلوب:
+- إزالة أي bypass يسمح بقبول purchase بدون on-chain verification
+- في بيئة التطوير الحالية الخاصة بالاختبار على Devnet:
+  يجب أن يكون التحقق من البلوكشين إلزامياً
+- إذا فشل التحقق:
+  لا تسجل purchase
+  لا تنشئ referral
+  لا تنشئ reward
+
+إذا أردت التمييز بين local development و devnet testing:
+- أضف env واضح مثل:
+  REQUIRE_ONCHAIN_VERIFICATION=true
+
+━━━━━━━━━━━━━━━━━━
+المرحلة 2 — ربط الشبكة بـ Devnet بشكل صريح
+━━━━━━━━━━━━━━━━━━
+
+تحقق من جميع ملفات الإعدادات والـ env.
+
+أريد التأكد من:
+- SOLANA_NETWORK=devnet
+- RPC endpoint يشير إلى Devnet
+- PRESALE_PROGRAM_ID هو الخاص بالعقد المنشور على Devnet
+- USDT mint أو أي token mint المستخدم خاص بـ Devnet إذا كان ذلك مطلوباً
+- frontend أيضاً مضبوط على Devnet
+
+إذا كان هناك أي mismatch بين:
+- frontend
+- backend
+- smart contract
+- verifyTransaction
+فأصلحه مباشرة
+
+━━━━━━━━━━━━━━━━━━
+المرحلة 3 — verifyTransaction الحقيقي
+━━━━━━━━━━━━━━━━━━
+
+افحص verifyTransaction بالكامل.
+
+أريد منه أن يتحقق من:
+
+1. المعاملة موجودة فعلاً على Devnet
+2. المعاملة ناجحة (meta.err === null)
+3. المحفظة المرسلة من frontend تطابق signer الحقيقي
+4. Program ID الخاص بالـ presale موجود فعلاً في المعاملة أو logs
+5. يتم استخراج المبلغ الحقيقي:
+   - SOL purchases من preBalances/postBalances مع طرح fee
+   - USDT purchases من token balances
+6. يتم استخراج أو حساب:
+   - acceptedUsd
+   - acceptedTokens
+7. يعيد response منظم مثل:
+   valid: true/false
+   estimatedUsd
+   estimatedTokens
+   source
+   network
+   reason if failed
+
+إذا فشل أي جزء:
+- ارجع خطأ واضح
+- لا تعتمد على client values
+
+━━━━━━━━━━━━━━━━━━
+المرحلة 4 — منع قبول client amounts
+━━━━━━━━━━━━━━━━━━
+
+أريد أن يصبح amountUsd و amountTokens القادمان من frontend مجرد قيم عرض أو مقارنة فقط، وليس source of truth.
+
+المطلوب:
+- لا يتم حفظ قيم client مباشرة في DB
+- لا يتم احتساب reward بناءً على client values
+- backend يجب أن يحفظ فقط:
+  acceptedUsd من on-chain/server verification
+  acceptedTokens من on-chain/server calculation
+
+يمكن الاحتفاظ بـ client values فقط في logs أو للمقارنة، لكن ليس كأساس للحسابات.
+
+━━━━━━━━━━━━━━━━━━
+المرحلة 5 — replay attack + invalid tx protection
+━━━━━━━━━━━━━━━━━━
+
+تأكد من:
+- منع تكرار txHash
+- رفض txHash غير صالح format
+- رفض txHash غير موجود
+- رفض txHash يخص محفظة أخرى
+- رفض txHash لا يحتوي على presale program interaction
+- رفض txHash failed on-chain
+
+أضف logs واضحة لكل حالة رفض.
+
+━━━━━━━━━━━━━━━━━━
+المرحلة 6 — referral reward server-side فقط
+━━━━━━━━━━━━━━━━━━
+
+أريد أن يتم حساب reward فقط بعد نجاح:
+- verifyTransaction
+- save purchase
+- reconciliation من server values
+
+المعادلة:
+- rewardTokens = acceptedTokens × rate
+- rewardUsd = acceptedUsd × rate
+
+ويجب أن تكون:
+- مبنية فقط على server verified values
+- لا تعتمد على أي client amount
+
+━━━━━━━━━━━━━━━━━━
+المرحلة 7 — logs واضحة للاختبار
+━━━━━━━━━━━━━━━━━━
+
+أضف logs واضحة جداً أثناء الاختبار على Devnet:
+
+- [PURCHASE] Incoming purchase request
+- [TX_VERIFY] Checking tx on devnet
+- [TX_VERIFY] Transaction found / not found
+- [TX_VERIFY] Signer match / mismatch
+- [TX_VERIFY] Program match / mismatch
+- [TX_VERIFY] Extracted amounts
+- [PURCHASE] Accepted server amounts
+- [PURCHASE] Saved to DB
+- [REFERRAL] Reward calculated from server values
+- [PURCHASE] Rejected: reason
+
+أريد أن أرى بوضوح في الـ logs أن النظام يعتمد على Devnet الحقيقي فقط.
+
+━━━━━━━━━━━━━━━━━━
+المرحلة 8 — تحديث الرسائل في الواجهة
+━━━━━━━━━━━━━━━━━━
+
+إذا فشل verifyTransaction:
+- أعط رسالة واضحة للمستخدم
+مثل:
+  Transaction verification failed on Devnet
+  Purchase could not be confirmed
+  Invalid or unsupported transaction
+
+إذا نجح:
+- أظهر success واضح
+
+ولا تجعل الواجهة تدعي النجاح إذا فشل backend verification.
+
+━━━━━━━━━━━━━━━━━━
+المرحلة 9 — فحص frontend network
+━━━━━━━━━━━━━━━━━━
+
+تحقق من frontend أيضاً:
+
+- هل Phantom / wallet adapter مضبوط على Devnet؟
+- هل connection endpoint هو Devnet؟
+- هل المعاملة تُرسل فعلاً على Devnet؟
+- هل txHash الذي يصل للbackend هو txHash الحقيقي الناتج من المعاملة؟
+
+إذا كان frontend ما زال على mainnet أو mixed config:
+- أصلحه
+
+━━━━━━━━━━━━━━━━━━
+المرحلة 10 — التقرير النهائي
+━━━━━━━━━━━━━━━━━━
+
+بعد التنفيذ، أعطني تقريراً واضحاً جداً:
+
+1. ما الملفات التي كانت تحتوي على bypass أو DEV MODE
+2. ما الذي تم تعطيله
+3. ما RPC / network / Program ID المستخدم الآن
+4. هل verifyTransaction أصبح إلزامياً 100%
+5. هل reward أصبح مبنياً على server verified values فقط
+6. ما الرسائل التي ستظهر في logs عند الاختبار
+7. كيف أختبر بنفسي خطوة بخطوة على Devnet
+
+━━━━━━━━━━━━━━━━━━
+قواعد صارمة
+━━━━━━━━━━━━━━━━━━
+
+- لا تترك أي bypass خفي
+- لا تعتمد على client amounts
+- لا تقل "تم الإصلاح" إلا إذا أصبح verifyTransaction إلزامياً فعلاً
+- لا تكسر purchase flow
+- لا تكسر referral flow
+- لا تجعل النجاح يظهر في الواجهة إذا فشل backend
+- اجعل النظام مناسباً لاختبار Devnet الحقيقي قبل الإطلاق

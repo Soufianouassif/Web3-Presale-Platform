@@ -3,6 +3,7 @@ import rateLimit from "express-rate-limit";
 import { db, pool } from "@workspace/db";
 import { referralCodes, referrals, purchases } from "@workspace/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
+import { logger } from "../lib/logger.js";
 
 const router = Router();
 
@@ -24,7 +25,7 @@ function generateCode(): string {
   return code;
 }
 
-// ─── Rate limiters (express-rate-limit — persistent across process lifetime) ──
+// ─── Rate limiters ──────────────────────────────────────────────────────────
 const codeLimiter = rateLimit({
   windowMs: 60 * 1_000,
   max: 20,
@@ -51,7 +52,6 @@ const readLimiter = rateLimit({
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/referral/code/:wallet
-// Returns the referral code for a wallet (creates one if it doesn't exist).
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
   const wallet = String(req.params.wallet);
@@ -69,11 +69,11 @@ router.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
       .limit(1);
 
     if (existing.length > 0) {
+      logger.info({ wallet: wallet.slice(0, 8), code: existing[0].code, source: "DB" }, "[REF_CODE] Returning existing code from DB");
       res.json({ code: existing[0].code });
       return;
     }
 
-    // Generate a unique code (retry up to 5 times on collision)
     let code = "";
     for (let attempt = 0; attempt < 5; attempt++) {
       const candidate = generateCode();
@@ -94,23 +94,16 @@ router.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
     }
 
     await db.insert(referralCodes).values({ walletAddress: wallet, code });
+    logger.info({ wallet: wallet.slice(0, 8), code, source: "CREATED" }, "[REF_CODE] New code inserted into DB");
     res.json({ code });
   } catch (err) {
+    logger.error({ err }, "[REF_CODE] DB error");
     res.status(500).json({ error: "Server error" });
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/referral/register
-// Called after a purchase is confirmed on-chain.
-// Body: { referrerCode, buyerWallet, purchaseId?, amountUsd?, amountTokens? }
-//
-// Security:
-//  1. Validate both wallets (buyer must be valid Solana address)
-//  2. Resolve referrerCode → referrerWallet
-//  3. Prevent self-referral (referrer === buyer)
-//  4. Prevent double-referral (buyer can only be referred once)
-//  5. Atomic update of reward counters
 // ─────────────────────────────────────────────────────────────────────────────
 router.post("/referral/register", registerLimiter, async (req, res) => {
   const { referrerCode, buyerWallet, purchaseId, amountUsd, amountTokens } =
@@ -132,17 +125,19 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
     return;
   }
 
-  // Sanitise code
   const code = referrerCode.trim().slice(0, 16);
 
-  // ── purchaseId إلزامي ويجب أن يكون موجوداً في DB ────────────────────────────
   if (!purchaseId || !Number.isInteger(purchaseId) || purchaseId <= 0) {
     res.status(400).json({ error: "Valid purchaseId is required" });
     return;
   }
 
+  logger.info(
+    { code, buyer: buyerWallet.slice(0, 8), purchaseId, amountUsd, amountTokens },
+    "[REF_REGISTER] Processing referral registration",
+  );
+
   try {
-    // ── 0. تحقق من وجود purchaseId في DB ومطابقته للمحفظة ───────────────────
     const purchaseRow = await db
       .select({ id: purchases.id, walletAddress: purchases.walletAddress })
       .from(purchases)
@@ -150,16 +145,17 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
       .limit(1);
 
     if (purchaseRow.length === 0) {
+      logger.warn({ purchaseId, buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] Purchase not found in DB");
       res.status(400).json({ error: "Purchase not found" });
       return;
     }
 
     if (purchaseRow[0].walletAddress.toLowerCase() !== buyerWallet.toLowerCase()) {
+      logger.warn({ purchaseId, buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] Purchase wallet mismatch");
       res.status(400).json({ error: "Purchase does not belong to this wallet" });
       return;
     }
 
-    // ── 1. Resolve code → referrerWallet ─────────────────────────────────────
     const codeRow = await db
       .select()
       .from(referralCodes)
@@ -167,19 +163,19 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
       .limit(1);
 
     if (codeRow.length === 0) {
+      logger.warn({ code }, "[REF_REGISTER] Invalid referral code — not found in DB");
       res.status(404).json({ error: "Invalid referral code" });
       return;
     }
 
     const referrerWallet = codeRow[0].walletAddress;
 
-    // ── 2. Self-referral check ────────────────────────────────────────────────
     if (referrerWallet.toLowerCase() === buyerWallet.toLowerCase()) {
+      logger.warn({ code, wallet: referrerWallet.slice(0, 8) }, "[REF_REGISTER] Blocked self-referral");
       res.status(400).json({ error: "Self-referral is not allowed" });
       return;
     }
 
-    // ── 3. Double-referral check ──────────────────────────────────────────────
     const alreadyReferred = await db
       .select({ id: referrals.id })
       .from(referrals)
@@ -187,11 +183,11 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
       .limit(1);
 
     if (alreadyReferred.length > 0) {
+      logger.warn({ buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] Blocked double-referral — wallet already referred");
       res.status(409).json({ error: "This wallet has already been referred" });
       return;
     }
 
-    // ── 4. Calculate reward (5% of purchase tokens) ──────────────────────────
     const REWARD_RATE = 5.0;
     const rewardTokens = amountTokens
       ? ((amountTokens * REWARD_RATE) / 100).toFixed(6)
@@ -200,7 +196,6 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
       ? ((amountUsd * REWARD_RATE) / 100).toFixed(6)
       : "0";
 
-    // ── 5. Atomic insert + counter update (PostgreSQL transaction) ────────────
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
@@ -229,6 +224,18 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
       client.release();
     }
 
+    logger.info(
+      {
+        code,
+        referrer: referrerWallet.slice(0, 8),
+        buyer: buyerWallet.slice(0, 8),
+        rewardTokens,
+        rewardUsd,
+        source: "DB_WRITE",
+      },
+      "[REF_REGISTER] ✓ Referral saved to DB — reward created",
+    );
+
     res.json({
       success: true,
       referrerWallet,
@@ -238,13 +245,14 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Server error";
+    logger.error({ err, code, buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] DB error");
     res.status(500).json({ error: message });
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/referral/stats/:wallet
-// Returns full referral stats for a wallet.
+// Referrer dashboard — pulls LIVE data from DB for this wallet
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
   const wallet = String(req.params.wallet);
@@ -254,6 +262,8 @@ router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
     return;
   }
 
+  logger.info({ wallet: wallet.slice(0, 8) }, "[REF_STATS] Querying referral stats from DB");
+
   try {
     const codeRow = await db
       .select()
@@ -262,6 +272,7 @@ router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
       .limit(1);
 
     if (codeRow.length === 0) {
+      logger.info({ wallet: wallet.slice(0, 8) }, "[REF_STATS] No referral code found → empty state returned");
       res.json({
         code: null,
         totalReferrals: 0,
@@ -276,7 +287,6 @@ router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
 
     const row = codeRow[0];
 
-    // Pending vs paid breakdown
     const breakdown = await db
       .select({
         status: referrals.status,
@@ -291,7 +301,6 @@ router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
     const paid =
       breakdown.find(b => b.status === "paid")?.sumTokens ?? "0";
 
-    // 5 most recent referrals
     const recent = await db
       .select({
         referredWallet: referrals.referredWallet,
@@ -304,6 +313,19 @@ router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
       .orderBy(desc(referrals.createdAt))
       .limit(5);
 
+    logger.info(
+      {
+        wallet: wallet.slice(0, 8),
+        code: row.code,
+        totalReferrals: row.totalReferrals,
+        pendingTokens: pending,
+        paidTokens: paid,
+        recentCount: recent.length,
+        source: "DB_READ",
+      },
+      "[REF_STATS] ✓ Stats returned from DB",
+    );
+
     res.json({
       code: row.code,
       totalReferrals: row.totalReferrals,
@@ -313,16 +335,19 @@ router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
       paidTokens: paid,
       recentReferrals: recent,
     });
-  } catch {
+  } catch (err) {
+    logger.error({ err, wallet: wallet.slice(0, 8) }, "[REF_STATS] DB error");
     res.status(500).json({ error: "Server error" });
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/referral/leaderboard
-// Top 10 referrers by total reward tokens.
+// Admin + investor dashboards — top 10 from DB
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/referral/leaderboard", readLimiter, async (_req, res) => {
+  logger.info({}, "[REF_LEADERBOARD] Querying top referrers from DB");
+
   try {
     const top = await db
       .select({
@@ -335,23 +360,22 @@ router.get("/referral/leaderboard", readLimiter, async (_req, res) => {
       .orderBy(desc(referralCodes.totalRewardTokens))
       .limit(10);
 
-    // Mask wallet addresses for privacy (show first 4 + last 4)
     const masked = top.map(r => ({
       ...r,
       walletAddress:
         r.walletAddress.slice(0, 4) + "…" + r.walletAddress.slice(-4),
     }));
 
+    logger.info({ count: masked.length, source: "DB_READ" }, "[REF_LEADERBOARD] ✓ Returned from DB");
     res.json(masked);
-  } catch {
+  } catch (err) {
+    logger.error({ err }, "[REF_LEADERBOARD] DB error");
     res.status(500).json({ error: "Server error" });
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/referral/resolve/:code
-// Validates a referral code and returns the masked referrer wallet.
-// Used by the frontend when a visitor lands with ?ref=CODE.
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/referral/resolve/:code", readLimiter, async (req, res) => {
   const code = String(req.params.code).trim().slice(0, 16);
@@ -373,7 +397,8 @@ router.get("/referral/resolve/:code", readLimiter, async (req, res) => {
       valid: true,
       referrerMasked: w.slice(0, 4) + "…" + w.slice(-4),
     });
-  } catch {
+  } catch (err) {
+    logger.error({ err, code }, "[REF_RESOLVE] DB error");
     res.status(500).json({ error: "Server error" });
   }
 });

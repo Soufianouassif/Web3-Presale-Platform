@@ -16,6 +16,7 @@ import {
   fetchBuyerState,
   fetchBuyerTransactions,
   stageTokenPriceUsd,
+  IS_DEVNET,
   type PresaleState,
   type BuyerState,
   type BuyerTx,
@@ -268,53 +269,65 @@ export default function Dashboard() {
     refreshReferralData();
   };
 
-  // ── نجاح الشراء: يُبلّغ الباك إند ويسجّل الإحالة ─────────────────────────
-  const handleDashBuySuccess = async (sig: string) => {
-    // احفظ القيم قبل التنظيف (React state is async)
-    const capturedAmount = buyAmount;
-    const capturedCurrency = currency;
+  // ── نجاح الشراء: يُبلّغ الباك إند ويتحقق على Devnet ───────────────────────
+  // يُعيد { verified, error? } للـ modal الذي ينتظر النتيجة قبل عرض success أو error.
+  const handleDashBuySuccess = async (sig: string): Promise<{ verified: boolean; error?: string }> => {
+    // احفظ القيم قبل أي تغيير في الـ state (React state is async)
+    const capturedAmount    = buyAmount;
+    const capturedCurrency  = currency;
     const capturedAmountNum = parseFloat(capturedAmount) || 0;
-    // استخدم 150 كـ fallback إذا لم يكن سعر SOL محمّلاً بعد
     const effectiveSolPrice = solPrice > 0 ? solPrice : 150;
     const capturedUsd = capturedCurrency === "SOL"
       ? capturedAmountNum * effectiveSolPrice
       : capturedAmountNum;
     const capturedStageIdx = presaleData?.currentStage ?? 0;
-    const capturedPricePerToken = parseFloat(STAGE_DATA[capturedStageIdx]?.price?.replace(/\$/g, "") || "0.00000001");
+    const capturedPricePerToken = parseFloat(
+      STAGE_DATA[capturedStageIdx]?.price?.replace(/\$/g, "") || "0.00000001",
+    );
     const capturedTokens = capturedPricePerToken > 0 ? capturedUsd / capturedPricePerToken : 0;
-
-    setDashTxSig(sig);
-    setBuyAmount("");
-    setShowBuyModal(false);
 
     // اقرأ كود الإحالة من localStorage قبل إرسال الطلب
     const refCode = getStoredReferralCode();
-    console.log("[DashBuySuccess] txHash:", sig.slice(0, 16), "| refCode:", refCode, "| amount:", capturedAmount, capturedCurrency, "| wallet:", address?.slice(0, 8));
-    console.log("[DashBuySuccess] Computed: usdAmt=", capturedUsd, "tokens=", capturedTokens, "solPrice=", effectiveSolPrice, "pricePerToken=", capturedPricePerToken);
+    const networkField = IS_DEVNET ? "devnet" : "mainnet";
 
-    // أبلّغ الباك إند بالشراء
+    console.log(
+      "[DashBuySuccess] Sending to backend:",
+      { txHash: sig.slice(0, 16), network: networkField, refCode, currency: capturedCurrency, usd: capturedUsd, tokens: capturedTokens },
+    );
+
+    // أرسل للـ backend وانتظر التحقق من Devnet
     const result = await tracker.purchase({
-      walletAddress: address ?? "",
-      network: "solana",
-      amountUsd: capturedUsd,
-      amountTokens: capturedTokens,
-      txHash: sig,
-      stage: capturedStageIdx + 1,
-      referralCode: refCode ?? undefined,
+      walletAddress:  address ?? "",
+      network:        networkField,  // "devnet" أو "mainnet" — ليس "solana"
+      amountUsd:      capturedUsd,
+      amountTokens:   capturedTokens,
+      txHash:         sig,
+      stage:          capturedStageIdx + 1,
+      referralCode:   refCode ?? undefined,
     });
 
     if (result.success) {
-      console.log("[DashBuySuccess] ✓ Tracked successfully, purchaseId=", result.purchaseId);
+      console.log("[DashBuySuccess] ✓ Backend verification passed, purchaseId=", result.purchaseId);
+      // نظّف الـ state بعد نجاح التحقق
+      setDashTxSig(sig);
+      setBuyAmount("");
       if (refCode) {
-        console.log("[DashBuySuccess] Clearing referral code from localStorage");
+        console.log("[DashBuySuccess] Clearing referral code from storage");
         clearStoredReferralCode();
       }
+      // حدّث البيانات بعد 3 ثوانٍ
+      setTimeout(() => refreshBuyerData(), 3000);
+      return { verified: true };
     } else {
-      console.warn("[DashBuySuccess] ✗ Purchase tracking failed:", result.error, result.reason);
+      console.warn("[DashBuySuccess] ✗ Backend verification failed:", result.error, result.reason);
+      // لا نغلق الـ modal — سيُظهر رسالة الخطأ للمستخدم
+      return {
+        verified: false,
+        error: result.reason
+          ? `Transaction verification failed on Devnet: ${result.reason}`
+          : (result.error ?? "Purchase could not be confirmed by the server."),
+      };
     }
-
-    // حدّث البيانات بعد 3 ثوانٍ للتأكد من أن البلوكتشين تحديث
-    setTimeout(() => refreshBuyerData(), 3000);
   };
 
   type StageStatus = "active" | "sold-out" | "upcoming";
