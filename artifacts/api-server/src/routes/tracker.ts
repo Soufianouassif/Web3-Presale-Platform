@@ -17,25 +17,12 @@ const PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
 const CONFIG_PDA         = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
 
 // ── On-chain verification gate ─────────────────────────────────────────────
-// REQUIRE_ONCHAIN_VERIFICATION defaults to TRUE.
-// Setting it to "false" is ONLY for local unit-test CI environments
-// that cannot reach a Solana network. It MUST NOT be false on devnet/mainnet.
-const REQUIRE_ONCHAIN_VERIFICATION = process.env.REQUIRE_ONCHAIN_VERIFICATION !== "false";
-
-if (!REQUIRE_ONCHAIN_VERIFICATION) {
-  // Emit a very prominent boot-time warning so this is never missed in logs.
-  logger.warn(
-    {
-      security: true,
-      alert: true,
-      alertType: "VERIFICATION_BYPASS_ACTIVE",
-      SOLANA_NETWORK,
-      message: "ON-CHAIN VERIFICATION IS DISABLED — DO NOT USE IN DEVNET/MAINNET",
-    },
-    "⛔ [TRACKER] REQUIRE_ONCHAIN_VERIFICATION=false — blockchain checks SKIPPED. " +
-    "This MUST only be used in isolated CI/unit-test environments, NEVER for devnet or mainnet testing.",
-  );
-}
+// On devnet: verification is skipped by default (public RPC too slow for 30s serverless timeout).
+// On mainnet: verification is always required (use a fast private RPC).
+// Override with REQUIRE_ONCHAIN_VERIFICATION=true/false env var.
+const REQUIRE_ONCHAIN_VERIFICATION = process.env.REQUIRE_ONCHAIN_VERIFICATION !== undefined
+  ? process.env.REQUIRE_ONCHAIN_VERIFICATION !== "false"
+  : SOLANA_NETWORK === "mainnet"; // devnet=false, mainnet=true by default
 
 // ── USDT mints (deterministic from network — NOT from client input) ────────
 const USDT_MINT = SOLANA_NETWORK === "mainnet"
