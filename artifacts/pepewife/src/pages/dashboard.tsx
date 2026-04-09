@@ -27,6 +27,8 @@ import {
   fetchLeaderboard,
   buildReferralUrl,
   formatTokens,
+  getStoredReferralCode,
+  clearStoredReferralCode,
   type ReferralStats,
   type LeaderboardEntry,
 } from "@/lib/referral";
@@ -152,17 +154,22 @@ export default function Dashboard() {
     return () => clearInterval(iv);
   }, []);
 
-  // ── Buyer on-chain data ──────────────────────────────────────────────────────
+  // ── Buyer on-chain data — تحديث تلقائي كل 30 ثانية ──────────────────────────
   useEffect(() => {
     if (!address) { setBuyerState(null); setBuyerTxs([]); return; }
-    setBuyerLoading(true);
-    fetchBuyerState(address)
-      .then(b => setBuyerState(b))
-      .finally(() => setBuyerLoading(false));
-    setBuyerTxsLoading(true);
-    fetchBuyerTransactions(address)
-      .then(txs => setBuyerTxs(txs))
-      .finally(() => setBuyerTxsLoading(false));
+    const load = () => {
+      setBuyerLoading(true);
+      fetchBuyerState(address)
+        .then(b => setBuyerState(b))
+        .finally(() => setBuyerLoading(false));
+      setBuyerTxsLoading(true);
+      fetchBuyerTransactions(address)
+        .then(txs => setBuyerTxs(txs))
+        .finally(() => setBuyerTxsLoading(false));
+    };
+    load();
+    const iv = setInterval(load, 30_000);
+    return () => clearInterval(iv);
   }, [address]);
 
   // ── Buy box constants & computations ────────────────────────────────────────
@@ -253,6 +260,48 @@ export default function Dashboard() {
     fetchBuyerState(address).then(b => setBuyerState(b)).catch(() => {});
     fetchBuyerTransactions(address).then(txs => setBuyerTxs(txs)).catch(() => {});
     fetchPresaleState().then(s => { if (s) setPresaleData(s); }).catch(() => {});
+    refreshReferralData();
+  };
+
+  // ── نجاح الشراء: يُبلّغ الباك إند ويسجّل الإحالة ─────────────────────────
+  const handleDashBuySuccess = async (sig: string) => {
+    // احفظ القيم قبل التنظيف
+    const capturedAmount = buyAmount;
+    const capturedCurrency = currency;
+    const capturedAmountNum = parseFloat(capturedAmount) || 0;
+    const capturedUsd = capturedCurrency === "SOL"
+      ? capturedAmountNum * solPrice
+      : capturedAmountNum;
+    const capturedStageIdx = presaleData?.currentStage ?? 0;
+    const capturedPricePerToken = parseFloat(STAGE_DATA[capturedStageIdx]?.price?.replace(/\$/g, "") || "0.00000001");
+    const capturedTokens = capturedPricePerToken > 0 ? capturedUsd / capturedPricePerToken : 0;
+
+    setDashTxSig(sig);
+    setBuyAmount("");
+    setShowBuyModal(false);
+
+    // اقرأ كود الإحالة من localStorage قبل إرسال الطلب
+    const refCode = getStoredReferralCode();
+
+    // أبلّغ الباك إند بالشراء
+    const result = await tracker.purchase({
+      walletAddress: address ?? "",
+      network: "solana",
+      amountUsd: capturedUsd,
+      amountTokens: capturedTokens,
+      txHash: sig,
+      stage: capturedStageIdx + 1,
+      referralCode: refCode ?? undefined,
+    });
+
+    if (result.success) {
+      if (refCode) clearStoredReferralCode();
+    } else {
+      console.warn("[Dashboard] Purchase tracking failed:", result.error, result.reason);
+    }
+
+    // حدّث البيانات بعد 3 ثوانٍ للتأكد من أن البلوكتشين تحديث
+    setTimeout(() => refreshBuyerData(), 3000);
   };
 
   type StageStatus = "active" | "sold-out" | "upcoming";
@@ -1147,12 +1196,7 @@ export default function Dashboard() {
           tokensEstimate={tokensOut}
           disableWalletSwitch={true}
           onClose={() => setShowBuyModal(false)}
-          onSuccess={(sig) => {
-            setDashTxSig(sig);
-            setBuyAmount("");
-            setShowBuyModal(false);
-            setTimeout(() => refreshBuyerData(), 3000);
-          }}
+          onSuccess={handleDashBuySuccess}
         />
       )}
     </div>

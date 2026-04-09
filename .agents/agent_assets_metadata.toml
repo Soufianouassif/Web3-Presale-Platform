@@ -185,3 +185,9 @@ id = "enG-yn5f3oQ2SCQFxzrS0"
 uri = "file://PEPEWIFE-GUIDE.md"
 type = "text"
 title = "PEPEWIFE - Complete Project Guide"
+
+[[outputs]]
+id = "dBN3vbkc1ajG0P-ueXPiA"
+uri = "file://PROJECT_DOCS.md"
+type = "text"
+title = "توثيق مشروع PEPEWIFE — دليل شامل"

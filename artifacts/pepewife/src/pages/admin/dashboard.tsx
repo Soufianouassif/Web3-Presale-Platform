@@ -646,7 +646,7 @@ export default function AdminDashboard() {
     if (!loading && !authenticated) setLocation("/admin");
   }, [loading, authenticated, setLocation]);
 
-  // ── Fetch DB stats ──────────────────────────────────────────────────────────
+  // ── Fetch DB stats — تحديث تلقائي كل 15 ثانية ─────────────────────────────
   const fetchStats = useCallback(() => {
     if (!authenticated) return;
     setDataLoading(true);
@@ -654,7 +654,11 @@ export default function AdminDashboard() {
       .then(d => { setStats(d); setDataLoading(false); })
       .catch(() => setDataLoading(false));
   }, [authenticated]);
-  useEffect(() => { fetchStats(); }, [fetchStats]);
+  useEffect(() => {
+    fetchStats();
+    const iv = setInterval(fetchStats, 15_000);
+    return () => clearInterval(iv);
+  }, [fetchStats]);
 
   // ── Fetch on-chain data ─────────────────────────────────────────────────────
   const refreshChain = useCallback(async () => {
