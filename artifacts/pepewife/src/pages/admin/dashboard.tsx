@@ -3,10 +3,11 @@ import { useLocation } from "wouter";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { adminApi, type AdminStats } from "@/lib/admin-api";
 import {
-  withdrawSol, withdrawSolWithKeypair, updateSolPrice,
+  withdrawSol, withdrawSolWithKeypair, withdrawUsdt, updateSolPrice,
   pauseSaleWithKeypair, resumeSaleWithKeypair,
-  connection, SOL_VAULT_PDA, fetchPresaleState,
-  stageTokenPriceUsd, buildExplorerUrl, type PresaleState,
+  advanceStage, endPresale,
+  connection, SOL_VAULT_PDA, VAULT_USDT_ATA,
+  fetchPresaleState, stageTokenPriceUsd, buildExplorerUrl, type PresaleState,
 } from "@/lib/presale-contract";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -315,6 +316,259 @@ function WithdrawPanel({ showNotification }: { showNotification: (msg: string, t
       {step === "success" && (
         <div className="p-4 bg-[#39ff14]/10 border border-[#39ff14]/20 rounded-xl space-y-1">
           <p className="text-[#39ff14] text-sm font-medium">✅ Withdrawn {withdrawn} SOL</p>
+          <a href={buildExplorerUrl(txSig)} target="_blank" rel="noreferrer"
+            className="text-xs text-blue-400 hover:underline font-mono">{txSig.slice(0, 20)}…</a>
+        </div>
+      )}
+      {step === "error" && (
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+          <p className="text-red-400 text-xs">❌ {errMsg}</p>
+          <button onClick={() => setStep("idle")} className="text-xs text-gray-500 hover:text-white mt-1">Try again</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Withdraw USDT Panel ──────────────────────────────────────────────────────
+function WithdrawUsdtPanel({ showNotification }: { showNotification: (msg: string, type?: "success" | "error") => void }) {
+  const [vaultUsdt, setVaultUsdt]   = useState<number | null>(null);
+  const [step, setStep]             = useState<WithdrawStep>("idle");
+  const [txSig, setTxSig]           = useState("");
+  const [withdrawn, setWithdrawn]   = useState("");
+  const [errMsg, setErrMsg]         = useState("");
+
+  useEffect(() => {
+    connection.getTokenAccountBalance(VAULT_USDT_ATA)
+      .then(info => setVaultUsdt(Number(info.value.uiAmount ?? 0)))
+      .catch(() => setVaultUsdt(null));
+  }, []);
+
+  async function handleWithdraw() {
+    try {
+      setStep("connecting");
+      const provider = (window as any).phantom?.solana ?? (window as any).solana;
+      if (!provider) throw new Error("Phantom not found");
+      const resp = await provider.connect();
+      const addr = resp.publicKey?.toString() ?? provider.publicKey?.toString();
+      if (addr !== PRESALE_AUTHORITY) throw new Error(`Need authority wallet: ${PRESALE_AUTHORITY.slice(0, 8)}...`);
+      setStep("signing");
+      const { signature, withdrawnRaw } = await withdrawUsdt(addr, "phantom", () => setStep("confirming"));
+      setTxSig(signature);
+      setWithdrawn((Number(withdrawnRaw) / 1e6).toFixed(2));
+      setStep("success");
+      showNotification(`Withdrew ${(Number(withdrawnRaw) / 1e6).toFixed(2)} USDT`, "success");
+    } catch (err) {
+      setErrMsg((err as Error).message);
+      setStep("error");
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
+        <div>
+          <p className="text-xs text-gray-400 mb-0.5">USDT Vault Balance</p>
+          <p className="text-xl font-bold text-green-400">{vaultUsdt !== null ? `${vaultUsdt.toLocaleString()} USDT` : "—"}</p>
+        </div>
+        {vaultUsdt !== null && vaultUsdt > 0 && (
+          <span className="text-xs px-2 py-1 bg-green-500/20 text-green-300 rounded-lg border border-green-500/30">Ready to withdraw</span>
+        )}
+      </div>
+
+      {step === "idle" && (
+        <Btn label="⬇ Withdraw USDT" variant="success" onClick={handleWithdraw} disabled={!vaultUsdt || vaultUsdt === 0} />
+      )}
+      {step === "connecting"  && <p className="flex items-center gap-2 text-sm text-gray-400">{spinning} Connecting Phantom…</p>}
+      {step === "signing"     && <p className="flex items-center gap-2 text-sm text-yellow-300">{spinning} Signing…</p>}
+      {step === "confirming"  && <p className="flex items-center gap-2 text-sm text-blue-300">{spinning} Confirming on-chain…</p>}
+      {step === "success" && (
+        <div className="p-4 bg-[#39ff14]/10 border border-[#39ff14]/20 rounded-xl space-y-1">
+          <p className="text-[#39ff14] text-sm font-medium">✅ Withdrawn {withdrawn} USDT</p>
+          <a href={buildExplorerUrl(txSig)} target="_blank" rel="noreferrer"
+            className="text-xs text-blue-400 hover:underline font-mono">{txSig.slice(0, 20)}…</a>
+        </div>
+      )}
+      {step === "error" && (
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+          <p className="text-red-400 text-xs">❌ {errMsg}</p>
+          <button onClick={() => setStep("idle")} className="text-xs text-gray-500 hover:text-white mt-1">Try again</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Advance Stage Panel ─────────────────────────────────────────────────────
+function AdvanceStagePanel({
+  chainData,
+  onRefresh,
+  showNotification,
+}: {
+  chainData: PresaleState | null;
+  onRefresh: () => void;
+  showNotification: (msg: string, type?: "success" | "error") => void;
+}) {
+  const [step, setStep] = useState<"idle" | "connecting" | "signing" | "confirming" | "success" | "error">("idle");
+  const [txSig, setTxSig] = useState("");
+  const [errMsg, setErrMsg] = useState("");
+
+  const currentStage = chainData?.currentStage ?? 0;
+  const isLastStage  = currentStage >= 3;
+
+  async function handleAdvance() {
+    try {
+      setStep("connecting");
+      const provider = (window as any).phantom?.solana ?? (window as any).solana;
+      if (!provider) throw new Error("Phantom not found");
+      const resp = await provider.connect();
+      const addr = resp.publicKey?.toString() ?? provider.publicKey?.toString();
+      if (addr !== PRESALE_AUTHORITY) throw new Error(`Need authority wallet: ${PRESALE_AUTHORITY.slice(0, 8)}...`);
+      setStep("signing");
+      const { signature } = await advanceStage(addr, "phantom", () => setStep("confirming"));
+      setTxSig(signature);
+      setStep("success");
+      showNotification(`✅ تم الانتقال للمرحلة ${currentStage + 2}`, "success");
+      onRefresh();
+    } catch (err) {
+      setErrMsg((err as Error).message);
+      setStep("error");
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* حالة المراحل */}
+      <div className="grid grid-cols-4 gap-2">
+        {[0, 1, 2, 3].map(i => (
+          <div key={i} className={`rounded-xl p-3 border text-center ${
+            i === currentStage
+              ? "bg-[#39ff14]/15 border-[#39ff14]/40"
+              : i < currentStage
+              ? "bg-white/5 border-white/10 opacity-50"
+              : "bg-white/3 border-white/5 opacity-30"
+          }`}>
+            <p className="text-xs text-gray-400 mb-0.5">المرحلة {i + 1}</p>
+            <p className="text-[10px] font-mono text-gray-500">
+              {i < currentStage ? "✅ انتهت" : i === currentStage ? "🟢 نشطة" : "🔒 قادمة"}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {step === "idle" && !isLastStage && (
+        <button
+          onClick={handleAdvance}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium bg-blue-500/20 hover:bg-blue-500/30 border-blue-500/40 text-blue-300 transition-all"
+        >
+          ⏭ الانتقال للمرحلة {currentStage + 2}
+        </button>
+      )}
+      {isLastStage && step === "idle" && (
+        <p className="text-xs text-center text-gray-500 py-2">أنت في المرحلة الأخيرة — استخدم "إنهاء البيع" أدناه</p>
+      )}
+      {step === "connecting"  && <p className="flex items-center gap-2 text-sm text-gray-400">{spinning} Connecting Phantom…</p>}
+      {step === "signing"     && <p className="flex items-center gap-2 text-sm text-yellow-300">{spinning} Signing…</p>}
+      {step === "confirming"  && <p className="flex items-center gap-2 text-sm text-blue-300">{spinning} Confirming on-chain…</p>}
+      {step === "success" && (
+        <div className="p-4 bg-[#39ff14]/10 border border-[#39ff14]/20 rounded-xl space-y-1">
+          <p className="text-[#39ff14] text-sm font-medium">✅ تم الانتقال للمرحلة {currentStage + 2}</p>
+          <a href={buildExplorerUrl(txSig)} target="_blank" rel="noreferrer"
+            className="text-xs text-blue-400 hover:underline font-mono">{txSig.slice(0, 20)}…</a>
+          <button onClick={() => setStep("idle")} className="block text-xs text-gray-500 hover:text-white mt-1">إغلاق</button>
+        </div>
+      )}
+      {step === "error" && (
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+          <p className="text-red-400 text-xs">❌ {errMsg}</p>
+          <button onClick={() => setStep("idle")} className="text-xs text-gray-500 hover:text-white mt-1">Try again</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── End Presale Panel ────────────────────────────────────────────────────────
+function EndPresalePanel({
+  chainData,
+  onRefresh,
+  showNotification,
+}: {
+  chainData: PresaleState | null;
+  onRefresh: () => void;
+  showNotification: (msg: string, type?: "success" | "error") => void;
+}) {
+  const [step, setStep]     = useState<"idle" | "confirm" | "connecting" | "signing" | "confirming" | "success" | "error">("idle");
+  const [txSig, setTxSig]   = useState("");
+  const [errMsg, setErrMsg] = useState("");
+
+  const isActive = chainData?.isActive ?? true;
+
+  async function handleEnd() {
+    try {
+      setStep("connecting");
+      const provider = (window as any).phantom?.solana ?? (window as any).solana;
+      if (!provider) throw new Error("Phantom not found");
+      const resp = await provider.connect();
+      const addr = resp.publicKey?.toString() ?? provider.publicKey?.toString();
+      if (addr !== PRESALE_AUTHORITY) throw new Error(`Need authority wallet: ${PRESALE_AUTHORITY.slice(0, 8)}...`);
+      setStep("signing");
+      const { signature } = await endPresale(addr, "phantom", () => setStep("confirming"));
+      setTxSig(signature);
+      setStep("success");
+      showNotification("✅ تم إنهاء البيع على البلوكتشين", "success");
+      onRefresh();
+    } catch (err) {
+      setErrMsg((err as Error).message);
+      setStep("error");
+    }
+  }
+
+  if (!isActive) {
+    return (
+      <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl text-center">
+        <p className="text-purple-300 text-sm font-semibold">🏁 البيع منتهٍ</p>
+        <p className="text-xs text-gray-500 mt-1">presale_end تم تسجيله على البلوكتشين</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+        <p className="text-red-300 text-sm font-semibold">⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه</p>
+        <p className="text-xs text-gray-400 mt-1">بمجرد الإنهاء، لن يستطيع أحد الشراء وسيُسجَّل وقت انتهاء البيع لعقد الاستحقاق.</p>
+      </div>
+
+      {step === "idle" && (
+        <button
+          onClick={() => setStep("confirm")}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium bg-red-500/20 hover:bg-red-500/30 border-red-500/40 text-red-300 transition-all"
+        >
+          🏁 إنهاء البيع نهائياً
+        </button>
+      )}
+      {step === "confirm" && (
+        <div className="space-y-2">
+          <p className="text-sm text-center text-yellow-300">هل أنت متأكد؟ هذا الإجراء لا رجعة فيه.</p>
+          <div className="flex gap-2">
+            <button onClick={handleEnd}
+              className="flex-1 px-4 py-2 rounded-xl bg-red-500/30 border border-red-500/40 text-red-300 text-sm hover:bg-red-500/40 transition-all">
+              نعم، إنهاء البيع
+            </button>
+            <button onClick={() => setStep("idle")}
+              className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 text-sm hover:bg-white/10 transition-all">
+              إلغاء
+            </button>
+          </div>
+        </div>
+      )}
+      {step === "connecting"  && <p className="flex items-center gap-2 text-sm text-gray-400">{spinning} Connecting Phantom…</p>}
+      {step === "signing"     && <p className="flex items-center gap-2 text-sm text-yellow-300">{spinning} Signing…</p>}
+      {step === "confirming"  && <p className="flex items-center gap-2 text-sm text-blue-300">{spinning} Confirming on-chain…</p>}
+      {step === "success" && (
+        <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl space-y-1">
+          <p className="text-purple-300 text-sm font-medium">🏁 تم إنهاء البيع على البلوكتشين</p>
           <a href={buildExplorerUrl(txSig)} target="_blank" rel="noreferrer"
             className="text-xs text-blue-400 hover:underline font-mono">{txSig.slice(0, 20)}…</a>
         </div>
@@ -728,6 +982,19 @@ export default function AdminDashboard() {
         </SectionCard>
       </div>
 
+      {/* Advance Stage + End Presale */}
+      <div className="grid lg:grid-cols-2 gap-5">
+        <SectionCard title="⏭ الانتقال بين المراحل">
+          <p className="text-xs text-gray-500 mb-4">عند انتهاء توكنز المرحلة الحالية، اضغط للانتقال للمرحلة التالية على البلوكتشين</p>
+          <AdvanceStagePanel chainData={chainData} onRefresh={refreshChain} showNotification={showNotification} />
+        </SectionCard>
+
+        <SectionCard title="🏁 إنهاء البيع نهائياً">
+          <p className="text-xs text-gray-500 mb-4">يُسجّل وقت انتهاء البيع على العقد — يُفعّل عقد الاستحقاق (Claim) بعده</p>
+          <EndPresalePanel chainData={chainData} onRefresh={refreshChain} showNotification={showNotification} />
+        </SectionCard>
+      </div>
+
       <div className="grid lg:grid-cols-2 gap-5">
         {/* UI Controls */}
         <SectionCard title="🖥 واجهة المستخدم (UI Control)">
@@ -778,7 +1045,7 @@ export default function AdminDashboard() {
 
         {/* Stage Info */}
         <SectionCard title="📋 معلومات المراحل">
-          <p className="text-xs text-gray-500 mb-4">المراحل تتقدم تلقائياً على البلوكتشين عندما تنتهي توكنز المرحلة</p>
+          <p className="text-xs text-gray-500 mb-4">المراحل لا تتقدم تلقائياً — يجب على الأدمن الضغط على "الانتقال للمرحلة التالية"</p>
           {chainData ? (
             <div className="space-y-2">
               {chainData.stages.map((s, i) => {
@@ -813,6 +1080,10 @@ export default function AdminDashboard() {
 
       <SectionCard title="سحب SOL من الخزينة">
         <WithdrawPanel showNotification={showNotification} />
+      </SectionCard>
+
+      <SectionCard title="سحب USDT من الخزينة">
+        <WithdrawUsdtPanel showNotification={showNotification} />
       </SectionCard>
 
       {/* Network breakdown */}
