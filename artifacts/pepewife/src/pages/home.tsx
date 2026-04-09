@@ -245,18 +245,28 @@ export default function Home() {
   // ── Modal buy success ─────────────────────────────────────────────
   const handleBuySuccess = async (sig: string) => {
     setTxSignature(sig);
+
+    // اقرأ القيم قبل التنظيف (React state updates are async, closure has old values)
+    const capturedAmount = amount;
+    const capturedCurrency = currency;
     setAmount("");
     fetchPresaleState().then(d => { if (d) setPresaleData(d); });
 
     const refCode = getStoredReferralCode();
-    const amountNum = parseFloat(amount) || 0;
+    console.log("[BuySuccess] txHash:", sig.slice(0, 16), "| refCode:", refCode, "| amount:", capturedAmount, capturedCurrency, "| wallet:", address?.slice(0, 8));
+
+    const amountNum = parseFloat(capturedAmount) || 0;
     const stageIdx  = presaleData?.currentStage ?? 0;
     const stage     = stageIdx + 1;
     const cs = presaleData?.stages[stageIdx];
     const pricePerToken = cs ? stageTokenPriceUsd(cs.tokensPerRawUsdtScaled) : 0.00000001;
-    const solUsd = currency === "SOL" ? amountNum * chainSolPrice : 0;
-    const usdAmt = currency === "SOL" ? solUsd : amountNum;
+    // استخدم solPrice كـ fallback إذا لم يكن chainSolPrice محمّلاً
+    const effectiveSolPrice = chainSolPrice > 0 ? chainSolPrice : (solPrice > 0 ? solPrice : 150);
+    const solUsd = capturedCurrency === "SOL" ? amountNum * effectiveSolPrice : 0;
+    const usdAmt = capturedCurrency === "SOL" ? solUsd : amountNum;
     const tokensEst = pricePerToken > 0 ? usdAmt / pricePerToken : 0;
+
+    console.log("[BuySuccess] Computed: usdAmt=", usdAmt, "tokensEst=", tokensEst, "solPrice=", effectiveSolPrice, "pricePerToken=", pricePerToken);
 
     // await the tracking call so we can show errors and only clear ref code on success
     const result = await tracker.purchase({
@@ -270,11 +280,15 @@ export default function Home() {
     });
 
     if (result.success) {
+      console.log("[BuySuccess] ✓ Tracked successfully, purchaseId=", result.purchaseId);
       // Clear the referral code only after it was successfully registered
-      if (refCode) clearStoredReferralCode();
+      if (refCode) {
+        console.log("[BuySuccess] Clearing referral code from localStorage");
+        clearStoredReferralCode();
+      }
     } else {
       // Log for debugging — the purchase TX itself succeeded on-chain
-      console.warn("[Tracker] Purchase tracking failed:", result.error, result.reason);
+      console.warn("[BuySuccess] ✗ Purchase tracking failed:", result.error, result.reason);
     }
 
     setTimeout(() => {

@@ -180,8 +180,16 @@ export const tracker = {
     txHash?: string;
     stage?: number;
     referralCode?: string;
-  }): Promise<{ success: boolean; error?: string; reason?: string }> => {
+  }): Promise<{ success: boolean; purchaseId?: number; error?: string; reason?: string }> => {
     try {
+      console.log("[tracker.purchase] Sending:", {
+        wallet: data.walletAddress?.slice(0, 8),
+        amountUsd: data.amountUsd,
+        amountTokens: data.amountTokens,
+        txHash: data.txHash?.slice(0, 16),
+        hasReferral: !!data.referralCode,
+        referralCode: data.referralCode,
+      });
       const res = await fetch(`${API_BASE}/track/purchase`, {
         method: "POST",
         credentials: "include",
@@ -189,11 +197,13 @@ export const tracker = {
         body: JSON.stringify(data),
       });
       const json = await res.json() as { success?: boolean; error?: string; reason?: string; purchaseId?: number };
-      if (!res.ok) {
+      console.log("[tracker.purchase] Response:", { status: res.status, json });
+      if (!res.ok || !json.success) {
         return { success: false, error: json.error, reason: json.reason };
       }
-      return { success: true };
-    } catch {
+      return { success: true, purchaseId: json.purchaseId };
+    } catch (err) {
+      console.error("[tracker.purchase] Network error:", err);
       return { success: false, error: "Network error" };
     }
   },

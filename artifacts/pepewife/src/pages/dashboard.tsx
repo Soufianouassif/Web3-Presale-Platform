@@ -26,6 +26,7 @@ import {
   fetchReferralStats,
   fetchLeaderboard,
   buildReferralUrl,
+  captureReferralFromUrl,
   formatTokens,
   getStoredReferralCode,
   clearStoredReferralCode,
@@ -80,6 +81,8 @@ export default function Dashboard() {
   // ── Page visit tracking ──────────────────────────────────────────────────
   useEffect(() => {
     tracker.visit("/dashboard");
+    // التقط كود الإحالة من URL عند دخول الصفحة (حالة ?ref=CODE في رابط مباشر)
+    captureReferralFromUrl();
   }, []);
 
   // ── Referral data refresh ────────────────────────────────────────────────
@@ -227,10 +230,12 @@ export default function Dashboard() {
     const cs = presaleData?.stages[i];
     const tokens = cs ? Number(cs.maxTokens)  : 5_000_000_000_000;
     const sold   = cs ? Number(cs.tokensSold) : 0;
+    const priceNum = cs ? stageTokenPriceUsd(cs.tokensPerRawUsdtScaled) : 0;
     const price  = cs
-      ? `$${stageTokenPriceUsd(cs.tokensPerRawUsdtScaled).toFixed(10).replace(/\.?0+$/, "")}`
+      ? `$${priceNum.toFixed(10).replace(/\.?0+$/, "")}`
       : fallbackPrice;
-    return { stage: i + 1, price, tokens, sold, color: STAGE_COLORS[i] };
+    const soldUsd = sold * priceNum;
+    return { stage: i + 1, price, tokens, sold, soldUsd, color: STAGE_COLORS[i] };
   });
   const LISTING_PRICE = "$0.061327";
   const currentStage = presaleData ? presaleData.currentStage : 0;
@@ -265,12 +270,14 @@ export default function Dashboard() {
 
   // ── نجاح الشراء: يُبلّغ الباك إند ويسجّل الإحالة ─────────────────────────
   const handleDashBuySuccess = async (sig: string) => {
-    // احفظ القيم قبل التنظيف
+    // احفظ القيم قبل التنظيف (React state is async)
     const capturedAmount = buyAmount;
     const capturedCurrency = currency;
     const capturedAmountNum = parseFloat(capturedAmount) || 0;
+    // استخدم 150 كـ fallback إذا لم يكن سعر SOL محمّلاً بعد
+    const effectiveSolPrice = solPrice > 0 ? solPrice : 150;
     const capturedUsd = capturedCurrency === "SOL"
-      ? capturedAmountNum * solPrice
+      ? capturedAmountNum * effectiveSolPrice
       : capturedAmountNum;
     const capturedStageIdx = presaleData?.currentStage ?? 0;
     const capturedPricePerToken = parseFloat(STAGE_DATA[capturedStageIdx]?.price?.replace(/\$/g, "") || "0.00000001");
@@ -282,6 +289,8 @@ export default function Dashboard() {
 
     // اقرأ كود الإحالة من localStorage قبل إرسال الطلب
     const refCode = getStoredReferralCode();
+    console.log("[DashBuySuccess] txHash:", sig.slice(0, 16), "| refCode:", refCode, "| amount:", capturedAmount, capturedCurrency, "| wallet:", address?.slice(0, 8));
+    console.log("[DashBuySuccess] Computed: usdAmt=", capturedUsd, "tokens=", capturedTokens, "solPrice=", effectiveSolPrice, "pricePerToken=", capturedPricePerToken);
 
     // أبلّغ الباك إند بالشراء
     const result = await tracker.purchase({
@@ -295,9 +304,13 @@ export default function Dashboard() {
     });
 
     if (result.success) {
-      if (refCode) clearStoredReferralCode();
+      console.log("[DashBuySuccess] ✓ Tracked successfully, purchaseId=", result.purchaseId);
+      if (refCode) {
+        console.log("[DashBuySuccess] Clearing referral code from localStorage");
+        clearStoredReferralCode();
+      }
     } else {
-      console.warn("[Dashboard] Purchase tracking failed:", result.error, result.reason);
+      console.warn("[DashBuySuccess] ✗ Purchase tracking failed:", result.error, result.reason);
     }
 
     // حدّث البيانات بعد 3 ثوانٍ للتأكد من أن البلوكتشين تحديث
@@ -305,11 +318,17 @@ export default function Dashboard() {
   };
 
   type StageStatus = "active" | "sold-out" | "upcoming";
+  function fmtUsd(n: number): string {
+    if (!presaleData || n === 0) return "—";
+    if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
+    return `$${n.toFixed(2)}`;
+  }
   const presaleStages: Array<{ stage: number; name: string; price: string; tokens: string; sold: number; total: string; status: StageStatus; color: string; shadow: string; emoji: string }> = [
-    { stage: 1, name: t.dashboard.earlyBird, price: STAGE_DATA[0].price, tokens: fmt(STAGE_DATA[0].tokens), sold: STAGE_DATA[0].sold, total: "$0", status: currentStage === 0 ? "active" : currentStage > 0 ? "sold-out" : "upcoming", color: "#4CAF50", shadow: "#2E7D32", emoji: currentStage > 0 ? "✅" : currentStage === 0 ? "🔥" : "🔒" },
-    { stage: 2, name: t.dashboard.community, price: STAGE_DATA[1].price, tokens: fmt(STAGE_DATA[1].tokens), sold: STAGE_DATA[1].sold, total: "$0", status: currentStage === 1 ? "active" : currentStage > 1 ? "sold-out" : "upcoming", color: "#FF4D9D", shadow: "#C2185B", emoji: currentStage > 1 ? "✅" : currentStage === 1 ? "🔥" : "🔒" },
-    { stage: 3, name: t.dashboard.growth, price: STAGE_DATA[2].price, tokens: fmt(STAGE_DATA[2].tokens), sold: STAGE_DATA[2].sold, total: "$0", status: currentStage === 2 ? "active" : currentStage > 2 ? "sold-out" : "upcoming", color: "#42A5F5", shadow: "#1565C0", emoji: currentStage > 2 ? "✅" : currentStage === 2 ? "🔥" : "🔒" },
-    { stage: 4, name: t.dashboard.final, price: STAGE_DATA[3].price, tokens: fmt(STAGE_DATA[3].tokens), sold: STAGE_DATA[3].sold, total: "$0", status: currentStage === 3 ? "active" : currentStage > 3 ? "sold-out" : "upcoming", color: "#AB47BC", shadow: "#7B1FA2", emoji: currentStage > 3 ? "✅" : currentStage === 3 ? "🔥" : "🔒" },
+    { stage: 1, name: t.dashboard.earlyBird, price: STAGE_DATA[0].price, tokens: fmt(STAGE_DATA[0].tokens), sold: STAGE_DATA[0].sold, total: fmtUsd(STAGE_DATA[0].soldUsd), status: currentStage === 0 ? "active" : currentStage > 0 ? "sold-out" : "upcoming", color: "#4CAF50", shadow: "#2E7D32", emoji: currentStage > 0 ? "✅" : currentStage === 0 ? "🔥" : "🔒" },
+    { stage: 2, name: t.dashboard.community, price: STAGE_DATA[1].price, tokens: fmt(STAGE_DATA[1].tokens), sold: STAGE_DATA[1].sold, total: fmtUsd(STAGE_DATA[1].soldUsd), status: currentStage === 1 ? "active" : currentStage > 1 ? "sold-out" : "upcoming", color: "#FF4D9D", shadow: "#C2185B", emoji: currentStage > 1 ? "✅" : currentStage === 1 ? "🔥" : "🔒" },
+    { stage: 3, name: t.dashboard.growth, price: STAGE_DATA[2].price, tokens: fmt(STAGE_DATA[2].tokens), sold: STAGE_DATA[2].sold, total: fmtUsd(STAGE_DATA[2].soldUsd), status: currentStage === 2 ? "active" : currentStage > 2 ? "sold-out" : "upcoming", color: "#42A5F5", shadow: "#1565C0", emoji: currentStage > 2 ? "✅" : currentStage === 2 ? "🔥" : "🔒" },
+    { stage: 4, name: t.dashboard.final, price: STAGE_DATA[3].price, tokens: fmt(STAGE_DATA[3].tokens), sold: STAGE_DATA[3].sold, total: fmtUsd(STAGE_DATA[3].soldUsd), status: currentStage === 3 ? "active" : currentStage > 3 ? "sold-out" : "upcoming", color: "#AB47BC", shadow: "#7B1FA2", emoji: currentStage > 3 ? "✅" : currentStage === 3 ? "🔥" : "🔒" },
   ];
 
   const tabs = [
