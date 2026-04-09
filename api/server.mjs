@@ -20503,27 +20503,27 @@ var require_router = __commonJS({
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var methods = METHODS.map((method) => method.toLowerCase());
-    module.exports = Router11;
+    module.exports = Router12;
     module.exports.Route = Route;
-    function Router11(options) {
-      if (!(this instanceof Router11)) {
-        return new Router11(options);
+    function Router12(options) {
+      if (!(this instanceof Router12)) {
+        return new Router12(options);
       }
       const opts = options || {};
-      function router11(req, res, next) {
-        router11.handle(req, res, next);
+      function router12(req, res, next) {
+        router12.handle(req, res, next);
       }
-      Object.setPrototypeOf(router11, this);
-      router11.caseSensitive = opts.caseSensitive;
-      router11.mergeParams = opts.mergeParams;
-      router11.params = {};
-      router11.strict = opts.strict;
-      router11.stack = [];
-      return router11;
+      Object.setPrototypeOf(router12, this);
+      router12.caseSensitive = opts.caseSensitive;
+      router12.mergeParams = opts.mergeParams;
+      router12.params = {};
+      router12.strict = opts.strict;
+      router12.stack = [];
+      return router12;
     }
-    Router11.prototype = function() {
+    Router12.prototype = function() {
     };
-    Router11.prototype.param = function param(name, fn) {
+    Router12.prototype.param = function param(name, fn) {
       if (!name) {
         throw new TypeError("argument name is required");
       }
@@ -20543,7 +20543,7 @@ var require_router = __commonJS({
       params.push(fn);
       return this;
     };
-    Router11.prototype.handle = function handle(req, res, callback) {
+    Router12.prototype.handle = function handle(req, res, callback) {
       if (!callback) {
         throw new TypeError("argument callback is required");
       }
@@ -20670,7 +20670,7 @@ var require_router = __commonJS({
         }
       }
     };
-    Router11.prototype.use = function use(handler) {
+    Router12.prototype.use = function use(handler) {
       let offset = 0;
       let path = "/";
       if (typeof handler !== "function") {
@@ -20703,7 +20703,7 @@ var require_router = __commonJS({
       }
       return this;
     };
-    Router11.prototype.route = function route(path) {
+    Router12.prototype.route = function route(path) {
       const route2 = new Route(path);
       const layer = new Layer(path, {
         sensitive: this.caseSensitive,
@@ -20718,7 +20718,7 @@ var require_router = __commonJS({
       return route2;
     };
     methods.concat("all").forEach(function(method) {
-      Router11.prototype[method] = function(path) {
+      Router12.prototype[method] = function(path) {
         const route = this.route(path);
         route[method].apply(route, slice.call(arguments, 1));
         return this;
@@ -20901,13 +20901,13 @@ var require_application = __commonJS({
     var compileTrust = require_utils3().compileTrust;
     var resolve = __require("node:path").resolve;
     var once = require_once();
-    var Router11 = require_router();
+    var Router12 = require_router();
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var app2 = exports = module.exports = {};
     var trustProxyDefaultSymbol = "@@symbol:trust_proxy_default";
     app2.init = function init() {
-      var router11 = null;
+      var router12 = null;
       this.cache = /* @__PURE__ */ Object.create(null);
       this.engines = /* @__PURE__ */ Object.create(null);
       this.settings = /* @__PURE__ */ Object.create(null);
@@ -20916,13 +20916,13 @@ var require_application = __commonJS({
         configurable: true,
         enumerable: true,
         get: function getrouter() {
-          if (router11 === null) {
-            router11 = new Router11({
+          if (router12 === null) {
+            router12 = new Router12({
               caseSensitive: this.enabled("case sensitive routing"),
               strict: this.enabled("strict routing")
             });
           }
-          return router11;
+          return router12;
         }
       });
     };
@@ -20993,15 +20993,15 @@ var require_application = __commonJS({
       if (fns.length === 0) {
         throw new TypeError("app.use() requires a middleware function");
       }
-      var router11 = this.router;
+      var router12 = this.router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router11.use(path, fn2);
+          return router12.use(path, fn2);
         }
         debug(".use app under %s", path);
         fn2.mountpath = path;
         fn2.parent = this;
-        router11.use(path, function mounted_app(req, res, next) {
+        router12.use(path, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             Object.setPrototypeOf(req, orig.request);
@@ -23528,7 +23528,7 @@ var require_express = __commonJS({
     var EventEmitter = __require("node:events").EventEmitter;
     var mixin = require_merge_descriptors();
     var proto = require_application();
-    var Router11 = require_router();
+    var Router12 = require_router();
     var req = require_request();
     var res = require_response();
     exports = module.exports = createApplication;
@@ -23550,8 +23550,8 @@ var require_express = __commonJS({
     exports.application = proto;
     exports.request = req;
     exports.response = res;
-    exports.Route = Router11.Route;
-    exports.Router = Router11;
+    exports.Route = Router12.Route;
+    exports.Router = Router12;
     exports.json = bodyParser.json;
     exports.raw = bodyParser.raw;
     exports.static = require_serve_static();
@@ -29441,10 +29441,10 @@ var require_memory = __commonJS({
       var sessionIds = Object.keys(this.sessions);
       var sessions = /* @__PURE__ */ Object.create(null);
       for (var i = 0; i < sessionIds.length; i++) {
-        var sessionId = sessionIds[i];
-        var session2 = getSession.call(this, sessionId);
+        var sessionId2 = sessionIds[i];
+        var session2 = getSession.call(this, sessionId2);
         if (session2) {
-          sessions[sessionId] = session2;
+          sessions[sessionId2] = session2;
         }
       }
       callback && defer(callback, null, sessions);
@@ -29453,15 +29453,15 @@ var require_memory = __commonJS({
       this.sessions = /* @__PURE__ */ Object.create(null);
       callback && defer(callback);
     };
-    MemoryStore2.prototype.destroy = function destroy(sessionId, callback) {
-      delete this.sessions[sessionId];
+    MemoryStore2.prototype.destroy = function destroy(sessionId2, callback) {
+      delete this.sessions[sessionId2];
       callback && defer(callback);
     };
-    MemoryStore2.prototype.get = function get(sessionId, callback) {
-      defer(callback, null, getSession.call(this, sessionId));
+    MemoryStore2.prototype.get = function get(sessionId2, callback) {
+      defer(callback, null, getSession.call(this, sessionId2));
     };
-    MemoryStore2.prototype.set = function set(sessionId, session2, callback) {
-      this.sessions[sessionId] = JSON.stringify(session2);
+    MemoryStore2.prototype.set = function set(sessionId2, session2, callback) {
+      this.sessions[sessionId2] = JSON.stringify(session2);
       callback && defer(callback);
     };
     MemoryStore2.prototype.length = function length(callback) {
@@ -29470,16 +29470,16 @@ var require_memory = __commonJS({
         callback(null, Object.keys(sessions).length);
       });
     };
-    MemoryStore2.prototype.touch = function touch(sessionId, session2, callback) {
-      var currentSession = getSession.call(this, sessionId);
+    MemoryStore2.prototype.touch = function touch(sessionId2, session2, callback) {
+      var currentSession = getSession.call(this, sessionId2);
       if (currentSession) {
         currentSession.cookie = session2.cookie;
-        this.sessions[sessionId] = JSON.stringify(currentSession);
+        this.sessions[sessionId2] = JSON.stringify(currentSession);
       }
       callback && defer(callback);
     };
-    function getSession(sessionId) {
-      var sess = this.sessions[sessionId];
+    function getSession(sessionId2) {
+      var sess = this.sessions[sessionId2];
       if (!sess) {
         return;
       }
@@ -29487,7 +29487,7 @@ var require_memory = __commonJS({
       if (sess.cookie) {
         var expires = typeof sess.cookie.expires === "string" ? new Date(sess.cookie.expires) : sess.cookie.expires;
         if (expires && expires <= Date.now()) {
-          delete this.sessions[sessionId];
+          delete this.sessions[sessionId2];
           return;
         }
       }
@@ -61156,7 +61156,7 @@ var require_index_cjs = __commonJS({
       return value._bn !== void 0;
     }
     var uniquePublicKeyCounter = 1;
-    var PublicKey3 = class _PublicKey2 extends Struct {
+    var PublicKey2 = class _PublicKey2 extends Struct {
       /**
        * Create a new PublicKey object
        * @param value ed25519 public key as buffer or base-58 encoded string
@@ -61318,9 +61318,9 @@ var require_index_cjs = __commonJS({
         return isOnCurve(pubkey.toBytes());
       }
     };
-    _PublicKey = PublicKey3;
-    PublicKey3.default = new _PublicKey("11111111111111111111111111111111");
-    SOLANA_SCHEMA.set(PublicKey3, {
+    _PublicKey = PublicKey2;
+    PublicKey2.default = new _PublicKey("11111111111111111111111111111111");
+    SOLANA_SCHEMA.set(PublicKey2, {
       kind: "struct",
       fields: [["_bn", "u256"]]
     });
@@ -61352,7 +61352,7 @@ var require_index_cjs = __commonJS({
        * The public key for this account
        */
       get publicKey() {
-        return new PublicKey3(this._publicKey);
+        return new PublicKey2(this._publicKey);
       }
       /**
        * The **unencrypted** secret key for this account. The first 32 bytes
@@ -61363,7 +61363,7 @@ var require_index_cjs = __commonJS({
         return buffer.Buffer.concat([this._secretKey, this._publicKey], 64);
       }
     };
-    var BPF_LOADER_DEPRECATED_PROGRAM_ID = new PublicKey3("BPFLoader1111111111111111111111111111111111");
+    var BPF_LOADER_DEPRECATED_PROGRAM_ID = new PublicKey2("BPFLoader1111111111111111111111111111111111");
     var PACKET_DATA_SIZE = 1280 - 40 - 8;
     var VERSION_PREFIX_MASK = 127;
     var SIGNATURE_LENGTH_IN_BYTES = 64;
@@ -61594,7 +61594,7 @@ var require_index_cjs = __commonJS({
           const [payerAddress] = writableSigners[0];
           assert(payerAddress === this.payer.toBase58(), "Expected first writable signer key to be the fee payer");
         }
-        const staticAccountKeys = [...writableSigners.map(([address]) => new PublicKey3(address)), ...readonlySigners.map(([address]) => new PublicKey3(address)), ...writableNonSigners.map(([address]) => new PublicKey3(address)), ...readonlyNonSigners.map(([address]) => new PublicKey3(address))];
+        const staticAccountKeys = [...writableSigners.map(([address]) => new PublicKey2(address)), ...readonlySigners.map(([address]) => new PublicKey2(address)), ...writableNonSigners.map(([address]) => new PublicKey2(address)), ...readonlyNonSigners.map(([address]) => new PublicKey2(address))];
         return [header, staticAccountKeys];
       }
       extractTableLookup(lookupTable) {
@@ -61618,7 +61618,7 @@ var require_index_cjs = __commonJS({
         const drainedKeys = new Array();
         for (const [address, keyMeta] of this.keyMetaMap.entries()) {
           if (keyMetaFilter(keyMeta)) {
-            const key = new PublicKey3(address);
+            const key = new PublicKey2(address);
             const lookupTableIndex = lookupTableEntries.findIndex((entry) => entry.equals(key));
             if (lookupTableIndex >= 0) {
               assert(lookupTableIndex < 256, "Max lookup table index exceeded");
@@ -61653,7 +61653,7 @@ var require_index_cjs = __commonJS({
         this.instructions = void 0;
         this.indexToProgramIds = /* @__PURE__ */ new Map();
         this.header = args.header;
-        this.accountKeys = args.accountKeys.map((account) => new PublicKey3(account));
+        this.accountKeys = args.accountKeys.map((account) => new PublicKey2(account));
         this.recentBlockhash = args.recentBlockhash;
         this.instructions = args.instructions;
         this.instructions.forEach((ix) => this.indexToProgramIds.set(ix.programIdIndex, this.accountKeys[ix.programIdIndex]));
@@ -61779,7 +61779,7 @@ var require_index_cjs = __commonJS({
         let accountKeys = [];
         for (let i = 0; i < accountCount; i++) {
           const account = guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH);
-          accountKeys.push(new PublicKey3(buffer.Buffer.from(account)));
+          accountKeys.push(new PublicKey2(buffer.Buffer.from(account)));
         }
         const recentBlockhash = guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH);
         const instructionCount = decodeLength(byteArray);
@@ -62003,7 +62003,7 @@ var require_index_cjs = __commonJS({
         const staticAccountKeys = [];
         const staticAccountKeysLength = decodeLength(byteArray);
         for (let i = 0; i < staticAccountKeysLength; i++) {
-          staticAccountKeys.push(new PublicKey3(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH)));
+          staticAccountKeys.push(new PublicKey2(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH)));
         }
         const recentBlockhash = bs58__default.default.encode(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
         const instructionCount = decodeLength(byteArray);
@@ -62023,7 +62023,7 @@ var require_index_cjs = __commonJS({
         const addressTableLookupsCount = decodeLength(byteArray);
         const addressTableLookups = [];
         for (let i = 0; i < addressTableLookupsCount; i++) {
-          const accountKey = new PublicKey3(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
+          const accountKey = new PublicKey2(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
           const writableIndexesLength = decodeLength(byteArray);
           const writableIndexes = guardedSplice(byteArray, 0, writableIndexesLength);
           const readonlyIndexesLength = decodeLength(byteArray);
@@ -62263,7 +62263,7 @@ var require_index_cjs = __commonJS({
         });
         programIds.forEach((programId) => {
           accountMetas.push({
-            pubkey: new PublicKey3(programId),
+            pubkey: new PublicKey2(programId),
             isSigner: false,
             isWritable: false
           });
@@ -62856,15 +62856,15 @@ Missing signature for public key${sigErrors.missing.length === 1 ? "" : "(s)"} [
     var DEFAULT_TICKS_PER_SLOT = 64;
     var NUM_SLOTS_PER_SECOND = NUM_TICKS_PER_SECOND / DEFAULT_TICKS_PER_SLOT;
     var MS_PER_SLOT = 1e3 / NUM_SLOTS_PER_SECOND;
-    var SYSVAR_CLOCK_PUBKEY = new PublicKey3("SysvarC1ock11111111111111111111111111111111");
-    var SYSVAR_EPOCH_SCHEDULE_PUBKEY = new PublicKey3("SysvarEpochSchedu1e111111111111111111111111");
-    var SYSVAR_INSTRUCTIONS_PUBKEY = new PublicKey3("Sysvar1nstructions1111111111111111111111111");
-    var SYSVAR_RECENT_BLOCKHASHES_PUBKEY = new PublicKey3("SysvarRecentB1ockHashes11111111111111111111");
-    var SYSVAR_RENT_PUBKEY = new PublicKey3("SysvarRent111111111111111111111111111111111");
-    var SYSVAR_REWARDS_PUBKEY = new PublicKey3("SysvarRewards111111111111111111111111111111");
-    var SYSVAR_SLOT_HASHES_PUBKEY = new PublicKey3("SysvarS1otHashes111111111111111111111111111");
-    var SYSVAR_SLOT_HISTORY_PUBKEY = new PublicKey3("SysvarS1otHistory11111111111111111111111111");
-    var SYSVAR_STAKE_HISTORY_PUBKEY = new PublicKey3("SysvarStakeHistory1111111111111111111111111");
+    var SYSVAR_CLOCK_PUBKEY = new PublicKey2("SysvarC1ock11111111111111111111111111111111");
+    var SYSVAR_EPOCH_SCHEDULE_PUBKEY = new PublicKey2("SysvarEpochSchedu1e111111111111111111111111");
+    var SYSVAR_INSTRUCTIONS_PUBKEY = new PublicKey2("Sysvar1nstructions1111111111111111111111111");
+    var SYSVAR_RECENT_BLOCKHASHES_PUBKEY = new PublicKey2("SysvarRecentB1ockHashes11111111111111111111");
+    var SYSVAR_RENT_PUBKEY = new PublicKey2("SysvarRent111111111111111111111111111111111");
+    var SYSVAR_REWARDS_PUBKEY = new PublicKey2("SysvarRewards111111111111111111111111111111");
+    var SYSVAR_SLOT_HASHES_PUBKEY = new PublicKey2("SysvarS1otHashes111111111111111111111111111");
+    var SYSVAR_SLOT_HISTORY_PUBKEY = new PublicKey2("SysvarS1otHistory11111111111111111111111111");
+    var SYSVAR_STAKE_HISTORY_PUBKEY = new PublicKey2("SysvarStakeHistory1111111111111111111111111");
     var SendTransactionError = class extends Error {
       constructor({
         action,
@@ -63055,8 +63055,8 @@ Message: ${transactionMessage}.
       static fromAccountData(buffer2) {
         const nonceAccount = NonceAccountLayout.decode(toBuffer(buffer2), 0);
         return new _NonceAccount({
-          authorizedPubkey: new PublicKey3(nonceAccount.authorizedPubkey),
-          nonce: new PublicKey3(nonceAccount.nonce).toString(),
+          authorizedPubkey: new PublicKey2(nonceAccount.authorizedPubkey),
+          nonce: new PublicKey2(nonceAccount.nonce).toString(),
           feeCalculator: nonceAccount.feeCalculator
         });
       }
@@ -63118,7 +63118,7 @@ Message: ${transactionMessage}.
           newAccountPubkey: instruction.keys[1].pubkey,
           lamports,
           space,
-          programId: new PublicKey3(programId)
+          programId: new PublicKey2(programId)
         };
       }
       /**
@@ -63153,7 +63153,7 @@ Message: ${transactionMessage}.
           toPubkey: instruction.keys[2].pubkey,
           lamports,
           seed,
-          programId: new PublicKey3(programId)
+          programId: new PublicKey2(programId)
         };
       }
       /**
@@ -63184,10 +63184,10 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.AllocateWithSeed, instruction.data);
         return {
           accountPubkey: instruction.keys[0].pubkey,
-          basePubkey: new PublicKey3(base),
+          basePubkey: new PublicKey2(base),
           seed,
           space,
-          programId: new PublicKey3(programId)
+          programId: new PublicKey2(programId)
         };
       }
       /**
@@ -63201,7 +63201,7 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.Assign, instruction.data);
         return {
           accountPubkey: instruction.keys[0].pubkey,
-          programId: new PublicKey3(programId)
+          programId: new PublicKey2(programId)
         };
       }
       /**
@@ -63217,9 +63217,9 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.AssignWithSeed, instruction.data);
         return {
           accountPubkey: instruction.keys[0].pubkey,
-          basePubkey: new PublicKey3(base),
+          basePubkey: new PublicKey2(base),
           seed,
-          programId: new PublicKey3(programId)
+          programId: new PublicKey2(programId)
         };
       }
       /**
@@ -63238,11 +63238,11 @@ Message: ${transactionMessage}.
         return {
           fromPubkey: instruction.keys[0].pubkey,
           newAccountPubkey: instruction.keys[1].pubkey,
-          basePubkey: new PublicKey3(base),
+          basePubkey: new PublicKey2(base),
           seed,
           lamports,
           space,
-          programId: new PublicKey3(programId)
+          programId: new PublicKey2(programId)
         };
       }
       /**
@@ -63256,7 +63256,7 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.InitializeNonceAccount, instruction.data);
         return {
           noncePubkey: instruction.keys[0].pubkey,
-          authorizedPubkey: new PublicKey3(authorized2)
+          authorizedPubkey: new PublicKey2(authorized2)
         };
       }
       /**
@@ -63299,7 +63299,7 @@ Message: ${transactionMessage}.
         return {
           noncePubkey: instruction.keys[0].pubkey,
           authorizedPubkey: instruction.keys[1].pubkey,
-          newAuthorizedPubkey: new PublicKey3(authorized2)
+          newAuthorizedPubkey: new PublicKey2(authorized2)
         };
       }
       /**
@@ -63708,7 +63708,7 @@ Message: ${transactionMessage}.
         });
       }
     };
-    SystemProgram.programId = new PublicKey3("11111111111111111111111111111111");
+    SystemProgram.programId = new PublicKey2("11111111111111111111111111111111");
     var CHUNK_SIZE = PACKET_DATA_SIZE - 300;
     var Loader = class _Loader {
       /**
@@ -63875,7 +63875,7 @@ Message: ${transactionMessage}.
       }
     };
     Loader.chunkSize = CHUNK_SIZE;
-    var BPF_LOADER_PROGRAM_ID = new PublicKey3("BPFLoader2111111111111111111111111111111111");
+    var BPF_LOADER_PROGRAM_ID = new PublicKey2("BPFLoader2111111111111111111111111111111111");
     var BpfLoader = class {
       /**
        * Minimum number of signatures required to load a program not including
@@ -64671,8 +64671,8 @@ Message: ${transactionMessage}.
           deactivationSlot: meta.deactivationSlot,
           lastExtendedSlot: meta.lastExtendedSlot,
           lastExtendedSlotStartIndex: meta.lastExtendedStartIndex,
-          authority: meta.authority.length !== 0 ? new PublicKey3(meta.authority[0]) : void 0,
-          addresses: addresses.map((address) => new PublicKey3(address))
+          authority: meta.authority.length !== 0 ? new PublicKey2(meta.authority[0]) : void 0,
+          addresses: addresses.map((address) => new PublicKey2(address))
         };
       }
     };
@@ -64714,7 +64714,7 @@ Message: ${transactionMessage}.
       );
       return `${protocol}//${hostish}${websocketPort}${rest}`;
     }
-    var PublicKeyFromString = superstruct.coerce(superstruct.instance(PublicKey3), superstruct.string(), (value) => new PublicKey3(value));
+    var PublicKeyFromString = superstruct.coerce(superstruct.instance(PublicKey2), superstruct.string(), (value) => new PublicKey2(value));
     var RawAccountDataResult = superstruct.tuple([superstruct.string(), superstruct.literal("base64")]);
     var BufferFromRawAccountData = superstruct.coerce(superstruct.instance(buffer.Buffer), RawAccountDataResult, (value) => buffer.Buffer.from(value[0], "base64"));
     var BLOCKHASH_CACHE_TIMEOUT_MS = 30 * 1e3;
@@ -64799,7 +64799,7 @@ Message: ${transactionMessage}.
       if (version3 === 0) {
         return new MessageV0({
           header: response.header,
-          staticAccountKeys: response.accountKeys.map((accountKey) => new PublicKey3(accountKey)),
+          staticAccountKeys: response.accountKeys.map((accountKey) => new PublicKey2(accountKey)),
           recentBlockhash: response.recentBlockhash,
           compiledInstructions: response.instructions.map((ix) => ({
             programIdIndex: ix.programIdIndex,
@@ -68239,7 +68239,7 @@ Message: ${transactionMessage}.
        * @returns {PublicKey} PublicKey
        */
       get publicKey() {
-        return new PublicKey3(this._keypair.publicKey);
+        return new PublicKey2(this._keypair.publicKey);
       }
       /**
        * The raw secret key for this keypair
@@ -68317,7 +68317,7 @@ Message: ${transactionMessage}.
           lookupTable: instruction.keys[0].pubkey,
           authority: instruction.keys[1].pubkey,
           payer: instruction.keys.length > 2 ? instruction.keys[2].pubkey : void 0,
-          addresses: addresses.map((buffer2) => new PublicKey3(buffer2))
+          addresses: addresses.map((buffer2) => new PublicKey2(buffer2))
         };
       }
       static decodeCloseLookupTable(instruction) {
@@ -68369,7 +68369,7 @@ Message: ${transactionMessage}.
       constructor() {
       }
       static createLookupTable(params) {
-        const [lookupTableAddress, bumpSeed] = PublicKey3.findProgramAddressSync([params.authority.toBuffer(), codecsNumbers.getU64Encoder().encode(params.recentSlot)], this.programId);
+        const [lookupTableAddress, bumpSeed] = PublicKey2.findProgramAddressSync([params.authority.toBuffer(), codecsNumbers.getU64Encoder().encode(params.recentSlot)], this.programId);
         const type = LOOKUP_TABLE_INSTRUCTION_LAYOUTS.CreateLookupTable;
         const data = encodeData(type, {
           recentSlot: BigInt(params.recentSlot),
@@ -68488,7 +68488,7 @@ Message: ${transactionMessage}.
         });
       }
     };
-    AddressLookupTableProgram.programId = new PublicKey3("AddressLookupTab1e1111111111111111111111111");
+    AddressLookupTableProgram.programId = new PublicKey2("AddressLookupTab1e1111111111111111111111111");
     var ComputeBudgetInstruction = class {
       /**
        * @internal
@@ -68642,7 +68642,7 @@ Message: ${transactionMessage}.
         });
       }
     };
-    ComputeBudgetProgram.programId = new PublicKey3("ComputeBudget111111111111111111111111111111");
+    ComputeBudgetProgram.programId = new PublicKey2("ComputeBudget111111111111111111111111111111");
     var PRIVATE_KEY_BYTES$1 = 64;
     var PUBLIC_KEY_BYTES$1 = 32;
     var SIGNATURE_BYTES = 64;
@@ -68722,7 +68722,7 @@ Message: ${transactionMessage}.
         }
       }
     };
-    Ed25519Program.programId = new PublicKey3("Ed25519SigVerify111111111111111111111111111");
+    Ed25519Program.programId = new PublicKey2("Ed25519SigVerify111111111111111111111111111");
     var ecdsaSign = (msgHash, privKey) => {
       const signature2 = secp256k1.secp256k1.sign(msgHash, privKey);
       return [signature2.toCompactRawBytes(), signature2.recovery];
@@ -68856,9 +68856,9 @@ Message: ${transactionMessage}.
         }
       }
     };
-    Secp256k1Program.programId = new PublicKey3("KeccakSecp256k11111111111111111111111111111");
+    Secp256k1Program.programId = new PublicKey2("KeccakSecp256k11111111111111111111111111111");
     var _Lockup;
-    var STAKE_CONFIG_ID = new PublicKey3("StakeConfig11111111111111111111111111111111");
+    var STAKE_CONFIG_ID = new PublicKey2("StakeConfig11111111111111111111111111111111");
     var Authorized = class {
       /**
        * Create a new Authorized object
@@ -68889,7 +68889,7 @@ Message: ${transactionMessage}.
        */
     };
     _Lockup = Lockup;
-    Lockup.default = new _Lockup(0, 0, PublicKey3.default);
+    Lockup.default = new _Lockup(0, 0, PublicKey2.default);
     var StakeInstruction = class {
       /**
        * @internal
@@ -68927,8 +68927,8 @@ Message: ${transactionMessage}.
         } = decodeData$1(STAKE_INSTRUCTION_LAYOUTS.Initialize, instruction.data);
         return {
           stakePubkey: instruction.keys[0].pubkey,
-          authorized: new Authorized(new PublicKey3(authorized2.staker), new PublicKey3(authorized2.withdrawer)),
-          lockup: new Lockup(lockup2.unixTimestamp, lockup2.epoch, new PublicKey3(lockup2.custodian))
+          authorized: new Authorized(new PublicKey2(authorized2.staker), new PublicKey2(authorized2.withdrawer)),
+          lockup: new Lockup(lockup2.unixTimestamp, lockup2.epoch, new PublicKey2(lockup2.custodian))
         };
       }
       /**
@@ -68957,7 +68957,7 @@ Message: ${transactionMessage}.
         const o = {
           stakePubkey: instruction.keys[0].pubkey,
           authorizedPubkey: instruction.keys[2].pubkey,
-          newAuthorizedPubkey: new PublicKey3(newAuthorized),
+          newAuthorizedPubkey: new PublicKey2(newAuthorized),
           stakeAuthorizationType: {
             index: stakeAuthorizationType
           }
@@ -68983,8 +68983,8 @@ Message: ${transactionMessage}.
           stakePubkey: instruction.keys[0].pubkey,
           authorityBase: instruction.keys[1].pubkey,
           authoritySeed,
-          authorityOwner: new PublicKey3(authorityOwner),
-          newAuthorizedPubkey: new PublicKey3(newAuthorized),
+          authorityOwner: new PublicKey2(authorityOwner),
+          newAuthorizedPubkey: new PublicKey2(newAuthorized),
           stakeAuthorizationType: {
             index: stakeAuthorizationType
           }
@@ -69538,7 +69538,7 @@ Message: ${transactionMessage}.
         });
       }
     };
-    StakeProgram.programId = new PublicKey3("Stake11111111111111111111111111111111111111");
+    StakeProgram.programId = new PublicKey2("Stake11111111111111111111111111111111111111");
     StakeProgram.space = 200;
     var VoteInit = class {
       /** [0, 100] */
@@ -69590,7 +69590,7 @@ Message: ${transactionMessage}.
         return {
           votePubkey: instruction.keys[0].pubkey,
           nodePubkey: instruction.keys[3].pubkey,
-          voteInit: new VoteInit(new PublicKey3(voteInit2.nodePubkey), new PublicKey3(voteInit2.authorizedVoter), new PublicKey3(voteInit2.authorizedWithdrawer), voteInit2.commission)
+          voteInit: new VoteInit(new PublicKey2(voteInit2.nodePubkey), new PublicKey2(voteInit2.authorizedVoter), new PublicKey2(voteInit2.authorizedWithdrawer), voteInit2.commission)
         };
       }
       /**
@@ -69606,7 +69606,7 @@ Message: ${transactionMessage}.
         return {
           votePubkey: instruction.keys[0].pubkey,
           authorizedPubkey: instruction.keys[2].pubkey,
-          newAuthorizedPubkey: new PublicKey3(newAuthorized),
+          newAuthorizedPubkey: new PublicKey2(newAuthorized),
           voteAuthorizationType: {
             index: voteAuthorizationType
           }
@@ -69628,9 +69628,9 @@ Message: ${transactionMessage}.
         } = decodeData$1(VOTE_INSTRUCTION_LAYOUTS.AuthorizeWithSeed, instruction.data);
         return {
           currentAuthorityDerivedKeyBasePubkey: instruction.keys[2].pubkey,
-          currentAuthorityDerivedKeyOwnerPubkey: new PublicKey3(currentAuthorityDerivedKeyOwnerPubkey),
+          currentAuthorityDerivedKeyOwnerPubkey: new PublicKey2(currentAuthorityDerivedKeyOwnerPubkey),
           currentAuthorityDerivedKeySeed,
-          newAuthorizedPubkey: new PublicKey3(newAuthorized),
+          newAuthorizedPubkey: new PublicKey2(newAuthorized),
           voteAuthorizationType: {
             index: voteAuthorizationType
           },
@@ -69921,9 +69921,9 @@ Message: ${transactionMessage}.
         });
       }
     };
-    VoteProgram.programId = new PublicKey3("Vote111111111111111111111111111111111111111");
+    VoteProgram.programId = new PublicKey2("Vote111111111111111111111111111111111111111");
     VoteProgram.space = 3762;
-    var VALIDATOR_INFO_KEY = new PublicKey3("Va1idator1nfo111111111111111111111111111111");
+    var VALIDATOR_INFO_KEY = new PublicKey2("Va1idator1nfo111111111111111111111111111111");
     var InfoString = superstruct.type({
       name: superstruct.string(),
       website: superstruct.optional(superstruct.string()),
@@ -69957,7 +69957,7 @@ Message: ${transactionMessage}.
         if (configKeyCount !== 2) return null;
         const configKeys = [];
         for (let i = 0; i < 2; i++) {
-          const publicKey2 = new PublicKey3(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
+          const publicKey2 = new PublicKey2(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
           const isSigner = guardedShift(byteArray) === 1;
           configKeys.push({
             publicKey: publicKey2,
@@ -69975,7 +69975,7 @@ Message: ${transactionMessage}.
         return null;
       }
     };
-    var VOTE_PROGRAM_ID = new PublicKey3("Vote111111111111111111111111111111111111111");
+    var VOTE_PROGRAM_ID = new PublicKey2("Vote111111111111111111111111111111111111111");
     var VoteAccountLayout = BufferLayout__namespace.struct([
       publicKey("nodePubkey"),
       publicKey("authorizedWithdrawer"),
@@ -70032,8 +70032,8 @@ Message: ${transactionMessage}.
           rootSlot = null;
         }
         return new _VoteAccount({
-          nodePubkey: new PublicKey3(va.nodePubkey),
-          authorizedWithdrawer: new PublicKey3(va.authorizedWithdrawer),
+          nodePubkey: new PublicKey2(va.nodePubkey),
+          authorizedWithdrawer: new PublicKey2(va.authorizedWithdrawer),
           commission: va.commission,
           votes: va.votes,
           rootSlot,
@@ -70050,7 +70050,7 @@ Message: ${transactionMessage}.
     }) {
       return {
         epoch,
-        authorizedVoter: new PublicKey3(authorizedVoter)
+        authorizedVoter: new PublicKey2(authorizedVoter)
       };
     }
     function parsePriorVoters({
@@ -70059,7 +70059,7 @@ Message: ${transactionMessage}.
       targetEpoch
     }) {
       return {
-        authorizedPubkey: new PublicKey3(authorizedPubkey),
+        authorizedPubkey: new PublicKey2(authorizedPubkey),
         epochOfLastAuthorizedSwitch,
         targetEpoch
       };
@@ -70161,7 +70161,7 @@ Message: ${transactionMessage}.
     exports.NonceAccount = NonceAccount;
     exports.PACKET_DATA_SIZE = PACKET_DATA_SIZE;
     exports.PUBLIC_KEY_LENGTH = PUBLIC_KEY_LENGTH;
-    exports.PublicKey = PublicKey3;
+    exports.PublicKey = PublicKey2;
     exports.SIGNATURE_LENGTH_IN_BYTES = SIGNATURE_LENGTH_IN_BYTES;
     exports.SOLANA_SCHEMA = SOLANA_SCHEMA;
     exports.STAKE_CONFIG_ID = STAKE_CONFIG_ID;
@@ -70211,7 +70211,7 @@ Message: ${transactionMessage}.
 });
 
 // src/app.ts
-var import_express11 = __toESM(require_express2(), 1);
+var import_express12 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
 
 // ../../node_modules/.pnpm/helmet@8.1.0/node_modules/helmet/index.mjs
@@ -70764,7 +70764,7 @@ var import_connect_pg_simple = __toESM(require_connect_pg_simple(), 1);
 var import_passport2 = __toESM(require_lib7(), 1);
 
 // src/routes/index.ts
-var import_express10 = __toESM(require_express2(), 1);
+var import_express11 = __toESM(require_express2(), 1);
 
 // src/routes/health.ts
 var import_express = __toESM(require_express2(), 1);
@@ -81714,14 +81714,16 @@ var referralsRelations = relations(referrals, ({ one }) => ({
 
 // ../../lib/db/src/index.ts
 var { Pool: Pool3 } = esm_default;
-if (!process.env.DATABASE_URL) {
+var dbUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL || "";
+if (!dbUrl) {
   throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?"
+    "DATABASE_URL (or NEON_DATABASE_URL) must be set. Did you forget to provision a database?"
   );
 }
+var needsSsl = process.env.NODE_ENV === "production" || dbUrl.includes("neon.tech");
 var pool = new Pool3({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : void 0
+  connectionString: dbUrl,
+  ssl: needsSsl ? { rejectUnauthorized: false } : void 0
 });
 var db = drizzle(pool, { schema: schema_exports });
 
@@ -82675,7 +82677,7 @@ var twitterLimiter = rate_limit_default({
 });
 router2.get("/twitter/timeline/:username", twitterLimiter, async (req, res) => {
   try {
-    const { username } = req.params;
+    const username = String(req.params.username);
     if (!USERNAME_RE.test(username)) {
       res.status(400).json({ error: "Invalid username" });
       return;
@@ -82764,10 +82766,254 @@ var twitter_default = router2;
 var import_express3 = __toESM(require_express2(), 1);
 var import_passport = __toESM(require_lib7(), 1);
 var import_passport_google_oauth20 = __toESM(require_lib9(), 1);
+
+// src/lib/logger.ts
+var import_pino = __toESM(require_pino(), 1);
+var isProduction = process.env.NODE_ENV === "production";
+var logger = (0, import_pino.default)({
+  level: process.env.LOG_LEVEL ?? "info",
+  redact: [
+    "req.headers.authorization",
+    "req.headers.cookie",
+    "res.headers['set-cookie']"
+  ],
+  ...isProduction ? {} : {
+    transport: {
+      target: "pino-pretty",
+      options: { colorize: true }
+    }
+  }
+});
+
+// src/middleware/admin-auth.ts
+var ADMIN_IDLE_TIMEOUT_MS = 8 * 60 * 60 * 1e3;
+var SUSPICIOUS_REAUTH_MINUTES = 10;
+var MAX_IP_CHANGES_BEFORE_KILL = 5;
+var MAX_UA_CHANGES_BEFORE_KILL = 2;
+var MAX_IP_HISTORY_SIZE = 10;
+function getClientIp(req) {
+  return req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? req.socket?.remoteAddress ?? "unknown";
+}
+function normalizeUa(req) {
+  return (req.headers["user-agent"] ?? "unknown").slice(0, 300);
+}
+function sessionId(req) {
+  return req.session?.id ? req.session.id.slice(0, 12) + "\u2026" : "no-session";
+}
+function securityAlert(type, req, extra = {}) {
+  logger.warn(
+    {
+      security: true,
+      alert: true,
+      alertType: type,
+      sessionId: sessionId(req),
+      userId: req.session?.userId,
+      userEmail: req.session?.userEmail,
+      ip: getClientIp(req),
+      ua: normalizeUa(req).slice(0, 80),
+      path: req.path,
+      method: req.method,
+      securityLevel: req.session?.securityLevel,
+      ipChangeCount: req.session?.ipChangeCount,
+      uaChangeCount: req.session?.uaChangeCount,
+      ipHistory: req.session?.ipHistory,
+      ...extra
+    },
+    `[SECURITY_ALERT] ${type}`
+  );
+}
+function terminateSession(req, res, reason, alertType) {
+  if (req.session) req.session.securityLevel = 3;
+  securityAlert(alertType, req, { terminationReason: reason });
+  req.session.destroy(() => {
+  });
+  res.status(401).json({
+    error: "Session terminated for security reasons",
+    code: "SESSION_TERMINATED",
+    reason
+  });
+}
+function analyzeSessionBinding(req, res, ip, ua) {
+  const s = req.session;
+  if (s.ipChangeCount === void 0) s.ipChangeCount = 0;
+  if (s.uaChangeCount === void 0) s.uaChangeCount = 0;
+  if (s.ipHistory === void 0) s.ipHistory = [s.sessionLoginIp ?? ip];
+  if (s.requestCount === void 0) s.requestCount = 0;
+  if (s.securityLevel === void 0) s.securityLevel = 0;
+  s.requestCount = (s.requestCount ?? 0) + 1;
+  s.lastRequestAt = Date.now();
+  const loginIp = s.sessionLoginIp;
+  const loginUa = s.sessionUserAgent;
+  const ipChanged = loginIp !== void 0 && loginIp !== ip;
+  const uaChanged = loginUa !== void 0 && loginUa !== ua;
+  if (ipChanged && !s.ipHistory.includes(ip)) {
+    s.ipHistory = [...s.ipHistory, ip].slice(-MAX_IP_HISTORY_SIZE);
+    s.ipChangeCount += 1;
+  }
+  if (uaChanged) {
+    s.uaChangeCount = (s.uaChangeCount ?? 0) + 1;
+  }
+  const uniqueIps = new Set(s.ipHistory).size;
+  if (ipChanged && uaChanged) {
+    terminateSession(req, res, "Both IP and User-Agent changed simultaneously", "DUAL_CHANGE_ATTACK");
+    return false;
+  }
+  if (uniqueIps > MAX_IP_CHANGES_BEFORE_KILL) {
+    terminateSession(req, res, `Session used from ${uniqueIps} different IPs`, "RAPID_IP_SWITCHING");
+    return false;
+  }
+  if ((s.uaChangeCount ?? 0) > MAX_UA_CHANGES_BEFORE_KILL) {
+    terminateSession(req, res, `User-Agent changed ${s.uaChangeCount} times`, "UA_MANIPULATION");
+    return false;
+  }
+  if (ipChanged) {
+    s.sessionSuspicious = true;
+    s.suspiciousReason = s.suspiciousReason ? s.suspiciousReason + "; IP_CHANGE" : "IP_CHANGE";
+    if ((s.securityLevel ?? 0) < 2) s.securityLevel = 2;
+    securityAlert("IP_CHANGE_DETECTED", req, {
+      loginIp,
+      currentIp: ip,
+      ipChangeCount: s.ipChangeCount,
+      uniqueIps,
+      action: "FLAGGED + requireRecentAuth"
+    });
+  }
+  if (uaChanged) {
+    s.sessionSuspicious = true;
+    s.suspiciousReason = s.suspiciousReason ? s.suspiciousReason + "; UA_CHANGE" : "UA_CHANGE";
+    if ((s.securityLevel ?? 0) < 2) s.securityLevel = 2;
+    securityAlert("UA_CHANGE_DETECTED", req, {
+      loginUa: loginUa?.slice(0, 80),
+      currentUa: ua.slice(0, 80),
+      uaChangeCount: s.uaChangeCount,
+      action: "FLAGGED + requireRecentAuth"
+    });
+  }
+  if (!ipChanged && !uaChanged && (s.securityLevel ?? 0) === 0) {
+    s.securityLevel = 0;
+  }
+  return true;
+}
+function requireAdminAuth(req, res, next) {
+  if (!req.path.startsWith("/admin")) {
+    return next();
+  }
+  const ip = getClientIp(req);
+  const ua = normalizeUa(req);
+  if (!req.session?.userId || !req.session?.isAdmin) {
+    logger.warn(
+      {
+        ip,
+        path: req.path,
+        sessionId: sessionId(req)
+      },
+      "ADMIN_ACCESS_DENIED: not authenticated"
+    );
+    res.status(401).json({ error: "Unauthorized", code: "NOT_AUTHENTICATED" });
+    return;
+  }
+  const lastActivity = req.session.adminLastActivity ?? req.session.adminLoginAt ?? 0;
+  if (Date.now() - lastActivity > ADMIN_IDLE_TIMEOUT_MS) {
+    logger.warn(
+      {
+        ip,
+        userId: req.session.userId,
+        userEmail: req.session.userEmail,
+        path: req.path,
+        idleHours: ((Date.now() - lastActivity) / 36e5).toFixed(1)
+      },
+      "ADMIN_SESSION_EXPIRED: idle timeout exceeded"
+    );
+    req.session.destroy(() => {
+    });
+    res.status(401).json({ error: "Session expired", code: "SESSION_EXPIRED" });
+    return;
+  }
+  const continueOk = analyzeSessionBinding(req, res, ip, ua);
+  if (!continueOk) return;
+  if ((req.session.securityLevel ?? 0) >= 2) {
+    const loginAt = req.session.adminLoginAt ?? 0;
+    const elapsedMs = Date.now() - loginAt;
+    const limitMs = SUSPICIOUS_REAUTH_MINUTES * 60 * 1e3;
+    if (elapsedMs > limitMs) {
+      securityAlert("SUSPICIOUS_SESSION_REAUTH_REQUIRED", req, {
+        suspiciousReason: req.session.suspiciousReason,
+        loginAgeMinutes: Math.floor(elapsedMs / 6e4),
+        requiredWithin: SUSPICIOUS_REAUTH_MINUTES
+      });
+      res.status(403).json({
+        error: "Re-authentication required (session flagged)",
+        code: "REAUTH_REQUIRED",
+        message: `Your session was flagged for suspicious activity (${req.session.suspiciousReason}). Please log in again to continue.`,
+        loginAgeMinutes: Math.floor(elapsedMs / 6e4),
+        sessionFlagged: true
+      });
+      return;
+    }
+  }
+  req.session.adminLastActivity = Date.now();
+  next();
+}
+function requireRecentAuth(minutes) {
+  return function recentAuthGuard(req, res, next) {
+    const loginAt = req.session?.adminLoginAt ?? 0;
+    const elapsedMs = Date.now() - loginAt;
+    const limitMs = minutes * 60 * 1e3;
+    if (elapsedMs > limitMs) {
+      logger.warn(
+        {
+          userId: req.session?.userId,
+          userEmail: req.session?.userEmail,
+          ip: getClientIp(req),
+          path: req.path,
+          loginAgeMinutes: Math.floor(elapsedMs / 6e4),
+          requiredWithinMinutes: minutes,
+          sessionFlagged: req.session?.sessionSuspicious ?? false
+        },
+        "ADMIN_REAUTH_REQUIRED: sensitive action blocked \u2014 login too old"
+      );
+      res.status(403).json({
+        error: "Re-authentication required",
+        code: "REAUTH_REQUIRED",
+        message: `This action requires a fresh login within the last ${minutes} minutes. Please log out and log in again.`,
+        loginAgeMinutes: Math.floor(elapsedMs / 6e4)
+      });
+      return;
+    }
+    logger.info(
+      {
+        userId: req.session?.userId,
+        userEmail: req.session?.userEmail,
+        path: req.path,
+        loginAgeMinutes: Math.floor(elapsedMs / 6e4),
+        requiredWithinMinutes: minutes
+      },
+      "ADMIN_SENSITIVE_ACTION: recent-auth check passed"
+    );
+    next();
+  };
+}
+
+// src/routes/auth.ts
 var ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
 var GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID ?? "";
 var GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET ?? "";
 var CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL ?? "/api/auth/google/callback";
+var IS_PROD = process.env.NODE_ENV === "production";
+var COOKIE_OPTS = {
+  path: "/",
+  httpOnly: true,
+  secure: IS_PROD,
+  sameSite: "lax"
+};
+var ADMIN_IDLE_TIMEOUT_MS2 = 8 * 60 * 60 * 1e3;
+var authLimiter = rate_limit_default({
+  windowMs: 15 * 60 * 1e3,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many auth requests. Please try again later." }
+});
 if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
   import_passport.default.use(
     new import_passport_google_oauth20.Strategy(
@@ -82780,6 +83026,7 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
         try {
           const email = profile.emails?.[0]?.value ?? "";
           if (!email || !ADMIN_EMAILS.includes(email.toLowerCase()) && ADMIN_EMAILS.length > 0) {
+            logger.warn({ email }, "AUTH_GOOGLE: email not authorized as admin");
             return done(null, false, { message: "Email not authorized as admin" });
           }
           const existing = await db.select().from(adminUsers).where(eq(adminUsers.googleId, profile.id)).limit(1);
@@ -82816,48 +83063,123 @@ import_passport.default.deserializeUser(async (id, done) => {
   }
 });
 var router3 = (0, import_express3.Router)();
-router3.get("/auth/google", (req, res, next) => {
+router3.get("/auth/google", authLimiter, (req, res, next) => {
   if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
     res.status(503).json({ error: "Google OAuth not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET." });
     return;
   }
+  logger.info({ ip: getClientIp(req) }, "AUTH_GOOGLE: OAuth flow initiated");
   import_passport.default.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
 });
 router3.get(
   "/auth/google/callback",
+  authLimiter,
   (req, res, next) => {
     import_passport.default.authenticate("google", { failureRedirect: "/admin?error=unauthorized" })(req, res, next);
   },
   (req, res) => {
     const user = req.user;
+    const ip = getClientIp(req);
+    const ua = normalizeUa(req);
     if (user) {
       req.session.regenerate((err) => {
         if (err) {
+          logger.error({ err, ip }, "AUTH_GOOGLE: session regenerate failed");
           res.redirect("/admin?error=session_error");
           return;
         }
+        const now = Date.now();
         req.session.userId = user.id;
         req.session.userEmail = user.email;
-        res.redirect("/admin/dashboard");
+        req.session.isAdmin = true;
+        req.session.adminLoginAt = now;
+        req.session.adminLastActivity = now;
+        req.session.sessionUserAgent = ua;
+        req.session.sessionLoginIp = ip;
+        req.session.securityLevel = 0;
+        req.session.sessionSuspicious = false;
+        req.session.ipChangeCount = 0;
+        req.session.uaChangeCount = 0;
+        req.session.ipHistory = [ip];
+        req.session.requestCount = 0;
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            logger.error({ saveErr, ip }, "AUTH_GOOGLE: session save failed");
+            res.redirect("/admin?error=session_error");
+            return;
+          }
+          logger.info(
+            { userId: user.id, email: user.email, ip, ua: ua.slice(0, 80) },
+            "AUTH_LOGIN: admin login success \u2014 session bound to UA+IP"
+          );
+          res.redirect("/admin/dashboard");
+        });
       });
     } else {
+      logger.warn({ ip }, "AUTH_GOOGLE: login failed \u2014 user not authorized");
       res.redirect("/admin?error=unauthorized");
     }
   }
 );
 router3.get("/auth/me", (req, res) => {
-  if (!req.session?.userId) {
+  const ip = getClientIp(req);
+  if (!req.session?.userId || !req.session?.isAdmin) {
     res.status(401).json({ authenticated: false });
     return;
   }
+  const lastActivity = req.session.adminLastActivity ?? req.session.adminLoginAt ?? 0;
+  if (Date.now() - lastActivity > ADMIN_IDLE_TIMEOUT_MS2) {
+    logger.warn(
+      { userId: req.session.userId, userEmail: req.session.userEmail, ip },
+      "AUTH_ME: session idle timeout \u2014 destroying"
+    );
+    securityAlert("SESSION_IDLE_EXPIRED", req, { idleMs: Date.now() - lastActivity });
+    req.session.destroy(() => {
+    });
+    res.status(401).json({ authenticated: false, reason: "session_expired" });
+    return;
+  }
+  const loginAge = Math.floor((Date.now() - (req.session.adminLoginAt ?? Date.now())) / 6e4);
+  logger.info(
+    {
+      userId: req.session.userId,
+      userEmail: req.session.userEmail,
+      ip,
+      loginAgeMinutes: loginAge,
+      securityLevel: req.session.securityLevel ?? 0,
+      suspicious: req.session.sessionSuspicious ?? false,
+      requestCount: req.session.requestCount ?? 0,
+      source: "SESSION_REUSE"
+    },
+    "AUTH_ME: session reused"
+  );
+  req.session.adminLastActivity = Date.now();
+  req.session.requestCount = (req.session.requestCount ?? 0) + 1;
   res.json({
     authenticated: true,
-    user: req.user
+    user: req.user,
+    security: {
+      level: req.session.securityLevel ?? 0,
+      suspicious: req.session.sessionSuspicious ?? false,
+      suspiciousReason: req.session.suspiciousReason,
+      ipChangeCount: req.session.ipChangeCount ?? 0,
+      uaChangeCount: req.session.uaChangeCount ?? 0,
+      requestCount: req.session.requestCount,
+      loginAgeMinutes: loginAge
+    }
   });
 });
-router3.post("/auth/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.clearCookie("__pwife_sid", { path: "/" });
+router3.post("/auth/logout", authLimiter, (req, res) => {
+  const userId = req.session?.userId;
+  const userEmail = req.session?.userEmail;
+  const ip = getClientIp(req);
+  req.session.destroy((err) => {
+    if (err) {
+      logger.error({ err, ip }, "AUTH_LOGOUT: session destroy failed");
+    } else {
+      logger.info({ userId, userEmail, ip }, "AUTH_LOGOUT: admin logged out");
+    }
+    res.clearCookie("__pwife_sid", COOKIE_OPTS);
     res.json({ success: true });
   });
 });
@@ -82865,38 +83187,7 @@ var auth_default = router3;
 
 // src/routes/admin.ts
 var import_express4 = __toESM(require_express2(), 1);
-
-// src/middleware/admin-auth.ts
-function requireAdminAuth(req, res, next) {
-  if (!req.path.startsWith("/admin")) {
-    return next();
-  }
-  if (!req.session?.userId) {
-    res.status(401).json({ error: "Unauthorized", code: "NOT_AUTHENTICATED" });
-    return;
-  }
-  next();
-}
-
-// src/lib/logger.ts
-var import_pino = __toESM(require_pino(), 1);
-var isProduction = process.env.NODE_ENV === "production";
-var logger = (0, import_pino.default)({
-  level: process.env.LOG_LEVEL ?? "info",
-  redact: [
-    "req.headers.authorization",
-    "req.headers.cookie",
-    "res.headers['set-cookie']"
-  ],
-  ...isProduction ? {} : {
-    transport: {
-      target: "pino-pretty",
-      options: { colorize: true }
-    }
-  }
-});
-
-// src/routes/admin.ts
+var REAUTH_WINDOW_MINUTES = 15;
 var SOLANA_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 var adminLimiter = rate_limit_default({
   windowMs: 5 * 60 * 1e3,
@@ -83038,7 +83329,7 @@ router4.get("/admin/config", async (_req, res) => {
     res.status(500).json({ error: "Failed to fetch config" });
   }
 });
-router4.post("/admin/presale/pause", async (req, res) => {
+router4.post("/admin/presale/pause", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   try {
     await db.insert(presaleConfig).values({ id: 1, isActive: false, updatedAt: /* @__PURE__ */ new Date() }).onConflictDoUpdate({ target: presaleConfig.id, set: { isActive: false, updatedAt: /* @__PURE__ */ new Date() } });
     auditLog(req, "presale.pause");
@@ -83048,7 +83339,7 @@ router4.post("/admin/presale/pause", async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to pause presale" });
   }
 });
-router4.post("/admin/presale/resume", async (req, res) => {
+router4.post("/admin/presale/resume", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   try {
     await db.insert(presaleConfig).values({ id: 1, isActive: true, updatedAt: /* @__PURE__ */ new Date() }).onConflictDoUpdate({ target: presaleConfig.id, set: { isActive: true, updatedAt: /* @__PURE__ */ new Date() } });
     auditLog(req, "presale.resume");
@@ -83058,7 +83349,7 @@ router4.post("/admin/presale/resume", async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to resume presale" });
   }
 });
-router4.post("/admin/presale/claim", async (req, res) => {
+router4.post("/admin/presale/claim", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   try {
     const { enabled } = req.body;
     if (typeof enabled !== "boolean") {
@@ -83073,7 +83364,7 @@ router4.post("/admin/presale/claim", async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to update claim status" });
   }
 });
-router4.post("/admin/presale/staking", async (req, res) => {
+router4.post("/admin/presale/staking", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   try {
     const { enabled } = req.body;
     if (typeof enabled !== "boolean") {
@@ -83088,7 +83379,7 @@ router4.post("/admin/presale/staking", async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to update staking status" });
   }
 });
-router4.post("/admin/presale/withdraw", async (req, res) => {
+router4.post("/admin/presale/withdraw", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   auditLog(req, "presale.withdraw_initiated");
   res.json({
     success: true,
@@ -83102,6 +83393,7 @@ router4.get("/admin/referrals", async (req, res) => {
     const limit = Math.min(200, Math.max(1, Number(req.query.limit ?? 50) || 50));
     const offset = (page - 1) * limit;
     const statusFilter = req.query.status;
+    logger.info({ page, limit, statusFilter: statusFilter ?? "all", source: "DB_QUERY" }, "[ADMIN_REFERRALS] Querying referrals from DB");
     const whereClause = statusFilter && ["pending", "paid"].includes(statusFilter) ? eq(referrals.status, statusFilter) : void 0;
     const rows = whereClause ? await db.select({
       id: referrals.id,
@@ -83121,6 +83413,7 @@ router4.get("/admin/referrals", async (req, res) => {
       createdAt: referrals.createdAt
     }).from(referrals).orderBy(desc(referrals.createdAt)).limit(limit).offset(offset);
     const [{ total }] = whereClause ? await db.select({ total: count() }).from(referrals).where(whereClause) : await db.select({ total: count() }).from(referrals);
+    logger.info({ rowCount: rows.length, total: Number(total), source: "DB_READ" }, "[ADMIN_REFERRALS] \u2713 Returned from DB");
     res.json({
       referrals: rows.map((r) => ({
         ...r,
@@ -83135,11 +83428,11 @@ router4.get("/admin/referrals", async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err);
+    logger.error({ err }, "[ADMIN_REFERRALS] DB error");
     res.status(500).json({ error: "Failed to fetch referrals" });
   }
 });
-router4.post("/admin/referrals/mark-paid", async (req, res) => {
+router4.post("/admin/referrals/mark-paid", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
   try {
     const { walletAddress } = req.body;
     if (walletAddress !== void 0 && !SOLANA_ADDRESS_RE.test(walletAddress)) {
@@ -83148,22 +83441,12 @@ router4.post("/admin/referrals/mark-paid", async (req, res) => {
     }
     if (walletAddress) {
       auditLog(req, "referral.mark_paid_single", { walletAddress: walletAddress.slice(0, 8) + "..." });
-      await db.update(referrals).set({ status: "paid" }).where(sql`${referrals.referrerWallet} = ${walletAddress} AND ${referrals.status} = 'pending'`);
-      const [referrerCode] = await db.select({ pendingTokens: referralCodes.pendingTokens, paidTokens: referralCodes.paidTokens }).from(referralCodes).where(eq(referralCodes.walletAddress, walletAddress)).limit(1);
-      if (referrerCode) {
-        const newPaid = Number(referrerCode.paidTokens) + Number(referrerCode.pendingTokens);
-        await db.update(referralCodes).set({ paidTokens: String(newPaid), pendingTokens: "0" }).where(eq(referralCodes.walletAddress, walletAddress));
-      }
-      res.json({ success: true, message: `Rewards marked as paid for ${walletAddress.slice(0, 8)}...` });
+      const result = await db.update(referrals).set({ status: "paid" }).where(sql`${referrals.referrerWallet} = ${walletAddress} AND ${referrals.status} = 'pending'`).returning({ id: referrals.id });
+      res.json({ success: true, message: `Rewards marked as paid for ${walletAddress.slice(0, 8)}...`, updated: result.length });
     } else {
-      await db.update(referrals).set({ status: "paid" }).where(eq(referrals.status, "pending"));
-      const allCodes = await db.select({ walletAddress: referralCodes.walletAddress, pendingTokens: referralCodes.pendingTokens, paidTokens: referralCodes.paidTokens }).from(referralCodes).where(sql`${referralCodes.pendingTokens}::numeric > 0`);
-      for (const rc of allCodes) {
-        const newPaid = Number(rc.paidTokens) + Number(rc.pendingTokens);
-        await db.update(referralCodes).set({ paidTokens: String(newPaid), pendingTokens: "0" }).where(eq(referralCodes.walletAddress, rc.walletAddress));
-      }
-      auditLog(req, "referral.mark_paid_all", { count: allCodes.length });
-      res.json({ success: true, message: "All pending referral rewards marked as paid" });
+      const result = await db.update(referrals).set({ status: "paid" }).where(eq(referrals.status, "pending")).returning({ id: referrals.id });
+      auditLog(req, "referral.mark_paid_all", { count: result.length });
+      res.json({ success: true, message: "All pending referral rewards marked as paid", updated: result.length });
     }
   } catch (err) {
     logger.error({ err }, "mark-paid error");
@@ -83180,26 +83463,445 @@ router4.get("/admin/users", async (_req, res) => {
 });
 var admin_default = router4;
 
-// src/routes/tracker.ts
+// src/routes/sessions.ts
 var import_express5 = __toESM(require_express2(), 1);
-var import_web3 = __toESM(require_index_cjs(), 1);
 var router5 = (0, import_express5.Router)();
-var SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
+router5.use(requireAdminAuth);
+async function getAdminSessions(currentSid) {
+  const result = await pool.query(
+    `SELECT sid, sess, expire FROM user_sessions
+     WHERE expire > NOW()
+       AND (sess->>'isAdmin')::boolean = true
+     ORDER BY COALESCE((sess->>'adminLastActivity'),'0')::bigint DESC
+     LIMIT 100`
+  );
+  return result.rows.map((row) => ({
+    sid: row.sid,
+    userId: row.sess.userId,
+    userEmail: row.sess.userEmail,
+    loginAt: row.sess.adminLoginAt,
+    lastActivity: row.sess.adminLastActivity,
+    loginIp: row.sess.sessionLoginIp,
+    userAgent: row.sess.sessionUserAgent?.slice(0, 120),
+    suspicious: row.sess.sessionSuspicious ?? false,
+    suspiciousReason: row.sess.suspiciousReason,
+    securityLevel: row.sess.securityLevel ?? 0,
+    ipChangeCount: row.sess.ipChangeCount ?? 0,
+    uaChangeCount: row.sess.uaChangeCount ?? 0,
+    ipHistory: row.sess.ipHistory ?? [],
+    requestCount: row.sess.requestCount ?? 0,
+    expiresAt: row.expire,
+    isCurrent: row.sid === currentSid
+  }));
+}
+router5.get("/admin/sessions", async (req, res) => {
+  try {
+    const sessions = await getAdminSessions(req.sessionID);
+    logger.info(
+      {
+        requestedBy: req.session.userEmail,
+        ip: getClientIp(req),
+        totalSessions: sessions.length,
+        suspicious: sessions.filter((s) => s.suspicious).length
+      },
+      "[SESSIONS] Admin listed active sessions"
+    );
+    res.json({ sessions, total: sessions.length });
+  } catch (err) {
+    logger.error({ err }, "[SESSIONS] Failed to list active sessions");
+    res.status(500).json({ error: "Failed to list sessions" });
+  }
+});
+router5.delete(
+  "/admin/sessions/:sid",
+  requireRecentAuth(15),
+  async (req, res) => {
+    const { sid } = req.params;
+    if (sid === req.sessionID) {
+      res.status(400).json({ error: "Cannot terminate your own session. Use /auth/logout instead." });
+      return;
+    }
+    try {
+      const existing = await pool.query(
+        "SELECT sid, sess, expire FROM user_sessions WHERE sid = $1",
+        [sid]
+      );
+      if (existing.rows.length === 0) {
+        res.status(404).json({ error: "Session not found or already expired" });
+        return;
+      }
+      const target = existing.rows[0];
+      const targetEmail = target.sess.userEmail ?? "unknown";
+      const targetIp = target.sess.sessionLoginIp ?? "unknown";
+      await pool.query("DELETE FROM user_sessions WHERE sid = $1", [sid]);
+      securityAlert("ADMIN_SESSION_KILL", req, {
+        killedBy: req.session.userEmail,
+        killedSid: sid.slice(0, 12) + "\u2026",
+        killedUser: targetEmail,
+        killedLoginIp: targetIp,
+        targetSuspicious: target.sess.sessionSuspicious ?? false,
+        targetLevel: target.sess.securityLevel ?? 0
+      });
+      logger.info(
+        {
+          killedBy: req.session.userEmail,
+          killed: targetEmail,
+          sid: sid.slice(0, 12) + "\u2026",
+          ip: getClientIp(req)
+        },
+        "[SESSIONS] \u2713 Session terminated"
+      );
+      res.json({ success: true, terminated: sid });
+    } catch (err) {
+      logger.error({ err, sid: sid.slice(0, 12) }, "[SESSIONS] Failed to terminate session");
+      res.status(500).json({ error: "Failed to terminate session" });
+    }
+  }
+);
+router5.post(
+  "/admin/sessions/purge",
+  requireRecentAuth(15),
+  async (req, res) => {
+    try {
+      const currentSid = req.sessionID;
+      const countRes = await pool.query(
+        `SELECT COUNT(*) as count FROM user_sessions
+         WHERE expire > NOW()
+           AND (sess->>'isAdmin')::boolean = true
+           AND sid != $1`,
+        [currentSid]
+      );
+      const purgeCount = parseInt(countRes.rows[0]?.count ?? "0", 10);
+      await pool.query(
+        `DELETE FROM user_sessions
+         WHERE (sess->>'isAdmin')::boolean = true
+           AND sid != $1`,
+        [currentSid]
+      );
+      securityAlert("ADMIN_SESSION_PURGE_ALL", req, {
+        initiatedBy: req.session.userEmail,
+        sessionsKilled: purgeCount
+      });
+      logger.info(
+        {
+          initiatedBy: req.session.userEmail,
+          ip: getClientIp(req),
+          purgeCount
+        },
+        "[SESSIONS] \u2713 All other admin sessions purged"
+      );
+      res.json({ success: true, terminated: purgeCount });
+    } catch (err) {
+      logger.error({ err }, "[SESSIONS] Failed to purge sessions");
+      res.status(500).json({ error: "Failed to purge sessions" });
+    }
+  }
+);
+var sessions_default = router5;
+
+// src/routes/tracker.ts
+var import_express6 = __toESM(require_express2(), 1);
+var import_web3 = __toESM(require_index_cjs(), 1);
+var router6 = (0, import_express6.Router)();
+var SOLANA_NETWORK = (process.env.SOLANA_NETWORK ?? "devnet").toLowerCase();
+var SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+var PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
+var CONFIG_PDA = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
+var REQUIRE_ONCHAIN_VERIFICATION = process.env.REQUIRE_ONCHAIN_VERIFICATION !== "false";
+if (!REQUIRE_ONCHAIN_VERIFICATION) {
+  logger.warn(
+    {
+      security: true,
+      alert: true,
+      alertType: "VERIFICATION_BYPASS_ACTIVE",
+      SOLANA_NETWORK,
+      message: "ON-CHAIN VERIFICATION IS DISABLED \u2014 DO NOT USE IN DEVNET/MAINNET"
+    },
+    "\u26D4 [TRACKER] REQUIRE_ONCHAIN_VERIFICATION=false \u2014 blockchain checks SKIPPED. This MUST only be used in isolated CI/unit-test environments, NEVER for devnet or mainnet testing."
+  );
+}
+var USDT_MINT = SOLANA_NETWORK === "mainnet" ? process.env.USDT_MINT ?? "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB" : process.env.USDT_MINT_DEVNET ?? "8PieQJ43S4PpVWQaBZp4TaHFZGoAA9FsDzYbPftVfo6X";
+var USDT_DECIMALS = 6;
+var MISMATCH_WARN_PCT = 0.15;
+var MISMATCH_BLOCK_PCT = 0.5;
+var REWARD_RATE = 5;
+logger.info(
+  { SOLANA_NETWORK, SOLANA_RPC, PRESALE_PROGRAM_ID, CONFIG_PDA, USDT_MINT, REQUIRE_ONCHAIN_VERIFICATION },
+  "[TRACKER] Network configuration loaded"
+);
 var _connection = null;
 function getConnection() {
   if (!_connection) _connection = new import_web3.Connection(SOLANA_RPC, "confirmed");
   return _connection;
 }
-var PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
-var ALLOWED_WALLET_TYPES = /* @__PURE__ */ new Set(["phantom", "solflare", "backpack", "okx", "unknown"]);
+var _solPriceCache = { price: 0, fetchedAt: 0 };
+var SOL_PRICE_TTL_MS = 2 * 60 * 1e3;
+async function fetchSolPriceUsd() {
+  const now = Date.now();
+  if (now - _solPriceCache.fetchedAt < SOL_PRICE_TTL_MS && _solPriceCache.price > 0) {
+    return _solPriceCache.price;
+  }
+  try {
+    const r = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd",
+      { signal: AbortSignal.timeout(5e3) }
+    );
+    if (r.ok) {
+      const d = await r.json();
+      const price = d?.solana?.usd;
+      if (price && price > 0) {
+        _solPriceCache = { price, fetchedAt: now };
+        return price;
+      }
+    }
+  } catch {
+  }
+  if (_solPriceCache.price > 0) {
+    logger.warn({ cachedPrice: _solPriceCache.price }, "[SOL_PRICE] CoinGecko unreachable \u2014 using cached price");
+    return _solPriceCache.price;
+  }
+  logger.warn(
+    { security: true, source: "FALLBACK_$150" },
+    "[SOL_PRICE] \u26A0 CoinGecko unreachable and cache empty \u2014 using $150 fallback (server-defined, not client)"
+  );
+  return 150;
+}
+var _chainStateCache = null;
+var CHAIN_STATE_TTL_MS = 3e4;
+async function fetchStageTokenPriceUsd(stageIndex) {
+  const now = Date.now();
+  if (!_chainStateCache || now - _chainStateCache.fetchedAt > CHAIN_STATE_TTL_MS) {
+    try {
+      const body = JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "getAccountInfo",
+        params: [CONFIG_PDA, { encoding: "base64" }]
+      });
+      const rpcRes = await fetch(SOLANA_RPC, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+        signal: AbortSignal.timeout(6e3)
+      });
+      const rpcJson = await rpcRes.json();
+      const b64 = rpcJson?.result?.value?.data?.[0];
+      if (!b64) {
+        logger.warn({ CONFIG_PDA, SOLANA_NETWORK }, "[CHAIN_STATE] Config PDA returned no data");
+        return null;
+      }
+      const raw = Buffer.from(b64, "base64");
+      let off = 8;
+      const readPk = () => {
+        off += 32;
+      };
+      const readU8 = () => {
+        const v = raw[off];
+        off += 1;
+        return v;
+      };
+      const readBool = () => readU8() !== 0;
+      const readI64 = () => {
+        off += 8;
+      };
+      const readU64 = () => {
+        const v = raw.readBigUInt64LE(off);
+        off += 8;
+        return v;
+      };
+      readPk();
+      readPk();
+      readPk();
+      readPk();
+      readU8();
+      readBool();
+      readBool();
+      readI64();
+      readI64();
+      readI64();
+      readU64();
+      readU64();
+      readU64();
+      readU64();
+      readU64();
+      const tokensPerRawUsdtScaled = [];
+      for (let i = 0; i < 4; i++) {
+        tokensPerRawUsdtScaled.push(readU64());
+        readU64();
+        readU64();
+      }
+      _chainStateCache = { tokensPerRawUsdtScaled, fetchedAt: now };
+      logger.info(
+        { stageIndex, tokensPerRawUsdtScaled: tokensPerRawUsdtScaled.map(String), SOLANA_NETWORK },
+        "[CHAIN_STATE] Presale config PDA fetched successfully"
+      );
+    } catch (err) {
+      logger.warn({ err, SOLANA_NETWORK, CONFIG_PDA }, "[CHAIN_STATE] Failed to fetch presale config PDA");
+      return null;
+    }
+  }
+  const scaled = _chainStateCache?.tokensPerRawUsdtScaled[stageIndex];
+  if (!scaled || scaled === 0n) return null;
+  return 1e-3 / Number(scaled);
+}
 var SOLANA_ADDRESS_RE2 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 var TX_HASH_RE = /^[1-9A-HJ-NP-Za-km-z]{80,90}$/;
+var ALLOWED_WALLET_TYPES = /* @__PURE__ */ new Set(["phantom", "solflare", "backpack", "okx", "unknown"]);
 function getIp(req) {
-  const forwarded = req.headers["x-forwarded-for"];
-  if (typeof forwarded === "string") {
-    return forwarded.split(",")[0]?.trim() ?? null;
-  }
+  const fwd = req.headers["x-forwarded-for"];
+  if (typeof fwd === "string") return fwd.split(",")[0]?.trim() ?? null;
   return req.socket?.remoteAddress ?? null;
+}
+async function verifyTransaction(txHash, expectedWallet, stageIndex, network) {
+  const logCtx = {
+    txHash: txHash.slice(0, 16) + "\u2026",
+    wallet: expectedWallet.slice(0, 8) + "\u2026",
+    network: SOLANA_NETWORK,
+    rpc: SOLANA_RPC
+  };
+  logger.info(logCtx, `[TX_VERIFY] Checking tx on ${SOLANA_NETWORK}`);
+  try {
+    const MAX_ATTEMPTS = 5;
+    const RETRY_DELAY_MS = 3e3;
+    let tx = null;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      tx = await getConnection().getTransaction(txHash, {
+        commitment: "confirmed",
+        maxSupportedTransactionVersion: 0
+      });
+      if (tx) {
+        if (attempt > 1) {
+          logger.info({ ...logCtx, attempt }, `[TX_VERIFY] Transaction found on attempt ${attempt}`);
+        }
+        break;
+      }
+      if (attempt < MAX_ATTEMPTS) {
+        logger.warn(
+          { ...logCtx, attempt, nextAttemptInMs: RETRY_DELAY_MS },
+          `[TX_VERIFY] Transaction not found (attempt ${attempt}/${MAX_ATTEMPTS}) \u2014 retrying...`
+        );
+        await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+      }
+    }
+    if (!tx) {
+      logger.warn({ ...logCtx, totalAttempts: MAX_ATTEMPTS }, `[TX_VERIFY] Transaction not found on ${SOLANA_NETWORK} after ${MAX_ATTEMPTS} attempts`);
+      return { valid: false, reason: `Transaction not found on ${SOLANA_NETWORK} after ${MAX_ATTEMPTS} attempts` };
+    }
+    if (tx.meta?.err !== null) {
+      logger.warn({ ...logCtx, txError: tx.meta?.err }, `[TX_VERIFY] Transaction FAILED on ${SOLANA_NETWORK}`);
+      return { valid: false, reason: `Transaction failed on-chain: ${JSON.stringify(tx.meta?.err)}` };
+    }
+    logger.info({ ...logCtx, slot: tx.slot }, `[TX_VERIFY] Transaction found and succeeded on ${SOLANA_NETWORK}`);
+    const accountKeys = "accountKeys" in tx.transaction.message ? tx.transaction.message.accountKeys.map((k) => k.toString()) : tx.transaction.message.staticAccountKeys.map((k) => k.toString());
+    const actualSigner = accountKeys[0] ?? "";
+    if (actualSigner !== expectedWallet) {
+      logger.warn(
+        { ...logCtx, expectedSigner: expectedWallet.slice(0, 8), actualSigner: actualSigner.slice(0, 8) },
+        "[TX_VERIFY] Signer MISMATCH \u2014 wallet in TX does not match request"
+      );
+      return {
+        valid: false,
+        reason: `Signer mismatch: request wallet ${expectedWallet.slice(0, 8)} \u2260 tx signer ${actualSigner.slice(0, 8)}`
+      };
+    }
+    logger.info({ ...logCtx }, "[TX_VERIFY] Signer match \u2713");
+    const logs = tx.meta?.logMessages ?? [];
+    const hasValidLog = logs.some((l) => l.includes("SOL_BUY") || l.includes("USDT_BUY"));
+    const involvesProgram = accountKeys.includes(PRESALE_PROGRAM_ID);
+    if (!involvesProgram && !hasValidLog) {
+      logger.warn(
+        { ...logCtx, PRESALE_PROGRAM_ID, accountKeys: accountKeys.slice(0, 5) },
+        "[TX_VERIFY] Program MISMATCH \u2014 presale program not in transaction"
+      );
+      return { valid: false, reason: "Transaction does not involve the presale program" };
+    }
+    if (involvesProgram && !hasValidLog) {
+      logger.warn({ ...logCtx }, "[TX_VERIFY] Program match \u2713 (no SOL_BUY/USDT_BUY log \u2014 accepted via program key)");
+    } else {
+      logger.info({ ...logCtx, logKey: hasValidLog ? "SOL_BUY/USDT_BUY found" : "program key" }, "[TX_VERIFY] Program match \u2713");
+    }
+    const preBalances = tx.meta?.preBalances ?? [];
+    const postBalances = tx.meta?.postBalances ?? [];
+    const fee = tx.meta?.fee ?? 0;
+    const preTkn = tx.meta?.preTokenBalances ?? [];
+    const postTkn = tx.meta?.postTokenBalances ?? [];
+    const buyerPreUsdt = preTkn.find((b) => b.mint === USDT_MINT && b.owner === expectedWallet);
+    const buyerPostUsdt = postTkn.find((b) => b.mint === USDT_MINT && b.owner === expectedWallet);
+    let onChain;
+    if (buyerPreUsdt && buyerPostUsdt) {
+      const preRaw = BigInt(buyerPreUsdt.uiTokenAmount.amount);
+      const postRaw = BigInt(buyerPostUsdt.uiTokenAmount.amount);
+      const diffRaw = preRaw > postRaw ? Number(preRaw - postRaw) : 0;
+      const usdtUnits = diffRaw / 10 ** USDT_DECIMALS;
+      const tokenPrice = await fetchStageTokenPriceUsd(stageIndex);
+      onChain = {
+        paymentType: "usdt",
+        usdtSpentRaw: diffRaw,
+        usdtSpentUnits: usdtUnits,
+        estimatedUsd: usdtUnits,
+        estimatedTokens: tokenPrice && tokenPrice > 0 ? usdtUnits / tokenPrice : null
+      };
+      logger.info(
+        { ...logCtx, usdtSpentUnits: usdtUnits, estimatedUsd: usdtUnits, estimatedTokens: onChain.estimatedTokens },
+        "[TX_VERIFY] Extracted amounts (USDT purchase)"
+      );
+    } else {
+      const preSol = preBalances[0] ?? 0;
+      const postSol = postBalances[0] ?? 0;
+      const lamportsDelta = Math.max(0, preSol - postSol);
+      const lamportsToVault = Math.max(0, lamportsDelta - fee);
+      const solUnits = lamportsToVault / 1e9;
+      const solPrice = await fetchSolPriceUsd();
+      const tokenPrice = await fetchStageTokenPriceUsd(stageIndex);
+      const estimatedUsd = solUnits * solPrice;
+      onChain = {
+        paymentType: "sol",
+        solSpentLamports: lamportsToVault,
+        solSpentSol: solUnits,
+        solPriceUsed: solPrice,
+        estimatedUsd,
+        estimatedTokens: tokenPrice && tokenPrice > 0 ? estimatedUsd / tokenPrice : null
+      };
+      logger.info(
+        {
+          ...logCtx,
+          solSpentSol: solUnits,
+          solPriceUsed: solPrice,
+          estimatedUsd,
+          estimatedTokens: onChain.estimatedTokens,
+          tokenPriceAvailable: tokenPrice !== null
+        },
+        "[TX_VERIFY] Extracted amounts (SOL purchase)"
+      );
+    }
+    return { valid: true, onChain };
+  } catch (err) {
+    logger.error(
+      { err, ...logCtx },
+      `[TX_VERIFY] Unexpected error during ${SOLANA_NETWORK} verification`
+    );
+    return { valid: false, reason: `Verification error: ${String(err)}` };
+  }
+}
+function logAmountComparison(label, clientValue, serverValue, txHash) {
+  if (serverValue <= 0) return;
+  const pct = Math.abs(clientValue - serverValue) / serverValue;
+  if (pct > MISMATCH_WARN_PCT) {
+    logger.warn(
+      {
+        label,
+        clientValue,
+        serverValue,
+        discrepancyPct: (pct * 100).toFixed(1) + "%",
+        txHash: txHash.slice(0, 16) + "\u2026",
+        suspicious: pct > 0.3,
+        security: pct > MISMATCH_BLOCK_PCT,
+        alert: pct > MISMATCH_BLOCK_PCT,
+        alertType: pct > MISMATCH_BLOCK_PCT ? "AMOUNT_MANIPULATION" : "AMOUNT_MISMATCH"
+      },
+      `[AMOUNT_MISMATCH] ${label}: client=${clientValue.toFixed(6)} server=${serverValue.toFixed(6)} diff=${(pct * 100).toFixed(1)}%`
+    );
+  }
 }
 var visitLimiter = rate_limit_default({
   windowMs: 60 * 1e3,
@@ -83222,53 +83924,22 @@ var purchaseLimiter = rate_limit_default({
   legacyHeaders: false,
   message: { error: "Too many requests" }
 });
-async function verifyTransaction(txHash, expectedWallet) {
-  try {
-    const tx = await getConnection().getTransaction(txHash, {
-      commitment: "confirmed",
-      maxSupportedTransactionVersion: 0
-    });
-    if (!tx) {
-      return { valid: false, reason: "Transaction not found on-chain" };
-    }
-    if (tx.meta?.err !== null) {
-      return { valid: false, reason: "Transaction failed on-chain" };
-    }
-    const accountKeys = "accountKeys" in tx.transaction.message ? tx.transaction.message.accountKeys.map((k) => k.toString()) : tx.transaction.message.staticAccountKeys.map((k) => k.toString());
-    const involvesProgram = accountKeys.includes(PRESALE_PROGRAM_ID);
-    if (!involvesProgram) {
-      return { valid: false, reason: "Transaction does not involve presale program" };
-    }
-    const signerKey = accountKeys[0];
-    if (signerKey !== expectedWallet) {
-      return { valid: false, reason: "Wallet mismatch in transaction" };
-    }
-    return { valid: true };
-  } catch (err) {
-    return { valid: false, reason: `Verification error: ${String(err)}` };
-  }
-}
-router5.post("/track/visit", visitLimiter, async (req, res) => {
+router6.post("/track/visit", visitLimiter, async (req, res) => {
   try {
     const { page = "/", visitorId, referrer } = req.body;
-    const safePage = String(page).slice(0, 200);
-    const safeVisitorId = visitorId ? String(visitorId).slice(0, 64) : void 0;
-    const safeReferrer = referrer ? String(referrer).slice(0, 200) : void 0;
-    const ip = getIp(req);
-    const userAgent = req.headers["user-agent"]?.slice(0, 300) ?? null;
     await db.insert(pageVisits).values({
-      page: safePage,
-      visitorId: safeVisitorId,
-      ip,
-      userAgent,
-      referrer: safeReferrer
+      page: String(page).slice(0, 200),
+      visitorId: visitorId ? String(visitorId).slice(0, 64) : void 0,
+      ip: getIp(req),
+      userAgent: req.headers["user-agent"]?.slice(0, 300) ?? null,
+      referrer: referrer ? String(referrer).slice(0, 200) : void 0
     });
     res.json({ success: true });
   } catch {
     res.json({ success: false });
   }
 });
-router5.post("/track/wallet", walletLimiter, async (req, res) => {
+router6.post("/track/wallet", walletLimiter, async (req, res) => {
   try {
     const { walletAddress, walletType, network = "unknown" } = req.body;
     if (!walletAddress || !walletType) {
@@ -83280,112 +83951,304 @@ router5.post("/track/wallet", walletLimiter, async (req, res) => {
       return;
     }
     const safeWalletType = ALLOWED_WALLET_TYPES.has(walletType.toLowerCase()) ? walletType.toLowerCase() : "unknown";
-    const ip = getIp(req);
     await db.insert(walletConnections).values({
       walletAddress,
       walletType: safeWalletType,
       network: String(network).slice(0, 20),
-      ip
+      ip: getIp(req)
     });
     res.json({ success: true });
   } catch {
     res.json({ success: false });
   }
 });
-router5.post("/track/purchase", purchaseLimiter, async (req, res) => {
+router6.post("/track/purchase", purchaseLimiter, async (req, res) => {
   try {
-    const { walletAddress, walletType, network, amountUsd, amountTokens, txHash, stage, referralCode } = req.body;
+    const {
+      walletAddress,
+      walletType,
+      network,
+      amountUsd: clientUsd,
+      amountTokens: clientTokens,
+      txHash,
+      stage,
+      referralCode
+    } = req.body;
+    const ip = getIp(req);
+    logger.info(
+      {
+        wallet: walletAddress?.slice(0, 8) + "\u2026",
+        txHash: txHash?.slice(0, 16) + "\u2026",
+        refCode: referralCode ?? "none",
+        clientUsd,
+        clientTokens,
+        stage,
+        network: SOLANA_NETWORK,
+        ip,
+        source: "CLIENT_REQUEST",
+        verificationRequired: REQUIRE_ONCHAIN_VERIFICATION
+      },
+      "[PURCHASE] Incoming purchase request"
+    );
     if (!walletAddress || !network) {
+      logger.warn({ ip }, "[PURCHASE] Rejected: missing required fields");
       res.status(400).json({ error: "Missing required fields" });
       return;
     }
     if (!SOLANA_ADDRESS_RE2.test(walletAddress)) {
+      logger.warn({ wallet: walletAddress?.slice(0, 8), ip }, "[PURCHASE] Rejected: invalid wallet address");
       res.status(400).json({ error: "Invalid wallet address" });
       return;
     }
     if (!txHash) {
+      logger.warn({ ip }, "[PURCHASE] Rejected: txHash is required");
       res.status(400).json({ error: "txHash is required" });
       return;
     }
     if (!TX_HASH_RE.test(txHash)) {
-      res.status(400).json({ error: "Invalid transaction hash format" });
-      return;
-    }
-    const verification = await verifyTransaction(txHash, walletAddress);
-    if (!verification.valid) {
+      logger.warn({ txHashLen: txHash.length, ip }, "[PURCHASE] Rejected: invalid txHash format");
       res.status(400).json({
-        error: "Transaction verification failed",
-        reason: verification.reason
+        error: "Invalid transaction hash format",
+        detail: `Expected base58 string of 80-90 characters, got ${txHash.length}`
       });
       return;
     }
     const existing = await db.select({ id: purchases.id }).from(purchases).where(eq(purchases.txHash, txHash)).limit(1);
     if (existing.length > 0) {
+      logger.warn(
+        { txHash: txHash.slice(0, 16) + "\u2026", existingId: existing[0].id, ip, security: true, alertType: "REPLAY_ATTACK" },
+        "[PURCHASE] Rejected: REPLAY_ATTACK \u2014 txHash already recorded"
+      );
       res.status(409).json({ error: "Transaction already recorded" });
       return;
     }
+    const safeClientUsd = Math.max(0, Number(clientUsd) || 0);
+    const safeClientTokens = Math.max(0, Number(clientTokens) || 0);
+    let acceptedUsd;
+    let acceptedTokens;
+    let verificationSource;
+    if (!REQUIRE_ONCHAIN_VERIFICATION) {
+      acceptedUsd = safeClientUsd;
+      acceptedTokens = safeClientTokens;
+      verificationSource = "CLIENT_UNVERIFIED_CI_ONLY";
+      logger.warn(
+        {
+          wallet: walletAddress.slice(0, 8) + "\u2026",
+          txHash: txHash.slice(0, 16) + "\u2026",
+          acceptedUsd,
+          acceptedTokens,
+          security: true,
+          alert: true,
+          alertType: "VERIFICATION_BYPASSED",
+          warning: "REQUIRE_ONCHAIN_VERIFICATION=false \u2014 client amounts accepted WITHOUT blockchain check"
+        },
+        "\u26D4 [PURCHASE] VERIFICATION BYPASSED \u2014 using client-provided amounts (CI only)"
+      );
+    } else {
+      const stageIndex = Math.max(0, Math.min(3, (stage ?? 1) - 1));
+      const verification = await verifyTransaction(txHash, walletAddress, stageIndex, network);
+      if (!verification.valid) {
+        logger.warn(
+          {
+            txHash: txHash.slice(0, 16) + "\u2026",
+            reason: verification.reason,
+            ip,
+            network: SOLANA_NETWORK
+          },
+          "[PURCHASE] Rejected: TX_VERIFICATION_FAILED"
+        );
+        res.status(400).json({
+          error: `Transaction verification failed on ${SOLANA_NETWORK}`,
+          reason: verification.reason,
+          network: SOLANA_NETWORK,
+          code: "TX_VERIFICATION_FAILED"
+        });
+        return;
+      }
+      if (!verification.onChain) {
+        logger.error(
+          { txHash: txHash.slice(0, 16) + "\u2026" },
+          "[PURCHASE] CRITICAL: valid=true but onChain is undefined \u2014 internal bug"
+        );
+        res.status(500).json({ error: "Internal verification error", code: "INTERNAL_ERROR" });
+        return;
+      }
+      const oc = verification.onChain;
+      if (oc.estimatedUsd <= 0) {
+        logger.warn(
+          {
+            txHash: txHash.slice(0, 16) + "\u2026",
+            paymentType: oc.paymentType,
+            solSpentSol: oc.solSpentSol,
+            usdtSpentUnits: oc.usdtSpentUnits,
+            ip
+          },
+          "[PURCHASE] Rejected: AMOUNT_EXTRACTION_FAILED \u2014 could not determine USD from on-chain data"
+        );
+        res.status(400).json({
+          error: "Could not extract payment amount from transaction",
+          detail: "Balance delta was zero or negative. Ensure the transaction actually transferred funds to the presale vault.",
+          code: "AMOUNT_EXTRACTION_FAILED"
+        });
+        return;
+      }
+      logAmountComparison("amountUsd", safeClientUsd, oc.estimatedUsd, txHash);
+      const usdPct = safeClientUsd > 0 && oc.estimatedUsd > 0 ? Math.abs(safeClientUsd - oc.estimatedUsd) / oc.estimatedUsd : 0;
+      if (usdPct > MISMATCH_BLOCK_PCT) {
+        logger.warn(
+          {
+            clientUsd: safeClientUsd,
+            serverUsd: oc.estimatedUsd,
+            discrepancyPct: (usdPct * 100).toFixed(1) + "%",
+            txHash: txHash.slice(0, 16) + "\u2026",
+            ip,
+            security: true,
+            alert: true,
+            alertType: "AMOUNT_MANIPULATION"
+          },
+          "[PURCHASE] Rejected: AMOUNT_MANIPULATION \u2014 client USD exceeds 50% deviation from on-chain value"
+        );
+        res.status(400).json({
+          error: "Amount mismatch with on-chain data",
+          code: "AMOUNT_MANIPULATION",
+          detail: "The USD amount you provided differs significantly from what the transaction shows."
+        });
+        return;
+      }
+      acceptedUsd = oc.estimatedUsd;
+      logAmountComparison("amountTokens", safeClientTokens, oc.estimatedTokens ?? 0, txHash);
+      if (oc.estimatedTokens !== null && oc.estimatedTokens > 0) {
+        acceptedTokens = oc.estimatedTokens;
+        verificationSource = "SERVER_VERIFIED_ONCHAIN";
+      } else {
+        acceptedTokens = 0;
+        verificationSource = "SERVER_VERIFIED_ONCHAIN_TOKENS_PENDING";
+        logger.warn(
+          {
+            txHash: txHash.slice(0, 16) + "\u2026",
+            stageIndex,
+            acceptedUsd,
+            clientTokens: safeClientTokens,
+            note: "Stage price unavailable from PDA \u2014 acceptedTokens=0, needs admin correction. Client tokens REJECTED."
+          },
+          "[PURCHASE] WARN: Stage token price unavailable \u2014 acceptedTokens set to 0 (NOT from client)"
+        );
+      }
+      logger.info(
+        {
+          acceptedUsd,
+          acceptedTokens,
+          paymentType: oc.paymentType,
+          source: verificationSource,
+          network: SOLANA_NETWORK
+        },
+        "[PURCHASE] Accepted server-verified amounts"
+      );
+    }
     const safeWalletType = walletType && ALLOWED_WALLET_TYPES.has(walletType.toLowerCase()) ? walletType.toLowerCase() : "unknown";
-    const safeAmountUsd = Math.max(0, Number(amountUsd) || 0);
-    const safeAmountTokens = Math.max(0, Number(amountTokens) || 0);
     const [purchase] = await db.insert(purchases).values({
       walletAddress,
       walletType: safeWalletType,
-      network: String(network).slice(0, 20),
-      amountUsd: String(safeAmountUsd),
-      amountTokens: String(safeAmountTokens),
+      network: SOLANA_NETWORK,
+      // always use server-side network, not client input
+      amountUsd: String(acceptedUsd),
+      amountTokens: String(acceptedTokens),
       txHash,
       stage: stage ?? 1
     }).returning({ id: purchases.id });
-    if (referralCode && SOLANA_ADDRESS_RE2.test(walletAddress)) {
+    logger.info(
+      {
+        purchaseId: purchase?.id,
+        wallet: walletAddress.slice(0, 8) + "\u2026",
+        acceptedUsd,
+        acceptedTokens,
+        source: verificationSource,
+        network: SOLANA_NETWORK
+      },
+      "[PURCHASE] \u2713 Saved to DB"
+    );
+    if (referralCode) {
       const code = referralCode.trim().slice(0, 16);
+      logger.info({ code, buyer: walletAddress.slice(0, 8) + "\u2026" }, "[REFERRAL] Processing referral code");
       try {
         const codeRow = await db.select().from(referralCodes).where(eq(referralCodes.code, code)).limit(1);
-        if (codeRow.length > 0) {
+        if (codeRow.length === 0) {
+          logger.warn({ code }, "[REFERRAL] Code not found in DB \u2014 no referral created");
+        } else {
           const referrerWallet = codeRow[0].walletAddress;
-          const isSelf = referrerWallet.toLowerCase() === walletAddress.toLowerCase();
-          const alreadyReferred = isSelf ? [1] : await db.select({ id: referrals.id }).from(referrals).where(eq(referrals.referredWallet, walletAddress)).limit(1);
-          if (!isSelf && alreadyReferred.length === 0) {
-            const REWARD_RATE = 5;
-            const rewardTokens = safeAmountTokens ? (safeAmountTokens * REWARD_RATE / 100).toFixed(6) : "0";
-            const rewardUsd = safeAmountUsd ? (safeAmountUsd * REWARD_RATE / 100).toFixed(6) : "0";
-            const client = await pool.connect();
-            try {
-              await client.query("BEGIN");
-              await client.query(
-                `INSERT INTO referrals
-                   (referrer_wallet, referred_wallet, purchase_id, reward_rate, reward_tokens, reward_usd, status)
-                 VALUES ($1, $2, $3, $4, $5, $6, 'pending')`,
-                [referrerWallet, walletAddress, purchase?.id ?? null, REWARD_RATE, rewardTokens, rewardUsd]
+          logger.info({ code, referrer: referrerWallet.slice(0, 8) + "\u2026" }, "[REFERRAL] Code resolved to referrer");
+          if (referrerWallet.toLowerCase() === walletAddress.toLowerCase()) {
+            logger.warn({ referrer: referrerWallet.slice(0, 8) }, "[REFERRAL] SELF_REFERRAL_BLOCKED");
+          } else {
+            const alreadyReferred = await db.select({ id: referrals.id }).from(referrals).where(eq(referrals.referredWallet, walletAddress)).limit(1);
+            if (alreadyReferred.length > 0) {
+              logger.warn(
+                { buyer: walletAddress.slice(0, 8) + "\u2026", existingReferralId: alreadyReferred[0].id },
+                "[REFERRAL] DOUBLE_REFERRAL_BLOCKED \u2014 wallet already has a referral"
               );
-              await client.query(
-                `UPDATE referral_codes
-                 SET total_referrals     = total_referrals + 1,
-                     total_reward_tokens = total_reward_tokens + $1,
-                     total_reward_usd    = total_reward_usd    + $2
-                 WHERE wallet_address = $3`,
-                [rewardTokens, rewardUsd, referrerWallet]
+            } else {
+              const rewardTokens = acceptedTokens > 0 ? (acceptedTokens * REWARD_RATE / 100).toFixed(6) : "0";
+              const rewardUsd = acceptedUsd > 0 ? (acceptedUsd * REWARD_RATE / 100).toFixed(6) : "0";
+              logger.info(
+                {
+                  referrer: referrerWallet.slice(0, 8) + "\u2026",
+                  buyer: walletAddress.slice(0, 8) + "\u2026",
+                  rewardTokens,
+                  rewardUsd,
+                  rewardRate: REWARD_RATE,
+                  basedOn: verificationSource,
+                  source: "SERVER_VERIFIED_REWARD"
+                },
+                "[REFERRAL] Reward calculated from server-verified amounts"
               );
-              await client.query("COMMIT");
-            } catch {
-              await client.query("ROLLBACK");
-            } finally {
-              client.release();
+              const client = await pool.connect();
+              try {
+                await client.query("BEGIN");
+                await client.query(
+                  `INSERT INTO referrals
+                     (referrer_wallet, referred_wallet, purchase_id, reward_rate, reward_tokens, reward_usd, status)
+                   VALUES ($1, $2, $3, $4, $5, $6, 'pending')`,
+                  [referrerWallet, walletAddress, purchase?.id ?? null, REWARD_RATE, rewardTokens, rewardUsd]
+                );
+                await client.query(
+                  `UPDATE referral_codes
+                   SET total_referrals     = total_referrals + 1,
+                       total_reward_tokens = total_reward_tokens + $1,
+                       total_reward_usd    = total_reward_usd    + $2
+                   WHERE wallet_address = $3`,
+                  [rewardTokens, rewardUsd, referrerWallet]
+                );
+                await client.query("COMMIT");
+                logger.info(
+                  { referrer: referrerWallet.slice(0, 8) + "\u2026", rewardTokens, rewardUsd },
+                  "[REFERRAL] \u2713 Referral reward committed to DB"
+                );
+              } catch (txErr) {
+                await client.query("ROLLBACK");
+                logger.error({ txErr }, "[REFERRAL] DB transaction ROLLBACK");
+              } finally {
+                client.release();
+              }
             }
           }
         }
-      } catch {
+      } catch (refErr) {
+        logger.error({ refErr }, "[REFERRAL] Unexpected error \u2014 purchase already saved");
       }
+    } else {
+      logger.info({ wallet: walletAddress.slice(0, 8) + "\u2026" }, "[PURCHASE] No referral code provided");
     }
-    res.json({ success: true, purchaseId: purchase?.id });
-  } catch {
-    res.json({ success: false });
+    res.json({ success: true, purchaseId: purchase?.id, network: SOLANA_NETWORK });
+  } catch (err) {
+    logger.error({ err }, "[PURCHASE] Unhandled error");
+    res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
-var tracker_default = router5;
+var tracker_default = router6;
 
 // src/routes/referral.ts
-var import_express6 = __toESM(require_express2(), 1);
-var router6 = (0, import_express6.Router)();
+var import_express7 = __toESM(require_express2(), 1);
+var router7 = (0, import_express7.Router)();
 var SOLANA_ADDRESS_RE3 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 function isValidSolanaAddress(addr) {
   return SOLANA_ADDRESS_RE3.test(addr);
@@ -83421,8 +84284,8 @@ var readLimiter = rate_limit_default({
   legacyHeaders: false,
   message: { error: "Too many requests" }
 });
-router6.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
-  const { wallet } = req.params;
+router7.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
+  const wallet = String(req.params.wallet);
   if (!isValidSolanaAddress(wallet)) {
     res.status(400).json({ error: "Invalid wallet address" });
     return;
@@ -83430,6 +84293,7 @@ router6.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
   try {
     const existing = await db.select().from(referralCodes).where(eq(referralCodes.walletAddress, wallet)).limit(1);
     if (existing.length > 0) {
+      logger.info({ wallet: wallet.slice(0, 8), code: existing[0].code, source: "DB" }, "[REF_CODE] Returning existing code from DB");
       res.json({ code: existing[0].code });
       return;
     }
@@ -83447,12 +84311,14 @@ router6.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
       return;
     }
     await db.insert(referralCodes).values({ walletAddress: wallet, code });
+    logger.info({ wallet: wallet.slice(0, 8), code, source: "CREATED" }, "[REF_CODE] New code inserted into DB");
     res.json({ code });
   } catch (err) {
+    logger.error({ err }, "[REF_CODE] DB error");
     res.status(500).json({ error: "Server error" });
   }
 });
-router6.post("/referral/register", registerLimiter, async (req, res) => {
+router7.post("/referral/register", registerLimiter, async (req, res) => {
   const { referrerCode, buyerWallet, purchaseId, amountUsd, amountTokens } = req.body;
   if (!referrerCode || !buyerWallet) {
     res.status(400).json({ error: "referrerCode and buyerWallet are required" });
@@ -83467,34 +84333,43 @@ router6.post("/referral/register", registerLimiter, async (req, res) => {
     res.status(400).json({ error: "Valid purchaseId is required" });
     return;
   }
+  logger.info(
+    { code, buyer: buyerWallet.slice(0, 8), purchaseId, amountUsd, amountTokens },
+    "[REF_REGISTER] Processing referral registration"
+  );
   try {
     const purchaseRow = await db.select({ id: purchases.id, walletAddress: purchases.walletAddress }).from(purchases).where(eq(purchases.id, purchaseId)).limit(1);
     if (purchaseRow.length === 0) {
+      logger.warn({ purchaseId, buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] Purchase not found in DB");
       res.status(400).json({ error: "Purchase not found" });
       return;
     }
     if (purchaseRow[0].walletAddress.toLowerCase() !== buyerWallet.toLowerCase()) {
+      logger.warn({ purchaseId, buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] Purchase wallet mismatch");
       res.status(400).json({ error: "Purchase does not belong to this wallet" });
       return;
     }
     const codeRow = await db.select().from(referralCodes).where(eq(referralCodes.code, code)).limit(1);
     if (codeRow.length === 0) {
+      logger.warn({ code }, "[REF_REGISTER] Invalid referral code \u2014 not found in DB");
       res.status(404).json({ error: "Invalid referral code" });
       return;
     }
     const referrerWallet = codeRow[0].walletAddress;
     if (referrerWallet.toLowerCase() === buyerWallet.toLowerCase()) {
+      logger.warn({ code, wallet: referrerWallet.slice(0, 8) }, "[REF_REGISTER] Blocked self-referral");
       res.status(400).json({ error: "Self-referral is not allowed" });
       return;
     }
     const alreadyReferred = await db.select({ id: referrals.id }).from(referrals).where(eq(referrals.referredWallet, buyerWallet)).limit(1);
     if (alreadyReferred.length > 0) {
+      logger.warn({ buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] Blocked double-referral \u2014 wallet already referred");
       res.status(409).json({ error: "This wallet has already been referred" });
       return;
     }
-    const REWARD_RATE = 5;
-    const rewardTokens = amountTokens ? (amountTokens * REWARD_RATE / 100).toFixed(6) : "0";
-    const rewardUsd = amountUsd ? (amountUsd * REWARD_RATE / 100).toFixed(6) : "0";
+    const REWARD_RATE2 = 5;
+    const rewardTokens = amountTokens ? (amountTokens * REWARD_RATE2 / 100).toFixed(6) : "0";
+    const rewardUsd = amountUsd ? (amountUsd * REWARD_RATE2 / 100).toFixed(6) : "0";
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
@@ -83502,7 +84377,7 @@ router6.post("/referral/register", registerLimiter, async (req, res) => {
         `INSERT INTO referrals
            (referrer_wallet, referred_wallet, purchase_id, reward_rate, reward_tokens, reward_usd, status)
          VALUES ($1, $2, $3, $4, $5, $6, 'pending')`,
-        [referrerWallet, buyerWallet, purchaseId ?? null, REWARD_RATE, rewardTokens, rewardUsd]
+        [referrerWallet, buyerWallet, purchaseId ?? null, REWARD_RATE2, rewardTokens, rewardUsd]
       );
       await client.query(
         `UPDATE referral_codes
@@ -83519,27 +84394,41 @@ router6.post("/referral/register", registerLimiter, async (req, res) => {
     } finally {
       client.release();
     }
+    logger.info(
+      {
+        code,
+        referrer: referrerWallet.slice(0, 8),
+        buyer: buyerWallet.slice(0, 8),
+        rewardTokens,
+        rewardUsd,
+        source: "DB_WRITE"
+      },
+      "[REF_REGISTER] \u2713 Referral saved to DB \u2014 reward created"
+    );
     res.json({
       success: true,
       referrerWallet,
       rewardTokens,
       rewardUsd,
-      rewardRate: REWARD_RATE
+      rewardRate: REWARD_RATE2
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Server error";
+    logger.error({ err, code, buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] DB error");
     res.status(500).json({ error: message });
   }
 });
-router6.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
-  const { wallet } = req.params;
+router7.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
+  const wallet = String(req.params.wallet);
   if (!isValidSolanaAddress(wallet)) {
     res.status(400).json({ error: "Invalid wallet address" });
     return;
   }
+  logger.info({ wallet: wallet.slice(0, 8) }, "[REF_STATS] Querying referral stats from DB");
   try {
     const codeRow = await db.select().from(referralCodes).where(eq(referralCodes.walletAddress, wallet)).limit(1);
     if (codeRow.length === 0) {
+      logger.info({ wallet: wallet.slice(0, 8) }, "[REF_STATS] No referral code found \u2192 empty state returned");
       res.json({
         code: null,
         totalReferrals: 0,
@@ -83564,6 +84453,18 @@ router6.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
       status: referrals.status,
       createdAt: referrals.createdAt
     }).from(referrals).where(eq(referrals.referrerWallet, wallet)).orderBy(desc(referrals.createdAt)).limit(5);
+    logger.info(
+      {
+        wallet: wallet.slice(0, 8),
+        code: row.code,
+        totalReferrals: row.totalReferrals,
+        pendingTokens: pending,
+        paidTokens: paid,
+        recentCount: recent.length,
+        source: "DB_READ"
+      },
+      "[REF_STATS] \u2713 Stats returned from DB"
+    );
     res.json({
       code: row.code,
       totalReferrals: row.totalReferrals,
@@ -83573,11 +84474,13 @@ router6.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
       paidTokens: paid,
       recentReferrals: recent
     });
-  } catch {
+  } catch (err) {
+    logger.error({ err, wallet: wallet.slice(0, 8) }, "[REF_STATS] DB error");
     res.status(500).json({ error: "Server error" });
   }
 });
-router6.get("/referral/leaderboard", readLimiter, async (_req, res) => {
+router7.get("/referral/leaderboard", readLimiter, async (_req, res) => {
+  logger.info({}, "[REF_LEADERBOARD] Querying top referrers from DB");
   try {
     const top = await db.select({
       walletAddress: referralCodes.walletAddress,
@@ -83588,13 +84491,15 @@ router6.get("/referral/leaderboard", readLimiter, async (_req, res) => {
       ...r,
       walletAddress: r.walletAddress.slice(0, 4) + "\u2026" + r.walletAddress.slice(-4)
     }));
+    logger.info({ count: masked.length, source: "DB_READ" }, "[REF_LEADERBOARD] \u2713 Returned from DB");
     res.json(masked);
-  } catch {
+  } catch (err) {
+    logger.error({ err }, "[REF_LEADERBOARD] DB error");
     res.status(500).json({ error: "Server error" });
   }
 });
-router6.get("/referral/resolve/:code", readLimiter, async (req, res) => {
-  const code = req.params.code.trim().slice(0, 16);
+router7.get("/referral/resolve/:code", readLimiter, async (req, res) => {
+  const code = String(req.params.code).trim().slice(0, 16);
   try {
     const row = await db.select({ walletAddress: referralCodes.walletAddress }).from(referralCodes).where(eq(referralCodes.code, code)).limit(1);
     if (row.length === 0) {
@@ -83606,15 +84511,16 @@ router6.get("/referral/resolve/:code", readLimiter, async (req, res) => {
       valid: true,
       referrerMasked: w.slice(0, 4) + "\u2026" + w.slice(-4)
     });
-  } catch {
+  } catch (err) {
+    logger.error({ err, code }, "[REF_RESOLVE] DB error");
     res.status(500).json({ error: "Server error" });
   }
 });
-var referral_default = router6;
+var referral_default = router7;
 
 // src/routes/rpc-proxy.ts
-var import_express7 = __toESM(require_express2(), 1);
-var router7 = (0, import_express7.Router)();
+var import_express8 = __toESM(require_express2(), 1);
+var router8 = (0, import_express8.Router)();
 var SOLANA_RPC2 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 var ALLOWED_METHODS = /* @__PURE__ */ new Set([
   "getAccountInfo",
@@ -83640,10 +84546,10 @@ var rpcLimiter = rate_limit_default({
   legacyHeaders: false,
   message: { error: "Too many requests, please slow down." }
 });
-router7.get("/rpc", (_req, res) => {
+router8.get("/rpc", (_req, res) => {
   res.json({ status: "ok" });
 });
-router7.post("/rpc", rpcLimiter, async (req, res) => {
+router8.post("/rpc", rpcLimiter, async (req, res) => {
   try {
     const body = req.body;
     if (!body.method || !ALLOWED_METHODS.has(body.method)) {
@@ -83664,14 +84570,14 @@ router7.post("/rpc", rpcLimiter, async (req, res) => {
     res.status(502).json({ error: "RPC proxy error", detail: String(err) });
   }
 });
-var rpc_proxy_default = router7;
+var rpc_proxy_default = router8;
 
 // src/routes/sol-price-sync.ts
-var import_express8 = __toESM(require_express2(), 1);
+var import_express9 = __toESM(require_express2(), 1);
 var import_web32 = __toESM(require_index_cjs(), 1);
-var router8 = (0, import_express8.Router)();
+var router9 = (0, import_express9.Router)();
 var CRON_SECRET = process.env.CRON_SECRET ?? null;
-var IS_PROD = process.env.NODE_ENV === "production";
+var IS_PROD2 = process.env.NODE_ENV === "production";
 var syncLimiter = rate_limit_default({
   windowMs: 5 * 60 * 1e3,
   max: 3,
@@ -83681,7 +84587,7 @@ var syncLimiter = rate_limit_default({
 });
 function isCronAuthorized(req) {
   if (!CRON_SECRET) {
-    if (IS_PROD) return false;
+    if (IS_PROD2) return false;
     const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? req.socket?.remoteAddress ?? "";
     return ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1";
   }
@@ -83689,7 +84595,7 @@ function isCronAuthorized(req) {
   return auth === `Bearer ${CRON_SECRET}`;
 }
 var PROGRAM_ID = new import_web32.PublicKey("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
-var CONFIG_PDA = new import_web32.PublicKey("BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi");
+var CONFIG_PDA2 = new import_web32.PublicKey("BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi");
 var SOLANA_RPC3 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 async function getDiscriminator2(name) {
   const encoder = new TextEncoder();
@@ -83697,7 +84603,7 @@ async function getDiscriminator2(name) {
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   return Buffer.from(hashBuffer).slice(0, 8);
 }
-async function fetchSolPriceUsd() {
+async function fetchSolPriceUsd2() {
   const r = await fetch(
     "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd",
     { signal: AbortSignal.timeout(8e3) }
@@ -83723,7 +84629,7 @@ async function syncSolPriceOnChain(priceUsd) {
   const ix = new import_web32.TransactionInstruction({
     programId: PROGRAM_ID,
     keys: [
-      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: CONFIG_PDA2, isSigner: false, isWritable: true },
       { pubkey: keypair.publicKey, isSigner: true, isWritable: false }
     ],
     data: Buffer.concat([discriminator, argsBuf])
@@ -83743,7 +84649,7 @@ var lastSyncAt = null;
 var lastPrice = null;
 async function runSolPriceSync() {
   try {
-    const price = await fetchSolPriceUsd();
+    const price = await fetchSolPriceUsd2();
     const sig = await syncSolPriceOnChain(price);
     lastSyncAt = /* @__PURE__ */ new Date();
     lastPrice = price;
@@ -83752,7 +84658,7 @@ async function runSolPriceSync() {
     logger.error({ err }, "SOL price sync failed");
   }
 }
-router8.post("/cron/sync-sol-price", syncLimiter, async (req, res) => {
+router9.post("/cron/sync-sol-price", syncLimiter, async (req, res) => {
   if (!isCronAuthorized(req)) {
     res.status(401).json({ ok: false, error: "Unauthorized \u2014 Bearer token required" });
     return;
@@ -83762,7 +84668,7 @@ router8.post("/cron/sync-sol-price", syncLimiter, async (req, res) => {
     return;
   }
   try {
-    const price = await fetchSolPriceUsd();
+    const price = await fetchSolPriceUsd2();
     const sig = await syncSolPriceOnChain(price);
     lastSyncAt = /* @__PURE__ */ new Date();
     lastPrice = price;
@@ -83771,14 +84677,14 @@ router8.post("/cron/sync-sol-price", syncLimiter, async (req, res) => {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
-router8.get("/cron/sync-sol-price/status", (_req, res) => {
+router9.get("/cron/sync-sol-price/status", (_req, res) => {
   res.json({ lastSyncAt, lastPrice });
 });
-var sol_price_sync_default = router8;
+var sol_price_sync_default = router9;
 
 // src/routes/presale-chain.ts
-var import_express9 = __toESM(require_express2(), 1);
-var router9 = (0, import_express9.Router)();
+var import_express10 = __toESM(require_express2(), 1);
+var router10 = (0, import_express10.Router)();
 var chainLimiter = rate_limit_default({
   windowMs: 60 * 1e3,
   max: 60,
@@ -83787,7 +84693,7 @@ var chainLimiter = rate_limit_default({
   message: { error: "Too many requests" }
 });
 var SOLANA_RPC4 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
-var CONFIG_PDA2 = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
+var CONFIG_PDA3 = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
 var solPriceCache = { price: 0, fetchedAt: 0 };
 var chainStateCache = null;
 var PRICE_TTL_MS = 60 * 1e3;
@@ -83820,7 +84726,7 @@ async function fetchPresaleChainState() {
     jsonrpc: "2.0",
     id: 1,
     method: "getAccountInfo",
-    params: [CONFIG_PDA2, { encoding: "base64" }]
+    params: [CONFIG_PDA3, { encoding: "base64" }]
   });
   const rpcRes = await fetch(SOLANA_RPC4, {
     method: "POST",
@@ -83895,7 +84801,7 @@ async function fetchPresaleChainState() {
   chainStateCache = { data, fetchedAt: now };
   return data;
 }
-router9.get("/sol-price", chainLimiter, async (_req, res) => {
+router10.get("/sol-price", chainLimiter, async (_req, res) => {
   try {
     const price = await fetchSolPrice();
     res.json({ price, currency: "USD", updatedAt: (/* @__PURE__ */ new Date()).toISOString() });
@@ -83903,8 +84809,8 @@ router9.get("/sol-price", chainLimiter, async (_req, res) => {
     res.json({ price: solPriceCache.price, currency: "USD", updatedAt: (/* @__PURE__ */ new Date()).toISOString() });
   }
 });
-var IS_PROD2 = process.env.NODE_ENV === "production";
-router9.get("/presale/on-chain", chainLimiter, async (_req, res) => {
+var IS_PROD3 = process.env.NODE_ENV === "production";
+router10.get("/presale/on-chain", chainLimiter, async (_req, res) => {
   try {
     const [state, solPrice] = await Promise.all([
       fetchPresaleChainState(),
@@ -83914,35 +84820,36 @@ router9.get("/presale/on-chain", chainLimiter, async (_req, res) => {
   } catch (err) {
     res.status(502).json({
       error: "Failed to fetch on-chain state",
-      ...IS_PROD2 ? {} : { detail: String(err) }
+      ...IS_PROD3 ? {} : { detail: String(err) }
     });
   }
 });
-var presale_chain_default = router9;
+var presale_chain_default = router10;
 
 // src/routes/index.ts
-var router10 = (0, import_express10.Router)();
-router10.use(rpc_proxy_default);
-router10.use(presale_chain_default);
-router10.use(auth_default);
-router10.use(admin_default);
-router10.use(tracker_default);
-router10.use(referral_default);
-router10.use(health_default);
-router10.use(twitter_default);
-router10.use(sol_price_sync_default);
-var routes_default = router10;
+var router11 = (0, import_express11.Router)();
+router11.use(rpc_proxy_default);
+router11.use(presale_chain_default);
+router11.use(auth_default);
+router11.use(admin_default);
+router11.use(sessions_default);
+router11.use(tracker_default);
+router11.use(referral_default);
+router11.use(health_default);
+router11.use(twitter_default);
+router11.use(sol_price_sync_default);
+var routes_default = router11;
 
 // src/app.ts
 var pinoHttpMiddleware = import_pino_http.default;
 var ConnectPgSimple = (0, import_connect_pg_simple.default)(import_express_session.default);
-var IS_PROD3 = process.env.NODE_ENV === "production";
-if (IS_PROD3 && !process.env.SESSION_SECRET) {
+var IS_PROD4 = process.env.NODE_ENV === "production";
+if (IS_PROD4 && !process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET environment variable is required in production");
 }
 var SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-production";
 var ALLOWED_ORIGINS_EXACT = [
-  ...IS_PROD3 ? [] : ["http://localhost:22793", "http://localhost:3000"],
+  ...IS_PROD4 ? [] : ["http://localhost:22793", "http://localhost:3000"],
   ...process.env.REPLIT_DEV_DOMAIN ? [`https://${process.env.REPLIT_DEV_DOMAIN}`] : [],
   ...process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []
 ];
@@ -83953,16 +84860,16 @@ var isOriginAllowed = (origin) => {
   if (VERCEL_PREVIEW_DOMAIN && origin === `https://${VERCEL_PREVIEW_DOMAIN}`) return true;
   return false;
 };
-var REQUIRED_PROD_VARS = IS_PROD3 ? ["SESSION_SECRET"] : [];
+var REQUIRED_PROD_VARS = IS_PROD4 ? ["SESSION_SECRET"] : [];
 for (const v of REQUIRED_PROD_VARS) {
   if (!process.env[v]) {
     throw new Error(`[STARTUP] Missing required environment variable: ${v}`);
   }
 }
-if (IS_PROD3 && !process.env.CRON_SECRET) {
+if (IS_PROD4 && !process.env.CRON_SECRET) {
   logger.warn("CRON_SECRET not set \u2014 cron endpoints will be disabled");
 }
-var app = (0, import_express11.default)();
+var app = (0, import_express12.default)();
 app.set("trust proxy", 1);
 app.use(
   helmet({
@@ -83999,8 +84906,8 @@ app.use(
     credentials: true
   })
 );
-app.use(import_express11.default.json({ limit: "64kb" }));
-app.use(import_express11.default.urlencoded({ extended: true, limit: "64kb" }));
+app.use(import_express12.default.json({ limit: "64kb" }));
+app.use(import_express12.default.urlencoded({ extended: true, limit: "64kb" }));
 app.use((0, import_cookie_parser.default)());
 app.use(
   (0, import_express_session.default)({
@@ -84014,11 +84921,11 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: IS_PROD3,
+      secure: IS_PROD4,
       httpOnly: true,
       path: "/",
-      maxAge: 7 * 24 * 60 * 60 * 1e3,
-      sameSite: IS_PROD3 ? "none" : "lax"
+      maxAge: 24 * 60 * 60 * 1e3,
+      sameSite: "lax"
     }
   })
 );
@@ -84029,7 +84936,7 @@ app.use((err, _req, res, _next) => {
   const status = err.status ?? 500;
   const message = err.message ?? "Internal Server Error";
   logger.error({ err }, "Unhandled error");
-  res.status(status).json({ error: message, stack: IS_PROD3 ? void 0 : err.stack });
+  res.status(status).json({ error: message, stack: IS_PROD4 ? void 0 : err.stack });
 });
 if (process.env.ADMIN_KEYPAIR_JSON) {
   const SYNC_INTERVAL_MS = 5 * 60 * 1e3;
