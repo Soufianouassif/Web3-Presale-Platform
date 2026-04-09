@@ -70,10 +70,13 @@ autoInstallPeers: false
 onlyBuiltDependencies:
   - '@swc/core'
   - '@tailwindcss/oxide'
+  - bigint-buffer
+  - bufferutil
   - esbuild
   - lightningcss
   - msw
   - unrs-resolver
+  - utf-8-validate
 
 overrides:
   # replit uses linux-x64 only, we can exclude all other platforms
@@ -152,3 +155,5 @@ overrides:
   # Force old esbuild transitive deps to a version that works in Replit (avoids EACCES on postinstall)
   "@esbuild-kit/core-utils>esbuild": "^0.25.0"
   "esbuild-register>esbuild": "^0.25.0"
+  # esbuild-plugin-pino pulls in esbuild@0.18 which fails postinstall on Replit (EACCES)
+  "esbuild-plugin-pino>esbuild": "^0.25.0"

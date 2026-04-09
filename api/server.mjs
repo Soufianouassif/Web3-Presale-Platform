@@ -1479,7 +1479,7 @@ var require_safer = __commonJS({
   "../../node_modules/.pnpm/safer-buffer@2.1.2/node_modules/safer-buffer/safer.js"(exports, module) {
     "use strict";
     var buffer = __require("buffer");
-    var Buffer2 = buffer.Buffer;
+    var Buffer3 = buffer.Buffer;
     var safer = {};
     var key;
     for (key in buffer) {
@@ -1488,12 +1488,12 @@ var require_safer = __commonJS({
       safer[key] = buffer[key];
     }
     var Safer = safer.Buffer = {};
-    for (key in Buffer2) {
-      if (!Buffer2.hasOwnProperty(key)) continue;
+    for (key in Buffer3) {
+      if (!Buffer3.hasOwnProperty(key)) continue;
       if (key === "allocUnsafe" || key === "allocUnsafeSlow") continue;
-      Safer[key] = Buffer2[key];
+      Safer[key] = Buffer3[key];
     }
-    safer.Buffer.prototype = Buffer2.prototype;
+    safer.Buffer.prototype = Buffer3.prototype;
     if (!Safer.from || Safer.from === Uint8Array.from) {
       Safer.from = function(value, encodingOrOffset, length) {
         if (typeof value === "number") {
@@ -1502,7 +1502,7 @@ var require_safer = __commonJS({
         if (value && typeof value.length === "undefined") {
           throw new TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type " + typeof value);
         }
-        return Buffer2(value, encodingOrOffset, length);
+        return Buffer3(value, encodingOrOffset, length);
       };
     }
     if (!Safer.alloc) {
@@ -1513,7 +1513,7 @@ var require_safer = __commonJS({
         if (size < 0 || size >= 2 * (1 << 30)) {
           throw new RangeError('The value "' + size + '" is invalid for option "size"');
         }
-        var buf = Buffer2(size);
+        var buf = Buffer3(size);
         if (!fill || fill.length === 0) {
           buf.fill(0);
         } else if (typeof encoding === "string") {
@@ -1608,7 +1608,7 @@ var require_merge_exports = __commonJS({
 var require_internal = __commonJS({
   "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/internal.js"(exports, module) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     module.exports = {
       // Encodings
       utf8: { type: "_internal", bomAware: true },
@@ -1632,7 +1632,7 @@ var require_internal = __commonJS({
       } else if (this.enc === "cesu8") {
         this.enc = "utf8";
         this.encoder = InternalEncoderCesu8;
-        if (Buffer2.from("eda0bdedb2a9", "hex").toString() !== "\u{1F4A9}") {
+        if (Buffer3.from("eda0bdedb2a9", "hex").toString() !== "\u{1F4A9}") {
           this.decoder = InternalDecoderCesu8;
           this.defaultCharUnicode = iconv.defaultCharUnicode;
         }
@@ -1645,8 +1645,8 @@ var require_internal = __commonJS({
       this.decoder = new StringDecoder(codec.enc);
     }
     InternalDecoder.prototype.write = function(buf) {
-      if (!Buffer2.isBuffer(buf)) {
-        buf = Buffer2.from(buf);
+      if (!Buffer3.isBuffer(buf)) {
+        buf = Buffer3.from(buf);
       }
       return this.decoder.write(buf);
     };
@@ -1657,7 +1657,7 @@ var require_internal = __commonJS({
       this.enc = codec.enc;
     }
     InternalEncoder.prototype.write = function(str) {
-      return Buffer2.from(str, this.enc);
+      return Buffer3.from(str, this.enc);
     };
     InternalEncoder.prototype.end = function() {
     };
@@ -1669,15 +1669,15 @@ var require_internal = __commonJS({
       var completeQuads = str.length - str.length % 4;
       this.prevStr = str.slice(completeQuads);
       str = str.slice(0, completeQuads);
-      return Buffer2.from(str, "base64");
+      return Buffer3.from(str, "base64");
     };
     InternalEncoderBase64.prototype.end = function() {
-      return Buffer2.from(this.prevStr, "base64");
+      return Buffer3.from(this.prevStr, "base64");
     };
     function InternalEncoderCesu8(options, codec) {
     }
     InternalEncoderCesu8.prototype.write = function(str) {
-      var buf = Buffer2.alloc(str.length * 3);
+      var buf = Buffer3.alloc(str.length * 3);
       var bufIdx = 0;
       for (var i = 0; i < str.length; i++) {
         var charCode = str.charCodeAt(i);
@@ -1773,13 +1773,13 @@ var require_internal = __commonJS({
           str = str.slice(0, str.length - 1);
         }
       }
-      return Buffer2.from(str, this.enc);
+      return Buffer3.from(str, this.enc);
     };
     InternalEncoderUtf8.prototype.end = function() {
       if (this.highSurrogate) {
         var str = this.highSurrogate;
         this.highSurrogate = "";
-        return Buffer2.from(str, this.enc);
+        return Buffer3.from(str, this.enc);
       }
     };
   }
@@ -1789,7 +1789,7 @@ var require_internal = __commonJS({
 var require_utf32 = __commonJS({
   "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf32.js"(exports) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     exports._utf32 = Utf32Codec;
     function Utf32Codec(codecOptions, iconv) {
       this.iconv = iconv;
@@ -1807,8 +1807,8 @@ var require_utf32 = __commonJS({
       this.highSurrogate = 0;
     }
     Utf32Encoder.prototype.write = function(str) {
-      var src = Buffer2.from(str, "ucs2");
-      var dst = Buffer2.alloc(src.length * 2);
+      var src = Buffer3.from(str, "ucs2");
+      var dst = Buffer3.alloc(src.length * 2);
       var write32 = this.isLE ? dst.writeUInt32LE : dst.writeUInt32BE;
       var offset = 0;
       for (var i = 0; i < src.length; i += 2) {
@@ -1844,7 +1844,7 @@ var require_utf32 = __commonJS({
       if (!this.highSurrogate) {
         return;
       }
-      var buf = Buffer2.alloc(4);
+      var buf = Buffer3.alloc(4);
       if (this.isLE) {
         buf.writeUInt32LE(this.highSurrogate, 0);
       } else {
@@ -1864,7 +1864,7 @@ var require_utf32 = __commonJS({
       }
       var i = 0;
       var codepoint = 0;
-      var dst = Buffer2.alloc(src.length + 4);
+      var dst = Buffer3.alloc(src.length + 4);
       var offset = 0;
       var isLE = this.isLE;
       var overflow = this.overflow;
@@ -2020,7 +2020,7 @@ var require_utf32 = __commonJS({
 var require_utf16 = __commonJS({
   "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf16.js"(exports) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     exports.utf16be = Utf16BECodec;
     function Utf16BECodec() {
     }
@@ -2030,7 +2030,7 @@ var require_utf16 = __commonJS({
     function Utf16BEEncoder() {
     }
     Utf16BEEncoder.prototype.write = function(str) {
-      var buf = Buffer2.from(str, "ucs2");
+      var buf = Buffer3.from(str, "ucs2");
       for (var i = 0; i < buf.length; i += 2) {
         var tmp = buf[i];
         buf[i] = buf[i + 1];
@@ -2047,7 +2047,7 @@ var require_utf16 = __commonJS({
       if (buf.length == 0) {
         return "";
       }
-      var buf2 = Buffer2.alloc(buf.length + 1);
+      var buf2 = Buffer3.alloc(buf.length + 1);
       var i = 0;
       var j = 0;
       if (this.overflowByte !== -1) {
@@ -2163,7 +2163,7 @@ var require_utf16 = __commonJS({
 var require_utf7 = __commonJS({
   "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf7.js"(exports) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     exports.utf7 = Utf7Codec;
     exports.unicode11utf7 = "utf7";
     function Utf7Codec(codecOptions, iconv) {
@@ -2177,7 +2177,7 @@ var require_utf7 = __commonJS({
       this.iconv = codec.iconv;
     }
     Utf7Encoder.prototype.write = function(str) {
-      return Buffer2.from(str.replace(nonDirectChars, function(chunk) {
+      return Buffer3.from(str.replace(nonDirectChars, function(chunk) {
         return "+" + (chunk === "+" ? "" : this.iconv.encode(chunk, "utf16-be").toString("base64").replace(/=+$/, "")) + "-";
       }.bind(this)));
     };
@@ -2215,7 +2215,7 @@ var require_utf7 = __commonJS({
               res += "+";
             } else {
               var b64str = base64Accum + this.iconv.decode(buf.slice(lastI, i2), "ascii");
-              res += this.iconv.decode(Buffer2.from(b64str, "base64"), "utf16-be");
+              res += this.iconv.decode(Buffer3.from(b64str, "base64"), "utf16-be");
             }
             if (buf[i2] != minusChar) {
               i2--;
@@ -2233,7 +2233,7 @@ var require_utf7 = __commonJS({
         var canBeDecoded = b64str.length - b64str.length % 8;
         base64Accum = b64str.slice(canBeDecoded);
         b64str = b64str.slice(0, canBeDecoded);
-        res += this.iconv.decode(Buffer2.from(b64str, "base64"), "utf16-be");
+        res += this.iconv.decode(Buffer3.from(b64str, "base64"), "utf16-be");
       }
       this.inBase64 = inBase64;
       this.base64Accum = base64Accum;
@@ -2242,7 +2242,7 @@ var require_utf7 = __commonJS({
     Utf7Decoder.prototype.end = function() {
       var res = "";
       if (this.inBase64 && this.base64Accum.length > 0) {
-        res = this.iconv.decode(Buffer2.from(this.base64Accum, "base64"), "utf16-be");
+        res = this.iconv.decode(Buffer3.from(this.base64Accum, "base64"), "utf16-be");
       }
       this.inBase64 = false;
       this.base64Accum = "";
@@ -2258,14 +2258,14 @@ var require_utf7 = __commonJS({
     function Utf7IMAPEncoder(options, codec) {
       this.iconv = codec.iconv;
       this.inBase64 = false;
-      this.base64Accum = Buffer2.alloc(6);
+      this.base64Accum = Buffer3.alloc(6);
       this.base64AccumIdx = 0;
     }
     Utf7IMAPEncoder.prototype.write = function(str) {
       var inBase64 = this.inBase64;
       var base64Accum = this.base64Accum;
       var base64AccumIdx = this.base64AccumIdx;
-      var buf = Buffer2.alloc(str.length * 5 + 10);
+      var buf = Buffer3.alloc(str.length * 5 + 10);
       var bufIdx = 0;
       for (var i2 = 0; i2 < str.length; i2++) {
         var uChar = str.charCodeAt(i2);
@@ -2304,7 +2304,7 @@ var require_utf7 = __commonJS({
       return buf.slice(0, bufIdx);
     };
     Utf7IMAPEncoder.prototype.end = function() {
-      var buf = Buffer2.alloc(10);
+      var buf = Buffer3.alloc(10);
       var bufIdx = 0;
       if (this.inBase64) {
         if (this.base64AccumIdx > 0) {
@@ -2341,7 +2341,7 @@ var require_utf7 = __commonJS({
               res += "&";
             } else {
               var b64str = base64Accum + this.iconv.decode(buf.slice(lastI, i2), "ascii").replace(/,/g, "/");
-              res += this.iconv.decode(Buffer2.from(b64str, "base64"), "utf16-be");
+              res += this.iconv.decode(Buffer3.from(b64str, "base64"), "utf16-be");
             }
             if (buf[i2] != minusChar) {
               i2--;
@@ -2359,7 +2359,7 @@ var require_utf7 = __commonJS({
         var canBeDecoded = b64str.length - b64str.length % 8;
         base64Accum = b64str.slice(canBeDecoded);
         b64str = b64str.slice(0, canBeDecoded);
-        res += this.iconv.decode(Buffer2.from(b64str, "base64"), "utf16-be");
+        res += this.iconv.decode(Buffer3.from(b64str, "base64"), "utf16-be");
       }
       this.inBase64 = inBase64;
       this.base64Accum = base64Accum;
@@ -2368,7 +2368,7 @@ var require_utf7 = __commonJS({
     Utf7IMAPDecoder.prototype.end = function() {
       var res = "";
       if (this.inBase64 && this.base64Accum.length > 0) {
-        res = this.iconv.decode(Buffer2.from(this.base64Accum, "base64"), "utf16-be");
+        res = this.iconv.decode(Buffer3.from(this.base64Accum, "base64"), "utf16-be");
       }
       this.inBase64 = false;
       this.base64Accum = "";
@@ -2381,7 +2381,7 @@ var require_utf7 = __commonJS({
 var require_sbcs_codec = __commonJS({
   "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-codec.js"(exports) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     exports._sbcs = SBCSCodec;
     function SBCSCodec(codecOptions, iconv) {
       if (!codecOptions) {
@@ -2397,8 +2397,8 @@ var require_sbcs_codec = __commonJS({
         }
         codecOptions.chars = asciiString + codecOptions.chars;
       }
-      this.decodeBuf = Buffer2.from(codecOptions.chars, "ucs2");
-      var encodeBuf = Buffer2.alloc(65536, iconv.defaultCharSingleByte.charCodeAt(0));
+      this.decodeBuf = Buffer3.from(codecOptions.chars, "ucs2");
+      var encodeBuf = Buffer3.alloc(65536, iconv.defaultCharSingleByte.charCodeAt(0));
       for (var i = 0; i < codecOptions.chars.length; i++) {
         encodeBuf[codecOptions.chars.charCodeAt(i)] = i;
       }
@@ -2410,7 +2410,7 @@ var require_sbcs_codec = __commonJS({
       this.encodeBuf = codec.encodeBuf;
     }
     SBCSEncoder.prototype.write = function(str) {
-      var buf = Buffer2.alloc(str.length);
+      var buf = Buffer3.alloc(str.length);
       for (var i = 0; i < str.length; i++) {
         buf[i] = this.encodeBuf[str.charCodeAt(i)];
       }
@@ -2423,7 +2423,7 @@ var require_sbcs_codec = __commonJS({
     }
     SBCSDecoder.prototype.write = function(buf) {
       var decodeBuf = this.decodeBuf;
-      var newBuf = Buffer2.alloc(buf.length * 2);
+      var newBuf = Buffer3.alloc(buf.length * 2);
       var idx1 = 0;
       var idx2 = 0;
       for (var i = 0; i < buf.length; i++) {
@@ -3051,7 +3051,7 @@ var require_sbcs_data_generated = __commonJS({
 var require_dbcs_codec = __commonJS({
   "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/dbcs-codec.js"(exports) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     exports._dbcs = DBCSCodec;
     var UNASSIGNED = -1;
     var GB18030_CODE = -2;
@@ -3287,7 +3287,7 @@ var require_dbcs_codec = __commonJS({
       this.gb18030 = codec.gb18030;
     }
     DBCSEncoder.prototype.write = function(str) {
-      var newBuf = Buffer2.alloc(str.length * (this.gb18030 ? 4 : 3));
+      var newBuf = Buffer3.alloc(str.length * (this.gb18030 ? 4 : 3));
       var leadSurrogate = this.leadSurrogate;
       var seqObj = this.seqObj;
       var nextChar = -1;
@@ -3391,7 +3391,7 @@ var require_dbcs_codec = __commonJS({
       if (this.leadSurrogate === -1 && this.seqObj === void 0) {
         return;
       }
-      var newBuf = Buffer2.alloc(10);
+      var newBuf = Buffer3.alloc(10);
       var j = 0;
       if (this.seqObj) {
         var dbcsCode = this.seqObj[DEF_CHAR];
@@ -3422,7 +3422,7 @@ var require_dbcs_codec = __commonJS({
       this.gb18030 = codec.gb18030;
     }
     DBCSDecoder.prototype.write = function(buf) {
-      var newBuf = Buffer2.alloc(buf.length * 2);
+      var newBuf = Buffer3.alloc(buf.length * 2);
       var nodeIdx = this.nodeIdx;
       var prevBytes = this.prevBytes;
       var prevOffset = this.prevBytes.length;
@@ -5031,7 +5031,7 @@ var require_encodings = __commonJS({
 var require_streams = __commonJS({
   "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/streams.js"(exports, module) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     module.exports = function(streamModule) {
       var Transform = streamModule.Transform;
       function IconvLiteEncoderStream(conv, options) {
@@ -5071,7 +5071,7 @@ var require_streams = __commonJS({
           chunks.push(chunk);
         });
         this.on("end", function() {
-          cb(null, Buffer2.concat(chunks));
+          cb(null, Buffer3.concat(chunks));
         });
         return this;
       };
@@ -5085,7 +5085,7 @@ var require_streams = __commonJS({
         constructor: { value: IconvLiteDecoderStream }
       });
       IconvLiteDecoderStream.prototype._transform = function(chunk, encoding, done) {
-        if (!Buffer2.isBuffer(chunk) && !(chunk instanceof Uint8Array)) {
+        if (!Buffer3.isBuffer(chunk) && !(chunk instanceof Uint8Array)) {
           return done(new Error("Iconv decoding stream needs buffers as its input."));
         }
         try {
@@ -5128,7 +5128,7 @@ var require_streams = __commonJS({
 var require_lib = __commonJS({
   "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/index.js"(exports, module) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     var bomHandling = require_bom_handling();
     var mergeModules = require_merge_exports();
     module.exports.encodings = null;
@@ -5139,7 +5139,7 @@ var require_lib = __commonJS({
       var encoder = module.exports.getEncoder(encoding, options);
       var res = encoder.write(str);
       var trail = encoder.end();
-      return trail && trail.length > 0 ? Buffer2.concat([res, trail]) : res;
+      return trail && trail.length > 0 ? Buffer3.concat([res, trail]) : res;
     };
     module.exports.decode = function decode(buf, encoding, options) {
       if (typeof buf === "string") {
@@ -5147,7 +5147,7 @@ var require_lib = __commonJS({
           console.error("Iconv-lite warning: decode()-ing strings is deprecated. Refer to https://github.com/ashtuchkin/iconv-lite/wiki/Use-Buffers-when-decoding");
           module.exports.skipDecodeWarning = true;
         }
-        buf = Buffer2.from("" + (buf || ""), "binary");
+        buf = Buffer3.from("" + (buf || ""), "binary");
       }
       var decoder = module.exports.getDecoder(encoding, options);
       var res = decoder.write(buf);
@@ -19649,7 +19649,7 @@ var require_utils3 = __commonJS({
     var proxyaddr = require_proxy_addr();
     var qs = require_lib2();
     var querystring = __require("node:querystring");
-    var { Buffer: Buffer2 } = __require("node:buffer");
+    var { Buffer: Buffer3 } = __require("node:buffer");
     exports.methods = METHODS.map((method) => method.toLowerCase());
     exports.etag = createETagGenerator({ weak: false });
     exports.wetag = createETagGenerator({ weak: true });
@@ -19753,7 +19753,7 @@ var require_utils3 = __commonJS({
     };
     function createETagGenerator(options) {
       return function generateETag(body, encoding) {
-        var buf = !Buffer2.isBuffer(body) ? Buffer2.from(body, encoding) : body;
+        var buf = !Buffer3.isBuffer(body) ? Buffer3.from(body, encoding) : body;
         return etag(buf, options);
       };
     }
@@ -20503,27 +20503,27 @@ var require_router = __commonJS({
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var methods = METHODS.map((method) => method.toLowerCase());
-    module.exports = Router10;
+    module.exports = Router11;
     module.exports.Route = Route;
-    function Router10(options) {
-      if (!(this instanceof Router10)) {
-        return new Router10(options);
+    function Router11(options) {
+      if (!(this instanceof Router11)) {
+        return new Router11(options);
       }
       const opts = options || {};
-      function router10(req, res, next) {
-        router10.handle(req, res, next);
+      function router11(req, res, next) {
+        router11.handle(req, res, next);
       }
-      Object.setPrototypeOf(router10, this);
-      router10.caseSensitive = opts.caseSensitive;
-      router10.mergeParams = opts.mergeParams;
-      router10.params = {};
-      router10.strict = opts.strict;
-      router10.stack = [];
-      return router10;
+      Object.setPrototypeOf(router11, this);
+      router11.caseSensitive = opts.caseSensitive;
+      router11.mergeParams = opts.mergeParams;
+      router11.params = {};
+      router11.strict = opts.strict;
+      router11.stack = [];
+      return router11;
     }
-    Router10.prototype = function() {
+    Router11.prototype = function() {
     };
-    Router10.prototype.param = function param(name, fn) {
+    Router11.prototype.param = function param(name, fn) {
       if (!name) {
         throw new TypeError("argument name is required");
       }
@@ -20543,7 +20543,7 @@ var require_router = __commonJS({
       params.push(fn);
       return this;
     };
-    Router10.prototype.handle = function handle(req, res, callback) {
+    Router11.prototype.handle = function handle(req, res, callback) {
       if (!callback) {
         throw new TypeError("argument callback is required");
       }
@@ -20670,7 +20670,7 @@ var require_router = __commonJS({
         }
       }
     };
-    Router10.prototype.use = function use(handler) {
+    Router11.prototype.use = function use(handler) {
       let offset = 0;
       let path = "/";
       if (typeof handler !== "function") {
@@ -20703,7 +20703,7 @@ var require_router = __commonJS({
       }
       return this;
     };
-    Router10.prototype.route = function route(path) {
+    Router11.prototype.route = function route(path) {
       const route2 = new Route(path);
       const layer = new Layer(path, {
         sensitive: this.caseSensitive,
@@ -20718,7 +20718,7 @@ var require_router = __commonJS({
       return route2;
     };
     methods.concat("all").forEach(function(method) {
-      Router10.prototype[method] = function(path) {
+      Router11.prototype[method] = function(path) {
         const route = this.route(path);
         route[method].apply(route, slice.call(arguments, 1));
         return this;
@@ -20901,13 +20901,13 @@ var require_application = __commonJS({
     var compileTrust = require_utils3().compileTrust;
     var resolve = __require("node:path").resolve;
     var once = require_once();
-    var Router10 = require_router();
+    var Router11 = require_router();
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var app2 = exports = module.exports = {};
     var trustProxyDefaultSymbol = "@@symbol:trust_proxy_default";
     app2.init = function init() {
-      var router10 = null;
+      var router11 = null;
       this.cache = /* @__PURE__ */ Object.create(null);
       this.engines = /* @__PURE__ */ Object.create(null);
       this.settings = /* @__PURE__ */ Object.create(null);
@@ -20916,13 +20916,13 @@ var require_application = __commonJS({
         configurable: true,
         enumerable: true,
         get: function getrouter() {
-          if (router10 === null) {
-            router10 = new Router10({
+          if (router11 === null) {
+            router11 = new Router11({
               caseSensitive: this.enabled("case sensitive routing"),
               strict: this.enabled("strict routing")
             });
           }
-          return router10;
+          return router11;
         }
       });
     };
@@ -20993,15 +20993,15 @@ var require_application = __commonJS({
       if (fns.length === 0) {
         throw new TypeError("app.use() requires a middleware function");
       }
-      var router10 = this.router;
+      var router11 = this.router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router10.use(path, fn2);
+          return router11.use(path, fn2);
         }
         debug(".use app under %s", path);
         fn2.mountpath = path;
         fn2.parent = this;
-        router10.use(path, function mounted_app(req, res, next) {
+        router11.use(path, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             Object.setPrototypeOf(req, orig.request);
@@ -21900,7 +21900,7 @@ var require_request = __commonJS({
   "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/request.js"(exports, module) {
     "use strict";
     var accepts = require_accepts();
-    var isIP = __require("node:net").isIP;
+    var isIP2 = __require("node:net").isIP;
     var typeis = require_type_is();
     var http = __require("node:http");
     var fresh = require_fresh();
@@ -21990,7 +21990,7 @@ var require_request = __commonJS({
       var hostname = this.hostname;
       if (!hostname) return [];
       var offset = this.app.get("subdomain offset");
-      var subdomains2 = !isIP(hostname) ? hostname.split(".").reverse() : [hostname];
+      var subdomains2 = !isIP2(hostname) ? hostname.split(".").reverse() : [hostname];
       return subdomains2.slice(offset);
     });
     defineGetter(req, "path", function path() {
@@ -22970,7 +22970,7 @@ var require_response = __commonJS({
     var extname = path.extname;
     var resolve = path.resolve;
     var vary = require_vary();
-    var { Buffer: Buffer2 } = __require("node:buffer");
+    var { Buffer: Buffer3 } = __require("node:buffer");
     var res = Object.create(http.ServerResponse.prototype);
     module.exports = res;
     res.status = function status(code) {
@@ -23034,12 +23034,12 @@ var require_response = __commonJS({
       var generateETag = !this.get("ETag") && typeof etagFn === "function";
       var len;
       if (chunk !== void 0) {
-        if (Buffer2.isBuffer(chunk)) {
+        if (Buffer3.isBuffer(chunk)) {
           len = chunk.length;
         } else if (!generateETag && chunk.length < 1e3) {
-          len = Buffer2.byteLength(chunk, encoding);
+          len = Buffer3.byteLength(chunk, encoding);
         } else {
-          chunk = Buffer2.from(chunk, encoding);
+          chunk = Buffer3.from(chunk, encoding);
           encoding = void 0;
           len = chunk.length;
         }
@@ -23301,7 +23301,7 @@ var require_response = __commonJS({
         }
       });
       this.status(status);
-      this.set("Content-Length", Buffer2.byteLength(body));
+      this.set("Content-Length", Buffer3.byteLength(body));
       if (this.req.method === "HEAD") {
         this.end();
       } else {
@@ -23528,7 +23528,7 @@ var require_express = __commonJS({
     var EventEmitter = __require("node:events").EventEmitter;
     var mixin = require_merge_descriptors();
     var proto = require_application();
-    var Router10 = require_router();
+    var Router11 = require_router();
     var req = require_request();
     var res = require_response();
     exports = module.exports = createApplication;
@@ -23550,8 +23550,8 @@ var require_express = __commonJS({
     exports.application = proto;
     exports.request = req;
     exports.response = res;
-    exports.Route = Router10.Route;
-    exports.Router = Router10;
+    exports.Route = Router11.Route;
+    exports.Router = Router11;
     exports.json = bodyParser.json;
     exports.raw = bodyParser.raw;
     exports.static = require_serve_static();
@@ -24215,7 +24215,7 @@ var require_req = __commonJS({
       value: {}
     });
     function reqSerializer(req) {
-      const connection = req.info || req.socket;
+      const connection2 = req.info || req.socket;
       const _req = Object.create(pinoReqProto);
       _req.id = typeof req.id === "function" ? req.id() : req.id || (req.info ? req.info.id : void 0);
       _req.method = req.method;
@@ -24232,8 +24232,8 @@ var require_req = __commonJS({
         _req.params = req.params;
       }
       _req.headers = req.headers;
-      _req.remoteAddress = connection && connection.remoteAddress;
-      _req.remotePort = connection && connection.remotePort;
+      _req.remoteAddress = connection2 && connection2.remoteAddress;
+      _req.remotePort = connection2 && connection2.remotePort;
       _req.raw = req.raw || req;
       return _req;
     }
@@ -28526,34 +28526,34 @@ var require_logger = __commonJS({
 var require_safe_buffer = __commonJS({
   "../../node_modules/.pnpm/safe-buffer@5.2.1/node_modules/safe-buffer/index.js"(exports, module) {
     var buffer = __require("buffer");
-    var Buffer2 = buffer.Buffer;
+    var Buffer3 = buffer.Buffer;
     function copyProps(src, dst) {
       for (var key in src) {
         dst[key] = src[key];
       }
     }
-    if (Buffer2.from && Buffer2.alloc && Buffer2.allocUnsafe && Buffer2.allocUnsafeSlow) {
+    if (Buffer3.from && Buffer3.alloc && Buffer3.allocUnsafe && Buffer3.allocUnsafeSlow) {
       module.exports = buffer;
     } else {
       copyProps(buffer, exports);
       exports.Buffer = SafeBuffer;
     }
     function SafeBuffer(arg, encodingOrOffset, length) {
-      return Buffer2(arg, encodingOrOffset, length);
+      return Buffer3(arg, encodingOrOffset, length);
     }
-    SafeBuffer.prototype = Object.create(Buffer2.prototype);
-    copyProps(Buffer2, SafeBuffer);
+    SafeBuffer.prototype = Object.create(Buffer3.prototype);
+    copyProps(Buffer3, SafeBuffer);
     SafeBuffer.from = function(arg, encodingOrOffset, length) {
       if (typeof arg === "number") {
         throw new TypeError("Argument must not be a number");
       }
-      return Buffer2(arg, encodingOrOffset, length);
+      return Buffer3(arg, encodingOrOffset, length);
     };
     SafeBuffer.alloc = function(size, fill, encoding) {
       if (typeof size !== "number") {
         throw new TypeError("Argument must be a number");
       }
-      var buf = Buffer2(size);
+      var buf = Buffer3(size);
       if (fill !== void 0) {
         if (typeof encoding === "string") {
           buf.fill(fill, encoding);
@@ -28569,7 +28569,7 @@ var require_safe_buffer = __commonJS({
       if (typeof size !== "number") {
         throw new TypeError("Argument must be a number");
       }
-      return Buffer2(size);
+      return Buffer3(size);
     };
     SafeBuffer.allocUnsafeSlow = function(size) {
       if (typeof size !== "number") {
@@ -29431,13 +29431,13 @@ var require_memory = __commonJS({
     var defer = typeof setImmediate === "function" ? setImmediate : function(fn) {
       process.nextTick(fn.bind.apply(fn, arguments));
     };
-    module.exports = MemoryStore;
-    function MemoryStore() {
+    module.exports = MemoryStore2;
+    function MemoryStore2() {
       Store.call(this);
       this.sessions = /* @__PURE__ */ Object.create(null);
     }
-    util2.inherits(MemoryStore, Store);
-    MemoryStore.prototype.all = function all(callback) {
+    util2.inherits(MemoryStore2, Store);
+    MemoryStore2.prototype.all = function all(callback) {
       var sessionIds = Object.keys(this.sessions);
       var sessions = /* @__PURE__ */ Object.create(null);
       for (var i = 0; i < sessionIds.length; i++) {
@@ -29449,28 +29449,28 @@ var require_memory = __commonJS({
       }
       callback && defer(callback, null, sessions);
     };
-    MemoryStore.prototype.clear = function clear(callback) {
+    MemoryStore2.prototype.clear = function clear(callback) {
       this.sessions = /* @__PURE__ */ Object.create(null);
       callback && defer(callback);
     };
-    MemoryStore.prototype.destroy = function destroy(sessionId, callback) {
+    MemoryStore2.prototype.destroy = function destroy(sessionId, callback) {
       delete this.sessions[sessionId];
       callback && defer(callback);
     };
-    MemoryStore.prototype.get = function get(sessionId, callback) {
+    MemoryStore2.prototype.get = function get(sessionId, callback) {
       defer(callback, null, getSession.call(this, sessionId));
     };
-    MemoryStore.prototype.set = function set(sessionId, session2, callback) {
+    MemoryStore2.prototype.set = function set(sessionId, session2, callback) {
       this.sessions[sessionId] = JSON.stringify(session2);
       callback && defer(callback);
     };
-    MemoryStore.prototype.length = function length(callback) {
+    MemoryStore2.prototype.length = function length(callback) {
       this.all(function(err, sessions) {
         if (err) return callback(err);
         callback(null, Object.keys(sessions).length);
       });
     };
-    MemoryStore.prototype.touch = function touch(sessionId, session2, callback) {
+    MemoryStore2.prototype.touch = function touch(sessionId, session2, callback) {
       var currentSession = getSession.call(this, sessionId);
       if (currentSession) {
         currentSession.cookie = session2.cookie;
@@ -29500,7 +29500,7 @@ var require_memory = __commonJS({
 var require_express_session = __commonJS({
   "../../node_modules/.pnpm/express-session@1.19.0/node_modules/express-session/index.js"(exports, module) {
     "use strict";
-    var Buffer2 = require_safe_buffer().Buffer;
+    var Buffer3 = require_safe_buffer().Buffer;
     var cookie = require_cookie();
     var crypto5 = __require("crypto");
     var debug = require_src2()("express-session");
@@ -29510,7 +29510,7 @@ var require_express_session = __commonJS({
     var signature = require_cookie_signature3();
     var uid = require_uid_safe().sync;
     var Cookie = require_cookie2();
-    var MemoryStore = require_memory();
+    var MemoryStore2 = require_memory();
     var Session = require_session();
     var Store = require_store();
     var env = process.env.NODE_ENV;
@@ -29518,7 +29518,7 @@ var require_express_session = __commonJS({
     exports.Store = Store;
     exports.Cookie = Cookie;
     exports.Session = Session;
-    exports.MemoryStore = MemoryStore;
+    exports.MemoryStore = MemoryStore2;
     var warning = "Warning: connect.session() MemoryStore is not\ndesigned for a production environment, as it will leak\nmemory, and will not scale past a single process.";
     var defer = typeof setImmediate === "function" ? setImmediate : function(fn) {
       process.nextTick(fn.bind.apply(fn, arguments));
@@ -29528,7 +29528,7 @@ var require_express_session = __commonJS({
       var cookieOptions = opts.cookie || {};
       var generateId = opts.genid || generateSessionId;
       var name = opts.name || opts.key || "connect.sid";
-      var store = opts.store || new MemoryStore();
+      var store = opts.store || new MemoryStore2();
       var trustProxy = opts.proxy;
       var resaveSession = opts.resave;
       var rollingSessions = Boolean(opts.rolling);
@@ -29558,7 +29558,7 @@ var require_express_session = __commonJS({
       if (!secret) {
         deprecate("req.secret; provide secret option");
       }
-      if (env === "production" && store instanceof MemoryStore) {
+      if (env === "production" && store instanceof MemoryStore2) {
         console.warn(warning);
       }
       store.generate = function(req) {
@@ -29662,7 +29662,7 @@ var require_express_session = __commonJS({
             }
             var contentLength = Number(res.getHeader("Content-Length"));
             if (!isNaN(contentLength) && contentLength > 0) {
-              chunk = !Buffer2.isBuffer(chunk) ? Buffer2.from(chunk, encoding) : chunk;
+              chunk = !Buffer3.isBuffer(chunk) ? Buffer3.from(chunk, encoding) : chunk;
               encoding = void 0;
               if (chunk.length !== 0) {
                 debug("split response");
@@ -31982,23 +31982,23 @@ var require_query = __commonJS({
           this._result.addRow(row);
         }
       }
-      handleCommandComplete(msg, connection) {
+      handleCommandComplete(msg, connection2) {
         this._checkForMultirow();
         this._result.addCommandComplete(msg);
         if (this.rows) {
-          connection.sync();
+          connection2.sync();
         }
       }
       // if a named prepared statement is created with empty query text
       // the backend will send an emptyQuery message but *not* a command complete message
       // since we pipeline sync immediately after execute we don't need to do anything here
       // unless we have rows specified, in which case we did not pipeline the initial sync call
-      handleEmptyQuery(connection) {
+      handleEmptyQuery(connection2) {
         if (this.rows) {
-          connection.sync();
+          connection2.sync();
         }
       }
-      handleError(err, connection) {
+      handleError(err, connection2) {
         if (this._canceledDueToError) {
           err = this._canceledDueToError;
           this._canceledDueToError = false;
@@ -32023,11 +32023,11 @@ var require_query = __commonJS({
         }
         this.emit("end", this._results);
       }
-      submit(connection) {
+      submit(connection2) {
         if (typeof this.text !== "string" && typeof this.name !== "string") {
           return new Error("A query must have either text or a name. Supplying neither is unsupported.");
         }
-        const previous = connection.parsedStatements[this.name];
+        const previous = connection2.parsedStatements[this.name];
         if (this.text && previous && this.text !== previous) {
           return new Error(`Prepared statements must be unique - '${this.name}' was used for a different statement`);
         }
@@ -32035,45 +32035,45 @@ var require_query = __commonJS({
           return new Error("Query values must be an array");
         }
         if (this.requiresPreparation()) {
-          connection.stream.cork && connection.stream.cork();
+          connection2.stream.cork && connection2.stream.cork();
           try {
-            this.prepare(connection);
+            this.prepare(connection2);
           } finally {
-            connection.stream.uncork && connection.stream.uncork();
+            connection2.stream.uncork && connection2.stream.uncork();
           }
         } else {
-          connection.query(this.text);
+          connection2.query(this.text);
         }
         return null;
       }
-      hasBeenParsed(connection) {
-        return this.name && connection.parsedStatements[this.name];
+      hasBeenParsed(connection2) {
+        return this.name && connection2.parsedStatements[this.name];
       }
-      handlePortalSuspended(connection) {
-        this._getRows(connection, this.rows);
+      handlePortalSuspended(connection2) {
+        this._getRows(connection2, this.rows);
       }
-      _getRows(connection, rows) {
-        connection.execute({
+      _getRows(connection2, rows) {
+        connection2.execute({
           portal: this.portal,
           rows
         });
         if (!rows) {
-          connection.sync();
+          connection2.sync();
         } else {
-          connection.flush();
+          connection2.flush();
         }
       }
       // http://developer.postgresql.org/pgdocs/postgres/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY
-      prepare(connection) {
-        if (!this.hasBeenParsed(connection)) {
-          connection.parse({
+      prepare(connection2) {
+        if (!this.hasBeenParsed(connection2)) {
+          connection2.parse({
             text: this.text,
             name: this.name,
             types: this.types
           });
         }
         try {
-          connection.bind({
+          connection2.bind({
             portal: this.portal,
             statement: this.name,
             values: this.values,
@@ -32081,19 +32081,19 @@ var require_query = __commonJS({
             valueMapper: utils.prepareValue
           });
         } catch (err) {
-          this.handleError(err, connection);
+          this.handleError(err, connection2);
           return;
         }
-        connection.describe({
+        connection2.describe({
           type: "P",
           name: this.portal || ""
         });
-        this._getRows(connection, this.rows);
+        this._getRows(connection2, this.rows);
       }
-      handleCopyInResponse(connection) {
-        connection.sendCopyFail("No source stream defined");
+      handleCopyInResponse(connection2) {
+        connection2.sendCopyFail("No source stream defined");
       }
-      handleCopyData(msg, connection) {
+      handleCopyData(msg, connection2) {
       }
     };
     module.exports = Query2;
@@ -33038,7 +33038,7 @@ var require_connection = __commonJS({
     var flushBuffer = serialize.flush();
     var syncBuffer = serialize.sync();
     var endBuffer = serialize.end();
-    var Connection3 = class extends EventEmitter {
+    var Connection4 = class extends EventEmitter {
       constructor(config) {
         super();
         config = config || {};
@@ -33207,7 +33207,7 @@ var require_connection = __commonJS({
         this._send(serialize.copyFail(msg));
       }
     };
-    module.exports = Connection3;
+    module.exports = Connection4;
   }
 });
 
@@ -33515,7 +33515,7 @@ var require_client = __commonJS({
     var ConnectionParameters = require_connection_parameters();
     var Query2 = require_query();
     var defaults2 = require_defaults();
-    var Connection3 = require_connection();
+    var Connection4 = require_connection();
     var crypto5 = require_utils5();
     var activeQueryDeprecationNotice = nodeUtils.deprecate(
       () => {
@@ -33571,7 +33571,7 @@ var require_client = __commonJS({
         this._queryable = true;
         this._activeQuery = null;
         this.enableChannelBinding = Boolean(c.enableChannelBinding);
-        this.connection = c.connection || new Connection3({
+        this.connection = c.connection || new Connection4({
           stream: c.stream,
           ssl: this.connectionParameters.ssl,
           keepAlive: c.keepAlive || false,
@@ -34956,7 +34956,7 @@ var require_lib5 = __commonJS({
     "use strict";
     var Client2 = require_client();
     var defaults2 = require_defaults();
-    var Connection3 = require_connection();
+    var Connection4 = require_connection();
     var Result2 = require_result();
     var utils = require_utils4();
     var Pool4 = require_pg_pool();
@@ -34976,7 +34976,7 @@ var require_lib5 = __commonJS({
       this.Query = this.Client.Query;
       this.Pool = poolFactory(this.Client);
       this._pools = [];
-      this.Connection = Connection3;
+      this.Connection = Connection4;
       this.types = require_pg_types();
       this.DatabaseError = DatabaseError2;
       this.TypeOverrides = TypeOverrides2;
@@ -36049,6 +36049,1568 @@ var require_lib7 = __commonJS({
     exports.Strategy = require_lib6();
     exports.strategies = {};
     exports.strategies.SessionStrategy = SessionStrategy;
+  }
+});
+
+// ../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/common.js
+var require_common2 = __commonJS({
+  "../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/common.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.isInSubnet = isInSubnet;
+    exports.isCorrect = isCorrect;
+    exports.numberToPaddedHex = numberToPaddedHex;
+    exports.stringToPaddedHex = stringToPaddedHex;
+    exports.testBit = testBit;
+    function isInSubnet(address) {
+      if (this.subnetMask < address.subnetMask) {
+        return false;
+      }
+      if (this.mask(address.subnetMask) === address.mask()) {
+        return true;
+      }
+      return false;
+    }
+    function isCorrect(defaultBits) {
+      return function() {
+        if (this.addressMinusSuffix !== this.correctForm()) {
+          return false;
+        }
+        if (this.subnetMask === defaultBits && !this.parsedSubnet) {
+          return true;
+        }
+        return this.parsedSubnet === String(this.subnetMask);
+      };
+    }
+    function numberToPaddedHex(number) {
+      return number.toString(16).padStart(2, "0");
+    }
+    function stringToPaddedHex(numberString) {
+      return numberToPaddedHex(parseInt(numberString, 10));
+    }
+    function testBit(binaryValue, position) {
+      const { length } = binaryValue;
+      if (position > length) {
+        return false;
+      }
+      const positionInString = length - position;
+      return binaryValue.substring(positionInString, positionInString + 1) === "1";
+    }
+  }
+});
+
+// ../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/v4/constants.js
+var require_constants2 = __commonJS({
+  "../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/v4/constants.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.RE_SUBNET_STRING = exports.RE_ADDRESS = exports.GROUPS = exports.BITS = void 0;
+    exports.BITS = 32;
+    exports.GROUPS = 4;
+    exports.RE_ADDRESS = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/g;
+    exports.RE_SUBNET_STRING = /\/\d{1,2}$/;
+  }
+});
+
+// ../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/address-error.js
+var require_address_error = __commonJS({
+  "../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/address-error.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.AddressError = void 0;
+    var AddressError = class extends Error {
+      constructor(message, parseMessage) {
+        super(message);
+        this.name = "AddressError";
+        this.parseMessage = parseMessage;
+      }
+    };
+    exports.AddressError = AddressError;
+  }
+});
+
+// ../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/ipv4.js
+var require_ipv4 = __commonJS({
+  "../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/ipv4.js"(exports) {
+    "use strict";
+    var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      var desc2 = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc2 || ("get" in desc2 ? !m.__esModule : desc2.writable || desc2.configurable)) {
+        desc2 = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc2);
+    }) : (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      o[k2] = m[k];
+    }));
+    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    }) : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar = exports && exports.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+      }
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Address4 = void 0;
+    var common = __importStar(require_common2());
+    var constants = __importStar(require_constants2());
+    var address_error_1 = require_address_error();
+    var Address4 = class _Address4 {
+      constructor(address) {
+        this.groups = constants.GROUPS;
+        this.parsedAddress = [];
+        this.parsedSubnet = "";
+        this.subnet = "/32";
+        this.subnetMask = 32;
+        this.v4 = true;
+        this.isCorrect = common.isCorrect(constants.BITS);
+        this.isInSubnet = common.isInSubnet;
+        this.address = address;
+        const subnet = constants.RE_SUBNET_STRING.exec(address);
+        if (subnet) {
+          this.parsedSubnet = subnet[0].replace("/", "");
+          this.subnetMask = parseInt(this.parsedSubnet, 10);
+          this.subnet = `/${this.subnetMask}`;
+          if (this.subnetMask < 0 || this.subnetMask > constants.BITS) {
+            throw new address_error_1.AddressError("Invalid subnet mask.");
+          }
+          address = address.replace(constants.RE_SUBNET_STRING, "");
+        }
+        this.addressMinusSuffix = address;
+        this.parsedAddress = this.parse(address);
+      }
+      static isValid(address) {
+        try {
+          new _Address4(address);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+      /*
+       * Parses a v4 address
+       */
+      parse(address) {
+        const groups = address.split(".");
+        if (!address.match(constants.RE_ADDRESS)) {
+          throw new address_error_1.AddressError("Invalid IPv4 address.");
+        }
+        return groups;
+      }
+      /**
+       * Returns the correct form of an address
+       * @memberof Address4
+       * @instance
+       * @returns {String}
+       */
+      correctForm() {
+        return this.parsedAddress.map((part) => parseInt(part, 10)).join(".");
+      }
+      /**
+       * Converts a hex string to an IPv4 address object
+       * @memberof Address4
+       * @static
+       * @param {string} hex - a hex string to convert
+       * @returns {Address4}
+       */
+      static fromHex(hex) {
+        const padded = hex.replace(/:/g, "").padStart(8, "0");
+        const groups = [];
+        let i;
+        for (i = 0; i < 8; i += 2) {
+          const h = padded.slice(i, i + 2);
+          groups.push(parseInt(h, 16));
+        }
+        return new _Address4(groups.join("."));
+      }
+      /**
+       * Converts an integer into a IPv4 address object
+       * @memberof Address4
+       * @static
+       * @param {integer} integer - a number to convert
+       * @returns {Address4}
+       */
+      static fromInteger(integer2) {
+        return _Address4.fromHex(integer2.toString(16));
+      }
+      /**
+       * Return an address from in-addr.arpa form
+       * @memberof Address4
+       * @static
+       * @param {string} arpaFormAddress - an 'in-addr.arpa' form ipv4 address
+       * @returns {Adress4}
+       * @example
+       * var address = Address4.fromArpa(42.2.0.192.in-addr.arpa.)
+       * address.correctForm(); // '192.0.2.42'
+       */
+      static fromArpa(arpaFormAddress) {
+        const leader = arpaFormAddress.replace(/(\.in-addr\.arpa)?\.$/, "");
+        const address = leader.split(".").reverse().join(".");
+        return new _Address4(address);
+      }
+      /**
+       * Converts an IPv4 address object to a hex string
+       * @memberof Address4
+       * @instance
+       * @returns {String}
+       */
+      toHex() {
+        return this.parsedAddress.map((part) => common.stringToPaddedHex(part)).join(":");
+      }
+      /**
+       * Converts an IPv4 address object to an array of bytes
+       * @memberof Address4
+       * @instance
+       * @returns {Array}
+       */
+      toArray() {
+        return this.parsedAddress.map((part) => parseInt(part, 10));
+      }
+      /**
+       * Converts an IPv4 address object to an IPv6 address group
+       * @memberof Address4
+       * @instance
+       * @returns {String}
+       */
+      toGroup6() {
+        const output = [];
+        let i;
+        for (i = 0; i < constants.GROUPS; i += 2) {
+          output.push(`${common.stringToPaddedHex(this.parsedAddress[i])}${common.stringToPaddedHex(this.parsedAddress[i + 1])}`);
+        }
+        return output.join(":");
+      }
+      /**
+       * Returns the address as a `bigint`
+       * @memberof Address4
+       * @instance
+       * @returns {bigint}
+       */
+      bigInt() {
+        return BigInt(`0x${this.parsedAddress.map((n) => common.stringToPaddedHex(n)).join("")}`);
+      }
+      /**
+       * Helper function getting start address.
+       * @memberof Address4
+       * @instance
+       * @returns {bigint}
+       */
+      _startAddress() {
+        return BigInt(`0b${this.mask() + "0".repeat(constants.BITS - this.subnetMask)}`);
+      }
+      /**
+       * The first address in the range given by this address' subnet.
+       * Often referred to as the Network Address.
+       * @memberof Address4
+       * @instance
+       * @returns {Address4}
+       */
+      startAddress() {
+        return _Address4.fromBigInt(this._startAddress());
+      }
+      /**
+       * The first host address in the range given by this address's subnet ie
+       * the first address after the Network Address
+       * @memberof Address4
+       * @instance
+       * @returns {Address4}
+       */
+      startAddressExclusive() {
+        const adjust = BigInt("1");
+        return _Address4.fromBigInt(this._startAddress() + adjust);
+      }
+      /**
+       * Helper function getting end address.
+       * @memberof Address4
+       * @instance
+       * @returns {bigint}
+       */
+      _endAddress() {
+        return BigInt(`0b${this.mask() + "1".repeat(constants.BITS - this.subnetMask)}`);
+      }
+      /**
+       * The last address in the range given by this address' subnet
+       * Often referred to as the Broadcast
+       * @memberof Address4
+       * @instance
+       * @returns {Address4}
+       */
+      endAddress() {
+        return _Address4.fromBigInt(this._endAddress());
+      }
+      /**
+       * The last host address in the range given by this address's subnet ie
+       * the last address prior to the Broadcast Address
+       * @memberof Address4
+       * @instance
+       * @returns {Address4}
+       */
+      endAddressExclusive() {
+        const adjust = BigInt("1");
+        return _Address4.fromBigInt(this._endAddress() - adjust);
+      }
+      /**
+       * Converts a BigInt to a v4 address object
+       * @memberof Address4
+       * @static
+       * @param {bigint} bigInt - a BigInt to convert
+       * @returns {Address4}
+       */
+      static fromBigInt(bigInt) {
+        return _Address4.fromHex(bigInt.toString(16));
+      }
+      /**
+       * Convert a byte array to an Address4 object
+       * @memberof Address4
+       * @static
+       * @param {Array<number>} bytes - an array of 4 bytes (0-255)
+       * @returns {Address4}
+       */
+      static fromByteArray(bytes) {
+        if (bytes.length !== 4) {
+          throw new address_error_1.AddressError("IPv4 addresses require exactly 4 bytes");
+        }
+        for (let i = 0; i < bytes.length; i++) {
+          if (!Number.isInteger(bytes[i]) || bytes[i] < 0 || bytes[i] > 255) {
+            throw new address_error_1.AddressError("All bytes must be integers between 0 and 255");
+          }
+        }
+        return this.fromUnsignedByteArray(bytes);
+      }
+      /**
+       * Convert an unsigned byte array to an Address4 object
+       * @memberof Address4
+       * @static
+       * @param {Array<number>} bytes - an array of 4 unsigned bytes (0-255)
+       * @returns {Address4}
+       */
+      static fromUnsignedByteArray(bytes) {
+        if (bytes.length !== 4) {
+          throw new address_error_1.AddressError("IPv4 addresses require exactly 4 bytes");
+        }
+        const address = bytes.join(".");
+        return new _Address4(address);
+      }
+      /**
+       * Returns the first n bits of the address, defaulting to the
+       * subnet mask
+       * @memberof Address4
+       * @instance
+       * @returns {String}
+       */
+      mask(mask) {
+        if (mask === void 0) {
+          mask = this.subnetMask;
+        }
+        return this.getBitsBase2(0, mask);
+      }
+      /**
+       * Returns the bits in the given range as a base-2 string
+       * @memberof Address4
+       * @instance
+       * @returns {string}
+       */
+      getBitsBase2(start, end) {
+        return this.binaryZeroPad().slice(start, end);
+      }
+      /**
+       * Return the reversed ip6.arpa form of the address
+       * @memberof Address4
+       * @param {Object} options
+       * @param {boolean} options.omitSuffix - omit the "in-addr.arpa" suffix
+       * @instance
+       * @returns {String}
+       */
+      reverseForm(options) {
+        if (!options) {
+          options = {};
+        }
+        const reversed = this.correctForm().split(".").reverse().join(".");
+        if (options.omitSuffix) {
+          return reversed;
+        }
+        return `${reversed}.in-addr.arpa.`;
+      }
+      /**
+       * Returns true if the given address is a multicast address
+       * @memberof Address4
+       * @instance
+       * @returns {boolean}
+       */
+      isMulticast() {
+        return this.isInSubnet(new _Address4("224.0.0.0/4"));
+      }
+      /**
+       * Returns a zero-padded base-2 string representation of the address
+       * @memberof Address4
+       * @instance
+       * @returns {string}
+       */
+      binaryZeroPad() {
+        return this.bigInt().toString(2).padStart(constants.BITS, "0");
+      }
+      /**
+       * Groups an IPv4 address for inclusion at the end of an IPv6 address
+       * @returns {String}
+       */
+      groupForV6() {
+        const segments = this.parsedAddress;
+        return this.address.replace(constants.RE_ADDRESS, `<span class="hover-group group-v4 group-6">${segments.slice(0, 2).join(".")}</span>.<span class="hover-group group-v4 group-7">${segments.slice(2, 4).join(".")}</span>`);
+      }
+    };
+    exports.Address4 = Address4;
+  }
+});
+
+// ../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/v6/constants.js
+var require_constants3 = __commonJS({
+  "../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/v6/constants.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.RE_URL_WITH_PORT = exports.RE_URL = exports.RE_ZONE_STRING = exports.RE_SUBNET_STRING = exports.RE_BAD_ADDRESS = exports.RE_BAD_CHARACTERS = exports.TYPES = exports.SCOPES = exports.GROUPS = exports.BITS = void 0;
+    exports.BITS = 128;
+    exports.GROUPS = 8;
+    exports.SCOPES = {
+      0: "Reserved",
+      1: "Interface local",
+      2: "Link local",
+      4: "Admin local",
+      5: "Site local",
+      8: "Organization local",
+      14: "Global",
+      15: "Reserved"
+    };
+    exports.TYPES = {
+      "ff01::1/128": "Multicast (All nodes on this interface)",
+      "ff01::2/128": "Multicast (All routers on this interface)",
+      "ff02::1/128": "Multicast (All nodes on this link)",
+      "ff02::2/128": "Multicast (All routers on this link)",
+      "ff05::2/128": "Multicast (All routers in this site)",
+      "ff02::5/128": "Multicast (OSPFv3 AllSPF routers)",
+      "ff02::6/128": "Multicast (OSPFv3 AllDR routers)",
+      "ff02::9/128": "Multicast (RIP routers)",
+      "ff02::a/128": "Multicast (EIGRP routers)",
+      "ff02::d/128": "Multicast (PIM routers)",
+      "ff02::16/128": "Multicast (MLDv2 reports)",
+      "ff01::fb/128": "Multicast (mDNSv6)",
+      "ff02::fb/128": "Multicast (mDNSv6)",
+      "ff05::fb/128": "Multicast (mDNSv6)",
+      "ff02::1:2/128": "Multicast (All DHCP servers and relay agents on this link)",
+      "ff05::1:2/128": "Multicast (All DHCP servers and relay agents in this site)",
+      "ff02::1:3/128": "Multicast (All DHCP servers on this link)",
+      "ff05::1:3/128": "Multicast (All DHCP servers in this site)",
+      "::/128": "Unspecified",
+      "::1/128": "Loopback",
+      "ff00::/8": "Multicast",
+      "fe80::/10": "Link-local unicast"
+    };
+    exports.RE_BAD_CHARACTERS = /([^0-9a-f:/%])/gi;
+    exports.RE_BAD_ADDRESS = /([0-9a-f]{5,}|:{3,}|[^:]:$|^:[^:]|\/$)/gi;
+    exports.RE_SUBNET_STRING = /\/\d{1,3}(?=%|$)/;
+    exports.RE_ZONE_STRING = /%.*$/;
+    exports.RE_URL = /^\[{0,1}([0-9a-f:]+)\]{0,1}/;
+    exports.RE_URL_WITH_PORT = /\[([0-9a-f:]+)\]:([0-9]{1,5})/;
+  }
+});
+
+// ../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/v6/helpers.js
+var require_helpers = __commonJS({
+  "../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/v6/helpers.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.spanAllZeroes = spanAllZeroes;
+    exports.spanAll = spanAll;
+    exports.spanLeadingZeroes = spanLeadingZeroes;
+    exports.simpleGroup = simpleGroup;
+    function spanAllZeroes(s) {
+      return s.replace(/(0+)/g, '<span class="zero">$1</span>');
+    }
+    function spanAll(s, offset = 0) {
+      const letters = s.split("");
+      return letters.map((n, i) => `<span class="digit value-${n} position-${i + offset}">${spanAllZeroes(n)}</span>`).join("");
+    }
+    function spanLeadingZeroesSimple(group) {
+      return group.replace(/^(0+)/, '<span class="zero">$1</span>');
+    }
+    function spanLeadingZeroes(address) {
+      const groups = address.split(":");
+      return groups.map((g) => spanLeadingZeroesSimple(g)).join(":");
+    }
+    function simpleGroup(addressString, offset = 0) {
+      const groups = addressString.split(":");
+      return groups.map((g, i) => {
+        if (/group-v4/.test(g)) {
+          return g;
+        }
+        return `<span class="hover-group group-${i + offset}">${spanLeadingZeroesSimple(g)}</span>`;
+      });
+    }
+  }
+});
+
+// ../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/v6/regular-expressions.js
+var require_regular_expressions = __commonJS({
+  "../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/v6/regular-expressions.js"(exports) {
+    "use strict";
+    var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      var desc2 = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc2 || ("get" in desc2 ? !m.__esModule : desc2.writable || desc2.configurable)) {
+        desc2 = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc2);
+    }) : (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      o[k2] = m[k];
+    }));
+    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    }) : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar = exports && exports.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+      }
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ADDRESS_BOUNDARY = void 0;
+    exports.groupPossibilities = groupPossibilities;
+    exports.padGroup = padGroup;
+    exports.simpleRegularExpression = simpleRegularExpression;
+    exports.possibleElisions = possibleElisions;
+    var v6 = __importStar(require_constants3());
+    function groupPossibilities(possibilities) {
+      return `(${possibilities.join("|")})`;
+    }
+    function padGroup(group) {
+      if (group.length < 4) {
+        return `0{0,${4 - group.length}}${group}`;
+      }
+      return group;
+    }
+    exports.ADDRESS_BOUNDARY = "[^A-Fa-f0-9:]";
+    function simpleRegularExpression(groups) {
+      const zeroIndexes = [];
+      groups.forEach((group, i) => {
+        const groupInteger = parseInt(group, 16);
+        if (groupInteger === 0) {
+          zeroIndexes.push(i);
+        }
+      });
+      const possibilities = zeroIndexes.map((zeroIndex) => groups.map((group, i) => {
+        if (i === zeroIndex) {
+          const elision = i === 0 || i === v6.GROUPS - 1 ? ":" : "";
+          return groupPossibilities([padGroup(group), elision]);
+        }
+        return padGroup(group);
+      }).join(":"));
+      possibilities.push(groups.map(padGroup).join(":"));
+      return groupPossibilities(possibilities);
+    }
+    function possibleElisions(elidedGroups, moreLeft, moreRight) {
+      const left = moreLeft ? "" : ":";
+      const right = moreRight ? "" : ":";
+      const possibilities = [];
+      if (!moreLeft && !moreRight) {
+        possibilities.push("::");
+      }
+      if (moreLeft && moreRight) {
+        possibilities.push("");
+      }
+      if (moreRight && !moreLeft || !moreRight && moreLeft) {
+        possibilities.push(":");
+      }
+      possibilities.push(`${left}(:0{1,4}){1,${elidedGroups - 1}}`);
+      possibilities.push(`(0{1,4}:){1,${elidedGroups - 1}}${right}`);
+      possibilities.push(`(0{1,4}:){${elidedGroups - 1}}0{1,4}`);
+      for (let groups = 1; groups < elidedGroups - 1; groups++) {
+        for (let position = 1; position < elidedGroups - groups; position++) {
+          possibilities.push(`(0{1,4}:){${position}}:(0{1,4}:){${elidedGroups - position - groups - 1}}0{1,4}`);
+        }
+      }
+      return groupPossibilities(possibilities);
+    }
+  }
+});
+
+// ../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/ipv6.js
+var require_ipv6 = __commonJS({
+  "../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/ipv6.js"(exports) {
+    "use strict";
+    var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      var desc2 = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc2 || ("get" in desc2 ? !m.__esModule : desc2.writable || desc2.configurable)) {
+        desc2 = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc2);
+    }) : (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      o[k2] = m[k];
+    }));
+    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    }) : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar = exports && exports.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+      }
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Address6 = void 0;
+    var common = __importStar(require_common2());
+    var constants4 = __importStar(require_constants2());
+    var constants6 = __importStar(require_constants3());
+    var helpers = __importStar(require_helpers());
+    var ipv4_1 = require_ipv4();
+    var regular_expressions_1 = require_regular_expressions();
+    var address_error_1 = require_address_error();
+    var common_1 = require_common2();
+    function assert(condition) {
+      if (!condition) {
+        throw new Error("Assertion failed.");
+      }
+    }
+    function addCommas(number) {
+      const r = /(\d+)(\d{3})/;
+      while (r.test(number)) {
+        number = number.replace(r, "$1,$2");
+      }
+      return number;
+    }
+    function spanLeadingZeroes4(n) {
+      n = n.replace(/^(0{1,})([1-9]+)$/, '<span class="parse-error">$1</span>$2');
+      n = n.replace(/^(0{1,})(0)$/, '<span class="parse-error">$1</span>$2');
+      return n;
+    }
+    function compact(address, slice) {
+      const s1 = [];
+      const s2 = [];
+      let i;
+      for (i = 0; i < address.length; i++) {
+        if (i < slice[0]) {
+          s1.push(address[i]);
+        } else if (i > slice[1]) {
+          s2.push(address[i]);
+        }
+      }
+      return s1.concat(["compact"]).concat(s2);
+    }
+    function paddedHex(octet) {
+      return parseInt(octet, 16).toString(16).padStart(4, "0");
+    }
+    function unsignByte(b) {
+      return b & 255;
+    }
+    var Address62 = class _Address6 {
+      constructor(address, optionalGroups) {
+        this.addressMinusSuffix = "";
+        this.parsedSubnet = "";
+        this.subnet = "/128";
+        this.subnetMask = 128;
+        this.v4 = false;
+        this.zone = "";
+        this.isInSubnet = common.isInSubnet;
+        this.isCorrect = common.isCorrect(constants6.BITS);
+        if (optionalGroups === void 0) {
+          this.groups = constants6.GROUPS;
+        } else {
+          this.groups = optionalGroups;
+        }
+        this.address = address;
+        const subnet = constants6.RE_SUBNET_STRING.exec(address);
+        if (subnet) {
+          this.parsedSubnet = subnet[0].replace("/", "");
+          this.subnetMask = parseInt(this.parsedSubnet, 10);
+          this.subnet = `/${this.subnetMask}`;
+          if (Number.isNaN(this.subnetMask) || this.subnetMask < 0 || this.subnetMask > constants6.BITS) {
+            throw new address_error_1.AddressError("Invalid subnet mask.");
+          }
+          address = address.replace(constants6.RE_SUBNET_STRING, "");
+        } else if (/\//.test(address)) {
+          throw new address_error_1.AddressError("Invalid subnet mask.");
+        }
+        const zone = constants6.RE_ZONE_STRING.exec(address);
+        if (zone) {
+          this.zone = zone[0];
+          address = address.replace(constants6.RE_ZONE_STRING, "");
+        }
+        this.addressMinusSuffix = address;
+        this.parsedAddress = this.parse(this.addressMinusSuffix);
+      }
+      static isValid(address) {
+        try {
+          new _Address6(address);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+      /**
+       * Convert a BigInt to a v6 address object
+       * @memberof Address6
+       * @static
+       * @param {bigint} bigInt - a BigInt to convert
+       * @returns {Address6}
+       * @example
+       * var bigInt = BigInt('1000000000000');
+       * var address = Address6.fromBigInt(bigInt);
+       * address.correctForm(); // '::e8:d4a5:1000'
+       */
+      static fromBigInt(bigInt) {
+        const hex = bigInt.toString(16).padStart(32, "0");
+        const groups = [];
+        let i;
+        for (i = 0; i < constants6.GROUPS; i++) {
+          groups.push(hex.slice(i * 4, (i + 1) * 4));
+        }
+        return new _Address6(groups.join(":"));
+      }
+      /**
+       * Convert a URL (with optional port number) to an address object
+       * @memberof Address6
+       * @static
+       * @param {string} url - a URL with optional port number
+       * @example
+       * var addressAndPort = Address6.fromURL('http://[ffff::]:8080/foo/');
+       * addressAndPort.address.correctForm(); // 'ffff::'
+       * addressAndPort.port; // 8080
+       */
+      static fromURL(url) {
+        let host;
+        let port = null;
+        let result;
+        if (url.indexOf("[") !== -1 && url.indexOf("]:") !== -1) {
+          result = constants6.RE_URL_WITH_PORT.exec(url);
+          if (result === null) {
+            return {
+              error: "failed to parse address with port",
+              address: null,
+              port: null
+            };
+          }
+          host = result[1];
+          port = result[2];
+        } else if (url.indexOf("/") !== -1) {
+          url = url.replace(/^[a-z0-9]+:\/\//, "");
+          result = constants6.RE_URL.exec(url);
+          if (result === null) {
+            return {
+              error: "failed to parse address from URL",
+              address: null,
+              port: null
+            };
+          }
+          host = result[1];
+        } else {
+          host = url;
+        }
+        if (port) {
+          port = parseInt(port, 10);
+          if (port < 0 || port > 65536) {
+            port = null;
+          }
+        } else {
+          port = null;
+        }
+        return {
+          address: new _Address6(host),
+          port
+        };
+      }
+      /**
+       * Create an IPv6-mapped address given an IPv4 address
+       * @memberof Address6
+       * @static
+       * @param {string} address - An IPv4 address string
+       * @returns {Address6}
+       * @example
+       * var address = Address6.fromAddress4('192.168.0.1');
+       * address.correctForm(); // '::ffff:c0a8:1'
+       * address.to4in6(); // '::ffff:192.168.0.1'
+       */
+      static fromAddress4(address) {
+        const address4 = new ipv4_1.Address4(address);
+        const mask6 = constants6.BITS - (constants4.BITS - address4.subnetMask);
+        return new _Address6(`::ffff:${address4.correctForm()}/${mask6}`);
+      }
+      /**
+       * Return an address from ip6.arpa form
+       * @memberof Address6
+       * @static
+       * @param {string} arpaFormAddress - an 'ip6.arpa' form address
+       * @returns {Adress6}
+       * @example
+       * var address = Address6.fromArpa(e.f.f.f.3.c.2.6.f.f.f.e.6.6.8.e.1.0.6.7.9.4.e.c.0.0.0.0.1.0.0.2.ip6.arpa.)
+       * address.correctForm(); // '2001:0:ce49:7601:e866:efff:62c3:fffe'
+       */
+      static fromArpa(arpaFormAddress) {
+        let address = arpaFormAddress.replace(/(\.ip6\.arpa)?\.$/, "");
+        const semicolonAmount = 7;
+        if (address.length !== 63) {
+          throw new address_error_1.AddressError("Invalid 'ip6.arpa' form.");
+        }
+        const parts = address.split(".").reverse();
+        for (let i = semicolonAmount; i > 0; i--) {
+          const insertIndex = i * 4;
+          parts.splice(insertIndex, 0, ":");
+        }
+        address = parts.join("");
+        return new _Address6(address);
+      }
+      /**
+       * Return the Microsoft UNC transcription of the address
+       * @memberof Address6
+       * @instance
+       * @returns {String} the Microsoft UNC transcription of the address
+       */
+      microsoftTranscription() {
+        return `${this.correctForm().replace(/:/g, "-")}.ipv6-literal.net`;
+      }
+      /**
+       * Return the first n bits of the address, defaulting to the subnet mask
+       * @memberof Address6
+       * @instance
+       * @param {number} [mask=subnet] - the number of bits to mask
+       * @returns {String} the first n bits of the address as a string
+       */
+      mask(mask = this.subnetMask) {
+        return this.getBitsBase2(0, mask);
+      }
+      /**
+       * Return the number of possible subnets of a given size in the address
+       * @memberof Address6
+       * @instance
+       * @param {number} [subnetSize=128] - the subnet size
+       * @returns {String}
+       */
+      // TODO: probably useful to have a numeric version of this too
+      possibleSubnets(subnetSize = 128) {
+        const availableBits = constants6.BITS - this.subnetMask;
+        const subnetBits = Math.abs(subnetSize - constants6.BITS);
+        const subnetPowers = availableBits - subnetBits;
+        if (subnetPowers < 0) {
+          return "0";
+        }
+        return addCommas((BigInt("2") ** BigInt(subnetPowers)).toString(10));
+      }
+      /**
+       * Helper function getting start address.
+       * @memberof Address6
+       * @instance
+       * @returns {bigint}
+       */
+      _startAddress() {
+        return BigInt(`0b${this.mask() + "0".repeat(constants6.BITS - this.subnetMask)}`);
+      }
+      /**
+       * The first address in the range given by this address' subnet
+       * Often referred to as the Network Address.
+       * @memberof Address6
+       * @instance
+       * @returns {Address6}
+       */
+      startAddress() {
+        return _Address6.fromBigInt(this._startAddress());
+      }
+      /**
+       * The first host address in the range given by this address's subnet ie
+       * the first address after the Network Address
+       * @memberof Address6
+       * @instance
+       * @returns {Address6}
+       */
+      startAddressExclusive() {
+        const adjust = BigInt("1");
+        return _Address6.fromBigInt(this._startAddress() + adjust);
+      }
+      /**
+       * Helper function getting end address.
+       * @memberof Address6
+       * @instance
+       * @returns {bigint}
+       */
+      _endAddress() {
+        return BigInt(`0b${this.mask() + "1".repeat(constants6.BITS - this.subnetMask)}`);
+      }
+      /**
+       * The last address in the range given by this address' subnet
+       * Often referred to as the Broadcast
+       * @memberof Address6
+       * @instance
+       * @returns {Address6}
+       */
+      endAddress() {
+        return _Address6.fromBigInt(this._endAddress());
+      }
+      /**
+       * The last host address in the range given by this address's subnet ie
+       * the last address prior to the Broadcast Address
+       * @memberof Address6
+       * @instance
+       * @returns {Address6}
+       */
+      endAddressExclusive() {
+        const adjust = BigInt("1");
+        return _Address6.fromBigInt(this._endAddress() - adjust);
+      }
+      /**
+       * Return the scope of the address
+       * @memberof Address6
+       * @instance
+       * @returns {String}
+       */
+      getScope() {
+        let scope = constants6.SCOPES[parseInt(this.getBits(12, 16).toString(10), 10)];
+        if (this.getType() === "Global unicast" && scope !== "Link local") {
+          scope = "Global";
+        }
+        return scope || "Unknown";
+      }
+      /**
+       * Return the type of the address
+       * @memberof Address6
+       * @instance
+       * @returns {String}
+       */
+      getType() {
+        for (const subnet of Object.keys(constants6.TYPES)) {
+          if (this.isInSubnet(new _Address6(subnet))) {
+            return constants6.TYPES[subnet];
+          }
+        }
+        return "Global unicast";
+      }
+      /**
+       * Return the bits in the given range as a BigInt
+       * @memberof Address6
+       * @instance
+       * @returns {bigint}
+       */
+      getBits(start, end) {
+        return BigInt(`0b${this.getBitsBase2(start, end)}`);
+      }
+      /**
+       * Return the bits in the given range as a base-2 string
+       * @memberof Address6
+       * @instance
+       * @returns {String}
+       */
+      getBitsBase2(start, end) {
+        return this.binaryZeroPad().slice(start, end);
+      }
+      /**
+       * Return the bits in the given range as a base-16 string
+       * @memberof Address6
+       * @instance
+       * @returns {String}
+       */
+      getBitsBase16(start, end) {
+        const length = end - start;
+        if (length % 4 !== 0) {
+          throw new Error("Length of bits to retrieve must be divisible by four");
+        }
+        return this.getBits(start, end).toString(16).padStart(length / 4, "0");
+      }
+      /**
+       * Return the bits that are set past the subnet mask length
+       * @memberof Address6
+       * @instance
+       * @returns {String}
+       */
+      getBitsPastSubnet() {
+        return this.getBitsBase2(this.subnetMask, constants6.BITS);
+      }
+      /**
+       * Return the reversed ip6.arpa form of the address
+       * @memberof Address6
+       * @param {Object} options
+       * @param {boolean} options.omitSuffix - omit the "ip6.arpa" suffix
+       * @instance
+       * @returns {String}
+       */
+      reverseForm(options) {
+        if (!options) {
+          options = {};
+        }
+        const characters = Math.floor(this.subnetMask / 4);
+        const reversed = this.canonicalForm().replace(/:/g, "").split("").slice(0, characters).reverse().join(".");
+        if (characters > 0) {
+          if (options.omitSuffix) {
+            return reversed;
+          }
+          return `${reversed}.ip6.arpa.`;
+        }
+        if (options.omitSuffix) {
+          return "";
+        }
+        return "ip6.arpa.";
+      }
+      /**
+       * Return the correct form of the address
+       * @memberof Address6
+       * @instance
+       * @returns {String}
+       */
+      correctForm() {
+        let i;
+        let groups = [];
+        let zeroCounter = 0;
+        const zeroes = [];
+        for (i = 0; i < this.parsedAddress.length; i++) {
+          const value = parseInt(this.parsedAddress[i], 16);
+          if (value === 0) {
+            zeroCounter++;
+          }
+          if (value !== 0 && zeroCounter > 0) {
+            if (zeroCounter > 1) {
+              zeroes.push([i - zeroCounter, i - 1]);
+            }
+            zeroCounter = 0;
+          }
+        }
+        if (zeroCounter > 1) {
+          zeroes.push([this.parsedAddress.length - zeroCounter, this.parsedAddress.length - 1]);
+        }
+        const zeroLengths = zeroes.map((n) => n[1] - n[0] + 1);
+        if (zeroes.length > 0) {
+          const index = zeroLengths.indexOf(Math.max(...zeroLengths));
+          groups = compact(this.parsedAddress, zeroes[index]);
+        } else {
+          groups = this.parsedAddress;
+        }
+        for (i = 0; i < groups.length; i++) {
+          if (groups[i] !== "compact") {
+            groups[i] = parseInt(groups[i], 16).toString(16);
+          }
+        }
+        let correct = groups.join(":");
+        correct = correct.replace(/^compact$/, "::");
+        correct = correct.replace(/(^compact)|(compact$)/, ":");
+        correct = correct.replace(/compact/, "");
+        return correct;
+      }
+      /**
+       * Return a zero-padded base-2 string representation of the address
+       * @memberof Address6
+       * @instance
+       * @returns {String}
+       * @example
+       * var address = new Address6('2001:4860:4001:803::1011');
+       * address.binaryZeroPad();
+       * // '0010000000000001010010000110000001000000000000010000100000000011
+       * //  0000000000000000000000000000000000000000000000000001000000010001'
+       */
+      binaryZeroPad() {
+        return this.bigInt().toString(2).padStart(constants6.BITS, "0");
+      }
+      // TODO: Improve the semantics of this helper function
+      parse4in6(address) {
+        const groups = address.split(":");
+        const lastGroup = groups.slice(-1)[0];
+        const address4 = lastGroup.match(constants4.RE_ADDRESS);
+        if (address4) {
+          this.parsedAddress4 = address4[0];
+          this.address4 = new ipv4_1.Address4(this.parsedAddress4);
+          for (let i = 0; i < this.address4.groups; i++) {
+            if (/^0[0-9]+/.test(this.address4.parsedAddress[i])) {
+              throw new address_error_1.AddressError("IPv4 addresses can't have leading zeroes.", address.replace(constants4.RE_ADDRESS, this.address4.parsedAddress.map(spanLeadingZeroes4).join(".")));
+            }
+          }
+          this.v4 = true;
+          groups[groups.length - 1] = this.address4.toGroup6();
+          address = groups.join(":");
+        }
+        return address;
+      }
+      // TODO: Make private?
+      parse(address) {
+        address = this.parse4in6(address);
+        const badCharacters = address.match(constants6.RE_BAD_CHARACTERS);
+        if (badCharacters) {
+          throw new address_error_1.AddressError(`Bad character${badCharacters.length > 1 ? "s" : ""} detected in address: ${badCharacters.join("")}`, address.replace(constants6.RE_BAD_CHARACTERS, '<span class="parse-error">$1</span>'));
+        }
+        const badAddress = address.match(constants6.RE_BAD_ADDRESS);
+        if (badAddress) {
+          throw new address_error_1.AddressError(`Address failed regex: ${badAddress.join("")}`, address.replace(constants6.RE_BAD_ADDRESS, '<span class="parse-error">$1</span>'));
+        }
+        let groups = [];
+        const halves = address.split("::");
+        if (halves.length === 2) {
+          let first = halves[0].split(":");
+          let last = halves[1].split(":");
+          if (first.length === 1 && first[0] === "") {
+            first = [];
+          }
+          if (last.length === 1 && last[0] === "") {
+            last = [];
+          }
+          const remaining = this.groups - (first.length + last.length);
+          if (!remaining) {
+            throw new address_error_1.AddressError("Error parsing groups");
+          }
+          this.elidedGroups = remaining;
+          this.elisionBegin = first.length;
+          this.elisionEnd = first.length + this.elidedGroups;
+          groups = groups.concat(first);
+          for (let i = 0; i < remaining; i++) {
+            groups.push("0");
+          }
+          groups = groups.concat(last);
+        } else if (halves.length === 1) {
+          groups = address.split(":");
+          this.elidedGroups = 0;
+        } else {
+          throw new address_error_1.AddressError("Too many :: groups found");
+        }
+        groups = groups.map((group) => parseInt(group, 16).toString(16));
+        if (groups.length !== this.groups) {
+          throw new address_error_1.AddressError("Incorrect number of groups found");
+        }
+        return groups;
+      }
+      /**
+       * Return the canonical form of the address
+       * @memberof Address6
+       * @instance
+       * @returns {String}
+       */
+      canonicalForm() {
+        return this.parsedAddress.map(paddedHex).join(":");
+      }
+      /**
+       * Return the decimal form of the address
+       * @memberof Address6
+       * @instance
+       * @returns {String}
+       */
+      decimal() {
+        return this.parsedAddress.map((n) => parseInt(n, 16).toString(10).padStart(5, "0")).join(":");
+      }
+      /**
+       * Return the address as a BigInt
+       * @memberof Address6
+       * @instance
+       * @returns {bigint}
+       */
+      bigInt() {
+        return BigInt(`0x${this.parsedAddress.map(paddedHex).join("")}`);
+      }
+      /**
+       * Return the last two groups of this address as an IPv4 address string
+       * @memberof Address6
+       * @instance
+       * @returns {Address4}
+       * @example
+       * var address = new Address6('2001:4860:4001::1825:bf11');
+       * address.to4().correctForm(); // '24.37.191.17'
+       */
+      to4() {
+        const binary = this.binaryZeroPad().split("");
+        return ipv4_1.Address4.fromHex(BigInt(`0b${binary.slice(96, 128).join("")}`).toString(16));
+      }
+      /**
+       * Return the v4-in-v6 form of the address
+       * @memberof Address6
+       * @instance
+       * @returns {String}
+       */
+      to4in6() {
+        const address4 = this.to4();
+        const address6 = new _Address6(this.parsedAddress.slice(0, 6).join(":"), 6);
+        const correct = address6.correctForm();
+        let infix = "";
+        if (!/:$/.test(correct)) {
+          infix = ":";
+        }
+        return correct + infix + address4.address;
+      }
+      /**
+       * Return an object containing the Teredo properties of the address
+       * @memberof Address6
+       * @instance
+       * @returns {Object}
+       */
+      inspectTeredo() {
+        const prefix = this.getBitsBase16(0, 32);
+        const bitsForUdpPort = this.getBits(80, 96);
+        const udpPort = (bitsForUdpPort ^ BigInt("0xffff")).toString();
+        const server4 = ipv4_1.Address4.fromHex(this.getBitsBase16(32, 64));
+        const bitsForClient4 = this.getBits(96, 128);
+        const client4 = ipv4_1.Address4.fromHex((bitsForClient4 ^ BigInt("0xffffffff")).toString(16));
+        const flagsBase2 = this.getBitsBase2(64, 80);
+        const coneNat = (0, common_1.testBit)(flagsBase2, 15);
+        const reserved = (0, common_1.testBit)(flagsBase2, 14);
+        const groupIndividual = (0, common_1.testBit)(flagsBase2, 8);
+        const universalLocal = (0, common_1.testBit)(flagsBase2, 9);
+        const nonce = BigInt(`0b${flagsBase2.slice(2, 6) + flagsBase2.slice(8, 16)}`).toString(10);
+        return {
+          prefix: `${prefix.slice(0, 4)}:${prefix.slice(4, 8)}`,
+          server4: server4.address,
+          client4: client4.address,
+          flags: flagsBase2,
+          coneNat,
+          microsoft: {
+            reserved,
+            universalLocal,
+            groupIndividual,
+            nonce
+          },
+          udpPort
+        };
+      }
+      /**
+       * Return an object containing the 6to4 properties of the address
+       * @memberof Address6
+       * @instance
+       * @returns {Object}
+       */
+      inspect6to4() {
+        const prefix = this.getBitsBase16(0, 16);
+        const gateway = ipv4_1.Address4.fromHex(this.getBitsBase16(16, 48));
+        return {
+          prefix: prefix.slice(0, 4),
+          gateway: gateway.address
+        };
+      }
+      /**
+       * Return a v6 6to4 address from a v6 v4inv6 address
+       * @memberof Address6
+       * @instance
+       * @returns {Address6}
+       */
+      to6to4() {
+        if (!this.is4()) {
+          return null;
+        }
+        const addr6to4 = [
+          "2002",
+          this.getBitsBase16(96, 112),
+          this.getBitsBase16(112, 128),
+          "",
+          "/16"
+        ].join(":");
+        return new _Address6(addr6to4);
+      }
+      /**
+       * Return a byte array
+       * @memberof Address6
+       * @instance
+       * @returns {Array}
+       */
+      toByteArray() {
+        const valueWithoutPadding = this.bigInt().toString(16);
+        const leadingPad = "0".repeat(valueWithoutPadding.length % 2);
+        const value = `${leadingPad}${valueWithoutPadding}`;
+        const bytes = [];
+        for (let i = 0, length = value.length; i < length; i += 2) {
+          bytes.push(parseInt(value.substring(i, i + 2), 16));
+        }
+        return bytes;
+      }
+      /**
+       * Return an unsigned byte array
+       * @memberof Address6
+       * @instance
+       * @returns {Array}
+       */
+      toUnsignedByteArray() {
+        return this.toByteArray().map(unsignByte);
+      }
+      /**
+       * Convert a byte array to an Address6 object
+       * @memberof Address6
+       * @static
+       * @returns {Address6}
+       */
+      static fromByteArray(bytes) {
+        return this.fromUnsignedByteArray(bytes.map(unsignByte));
+      }
+      /**
+       * Convert an unsigned byte array to an Address6 object
+       * @memberof Address6
+       * @static
+       * @returns {Address6}
+       */
+      static fromUnsignedByteArray(bytes) {
+        const BYTE_MAX = BigInt("256");
+        let result = BigInt("0");
+        let multiplier = BigInt("1");
+        for (let i = bytes.length - 1; i >= 0; i--) {
+          result += multiplier * BigInt(bytes[i].toString(10));
+          multiplier *= BYTE_MAX;
+        }
+        return _Address6.fromBigInt(result);
+      }
+      /**
+       * Returns true if the address is in the canonical form, false otherwise
+       * @memberof Address6
+       * @instance
+       * @returns {boolean}
+       */
+      isCanonical() {
+        return this.addressMinusSuffix === this.canonicalForm();
+      }
+      /**
+       * Returns true if the address is a link local address, false otherwise
+       * @memberof Address6
+       * @instance
+       * @returns {boolean}
+       */
+      isLinkLocal() {
+        if (this.getBitsBase2(0, 64) === "1111111010000000000000000000000000000000000000000000000000000000") {
+          return true;
+        }
+        return false;
+      }
+      /**
+       * Returns true if the address is a multicast address, false otherwise
+       * @memberof Address6
+       * @instance
+       * @returns {boolean}
+       */
+      isMulticast() {
+        return this.getType() === "Multicast";
+      }
+      /**
+       * Returns true if the address is a v4-in-v6 address, false otherwise
+       * @memberof Address6
+       * @instance
+       * @returns {boolean}
+       */
+      is4() {
+        return this.v4;
+      }
+      /**
+       * Returns true if the address is a Teredo address, false otherwise
+       * @memberof Address6
+       * @instance
+       * @returns {boolean}
+       */
+      isTeredo() {
+        return this.isInSubnet(new _Address6("2001::/32"));
+      }
+      /**
+       * Returns true if the address is a 6to4 address, false otherwise
+       * @memberof Address6
+       * @instance
+       * @returns {boolean}
+       */
+      is6to4() {
+        return this.isInSubnet(new _Address6("2002::/16"));
+      }
+      /**
+       * Returns true if the address is a loopback address, false otherwise
+       * @memberof Address6
+       * @instance
+       * @returns {boolean}
+       */
+      isLoopback() {
+        return this.getType() === "Loopback";
+      }
+      // #endregion
+      // #region HTML
+      /**
+       * @returns {String} the address in link form with a default port of 80
+       */
+      href(optionalPort) {
+        if (optionalPort === void 0) {
+          optionalPort = "";
+        } else {
+          optionalPort = `:${optionalPort}`;
+        }
+        return `http://[${this.correctForm()}]${optionalPort}/`;
+      }
+      /**
+       * @returns {String} a link suitable for conveying the address via a URL hash
+       */
+      link(options) {
+        if (!options) {
+          options = {};
+        }
+        if (options.className === void 0) {
+          options.className = "";
+        }
+        if (options.prefix === void 0) {
+          options.prefix = "/#address=";
+        }
+        if (options.v4 === void 0) {
+          options.v4 = false;
+        }
+        let formFunction = this.correctForm;
+        if (options.v4) {
+          formFunction = this.to4in6;
+        }
+        const form = formFunction.call(this);
+        if (options.className) {
+          return `<a href="${options.prefix}${form}" class="${options.className}">${form}</a>`;
+        }
+        return `<a href="${options.prefix}${form}">${form}</a>`;
+      }
+      /**
+       * Groups an address
+       * @returns {String}
+       */
+      group() {
+        if (this.elidedGroups === 0) {
+          return helpers.simpleGroup(this.address).join(":");
+        }
+        assert(typeof this.elidedGroups === "number");
+        assert(typeof this.elisionBegin === "number");
+        const output = [];
+        const [left, right] = this.address.split("::");
+        if (left.length) {
+          output.push(...helpers.simpleGroup(left));
+        } else {
+          output.push("");
+        }
+        const classes = ["hover-group"];
+        for (let i = this.elisionBegin; i < this.elisionBegin + this.elidedGroups; i++) {
+          classes.push(`group-${i}`);
+        }
+        output.push(`<span class="${classes.join(" ")}"></span>`);
+        if (right.length) {
+          output.push(...helpers.simpleGroup(right, this.elisionEnd));
+        } else {
+          output.push("");
+        }
+        if (this.is4()) {
+          assert(this.address4 instanceof ipv4_1.Address4);
+          output.pop();
+          output.push(this.address4.groupForV6());
+        }
+        return output.join(":");
+      }
+      // #endregion
+      // #region Regular expressions
+      /**
+       * Generate a regular expression string that can be used to find or validate
+       * all variations of this address
+       * @memberof Address6
+       * @instance
+       * @param {boolean} substringSearch
+       * @returns {string}
+       */
+      regularExpressionString(substringSearch = false) {
+        let output = [];
+        const address6 = new _Address6(this.correctForm());
+        if (address6.elidedGroups === 0) {
+          output.push((0, regular_expressions_1.simpleRegularExpression)(address6.parsedAddress));
+        } else if (address6.elidedGroups === constants6.GROUPS) {
+          output.push((0, regular_expressions_1.possibleElisions)(constants6.GROUPS));
+        } else {
+          const halves = address6.address.split("::");
+          if (halves[0].length) {
+            output.push((0, regular_expressions_1.simpleRegularExpression)(halves[0].split(":")));
+          }
+          assert(typeof address6.elidedGroups === "number");
+          output.push((0, regular_expressions_1.possibleElisions)(address6.elidedGroups, halves[0].length !== 0, halves[1].length !== 0));
+          if (halves[1].length) {
+            output.push((0, regular_expressions_1.simpleRegularExpression)(halves[1].split(":")));
+          }
+          output = [output.join(":")];
+        }
+        if (!substringSearch) {
+          output = [
+            "(?=^|",
+            regular_expressions_1.ADDRESS_BOUNDARY,
+            "|[^\\w\\:])(",
+            ...output,
+            ")(?=[^\\w\\:]|",
+            regular_expressions_1.ADDRESS_BOUNDARY,
+            "|$)"
+          ];
+        }
+        return output.join("");
+      }
+      /**
+       * Generate a regular expression that can be used to find or validate all
+       * variations of this address.
+       * @memberof Address6
+       * @instance
+       * @param {boolean} substringSearch
+       * @returns {RegExp}
+       */
+      regularExpression(substringSearch = false) {
+        return new RegExp(this.regularExpressionString(substringSearch), "i");
+      }
+    };
+    exports.Address6 = Address62;
+  }
+});
+
+// ../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/ip-address.js
+var require_ip_address = __commonJS({
+  "../../node_modules/.pnpm/ip-address@10.1.0/node_modules/ip-address/dist/ip-address.js"(exports) {
+    "use strict";
+    var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      var desc2 = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc2 || ("get" in desc2 ? !m.__esModule : desc2.writable || desc2.configurable)) {
+        desc2 = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc2);
+    }) : (function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
+      o[k2] = m[k];
+    }));
+    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? (function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    }) : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar = exports && exports.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+      }
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.v6 = exports.AddressError = exports.Address6 = exports.Address4 = void 0;
+    var ipv4_1 = require_ipv4();
+    Object.defineProperty(exports, "Address4", { enumerable: true, get: function() {
+      return ipv4_1.Address4;
+    } });
+    var ipv6_1 = require_ipv6();
+    Object.defineProperty(exports, "Address6", { enumerable: true, get: function() {
+      return ipv6_1.Address6;
+    } });
+    var address_error_1 = require_address_error();
+    Object.defineProperty(exports, "AddressError", { enumerable: true, get: function() {
+      return address_error_1.AddressError;
+    } });
+    var helpers = __importStar(require_helpers());
+    exports.v6 = { helpers };
   }
 });
 
@@ -41095,12 +42657,12 @@ var require_bn = __commonJS({
       }
       BN.BN = BN;
       BN.wordSize = 26;
-      var Buffer2;
+      var Buffer3;
       try {
         if (typeof window !== "undefined" && typeof window.Buffer !== "undefined") {
-          Buffer2 = window.Buffer;
+          Buffer3 = window.Buffer;
         } else {
-          Buffer2 = __require("buffer").Buffer;
+          Buffer3 = __require("buffer").Buffer;
         }
       } catch (e) {
       }
@@ -41557,9 +43119,9 @@ var require_bn = __commonJS({
       BN.prototype.toJSON = function toJSON() {
         return this.toString(16, 2);
       };
-      if (Buffer2) {
+      if (Buffer3) {
         BN.prototype.toBuffer = function toBuffer(endian, length) {
-          return this.toArrayLike(Buffer2, endian, length);
+          return this.toArrayLike(Buffer3, endian, length);
         };
       }
       BN.prototype.toArray = function toArray(endian, length) {
@@ -41783,7 +43345,7 @@ var require_bn = __commonJS({
         assert((this.negative | num.negative) === 0);
         return this.iuand(num);
       };
-      BN.prototype.and = function and3(num) {
+      BN.prototype.and = function and2(num) {
         if (this.length > num.length) return this.clone().iand(num);
         return num.clone().iand(this);
       };
@@ -52471,7 +54033,7 @@ var require_lib12 = __commonJS({
 });
 
 // ../../node_modules/.pnpm/ws@8.20.0_bufferutil@4.1.0_utf-8-validate@6.0.6/node_modules/ws/lib/constants.js
-var require_constants2 = __commonJS({
+var require_constants4 = __commonJS({
   "../../node_modules/.pnpm/ws@8.20.0_bufferutil@4.1.0_utf-8-validate@6.0.6/node_modules/ws/lib/constants.js"(exports, module) {
     "use strict";
     var BINARY_TYPES = ["nodebuffer", "arraybuffer", "fragments"];
@@ -52497,7 +54059,7 @@ var require_constants2 = __commonJS({
 var require_buffer_util = __commonJS({
   "../../node_modules/.pnpm/ws@8.20.0_bufferutil@4.1.0_utf-8-validate@6.0.6/node_modules/ws/lib/buffer-util.js"(exports, module) {
     "use strict";
-    var { EMPTY_BUFFER } = require_constants2();
+    var { EMPTY_BUFFER } = require_constants4();
     var FastBuffer = Buffer[Symbol.species];
     function concat(list, totalLength) {
       if (list.length === 0) return EMPTY_BUFFER;
@@ -52625,7 +54187,7 @@ var require_permessage_deflate = __commonJS({
     var zlib = __require("zlib");
     var bufferUtil = require_buffer_util();
     var Limiter = require_limiter();
-    var { kStatusCode } = require_constants2();
+    var { kStatusCode } = require_constants4();
     var FastBuffer = Buffer[Symbol.species];
     var TRAILER = Buffer.from([0, 0, 255, 255]);
     var kPerMessageDeflate = /* @__PURE__ */ Symbol("permessage-deflate");
@@ -53006,7 +54568,7 @@ var require_validation = __commonJS({
   "../../node_modules/.pnpm/ws@8.20.0_bufferutil@4.1.0_utf-8-validate@6.0.6/node_modules/ws/lib/validation.js"(exports, module) {
     "use strict";
     var { isUtf8 } = __require("buffer");
-    var { hasBlob } = require_constants2();
+    var { hasBlob } = require_constants4();
     var tokenChars = [
       0,
       0,
@@ -53213,7 +54775,7 @@ var require_receiver = __commonJS({
       EMPTY_BUFFER,
       kStatusCode,
       kWebSocket
-    } = require_constants2();
+    } = require_constants4();
     var { concat, toArrayBuffer, unmask } = require_buffer_util();
     var { isValidStatusCode, isValidUTF8 } = require_validation();
     var FastBuffer = Buffer[Symbol.species];
@@ -53801,7 +55363,7 @@ var require_sender = __commonJS({
     var { Duplex } = __require("stream");
     var { randomFillSync } = __require("crypto");
     var PerMessageDeflate = require_permessage_deflate();
-    var { EMPTY_BUFFER, kWebSocket, NOOP } = require_constants2();
+    var { EMPTY_BUFFER, kWebSocket, NOOP } = require_constants4();
     var { isBlob, isValidStatusCode } = require_validation();
     var { mask: applyMask, toBuffer } = require_buffer_util();
     var kByteLength = /* @__PURE__ */ Symbol("kByteLength");
@@ -54286,7 +55848,7 @@ var require_sender = __commonJS({
 var require_event_target = __commonJS({
   "../../node_modules/.pnpm/ws@8.20.0_bufferutil@4.1.0_utf-8-validate@6.0.6/node_modules/ws/lib/event-target.js"(exports, module) {
     "use strict";
-    var { kForOnEventAttribute, kListener } = require_constants2();
+    var { kForOnEventAttribute, kListener } = require_constants4();
     var kCode = /* @__PURE__ */ Symbol("kCode");
     var kData = /* @__PURE__ */ Symbol("kData");
     var kError = /* @__PURE__ */ Symbol("kError");
@@ -54673,7 +56235,7 @@ var require_websocket = __commonJS({
     var http = __require("http");
     var net = __require("net");
     var tls = __require("tls");
-    var { randomBytes, createHash } = __require("crypto");
+    var { randomBytes, createHash: createHash2 } = __require("crypto");
     var { Duplex, Readable } = __require("stream");
     var { URL: URL3 } = __require("url");
     var PerMessageDeflate = require_permessage_deflate();
@@ -54690,7 +56252,7 @@ var require_websocket = __commonJS({
       kStatusCode,
       kWebSocket,
       NOOP
-    } = require_constants2();
+    } = require_constants4();
     var {
       EventTarget: { addEventListener, removeEventListener }
     } = require_event_target();
@@ -55333,7 +56895,7 @@ var require_websocket = __commonJS({
           abortHandshake(websocket, socket, "Invalid Upgrade header");
           return;
         }
-        const digest = createHash("sha1").update(key + GUID).digest("base64");
+        const digest = createHash2("sha1").update(key + GUID).digest("base64");
         if (res.headers["sec-websocket-accept"] !== digest) {
           abortHandshake(websocket, socket, "Invalid Sec-WebSocket-Accept header");
           return;
@@ -55700,12 +57262,12 @@ var require_websocket_server = __commonJS({
     var EventEmitter = __require("events");
     var http = __require("http");
     var { Duplex } = __require("stream");
-    var { createHash } = __require("crypto");
+    var { createHash: createHash2 } = __require("crypto");
     var extension = require_extension();
     var PerMessageDeflate = require_permessage_deflate();
     var subprotocol = require_subprotocol();
     var WebSocket = require_websocket();
-    var { CLOSE_TIMEOUT, GUID, kWebSocket } = require_constants2();
+    var { CLOSE_TIMEOUT, GUID, kWebSocket } = require_constants4();
     var keyRegex = /^[+/0-9A-Za-z]{22}==$/;
     var RUNNING = 0;
     var CLOSING = 1;
@@ -56001,7 +57563,7 @@ var require_websocket_server = __commonJS({
           );
         }
         if (this._state > RUNNING) return abortHandshake(socket, 503);
-        const digest = createHash("sha1").update(key + GUID).digest("base64");
+        const digest = createHash2("sha1").update(key + GUID).digest("base64");
         const headers = [
           "HTTP/1.1 101 Switching Protocols",
           "Upgrade: websocket",
@@ -59594,7 +61156,7 @@ var require_index_cjs = __commonJS({
       return value._bn !== void 0;
     }
     var uniquePublicKeyCounter = 1;
-    var PublicKey2 = class _PublicKey2 extends Struct {
+    var PublicKey3 = class _PublicKey2 extends Struct {
       /**
        * Create a new PublicKey object
        * @param value ed25519 public key as buffer or base-58 encoded string
@@ -59756,9 +61318,9 @@ var require_index_cjs = __commonJS({
         return isOnCurve(pubkey.toBytes());
       }
     };
-    _PublicKey = PublicKey2;
-    PublicKey2.default = new _PublicKey("11111111111111111111111111111111");
-    SOLANA_SCHEMA.set(PublicKey2, {
+    _PublicKey = PublicKey3;
+    PublicKey3.default = new _PublicKey("11111111111111111111111111111111");
+    SOLANA_SCHEMA.set(PublicKey3, {
       kind: "struct",
       fields: [["_bn", "u256"]]
     });
@@ -59790,7 +61352,7 @@ var require_index_cjs = __commonJS({
        * The public key for this account
        */
       get publicKey() {
-        return new PublicKey2(this._publicKey);
+        return new PublicKey3(this._publicKey);
       }
       /**
        * The **unencrypted** secret key for this account. The first 32 bytes
@@ -59801,7 +61363,7 @@ var require_index_cjs = __commonJS({
         return buffer.Buffer.concat([this._secretKey, this._publicKey], 64);
       }
     };
-    var BPF_LOADER_DEPRECATED_PROGRAM_ID = new PublicKey2("BPFLoader1111111111111111111111111111111111");
+    var BPF_LOADER_DEPRECATED_PROGRAM_ID = new PublicKey3("BPFLoader1111111111111111111111111111111111");
     var PACKET_DATA_SIZE = 1280 - 40 - 8;
     var VERSION_PREFIX_MASK = 127;
     var SIGNATURE_LENGTH_IN_BYTES = 64;
@@ -60032,7 +61594,7 @@ var require_index_cjs = __commonJS({
           const [payerAddress] = writableSigners[0];
           assert(payerAddress === this.payer.toBase58(), "Expected first writable signer key to be the fee payer");
         }
-        const staticAccountKeys = [...writableSigners.map(([address]) => new PublicKey2(address)), ...readonlySigners.map(([address]) => new PublicKey2(address)), ...writableNonSigners.map(([address]) => new PublicKey2(address)), ...readonlyNonSigners.map(([address]) => new PublicKey2(address))];
+        const staticAccountKeys = [...writableSigners.map(([address]) => new PublicKey3(address)), ...readonlySigners.map(([address]) => new PublicKey3(address)), ...writableNonSigners.map(([address]) => new PublicKey3(address)), ...readonlyNonSigners.map(([address]) => new PublicKey3(address))];
         return [header, staticAccountKeys];
       }
       extractTableLookup(lookupTable) {
@@ -60056,7 +61618,7 @@ var require_index_cjs = __commonJS({
         const drainedKeys = new Array();
         for (const [address, keyMeta] of this.keyMetaMap.entries()) {
           if (keyMetaFilter(keyMeta)) {
-            const key = new PublicKey2(address);
+            const key = new PublicKey3(address);
             const lookupTableIndex = lookupTableEntries.findIndex((entry) => entry.equals(key));
             if (lookupTableIndex >= 0) {
               assert(lookupTableIndex < 256, "Max lookup table index exceeded");
@@ -60091,7 +61653,7 @@ var require_index_cjs = __commonJS({
         this.instructions = void 0;
         this.indexToProgramIds = /* @__PURE__ */ new Map();
         this.header = args.header;
-        this.accountKeys = args.accountKeys.map((account) => new PublicKey2(account));
+        this.accountKeys = args.accountKeys.map((account) => new PublicKey3(account));
         this.recentBlockhash = args.recentBlockhash;
         this.instructions = args.instructions;
         this.instructions.forEach((ix) => this.indexToProgramIds.set(ix.programIdIndex, this.accountKeys[ix.programIdIndex]));
@@ -60217,7 +61779,7 @@ var require_index_cjs = __commonJS({
         let accountKeys = [];
         for (let i = 0; i < accountCount; i++) {
           const account = guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH);
-          accountKeys.push(new PublicKey2(buffer.Buffer.from(account)));
+          accountKeys.push(new PublicKey3(buffer.Buffer.from(account)));
         }
         const recentBlockhash = guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH);
         const instructionCount = decodeLength(byteArray);
@@ -60441,7 +62003,7 @@ var require_index_cjs = __commonJS({
         const staticAccountKeys = [];
         const staticAccountKeysLength = decodeLength(byteArray);
         for (let i = 0; i < staticAccountKeysLength; i++) {
-          staticAccountKeys.push(new PublicKey2(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH)));
+          staticAccountKeys.push(new PublicKey3(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH)));
         }
         const recentBlockhash = bs58__default.default.encode(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
         const instructionCount = decodeLength(byteArray);
@@ -60461,7 +62023,7 @@ var require_index_cjs = __commonJS({
         const addressTableLookupsCount = decodeLength(byteArray);
         const addressTableLookups = [];
         for (let i = 0; i < addressTableLookupsCount; i++) {
-          const accountKey = new PublicKey2(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
+          const accountKey = new PublicKey3(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
           const writableIndexesLength = decodeLength(byteArray);
           const writableIndexes = guardedSplice(byteArray, 0, writableIndexesLength);
           const readonlyIndexesLength = decodeLength(byteArray);
@@ -60701,7 +62263,7 @@ var require_index_cjs = __commonJS({
         });
         programIds.forEach((programId) => {
           accountMetas.push({
-            pubkey: new PublicKey2(programId),
+            pubkey: new PublicKey3(programId),
             isSigner: false,
             isWritable: false
           });
@@ -60845,8 +62407,8 @@ var require_index_cjs = __commonJS({
        *
        * @returns {Promise<number | null>} The estimated fee for the transaction
        */
-      async getEstimatedFee(connection) {
-        return (await connection.getFeeForMessage(this.compileMessage())).value;
+      async getEstimatedFee(connection2) {
+        return (await connection2.getFeeForMessage(this.compileMessage())).value;
       }
       /**
        * Specify the public keys which will be used to sign the Transaction.
@@ -61294,15 +62856,15 @@ Missing signature for public key${sigErrors.missing.length === 1 ? "" : "(s)"} [
     var DEFAULT_TICKS_PER_SLOT = 64;
     var NUM_SLOTS_PER_SECOND = NUM_TICKS_PER_SECOND / DEFAULT_TICKS_PER_SLOT;
     var MS_PER_SLOT = 1e3 / NUM_SLOTS_PER_SECOND;
-    var SYSVAR_CLOCK_PUBKEY = new PublicKey2("SysvarC1ock11111111111111111111111111111111");
-    var SYSVAR_EPOCH_SCHEDULE_PUBKEY = new PublicKey2("SysvarEpochSchedu1e111111111111111111111111");
-    var SYSVAR_INSTRUCTIONS_PUBKEY = new PublicKey2("Sysvar1nstructions1111111111111111111111111");
-    var SYSVAR_RECENT_BLOCKHASHES_PUBKEY = new PublicKey2("SysvarRecentB1ockHashes11111111111111111111");
-    var SYSVAR_RENT_PUBKEY = new PublicKey2("SysvarRent111111111111111111111111111111111");
-    var SYSVAR_REWARDS_PUBKEY = new PublicKey2("SysvarRewards111111111111111111111111111111");
-    var SYSVAR_SLOT_HASHES_PUBKEY = new PublicKey2("SysvarS1otHashes111111111111111111111111111");
-    var SYSVAR_SLOT_HISTORY_PUBKEY = new PublicKey2("SysvarS1otHistory11111111111111111111111111");
-    var SYSVAR_STAKE_HISTORY_PUBKEY = new PublicKey2("SysvarStakeHistory1111111111111111111111111");
+    var SYSVAR_CLOCK_PUBKEY = new PublicKey3("SysvarC1ock11111111111111111111111111111111");
+    var SYSVAR_EPOCH_SCHEDULE_PUBKEY = new PublicKey3("SysvarEpochSchedu1e111111111111111111111111");
+    var SYSVAR_INSTRUCTIONS_PUBKEY = new PublicKey3("Sysvar1nstructions1111111111111111111111111");
+    var SYSVAR_RECENT_BLOCKHASHES_PUBKEY = new PublicKey3("SysvarRecentB1ockHashes11111111111111111111");
+    var SYSVAR_RENT_PUBKEY = new PublicKey3("SysvarRent111111111111111111111111111111111");
+    var SYSVAR_REWARDS_PUBKEY = new PublicKey3("SysvarRewards111111111111111111111111111111");
+    var SYSVAR_SLOT_HASHES_PUBKEY = new PublicKey3("SysvarS1otHashes111111111111111111111111111");
+    var SYSVAR_SLOT_HISTORY_PUBKEY = new PublicKey3("SysvarS1otHistory11111111111111111111111111");
+    var SYSVAR_STAKE_HISTORY_PUBKEY = new PublicKey3("SysvarStakeHistory1111111111111111111111111");
     var SendTransactionError = class extends Error {
       constructor({
         action,
@@ -61350,10 +62912,10 @@ Message: ${transactionMessage}.
         }
         return cachedLogs;
       }
-      async getLogs(connection) {
+      async getLogs(connection2) {
         if (!Array.isArray(this.transactionLogs)) {
           this.transactionLogs = new Promise((resolve, reject) => {
-            connection.getTransaction(this.signature).then((tx) => {
+            connection2.getTransaction(this.signature).then((tx) => {
               if (tx && tx.meta && tx.meta.logMessages) {
                 const logs = tx.meta.logMessages;
                 this.transactionLogs = logs;
@@ -61399,17 +62961,17 @@ Message: ${transactionMessage}.
         this.name = "SolanaJSONRPCError";
       }
     };
-    async function sendAndConfirmTransaction(connection, transaction, signers, options) {
+    async function sendAndConfirmTransaction(connection2, transaction, signers, options) {
       const sendOptions = options && {
         skipPreflight: options.skipPreflight,
         preflightCommitment: options.preflightCommitment || options.commitment,
         maxRetries: options.maxRetries,
         minContextSlot: options.minContextSlot
       };
-      const signature2 = await connection.sendTransaction(transaction, signers, sendOptions);
+      const signature2 = await connection2.sendTransaction(transaction, signers, sendOptions);
       let status;
       if (transaction.recentBlockhash != null && transaction.lastValidBlockHeight != null) {
-        status = (await connection.confirmTransaction({
+        status = (await connection2.confirmTransaction({
           abortSignal: options?.abortSignal,
           signature: signature2,
           blockhash: transaction.recentBlockhash,
@@ -61420,7 +62982,7 @@ Message: ${transactionMessage}.
           nonceInstruction
         } = transaction.nonceInfo;
         const nonceAccountPubkey = nonceInstruction.keys[0].pubkey;
-        status = (await connection.confirmTransaction({
+        status = (await connection2.confirmTransaction({
           abortSignal: options?.abortSignal,
           minContextSlot: transaction.minNonceContextSlot,
           nonceAccountPubkey,
@@ -61431,7 +62993,7 @@ Message: ${transactionMessage}.
         if (options?.abortSignal != null) {
           console.warn("sendAndConfirmTransaction(): A transaction with a deprecated confirmation strategy was supplied along with an `abortSignal`. Only transactions having `lastValidBlockHeight` or a combination of `nonceInfo` and `minNonceContextSlot` are abortable.");
         }
-        status = (await connection.confirmTransaction(signature2, options && options.commitment)).value;
+        status = (await connection2.confirmTransaction(signature2, options && options.commitment)).value;
       }
       if (status.err) {
         if (signature2 != null) {
@@ -61493,8 +63055,8 @@ Message: ${transactionMessage}.
       static fromAccountData(buffer2) {
         const nonceAccount = NonceAccountLayout.decode(toBuffer(buffer2), 0);
         return new _NonceAccount({
-          authorizedPubkey: new PublicKey2(nonceAccount.authorizedPubkey),
-          nonce: new PublicKey2(nonceAccount.nonce).toString(),
+          authorizedPubkey: new PublicKey3(nonceAccount.authorizedPubkey),
+          nonce: new PublicKey3(nonceAccount.nonce).toString(),
           feeCalculator: nonceAccount.feeCalculator
         });
       }
@@ -61556,7 +63118,7 @@ Message: ${transactionMessage}.
           newAccountPubkey: instruction.keys[1].pubkey,
           lamports,
           space,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -61591,7 +63153,7 @@ Message: ${transactionMessage}.
           toPubkey: instruction.keys[2].pubkey,
           lamports,
           seed,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -61622,10 +63184,10 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.AllocateWithSeed, instruction.data);
         return {
           accountPubkey: instruction.keys[0].pubkey,
-          basePubkey: new PublicKey2(base),
+          basePubkey: new PublicKey3(base),
           seed,
           space,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -61639,7 +63201,7 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.Assign, instruction.data);
         return {
           accountPubkey: instruction.keys[0].pubkey,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -61655,9 +63217,9 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.AssignWithSeed, instruction.data);
         return {
           accountPubkey: instruction.keys[0].pubkey,
-          basePubkey: new PublicKey2(base),
+          basePubkey: new PublicKey3(base),
           seed,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -61676,11 +63238,11 @@ Message: ${transactionMessage}.
         return {
           fromPubkey: instruction.keys[0].pubkey,
           newAccountPubkey: instruction.keys[1].pubkey,
-          basePubkey: new PublicKey2(base),
+          basePubkey: new PublicKey3(base),
           seed,
           lamports,
           space,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -61694,7 +63256,7 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.InitializeNonceAccount, instruction.data);
         return {
           noncePubkey: instruction.keys[0].pubkey,
-          authorizedPubkey: new PublicKey2(authorized2)
+          authorizedPubkey: new PublicKey3(authorized2)
         };
       }
       /**
@@ -61737,7 +63299,7 @@ Message: ${transactionMessage}.
         return {
           noncePubkey: instruction.keys[0].pubkey,
           authorizedPubkey: instruction.keys[1].pubkey,
-          newAuthorizedPubkey: new PublicKey2(authorized2)
+          newAuthorizedPubkey: new PublicKey3(authorized2)
         };
       }
       /**
@@ -62146,7 +63708,7 @@ Message: ${transactionMessage}.
         });
       }
     };
-    SystemProgram.programId = new PublicKey2("11111111111111111111111111111111");
+    SystemProgram.programId = new PublicKey3("11111111111111111111111111111111");
     var CHUNK_SIZE = PACKET_DATA_SIZE - 300;
     var Loader = class _Loader {
       /**
@@ -62178,10 +63740,10 @@ Message: ${transactionMessage}.
        * @param data Program octets
        * @return true if program was loaded successfully, false if program was already loaded
        */
-      static async load(connection, payer, program, programId, data) {
+      static async load(connection2, payer, program, programId, data) {
         {
-          const balanceNeeded = await connection.getMinimumBalanceForRentExemption(data.length);
-          const programInfo = await connection.getAccountInfo(program.publicKey, "confirmed");
+          const balanceNeeded = await connection2.getMinimumBalanceForRentExemption(data.length);
+          const programInfo = await connection2.getAccountInfo(program.publicKey, "confirmed");
           let transaction = null;
           if (programInfo !== null) {
             if (programInfo.executable) {
@@ -62220,7 +63782,7 @@ Message: ${transactionMessage}.
             }));
           }
           if (transaction !== null) {
-            await sendAndConfirmTransaction(connection, transaction, [payer, program], {
+            await sendAndConfirmTransaction(connection2, transaction, [payer, program], {
               commitment: "confirmed"
             });
           }
@@ -62250,10 +63812,10 @@ Message: ${transactionMessage}.
             programId,
             data: data2
           });
-          transactions.push(sendAndConfirmTransaction(connection, transaction, [payer, program], {
+          transactions.push(sendAndConfirmTransaction(connection2, transaction, [payer, program], {
             commitment: "confirmed"
           }));
-          if (connection._rpcEndpoint.includes("solana.com")) {
+          if (connection2._rpcEndpoint.includes("solana.com")) {
             const REQUESTS_PER_SECOND = 4;
             await sleep(1e3 / REQUESTS_PER_SECOND);
           }
@@ -62282,13 +63844,13 @@ Message: ${transactionMessage}.
             data: data2
           });
           const deployCommitment = "processed";
-          const finalizeSignature = await connection.sendTransaction(transaction, [payer, program], {
+          const finalizeSignature = await connection2.sendTransaction(transaction, [payer, program], {
             preflightCommitment: deployCommitment
           });
           const {
             context,
             value
-          } = await connection.confirmTransaction({
+          } = await connection2.confirmTransaction({
             signature: finalizeSignature,
             lastValidBlockHeight: transaction.lastValidBlockHeight,
             blockhash: transaction.recentBlockhash
@@ -62298,7 +63860,7 @@ Message: ${transactionMessage}.
           }
           while (true) {
             try {
-              const currentSlot = await connection.getSlot({
+              const currentSlot = await connection2.getSlot({
                 commitment: deployCommitment
               });
               if (currentSlot > context.slot) {
@@ -62313,7 +63875,7 @@ Message: ${transactionMessage}.
       }
     };
     Loader.chunkSize = CHUNK_SIZE;
-    var BPF_LOADER_PROGRAM_ID = new PublicKey2("BPFLoader2111111111111111111111111111111111");
+    var BPF_LOADER_PROGRAM_ID = new PublicKey3("BPFLoader2111111111111111111111111111111111");
     var BpfLoader = class {
       /**
        * Minimum number of signatures required to load a program not including
@@ -62334,8 +63896,8 @@ Message: ${transactionMessage}.
        * @param loaderProgramId The program id of the BPF loader to use
        * @return true if program was loaded successfully, false if program was already loaded
        */
-      static load(connection, payer, program, elf, loaderProgramId) {
-        return Loader.load(connection, payer, program, loaderProgramId, elf);
+      static load(connection2, payer, program, elf, loaderProgramId) {
+        return Loader.load(connection2, payer, program, loaderProgramId, elf);
       }
     };
     function getDefaultExportFromCjs(x) {
@@ -63109,8 +64671,8 @@ Message: ${transactionMessage}.
           deactivationSlot: meta.deactivationSlot,
           lastExtendedSlot: meta.lastExtendedSlot,
           lastExtendedSlotStartIndex: meta.lastExtendedStartIndex,
-          authority: meta.authority.length !== 0 ? new PublicKey2(meta.authority[0]) : void 0,
-          addresses: addresses.map((address) => new PublicKey2(address))
+          authority: meta.authority.length !== 0 ? new PublicKey3(meta.authority[0]) : void 0,
+          addresses: addresses.map((address) => new PublicKey3(address))
         };
       }
     };
@@ -63152,7 +64714,7 @@ Message: ${transactionMessage}.
       );
       return `${protocol}//${hostish}${websocketPort}${rest}`;
     }
-    var PublicKeyFromString = superstruct.coerce(superstruct.instance(PublicKey2), superstruct.string(), (value) => new PublicKey2(value));
+    var PublicKeyFromString = superstruct.coerce(superstruct.instance(PublicKey3), superstruct.string(), (value) => new PublicKey3(value));
     var RawAccountDataResult = superstruct.tuple([superstruct.string(), superstruct.literal("base64")]);
     var BufferFromRawAccountData = superstruct.coerce(superstruct.instance(buffer.Buffer), RawAccountDataResult, (value) => buffer.Buffer.from(value[0], "base64"));
     var BLOCKHASH_CACHE_TIMEOUT_MS = 30 * 1e3;
@@ -63237,7 +64799,7 @@ Message: ${transactionMessage}.
       if (version3 === 0) {
         return new MessageV0({
           header: response.header,
-          staticAccountKeys: response.accountKeys.map((accountKey) => new PublicKey2(accountKey)),
+          staticAccountKeys: response.accountKeys.map((accountKey) => new PublicKey3(accountKey)),
           recentBlockhash: response.recentBlockhash,
           compiledInstructions: response.instructions.map((ix) => ({
             programIdIndex: ix.programIdIndex,
@@ -63901,7 +65463,7 @@ Message: ${transactionMessage}.
     var COMMON_HTTP_HEADERS = {
       "solana-client": `js/${"1.0.0-maintenance"}`
     };
-    var Connection3 = class {
+    var Connection4 = class {
       /**
        * Establish a JSON RPC connection
        *
@@ -66677,7 +68239,7 @@ Message: ${transactionMessage}.
        * @returns {PublicKey} PublicKey
        */
       get publicKey() {
-        return new PublicKey2(this._keypair.publicKey);
+        return new PublicKey3(this._keypair.publicKey);
       }
       /**
        * The raw secret key for this keypair
@@ -66755,7 +68317,7 @@ Message: ${transactionMessage}.
           lookupTable: instruction.keys[0].pubkey,
           authority: instruction.keys[1].pubkey,
           payer: instruction.keys.length > 2 ? instruction.keys[2].pubkey : void 0,
-          addresses: addresses.map((buffer2) => new PublicKey2(buffer2))
+          addresses: addresses.map((buffer2) => new PublicKey3(buffer2))
         };
       }
       static decodeCloseLookupTable(instruction) {
@@ -66807,7 +68369,7 @@ Message: ${transactionMessage}.
       constructor() {
       }
       static createLookupTable(params) {
-        const [lookupTableAddress, bumpSeed] = PublicKey2.findProgramAddressSync([params.authority.toBuffer(), codecsNumbers.getU64Encoder().encode(params.recentSlot)], this.programId);
+        const [lookupTableAddress, bumpSeed] = PublicKey3.findProgramAddressSync([params.authority.toBuffer(), codecsNumbers.getU64Encoder().encode(params.recentSlot)], this.programId);
         const type = LOOKUP_TABLE_INSTRUCTION_LAYOUTS.CreateLookupTable;
         const data = encodeData(type, {
           recentSlot: BigInt(params.recentSlot),
@@ -66926,7 +68488,7 @@ Message: ${transactionMessage}.
         });
       }
     };
-    AddressLookupTableProgram.programId = new PublicKey2("AddressLookupTab1e1111111111111111111111111");
+    AddressLookupTableProgram.programId = new PublicKey3("AddressLookupTab1e1111111111111111111111111");
     var ComputeBudgetInstruction = class {
       /**
        * @internal
@@ -67080,7 +68642,7 @@ Message: ${transactionMessage}.
         });
       }
     };
-    ComputeBudgetProgram.programId = new PublicKey2("ComputeBudget111111111111111111111111111111");
+    ComputeBudgetProgram.programId = new PublicKey3("ComputeBudget111111111111111111111111111111");
     var PRIVATE_KEY_BYTES$1 = 64;
     var PUBLIC_KEY_BYTES$1 = 32;
     var SIGNATURE_BYTES = 64;
@@ -67160,7 +68722,7 @@ Message: ${transactionMessage}.
         }
       }
     };
-    Ed25519Program.programId = new PublicKey2("Ed25519SigVerify111111111111111111111111111");
+    Ed25519Program.programId = new PublicKey3("Ed25519SigVerify111111111111111111111111111");
     var ecdsaSign = (msgHash, privKey) => {
       const signature2 = secp256k1.secp256k1.sign(msgHash, privKey);
       return [signature2.toCompactRawBytes(), signature2.recovery];
@@ -67294,9 +68856,9 @@ Message: ${transactionMessage}.
         }
       }
     };
-    Secp256k1Program.programId = new PublicKey2("KeccakSecp256k11111111111111111111111111111");
+    Secp256k1Program.programId = new PublicKey3("KeccakSecp256k11111111111111111111111111111");
     var _Lockup;
-    var STAKE_CONFIG_ID = new PublicKey2("StakeConfig11111111111111111111111111111111");
+    var STAKE_CONFIG_ID = new PublicKey3("StakeConfig11111111111111111111111111111111");
     var Authorized = class {
       /**
        * Create a new Authorized object
@@ -67327,7 +68889,7 @@ Message: ${transactionMessage}.
        */
     };
     _Lockup = Lockup;
-    Lockup.default = new _Lockup(0, 0, PublicKey2.default);
+    Lockup.default = new _Lockup(0, 0, PublicKey3.default);
     var StakeInstruction = class {
       /**
        * @internal
@@ -67365,8 +68927,8 @@ Message: ${transactionMessage}.
         } = decodeData$1(STAKE_INSTRUCTION_LAYOUTS.Initialize, instruction.data);
         return {
           stakePubkey: instruction.keys[0].pubkey,
-          authorized: new Authorized(new PublicKey2(authorized2.staker), new PublicKey2(authorized2.withdrawer)),
-          lockup: new Lockup(lockup2.unixTimestamp, lockup2.epoch, new PublicKey2(lockup2.custodian))
+          authorized: new Authorized(new PublicKey3(authorized2.staker), new PublicKey3(authorized2.withdrawer)),
+          lockup: new Lockup(lockup2.unixTimestamp, lockup2.epoch, new PublicKey3(lockup2.custodian))
         };
       }
       /**
@@ -67395,7 +68957,7 @@ Message: ${transactionMessage}.
         const o = {
           stakePubkey: instruction.keys[0].pubkey,
           authorizedPubkey: instruction.keys[2].pubkey,
-          newAuthorizedPubkey: new PublicKey2(newAuthorized),
+          newAuthorizedPubkey: new PublicKey3(newAuthorized),
           stakeAuthorizationType: {
             index: stakeAuthorizationType
           }
@@ -67421,8 +68983,8 @@ Message: ${transactionMessage}.
           stakePubkey: instruction.keys[0].pubkey,
           authorityBase: instruction.keys[1].pubkey,
           authoritySeed,
-          authorityOwner: new PublicKey2(authorityOwner),
-          newAuthorizedPubkey: new PublicKey2(newAuthorized),
+          authorityOwner: new PublicKey3(authorityOwner),
+          newAuthorizedPubkey: new PublicKey3(newAuthorized),
           stakeAuthorizationType: {
             index: stakeAuthorizationType
           }
@@ -67976,7 +69538,7 @@ Message: ${transactionMessage}.
         });
       }
     };
-    StakeProgram.programId = new PublicKey2("Stake11111111111111111111111111111111111111");
+    StakeProgram.programId = new PublicKey3("Stake11111111111111111111111111111111111111");
     StakeProgram.space = 200;
     var VoteInit = class {
       /** [0, 100] */
@@ -68028,7 +69590,7 @@ Message: ${transactionMessage}.
         return {
           votePubkey: instruction.keys[0].pubkey,
           nodePubkey: instruction.keys[3].pubkey,
-          voteInit: new VoteInit(new PublicKey2(voteInit2.nodePubkey), new PublicKey2(voteInit2.authorizedVoter), new PublicKey2(voteInit2.authorizedWithdrawer), voteInit2.commission)
+          voteInit: new VoteInit(new PublicKey3(voteInit2.nodePubkey), new PublicKey3(voteInit2.authorizedVoter), new PublicKey3(voteInit2.authorizedWithdrawer), voteInit2.commission)
         };
       }
       /**
@@ -68044,7 +69606,7 @@ Message: ${transactionMessage}.
         return {
           votePubkey: instruction.keys[0].pubkey,
           authorizedPubkey: instruction.keys[2].pubkey,
-          newAuthorizedPubkey: new PublicKey2(newAuthorized),
+          newAuthorizedPubkey: new PublicKey3(newAuthorized),
           voteAuthorizationType: {
             index: voteAuthorizationType
           }
@@ -68066,9 +69628,9 @@ Message: ${transactionMessage}.
         } = decodeData$1(VOTE_INSTRUCTION_LAYOUTS.AuthorizeWithSeed, instruction.data);
         return {
           currentAuthorityDerivedKeyBasePubkey: instruction.keys[2].pubkey,
-          currentAuthorityDerivedKeyOwnerPubkey: new PublicKey2(currentAuthorityDerivedKeyOwnerPubkey),
+          currentAuthorityDerivedKeyOwnerPubkey: new PublicKey3(currentAuthorityDerivedKeyOwnerPubkey),
           currentAuthorityDerivedKeySeed,
-          newAuthorizedPubkey: new PublicKey2(newAuthorized),
+          newAuthorizedPubkey: new PublicKey3(newAuthorized),
           voteAuthorizationType: {
             index: voteAuthorizationType
           },
@@ -68359,9 +69921,9 @@ Message: ${transactionMessage}.
         });
       }
     };
-    VoteProgram.programId = new PublicKey2("Vote111111111111111111111111111111111111111");
+    VoteProgram.programId = new PublicKey3("Vote111111111111111111111111111111111111111");
     VoteProgram.space = 3762;
-    var VALIDATOR_INFO_KEY = new PublicKey2("Va1idator1nfo111111111111111111111111111111");
+    var VALIDATOR_INFO_KEY = new PublicKey3("Va1idator1nfo111111111111111111111111111111");
     var InfoString = superstruct.type({
       name: superstruct.string(),
       website: superstruct.optional(superstruct.string()),
@@ -68395,7 +69957,7 @@ Message: ${transactionMessage}.
         if (configKeyCount !== 2) return null;
         const configKeys = [];
         for (let i = 0; i < 2; i++) {
-          const publicKey2 = new PublicKey2(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
+          const publicKey2 = new PublicKey3(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
           const isSigner = guardedShift(byteArray) === 1;
           configKeys.push({
             publicKey: publicKey2,
@@ -68413,7 +69975,7 @@ Message: ${transactionMessage}.
         return null;
       }
     };
-    var VOTE_PROGRAM_ID = new PublicKey2("Vote111111111111111111111111111111111111111");
+    var VOTE_PROGRAM_ID = new PublicKey3("Vote111111111111111111111111111111111111111");
     var VoteAccountLayout = BufferLayout__namespace.struct([
       publicKey("nodePubkey"),
       publicKey("authorizedWithdrawer"),
@@ -68470,8 +70032,8 @@ Message: ${transactionMessage}.
           rootSlot = null;
         }
         return new _VoteAccount({
-          nodePubkey: new PublicKey2(va.nodePubkey),
-          authorizedWithdrawer: new PublicKey2(va.authorizedWithdrawer),
+          nodePubkey: new PublicKey3(va.nodePubkey),
+          authorizedWithdrawer: new PublicKey3(va.authorizedWithdrawer),
           commission: va.commission,
           votes: va.votes,
           rootSlot,
@@ -68488,7 +70050,7 @@ Message: ${transactionMessage}.
     }) {
       return {
         epoch,
-        authorizedVoter: new PublicKey2(authorizedVoter)
+        authorizedVoter: new PublicKey3(authorizedVoter)
       };
     }
     function parsePriorVoters({
@@ -68497,7 +70059,7 @@ Message: ${transactionMessage}.
       targetEpoch
     }) {
       return {
-        authorizedPubkey: new PublicKey2(authorizedPubkey),
+        authorizedPubkey: new PublicKey3(authorizedPubkey),
         epochOfLastAuthorizedSwitch,
         targetEpoch
       };
@@ -68535,7 +70097,7 @@ Message: ${transactionMessage}.
       }
       return url;
     }
-    async function sendAndConfirmRawTransaction(connection, rawTransaction, confirmationStrategyOrConfirmOptions, maybeConfirmOptions) {
+    async function sendAndConfirmRawTransaction(connection2, rawTransaction, confirmationStrategyOrConfirmOptions, maybeConfirmOptions) {
       let confirmationStrategy;
       let options;
       if (confirmationStrategyOrConfirmOptions && Object.prototype.hasOwnProperty.call(confirmationStrategyOrConfirmOptions, "lastValidBlockHeight")) {
@@ -68552,9 +70114,9 @@ Message: ${transactionMessage}.
         preflightCommitment: options.preflightCommitment || options.commitment,
         minContextSlot: options.minContextSlot
       };
-      const signature2 = await connection.sendRawTransaction(rawTransaction, sendOptions);
+      const signature2 = await connection2.sendRawTransaction(rawTransaction, sendOptions);
       const commitment = options && options.commitment;
-      const confirmationPromise = confirmationStrategy ? connection.confirmTransaction(confirmationStrategy, commitment) : connection.confirmTransaction(signature2, commitment);
+      const confirmationPromise = confirmationStrategy ? connection2.confirmTransaction(confirmationStrategy, commitment) : connection2.confirmTransaction(signature2, commitment);
       const status = (await confirmationPromise).value;
       if (status.err) {
         if (signature2 != null) {
@@ -68581,7 +70143,7 @@ Message: ${transactionMessage}.
     exports.COMPUTE_BUDGET_INSTRUCTION_LAYOUTS = COMPUTE_BUDGET_INSTRUCTION_LAYOUTS;
     exports.ComputeBudgetInstruction = ComputeBudgetInstruction;
     exports.ComputeBudgetProgram = ComputeBudgetProgram;
-    exports.Connection = Connection3;
+    exports.Connection = Connection4;
     exports.Ed25519Program = Ed25519Program;
     exports.Enum = Enum;
     exports.EpochSchedule = EpochSchedule;
@@ -68599,7 +70161,7 @@ Message: ${transactionMessage}.
     exports.NonceAccount = NonceAccount;
     exports.PACKET_DATA_SIZE = PACKET_DATA_SIZE;
     exports.PUBLIC_KEY_LENGTH = PUBLIC_KEY_LENGTH;
-    exports.PublicKey = PublicKey2;
+    exports.PublicKey = PublicKey3;
     exports.SIGNATURE_LENGTH_IN_BYTES = SIGNATURE_LENGTH_IN_BYTES;
     exports.SOLANA_SCHEMA = SOLANA_SCHEMA;
     exports.STAKE_CONFIG_ID = STAKE_CONFIG_ID;
@@ -68649,8 +70211,552 @@ Message: ${transactionMessage}.
 });
 
 // src/app.ts
-var import_express10 = __toESM(require_express2(), 1);
+var import_express11 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
+
+// ../../node_modules/.pnpm/helmet@8.1.0/node_modules/helmet/index.mjs
+var dangerouslyDisableDefaultSrc = /* @__PURE__ */ Symbol("dangerouslyDisableDefaultSrc");
+var SHOULD_BE_QUOTED = /* @__PURE__ */ new Set(["none", "self", "strict-dynamic", "report-sample", "inline-speculation-rules", "unsafe-inline", "unsafe-eval", "unsafe-hashes", "wasm-unsafe-eval"]);
+var getDefaultDirectives = () => ({
+  "default-src": ["'self'"],
+  "base-uri": ["'self'"],
+  "font-src": ["'self'", "https:", "data:"],
+  "form-action": ["'self'"],
+  "frame-ancestors": ["'self'"],
+  "img-src": ["'self'", "data:"],
+  "object-src": ["'none'"],
+  "script-src": ["'self'"],
+  "script-src-attr": ["'none'"],
+  "style-src": ["'self'", "https:", "'unsafe-inline'"],
+  "upgrade-insecure-requests": []
+});
+var dashify = (str) => str.replace(/[A-Z]/g, (capitalLetter) => "-" + capitalLetter.toLowerCase());
+var assertDirectiveValueIsValid = (directiveName, directiveValue) => {
+  if (/;|,/.test(directiveValue)) {
+    throw new Error(`Content-Security-Policy received an invalid directive value for ${JSON.stringify(directiveName)}`);
+  }
+};
+var assertDirectiveValueEntryIsValid = (directiveName, directiveValueEntry) => {
+  if (SHOULD_BE_QUOTED.has(directiveValueEntry) || directiveValueEntry.startsWith("nonce-") || directiveValueEntry.startsWith("sha256-") || directiveValueEntry.startsWith("sha384-") || directiveValueEntry.startsWith("sha512-")) {
+    throw new Error(`Content-Security-Policy received an invalid directive value for ${JSON.stringify(directiveName)}. ${JSON.stringify(directiveValueEntry)} should be quoted`);
+  }
+};
+function normalizeDirectives(options) {
+  const defaultDirectives = getDefaultDirectives();
+  const { useDefaults = true, directives: rawDirectives = defaultDirectives } = options;
+  const result = /* @__PURE__ */ new Map();
+  const directiveNamesSeen = /* @__PURE__ */ new Set();
+  const directivesExplicitlyDisabled = /* @__PURE__ */ new Set();
+  for (const rawDirectiveName in rawDirectives) {
+    if (!Object.hasOwn(rawDirectives, rawDirectiveName)) {
+      continue;
+    }
+    if (rawDirectiveName.length === 0 || /[^a-zA-Z0-9-]/.test(rawDirectiveName)) {
+      throw new Error(`Content-Security-Policy received an invalid directive name ${JSON.stringify(rawDirectiveName)}`);
+    }
+    const directiveName = dashify(rawDirectiveName);
+    if (directiveNamesSeen.has(directiveName)) {
+      throw new Error(`Content-Security-Policy received a duplicate directive ${JSON.stringify(directiveName)}`);
+    }
+    directiveNamesSeen.add(directiveName);
+    const rawDirectiveValue = rawDirectives[rawDirectiveName];
+    let directiveValue;
+    if (rawDirectiveValue === null) {
+      if (directiveName === "default-src") {
+        throw new Error("Content-Security-Policy needs a default-src but it was set to `null`. If you really want to disable it, set it to `contentSecurityPolicy.dangerouslyDisableDefaultSrc`.");
+      }
+      directivesExplicitlyDisabled.add(directiveName);
+      continue;
+    } else if (typeof rawDirectiveValue === "string") {
+      directiveValue = [rawDirectiveValue];
+    } else if (!rawDirectiveValue) {
+      throw new Error(`Content-Security-Policy received an invalid directive value for ${JSON.stringify(directiveName)}`);
+    } else if (rawDirectiveValue === dangerouslyDisableDefaultSrc) {
+      if (directiveName === "default-src") {
+        directivesExplicitlyDisabled.add("default-src");
+        continue;
+      } else {
+        throw new Error(`Content-Security-Policy: tried to disable ${JSON.stringify(directiveName)} as if it were default-src; simply omit the key`);
+      }
+    } else {
+      directiveValue = rawDirectiveValue;
+    }
+    for (const element of directiveValue) {
+      if (typeof element !== "string") continue;
+      assertDirectiveValueIsValid(directiveName, element);
+      assertDirectiveValueEntryIsValid(directiveName, element);
+    }
+    result.set(directiveName, directiveValue);
+  }
+  if (useDefaults) {
+    Object.entries(defaultDirectives).forEach(([defaultDirectiveName, defaultDirectiveValue]) => {
+      if (!result.has(defaultDirectiveName) && !directivesExplicitlyDisabled.has(defaultDirectiveName)) {
+        result.set(defaultDirectiveName, defaultDirectiveValue);
+      }
+    });
+  }
+  if (!result.size) {
+    throw new Error("Content-Security-Policy has no directives. Either set some or disable the header");
+  }
+  if (!result.has("default-src") && !directivesExplicitlyDisabled.has("default-src")) {
+    throw new Error("Content-Security-Policy needs a default-src but none was provided. If you really want to disable it, set it to `contentSecurityPolicy.dangerouslyDisableDefaultSrc`.");
+  }
+  return result;
+}
+function getHeaderValue(req, res, normalizedDirectives) {
+  const result = [];
+  for (const [directiveName, rawDirectiveValue] of normalizedDirectives) {
+    let directiveValue = "";
+    for (const element of rawDirectiveValue) {
+      if (typeof element === "function") {
+        const newElement = element(req, res);
+        assertDirectiveValueEntryIsValid(directiveName, newElement);
+        directiveValue += " " + newElement;
+      } else {
+        directiveValue += " " + element;
+      }
+    }
+    if (directiveValue) {
+      assertDirectiveValueIsValid(directiveName, directiveValue);
+      result.push(`${directiveName}${directiveValue}`);
+    } else {
+      result.push(directiveName);
+    }
+  }
+  return result.join(";");
+}
+var contentSecurityPolicy = function contentSecurityPolicy2(options = {}) {
+  const headerName = options.reportOnly ? "Content-Security-Policy-Report-Only" : "Content-Security-Policy";
+  const normalizedDirectives = normalizeDirectives(options);
+  return function contentSecurityPolicyMiddleware(req, res, next) {
+    const result = getHeaderValue(req, res, normalizedDirectives);
+    if (result instanceof Error) {
+      next(result);
+    } else {
+      res.setHeader(headerName, result);
+      next();
+    }
+  };
+};
+contentSecurityPolicy.getDefaultDirectives = getDefaultDirectives;
+contentSecurityPolicy.dangerouslyDisableDefaultSrc = dangerouslyDisableDefaultSrc;
+var ALLOWED_POLICIES$2 = /* @__PURE__ */ new Set(["require-corp", "credentialless", "unsafe-none"]);
+function getHeaderValueFromOptions$6({ policy = "require-corp" }) {
+  if (ALLOWED_POLICIES$2.has(policy)) {
+    return policy;
+  } else {
+    throw new Error(`Cross-Origin-Embedder-Policy does not support the ${JSON.stringify(policy)} policy`);
+  }
+}
+function crossOriginEmbedderPolicy(options = {}) {
+  const headerValue = getHeaderValueFromOptions$6(options);
+  return function crossOriginEmbedderPolicyMiddleware(_req, res, next) {
+    res.setHeader("Cross-Origin-Embedder-Policy", headerValue);
+    next();
+  };
+}
+var ALLOWED_POLICIES$1 = /* @__PURE__ */ new Set(["same-origin", "same-origin-allow-popups", "unsafe-none"]);
+function getHeaderValueFromOptions$5({ policy = "same-origin" }) {
+  if (ALLOWED_POLICIES$1.has(policy)) {
+    return policy;
+  } else {
+    throw new Error(`Cross-Origin-Opener-Policy does not support the ${JSON.stringify(policy)} policy`);
+  }
+}
+function crossOriginOpenerPolicy(options = {}) {
+  const headerValue = getHeaderValueFromOptions$5(options);
+  return function crossOriginOpenerPolicyMiddleware(_req, res, next) {
+    res.setHeader("Cross-Origin-Opener-Policy", headerValue);
+    next();
+  };
+}
+var ALLOWED_POLICIES = /* @__PURE__ */ new Set(["same-origin", "same-site", "cross-origin"]);
+function getHeaderValueFromOptions$4({ policy = "same-origin" }) {
+  if (ALLOWED_POLICIES.has(policy)) {
+    return policy;
+  } else {
+    throw new Error(`Cross-Origin-Resource-Policy does not support the ${JSON.stringify(policy)} policy`);
+  }
+}
+function crossOriginResourcePolicy(options = {}) {
+  const headerValue = getHeaderValueFromOptions$4(options);
+  return function crossOriginResourcePolicyMiddleware(_req, res, next) {
+    res.setHeader("Cross-Origin-Resource-Policy", headerValue);
+    next();
+  };
+}
+function originAgentCluster() {
+  return function originAgentClusterMiddleware(_req, res, next) {
+    res.setHeader("Origin-Agent-Cluster", "?1");
+    next();
+  };
+}
+var ALLOWED_TOKENS = /* @__PURE__ */ new Set(["no-referrer", "no-referrer-when-downgrade", "same-origin", "origin", "strict-origin", "origin-when-cross-origin", "strict-origin-when-cross-origin", "unsafe-url", ""]);
+function getHeaderValueFromOptions$3({ policy = ["no-referrer"] }) {
+  const tokens = typeof policy === "string" ? [policy] : policy;
+  if (tokens.length === 0) {
+    throw new Error("Referrer-Policy received no policy tokens");
+  }
+  const tokensSeen = /* @__PURE__ */ new Set();
+  tokens.forEach((token) => {
+    if (!ALLOWED_TOKENS.has(token)) {
+      throw new Error(`Referrer-Policy received an unexpected policy token ${JSON.stringify(token)}`);
+    } else if (tokensSeen.has(token)) {
+      throw new Error(`Referrer-Policy received a duplicate policy token ${JSON.stringify(token)}`);
+    }
+    tokensSeen.add(token);
+  });
+  return tokens.join(",");
+}
+function referrerPolicy(options = {}) {
+  const headerValue = getHeaderValueFromOptions$3(options);
+  return function referrerPolicyMiddleware(_req, res, next) {
+    res.setHeader("Referrer-Policy", headerValue);
+    next();
+  };
+}
+var DEFAULT_MAX_AGE = 365 * 24 * 60 * 60;
+function parseMaxAge(value = DEFAULT_MAX_AGE) {
+  if (value >= 0 && Number.isFinite(value)) {
+    return Math.floor(value);
+  } else {
+    throw new Error(`Strict-Transport-Security: ${JSON.stringify(value)} is not a valid value for maxAge. Please choose a positive integer.`);
+  }
+}
+function getHeaderValueFromOptions$2(options) {
+  if ("maxage" in options) {
+    throw new Error("Strict-Transport-Security received an unsupported property, `maxage`. Did you mean to pass `maxAge`?");
+  }
+  if ("includeSubdomains" in options) {
+    throw new Error('Strict-Transport-Security middleware should use `includeSubDomains` instead of `includeSubdomains`. (The correct one has an uppercase "D".)');
+  }
+  const directives = [`max-age=${parseMaxAge(options.maxAge)}`];
+  if (options.includeSubDomains === void 0 || options.includeSubDomains) {
+    directives.push("includeSubDomains");
+  }
+  if (options.preload) {
+    directives.push("preload");
+  }
+  return directives.join("; ");
+}
+function strictTransportSecurity(options = {}) {
+  const headerValue = getHeaderValueFromOptions$2(options);
+  return function strictTransportSecurityMiddleware(_req, res, next) {
+    res.setHeader("Strict-Transport-Security", headerValue);
+    next();
+  };
+}
+function xContentTypeOptions() {
+  return function xContentTypeOptionsMiddleware(_req, res, next) {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    next();
+  };
+}
+function xDnsPrefetchControl(options = {}) {
+  const headerValue = options.allow ? "on" : "off";
+  return function xDnsPrefetchControlMiddleware(_req, res, next) {
+    res.setHeader("X-DNS-Prefetch-Control", headerValue);
+    next();
+  };
+}
+function xDownloadOptions() {
+  return function xDownloadOptionsMiddleware(_req, res, next) {
+    res.setHeader("X-Download-Options", "noopen");
+    next();
+  };
+}
+function getHeaderValueFromOptions$1({ action = "sameorigin" }) {
+  const normalizedAction = typeof action === "string" ? action.toUpperCase() : action;
+  switch (normalizedAction) {
+    case "SAME-ORIGIN":
+      return "SAMEORIGIN";
+    case "DENY":
+    case "SAMEORIGIN":
+      return normalizedAction;
+    default:
+      throw new Error(`X-Frame-Options received an invalid action ${JSON.stringify(action)}`);
+  }
+}
+function xFrameOptions(options = {}) {
+  const headerValue = getHeaderValueFromOptions$1(options);
+  return function xFrameOptionsMiddleware(_req, res, next) {
+    res.setHeader("X-Frame-Options", headerValue);
+    next();
+  };
+}
+var ALLOWED_PERMITTED_POLICIES = /* @__PURE__ */ new Set(["none", "master-only", "by-content-type", "all"]);
+function getHeaderValueFromOptions({ permittedPolicies = "none" }) {
+  if (ALLOWED_PERMITTED_POLICIES.has(permittedPolicies)) {
+    return permittedPolicies;
+  } else {
+    throw new Error(`X-Permitted-Cross-Domain-Policies does not support ${JSON.stringify(permittedPolicies)}`);
+  }
+}
+function xPermittedCrossDomainPolicies(options = {}) {
+  const headerValue = getHeaderValueFromOptions(options);
+  return function xPermittedCrossDomainPoliciesMiddleware(_req, res, next) {
+    res.setHeader("X-Permitted-Cross-Domain-Policies", headerValue);
+    next();
+  };
+}
+function xPoweredBy() {
+  return function xPoweredByMiddleware(_req, res, next) {
+    res.removeHeader("X-Powered-By");
+    next();
+  };
+}
+function xXssProtection() {
+  return function xXssProtectionMiddleware(_req, res, next) {
+    res.setHeader("X-XSS-Protection", "0");
+    next();
+  };
+}
+function getMiddlewareFunctionsFromOptions(options) {
+  const result = [];
+  switch (options.contentSecurityPolicy) {
+    case void 0:
+    case true:
+      result.push(contentSecurityPolicy());
+      break;
+    case false:
+      break;
+    default:
+      result.push(contentSecurityPolicy(options.contentSecurityPolicy));
+      break;
+  }
+  switch (options.crossOriginEmbedderPolicy) {
+    case void 0:
+    case false:
+      break;
+    case true:
+      result.push(crossOriginEmbedderPolicy());
+      break;
+    default:
+      result.push(crossOriginEmbedderPolicy(options.crossOriginEmbedderPolicy));
+      break;
+  }
+  switch (options.crossOriginOpenerPolicy) {
+    case void 0:
+    case true:
+      result.push(crossOriginOpenerPolicy());
+      break;
+    case false:
+      break;
+    default:
+      result.push(crossOriginOpenerPolicy(options.crossOriginOpenerPolicy));
+      break;
+  }
+  switch (options.crossOriginResourcePolicy) {
+    case void 0:
+    case true:
+      result.push(crossOriginResourcePolicy());
+      break;
+    case false:
+      break;
+    default:
+      result.push(crossOriginResourcePolicy(options.crossOriginResourcePolicy));
+      break;
+  }
+  switch (options.originAgentCluster) {
+    case void 0:
+    case true:
+      result.push(originAgentCluster());
+      break;
+    case false:
+      break;
+    default:
+      console.warn("Origin-Agent-Cluster does not take options. Remove the property to silence this warning.");
+      result.push(originAgentCluster());
+      break;
+  }
+  switch (options.referrerPolicy) {
+    case void 0:
+    case true:
+      result.push(referrerPolicy());
+      break;
+    case false:
+      break;
+    default:
+      result.push(referrerPolicy(options.referrerPolicy));
+      break;
+  }
+  if ("strictTransportSecurity" in options && "hsts" in options) {
+    throw new Error("Strict-Transport-Security option was specified twice. Remove `hsts` to silence this warning.");
+  }
+  const strictTransportSecurityOption = options.strictTransportSecurity ?? options.hsts;
+  switch (strictTransportSecurityOption) {
+    case void 0:
+    case true:
+      result.push(strictTransportSecurity());
+      break;
+    case false:
+      break;
+    default:
+      result.push(strictTransportSecurity(strictTransportSecurityOption));
+      break;
+  }
+  if ("xContentTypeOptions" in options && "noSniff" in options) {
+    throw new Error("X-Content-Type-Options option was specified twice. Remove `noSniff` to silence this warning.");
+  }
+  const xContentTypeOptionsOption = options.xContentTypeOptions ?? options.noSniff;
+  switch (xContentTypeOptionsOption) {
+    case void 0:
+    case true:
+      result.push(xContentTypeOptions());
+      break;
+    case false:
+      break;
+    default:
+      console.warn("X-Content-Type-Options does not take options. Remove the property to silence this warning.");
+      result.push(xContentTypeOptions());
+      break;
+  }
+  if ("xDnsPrefetchControl" in options && "dnsPrefetchControl" in options) {
+    throw new Error("X-DNS-Prefetch-Control option was specified twice. Remove `dnsPrefetchControl` to silence this warning.");
+  }
+  const xDnsPrefetchControlOption = options.xDnsPrefetchControl ?? options.dnsPrefetchControl;
+  switch (xDnsPrefetchControlOption) {
+    case void 0:
+    case true:
+      result.push(xDnsPrefetchControl());
+      break;
+    case false:
+      break;
+    default:
+      result.push(xDnsPrefetchControl(xDnsPrefetchControlOption));
+      break;
+  }
+  if ("xDownloadOptions" in options && "ieNoOpen" in options) {
+    throw new Error("X-Download-Options option was specified twice. Remove `ieNoOpen` to silence this warning.");
+  }
+  const xDownloadOptionsOption = options.xDownloadOptions ?? options.ieNoOpen;
+  switch (xDownloadOptionsOption) {
+    case void 0:
+    case true:
+      result.push(xDownloadOptions());
+      break;
+    case false:
+      break;
+    default:
+      console.warn("X-Download-Options does not take options. Remove the property to silence this warning.");
+      result.push(xDownloadOptions());
+      break;
+  }
+  if ("xFrameOptions" in options && "frameguard" in options) {
+    throw new Error("X-Frame-Options option was specified twice. Remove `frameguard` to silence this warning.");
+  }
+  const xFrameOptionsOption = options.xFrameOptions ?? options.frameguard;
+  switch (xFrameOptionsOption) {
+    case void 0:
+    case true:
+      result.push(xFrameOptions());
+      break;
+    case false:
+      break;
+    default:
+      result.push(xFrameOptions(xFrameOptionsOption));
+      break;
+  }
+  if ("xPermittedCrossDomainPolicies" in options && "permittedCrossDomainPolicies" in options) {
+    throw new Error("X-Permitted-Cross-Domain-Policies option was specified twice. Remove `permittedCrossDomainPolicies` to silence this warning.");
+  }
+  const xPermittedCrossDomainPoliciesOption = options.xPermittedCrossDomainPolicies ?? options.permittedCrossDomainPolicies;
+  switch (xPermittedCrossDomainPoliciesOption) {
+    case void 0:
+    case true:
+      result.push(xPermittedCrossDomainPolicies());
+      break;
+    case false:
+      break;
+    default:
+      result.push(xPermittedCrossDomainPolicies(xPermittedCrossDomainPoliciesOption));
+      break;
+  }
+  if ("xPoweredBy" in options && "hidePoweredBy" in options) {
+    throw new Error("X-Powered-By option was specified twice. Remove `hidePoweredBy` to silence this warning.");
+  }
+  const xPoweredByOption = options.xPoweredBy ?? options.hidePoweredBy;
+  switch (xPoweredByOption) {
+    case void 0:
+    case true:
+      result.push(xPoweredBy());
+      break;
+    case false:
+      break;
+    default:
+      console.warn("X-Powered-By does not take options. Remove the property to silence this warning.");
+      result.push(xPoweredBy());
+      break;
+  }
+  if ("xXssProtection" in options && "xssFilter" in options) {
+    throw new Error("X-XSS-Protection option was specified twice. Remove `xssFilter` to silence this warning.");
+  }
+  const xXssProtectionOption = options.xXssProtection ?? options.xssFilter;
+  switch (xXssProtectionOption) {
+    case void 0:
+    case true:
+      result.push(xXssProtection());
+      break;
+    case false:
+      break;
+    default:
+      console.warn("X-XSS-Protection does not take options. Remove the property to silence this warning.");
+      result.push(xXssProtection());
+      break;
+  }
+  return result;
+}
+var helmet = Object.assign(
+  function helmet2(options = {}) {
+    if (options.constructor?.name === "IncomingMessage") {
+      throw new Error("It appears you have done something like `app.use(helmet)`, but it should be `app.use(helmet())`.");
+    }
+    const middlewareFunctions = getMiddlewareFunctionsFromOptions(options);
+    return function helmetMiddleware(req, res, next) {
+      let middlewareIndex = 0;
+      (function internalNext(err) {
+        if (err) {
+          next(err);
+          return;
+        }
+        const middlewareFunction = middlewareFunctions[middlewareIndex];
+        if (middlewareFunction) {
+          middlewareIndex++;
+          middlewareFunction(req, res, internalNext);
+        } else {
+          next();
+        }
+      })();
+    };
+  },
+  {
+    contentSecurityPolicy,
+    crossOriginEmbedderPolicy,
+    crossOriginOpenerPolicy,
+    crossOriginResourcePolicy,
+    originAgentCluster,
+    referrerPolicy,
+    strictTransportSecurity,
+    xContentTypeOptions,
+    xDnsPrefetchControl,
+    xDownloadOptions,
+    xFrameOptions,
+    xPermittedCrossDomainPolicies,
+    xPoweredBy,
+    xXssProtection,
+    // Legacy aliases
+    dnsPrefetchControl: xDnsPrefetchControl,
+    xssFilter: xXssProtection,
+    permittedCrossDomainPolicies: xPermittedCrossDomainPolicies,
+    ieNoOpen: xDownloadOptions,
+    noSniff: xContentTypeOptions,
+    frameguard: xFrameOptions,
+    hidePoweredBy: xPoweredBy,
+    hsts: strictTransportSecurity
+  }
+);
+
+// src/app.ts
 var import_cookie_parser = __toESM(require_cookie_parser(), 1);
 var import_pino_http = __toESM(require_logger(), 1);
 var import_express_session = __toESM(require_express_session(), 1);
@@ -68658,7 +70764,7 @@ var import_connect_pg_simple = __toESM(require_connect_pg_simple(), 1);
 var import_passport2 = __toESM(require_lib7(), 1);
 
 // src/routes/index.ts
-var import_express9 = __toESM(require_express2(), 1);
+var import_express10 = __toESM(require_express2(), 1);
 
 // src/routes/health.ts
 var import_express = __toESM(require_express2(), 1);
@@ -79504,11 +81610,11 @@ function drizzle(...params) {
     return construct(instance, params[1]);
   }
   if (isConfig(params[0])) {
-    const { connection, client, ...drizzleConfig } = params[0];
+    const { connection: connection2, client, ...drizzleConfig } = params[0];
     if (client) return construct(client, drizzleConfig);
-    const instance = typeof connection === "string" ? new esm_default.Pool({
-      connectionString: connection
-    }) : new esm_default.Pool(connection);
+    const instance = typeof connection2 === "string" ? new esm_default.Pool({
+      connectionString: connection2
+    }) : new esm_default.Pool(connection2);
     return construct(instance, drizzleConfig);
   }
   return construct(params[0], params[1]);
@@ -79642,10 +81748,938 @@ var health_default = router;
 
 // src/routes/twitter.ts
 var import_express2 = __toESM(require_express2(), 1);
+
+// ../../node_modules/.pnpm/express-rate-limit@8.3.2_express@5.2.1/node_modules/express-rate-limit/dist/index.mjs
+var import_ip_address = __toESM(require_ip_address(), 1);
+import { isIPv6 } from "node:net";
+import { isIPv6 as isIPv62 } from "node:net";
+import { Buffer as Buffer2 } from "node:buffer";
+import { createHash } from "node:crypto";
+import { isIP } from "node:net";
+function ipKeyGenerator(ip, ipv6Subnet = 56) {
+  if (isIPv6(ip)) {
+    const address = new import_ip_address.Address6(ip);
+    if (address.is4()) return address.to4().correctForm();
+    if (ipv6Subnet) {
+      const subnet = new import_ip_address.Address6(`${ip}/${ipv6Subnet}`);
+      return `${subnet.startAddress().correctForm()}/${ipv6Subnet}`;
+    }
+  }
+  return ip;
+}
+var MemoryStore = class {
+  constructor(validations2) {
+    this.validations = validations2;
+    this.previous = /* @__PURE__ */ new Map();
+    this.current = /* @__PURE__ */ new Map();
+    this.localKeys = true;
+  }
+  /**
+   * Method that initializes the store.
+   *
+   * @param options {Options} - The options used to setup the middleware.
+   */
+  init(options) {
+    this.windowMs = options.windowMs;
+    this.validations?.windowMs(this.windowMs);
+    if (this.interval) clearInterval(this.interval);
+    this.interval = setInterval(() => {
+      this.clearExpired();
+    }, this.windowMs);
+    this.interval.unref?.();
+  }
+  /**
+   * Method to fetch a client's hit count and reset time.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @returns {ClientRateLimitInfo | undefined} - The number of hits and reset time for that client.
+   *
+   * @public
+   */
+  async get(key) {
+    return this.current.get(key) ?? this.previous.get(key);
+  }
+  /**
+   * Method to increment a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @returns {ClientRateLimitInfo} - The number of hits and reset time for that client.
+   *
+   * @public
+   */
+  async increment(key) {
+    const client = this.getClient(key);
+    const now = Date.now();
+    if (client.resetTime.getTime() <= now) {
+      this.resetClient(client, now);
+    }
+    client.totalHits++;
+    return client;
+  }
+  /**
+   * Method to decrement a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @public
+   */
+  async decrement(key) {
+    const client = this.getClient(key);
+    if (client.totalHits > 0) client.totalHits--;
+  }
+  /**
+   * Method to reset a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @public
+   */
+  async resetKey(key) {
+    this.current.delete(key);
+    this.previous.delete(key);
+  }
+  /**
+   * Method to reset everyone's hit counter.
+   *
+   * @public
+   */
+  async resetAll() {
+    this.current.clear();
+    this.previous.clear();
+  }
+  /**
+   * Method to stop the timer (if currently running) and prevent any memory
+   * leaks.
+   *
+   * @public
+   */
+  shutdown() {
+    clearInterval(this.interval);
+    void this.resetAll();
+  }
+  /**
+   * Recycles a client by setting its hit count to zero, and reset time to
+   * `windowMs` milliseconds from now.
+   *
+   * NOT to be confused with `#resetKey()`, which removes a client from both the
+   * `current` and `previous` maps.
+   *
+   * @param client {Client} - The client to recycle.
+   * @param now {number} - The current time, to which the `windowMs` is added to get the `resetTime` for the client.
+   *
+   * @return {Client} - The modified client that was passed in, to allow for chaining.
+   */
+  resetClient(client, now = Date.now()) {
+    client.totalHits = 0;
+    client.resetTime.setTime(now + this.windowMs);
+    return client;
+  }
+  /**
+   * Retrieves or creates a client, given a key. Also ensures that the client being
+   * returned is in the `current` map.
+   *
+   * @param key {string} - The key under which the client is (or is to be) stored.
+   *
+   * @returns {Client} - The requested client.
+   */
+  getClient(key) {
+    if (this.current.has(key)) return this.current.get(key);
+    let client;
+    if (this.previous.has(key)) {
+      client = this.previous.get(key);
+      this.previous.delete(key);
+    } else {
+      client = { totalHits: 0, resetTime: /* @__PURE__ */ new Date() };
+      this.resetClient(client);
+    }
+    this.current.set(key, client);
+    return client;
+  }
+  /**
+   * Move current clients to previous, create a new map for current.
+   *
+   * This function is called every `windowMs`.
+   */
+  clearExpired() {
+    this.previous = this.current;
+    this.current = /* @__PURE__ */ new Map();
+  }
+};
+var SUPPORTED_DRAFT_VERSIONS = [
+  "draft-6",
+  "draft-7",
+  "draft-8"
+];
+var getResetSeconds = (windowMs, resetTime) => {
+  let resetSeconds;
+  if (resetTime) {
+    const deltaSeconds = Math.ceil((resetTime.getTime() - Date.now()) / 1e3);
+    resetSeconds = Math.max(0, deltaSeconds);
+  } else {
+    resetSeconds = Math.ceil(windowMs / 1e3);
+  }
+  return resetSeconds;
+};
+var getPartitionKey = (key) => {
+  const hash = createHash("sha256");
+  hash.update(key);
+  const partitionKey = hash.digest("hex").slice(0, 12);
+  return Buffer2.from(partitionKey).toString("base64");
+};
+var setLegacyHeaders = (response, info) => {
+  if (response.headersSent) return;
+  response.setHeader("X-RateLimit-Limit", info.limit.toString());
+  response.setHeader("X-RateLimit-Remaining", info.remaining.toString());
+  if (info.resetTime instanceof Date) {
+    response.setHeader("Date", (/* @__PURE__ */ new Date()).toUTCString());
+    response.setHeader(
+      "X-RateLimit-Reset",
+      Math.ceil(info.resetTime.getTime() / 1e3).toString()
+    );
+  }
+};
+var setDraft6Headers = (response, info, windowMs) => {
+  if (response.headersSent) return;
+  const windowSeconds = Math.ceil(windowMs / 1e3);
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  response.setHeader("RateLimit-Policy", `${info.limit};w=${windowSeconds}`);
+  response.setHeader("RateLimit-Limit", info.limit.toString());
+  response.setHeader("RateLimit-Remaining", info.remaining.toString());
+  if (typeof resetSeconds === "number")
+    response.setHeader("RateLimit-Reset", resetSeconds.toString());
+};
+var setDraft7Headers = (response, info, windowMs) => {
+  if (response.headersSent) return;
+  const windowSeconds = Math.ceil(windowMs / 1e3);
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  response.setHeader("RateLimit-Policy", `${info.limit};w=${windowSeconds}`);
+  response.setHeader(
+    "RateLimit",
+    `limit=${info.limit}, remaining=${info.remaining}, reset=${resetSeconds}`
+  );
+};
+var setDraft8Headers = (response, info, windowMs, name, key) => {
+  if (response.headersSent) return;
+  const windowSeconds = Math.ceil(windowMs / 1e3);
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  const partitionKey = getPartitionKey(key);
+  const header = `r=${info.remaining}; t=${resetSeconds}`;
+  const policy = `q=${info.limit}; w=${windowSeconds}; pk=:${partitionKey}:`;
+  response.append("RateLimit", `"${name}"; ${header}`);
+  response.append("RateLimit-Policy", `"${name}"; ${policy}`);
+};
+var setRetryAfterHeader = (response, info, windowMs) => {
+  if (response.headersSent) return;
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  response.setHeader("Retry-After", resetSeconds.toString());
+};
+var omitUndefinedProperties = (passedOptions) => {
+  const omittedOptions = {};
+  for (const k of Object.keys(passedOptions)) {
+    const key = k;
+    if (passedOptions[key] !== void 0) {
+      omittedOptions[key] = passedOptions[key];
+    }
+  }
+  return omittedOptions;
+};
+var ValidationError = class extends Error {
+  /**
+   * The code must be a string, in snake case and all capital, that starts with
+   * the substring `ERR_ERL_`.
+   *
+   * The message must be a string, starting with an uppercase character,
+   * describing the issue in detail.
+   */
+  constructor(code, message) {
+    const url = `https://express-rate-limit.github.io/${code}/`;
+    super(`${message} See ${url} for more information.`);
+    this.name = this.constructor.name;
+    this.code = code;
+    this.help = url;
+  }
+};
+var ChangeWarning = class extends ValidationError {
+};
+var usedStores = /* @__PURE__ */ new Set();
+var singleCountKeys = /* @__PURE__ */ new WeakMap();
+var validations = {
+  enabled: {
+    default: true
+  },
+  // Should be EnabledValidations type, but that's a circular reference
+  disable() {
+    for (const k of Object.keys(this.enabled)) this.enabled[k] = false;
+  },
+  /**
+   * Checks whether the IP address is valid, and that it does not have a port
+   * number in it.
+   *
+   * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_invalid_ip_address.
+   *
+   * @param ip {string | undefined} - The IP address provided by Express as request.ip.
+   *
+   * @returns {void}
+   */
+  ip(ip) {
+    if (ip === void 0) {
+      throw new ValidationError(
+        "ERR_ERL_UNDEFINED_IP_ADDRESS",
+        `An undefined 'request.ip' was detected. This might indicate a misconfiguration or the connection being destroyed prematurely.`
+      );
+    }
+    if (!isIP(ip)) {
+      throw new ValidationError(
+        "ERR_ERL_INVALID_IP_ADDRESS",
+        `An invalid 'request.ip' (${ip}) was detected. Consider passing a custom 'keyGenerator' function to the rate limiter.`
+      );
+    }
+  },
+  /**
+   * Makes sure the trust proxy setting is not set to `true`.
+   *
+   * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_permissive_trust_proxy.
+   *
+   * @param request {Request} - The Express request object.
+   *
+   * @returns {void}
+   */
+  trustProxy(request) {
+    if (request.app.get("trust proxy") === true) {
+      throw new ValidationError(
+        "ERR_ERL_PERMISSIVE_TRUST_PROXY",
+        `The Express 'trust proxy' setting is true, which allows anyone to trivially bypass IP-based rate limiting.`
+      );
+    }
+  },
+  /**
+   * Makes sure the trust proxy setting is set in case the `X-Forwarded-For`
+   * header is present.
+   *
+   * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_unset_trust_proxy.
+   *
+   * @param request {Request} - The Express request object.
+   *
+   * @returns {void}
+   */
+  xForwardedForHeader(request) {
+    if (request.headers["x-forwarded-for"] && request.app.get("trust proxy") === false) {
+      throw new ValidationError(
+        "ERR_ERL_UNEXPECTED_X_FORWARDED_FOR",
+        `The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users.`
+      );
+    }
+  },
+  /**
+   * Alert the user if the Forwarded header is set (standardized version of X-Forwarded-For - not supported by express as of version 5.1.0)
+   *
+   * @param request {Request} - The Express request object.
+   *
+   * @returns {void}
+   */
+  forwardedHeader(request) {
+    if (request.headers.forwarded && request.ip === request.socket?.remoteAddress) {
+      throw new ValidationError(
+        "ERR_ERL_FORWARDED_HEADER",
+        `The 'Forwarded' header (standardized X-Forwarded-For) is set but currently being ignored. Add a custom keyGenerator to use a value from this header.`
+      );
+    }
+  },
+  /**
+   * Ensures totalHits value from store is a positive integer.
+   *
+   * @param hits {any} - The `totalHits` returned by the store.
+   */
+  positiveHits(hits) {
+    if (typeof hits !== "number" || hits < 1 || hits !== Math.round(hits)) {
+      throw new ValidationError(
+        "ERR_ERL_INVALID_HITS",
+        `The totalHits value returned from the store must be a positive integer, got ${hits}`
+      );
+    }
+  },
+  /**
+   * Ensures a single store instance is not used with multiple express-rate-limit instances
+   */
+  unsharedStore(store) {
+    if (usedStores.has(store)) {
+      const maybeUniquePrefix = store?.localKeys ? "" : " (with a unique prefix)";
+      throw new ValidationError(
+        "ERR_ERL_STORE_REUSE",
+        `A Store instance must not be shared across multiple rate limiters. Create a new instance of ${store.constructor.name}${maybeUniquePrefix} for each limiter instead.`
+      );
+    }
+    usedStores.add(store);
+  },
+  /**
+   * Ensures a given key is incremented only once per request.
+   *
+   * @param request {Request} - The Express request object.
+   * @param store {Store} - The store class.
+   * @param key {string} - The key used to store the client's hit count.
+   *
+   * @returns {void}
+   */
+  singleCount(request, store, key) {
+    let storeKeys = singleCountKeys.get(request);
+    if (!storeKeys) {
+      storeKeys = /* @__PURE__ */ new Map();
+      singleCountKeys.set(request, storeKeys);
+    }
+    const storeKey = store.localKeys ? store : store.constructor.name;
+    let keys = storeKeys.get(storeKey);
+    if (!keys) {
+      keys = [];
+      storeKeys.set(storeKey, keys);
+    }
+    const prefixedKey = `${store.prefix ?? ""}${key}`;
+    if (keys.includes(prefixedKey)) {
+      throw new ValidationError(
+        "ERR_ERL_DOUBLE_COUNT",
+        `The hit count for ${key} was incremented more than once for a single request.`
+      );
+    }
+    keys.push(prefixedKey);
+  },
+  /**
+   * Warns the user that the behaviour for `max: 0` / `limit: 0` is
+   * changing in the next major release.
+   *
+   * @param limit {number} - The maximum number of hits per client.
+   *
+   * @returns {void}
+   */
+  limit(limit) {
+    if (limit === 0) {
+      throw new ChangeWarning(
+        "WRN_ERL_MAX_ZERO",
+        "Setting limit or max to 0 disables rate limiting in express-rate-limit v6 and older, but will cause all requests to be blocked in v7"
+      );
+    }
+  },
+  /**
+   * Warns the user that the `draft_polli_ratelimit_headers` option is deprecated
+   * and will be removed in the next major release.
+   *
+   * @param draft_polli_ratelimit_headers {any | undefined} - The now-deprecated setting that was used to enable standard headers.
+   *
+   * @returns {void}
+   */
+  draftPolliHeaders(draft_polli_ratelimit_headers) {
+    if (draft_polli_ratelimit_headers) {
+      throw new ChangeWarning(
+        "WRN_ERL_DEPRECATED_DRAFT_POLLI_HEADERS",
+        `The draft_polli_ratelimit_headers configuration option is deprecated and has been removed in express-rate-limit v7, please set standardHeaders: 'draft-6' instead.`
+      );
+    }
+  },
+  /**
+   * Warns the user that the `onLimitReached` option is deprecated and
+   * will be removed in the next major release.
+   *
+   * @param onLimitReached {any | undefined} - The maximum number of hits per client.
+   *
+   * @returns {void}
+   */
+  onLimitReached(onLimitReached) {
+    if (onLimitReached) {
+      throw new ChangeWarning(
+        "WRN_ERL_DEPRECATED_ON_LIMIT_REACHED",
+        "The onLimitReached configuration option is deprecated and has been removed in express-rate-limit v7."
+      );
+    }
+  },
+  /**
+   * Warns the user when an invalid/unsupported version of the draft spec is passed.
+   *
+   * @param version {any | undefined} - The version passed by the user.
+   *
+   * @returns {void}
+   */
+  headersDraftVersion(version3) {
+    if (typeof version3 !== "string" || // @ts-expect-error This is fine. If version is not in the array, it will just return false.
+    !SUPPORTED_DRAFT_VERSIONS.includes(version3)) {
+      const versionString = SUPPORTED_DRAFT_VERSIONS.join(", ");
+      throw new ValidationError(
+        "ERR_ERL_HEADERS_UNSUPPORTED_DRAFT_VERSION",
+        `standardHeaders: only the following versions of the IETF draft specification are supported: ${versionString}.`
+      );
+    }
+  },
+  /**
+   * Warns the user when the selected headers option requires a reset time but
+   * the store does not provide one.
+   *
+   * @param resetTime {Date | undefined} - The timestamp when the client's hit count will be reset.
+   *
+   * @returns {void}
+   */
+  headersResetTime(resetTime) {
+    if (!resetTime) {
+      throw new ValidationError(
+        "ERR_ERL_HEADERS_NO_RESET",
+        `standardHeaders:  'draft-7' requires a 'resetTime', but the store did not provide one. The 'windowMs' value will be used instead, which may cause clients to wait longer than necessary.`
+      );
+    }
+  },
+  knownOptions(passedOptions) {
+    if (!passedOptions) return;
+    const optionsMap = {
+      windowMs: true,
+      limit: true,
+      message: true,
+      statusCode: true,
+      legacyHeaders: true,
+      standardHeaders: true,
+      identifier: true,
+      requestPropertyName: true,
+      skipFailedRequests: true,
+      skipSuccessfulRequests: true,
+      keyGenerator: true,
+      ipv6Subnet: true,
+      handler: true,
+      skip: true,
+      requestWasSuccessful: true,
+      store: true,
+      validate: true,
+      headers: true,
+      max: true,
+      passOnStoreError: true
+    };
+    const validOptions = Object.keys(optionsMap).concat(
+      "draft_polli_ratelimit_headers",
+      // not a valid option anymore, but we have a more specific check for this one, so don't warn for it here
+      // from express-slow-down - https://github.com/express-rate-limit/express-slow-down/blob/main/source/types.ts#L65
+      "delayAfter",
+      "delayMs",
+      "maxDelayMs"
+    );
+    for (const key of Object.keys(passedOptions)) {
+      if (!validOptions.includes(key)) {
+        throw new ValidationError(
+          "ERR_ERL_UNKNOWN_OPTION",
+          `Unexpected configuration option: ${key}`
+          // todo: suggest a valid option with a short levenstein distance?
+        );
+      }
+    }
+  },
+  /**
+   * Checks the options.validate setting to ensure that only recognized
+   * validations are enabled or disabled.
+   *
+   * If any unrecognized values are found, an error is logged that
+   * includes the list of supported validations.
+   */
+  validationsConfig() {
+    const supportedValidations = Object.keys(this).filter(
+      (k) => !["enabled", "disable"].includes(k)
+    );
+    supportedValidations.push("default");
+    for (const key of Object.keys(this.enabled)) {
+      if (!supportedValidations.includes(key)) {
+        throw new ValidationError(
+          "ERR_ERL_UNKNOWN_VALIDATION",
+          `options.validate.${key} is not recognized. Supported validate options are: ${supportedValidations.join(
+            ", "
+          )}.`
+        );
+      }
+    }
+  },
+  /**
+   * Checks to see if the instance was created inside of a request handler,
+   * which would prevent it from working correctly, with the default memory
+   * store (or any other store with localKeys.)
+   */
+  creationStack(store) {
+    const { stack } = new Error(
+      "express-rate-limit validation check (set options.validate.creationStack=false to disable)"
+    );
+    if (stack?.includes("Layer.handle [as handle_request]") || // express v4
+    stack?.includes("Layer.handleRequest")) {
+      if (!store.localKeys) {
+        throw new ValidationError(
+          "ERR_ERL_CREATED_IN_REQUEST_HANDLER",
+          "express-rate-limit instance should *usually* be created at app initialization, not when responding to a request."
+        );
+      }
+      throw new ValidationError(
+        "ERR_ERL_CREATED_IN_REQUEST_HANDLER",
+        "express-rate-limit instance should be created at app initialization, not when responding to a request."
+      );
+    }
+  },
+  ipv6Subnet(ipv6Subnet) {
+    if (ipv6Subnet === false) {
+      return;
+    }
+    if (!Number.isInteger(ipv6Subnet) || ipv6Subnet < 32 || ipv6Subnet > 64) {
+      throw new ValidationError(
+        "ERR_ERL_IPV6_SUBNET",
+        `Unexpected ipv6Subnet value: ${ipv6Subnet}. Expected an integer between 32 and 64 (usually 48-64).`
+      );
+    }
+  },
+  ipv6SubnetOrKeyGenerator(options) {
+    if (options.ipv6Subnet !== void 0 && options.keyGenerator) {
+      throw new ValidationError(
+        "ERR_ERL_IPV6SUBNET_OR_KEYGENERATOR",
+        `Incompatible options: the 'ipv6Subnet' option is ignored when a custom 'keyGenerator' function is also set.`
+      );
+    }
+  },
+  keyGeneratorIpFallback(keyGenerator) {
+    if (!keyGenerator) {
+      return;
+    }
+    const src = keyGenerator.toString();
+    if ((src.includes("req.ip") || src.includes("request.ip")) && !src.includes("ipKeyGenerator")) {
+      throw new ValidationError(
+        "ERR_ERL_KEY_GEN_IPV6",
+        "Custom keyGenerator appears to use request IP without calling the ipKeyGenerator helper function for IPv6 addresses. This could allow IPv6 users to bypass limits."
+      );
+    }
+  },
+  /**
+   * Checks to see if the window duration is greater than 2^32 - 1. This is only
+   * called by the default MemoryStore, since it uses Node's setInterval method.
+   *
+   * See https://nodejs.org/api/timers.html#setintervalcallback-delay-args.
+   */
+  windowMs(windowMs) {
+    const SET_TIMEOUT_MAX = 2 ** 31 - 1;
+    if (typeof windowMs !== "number" || Number.isNaN(windowMs) || windowMs < 1 || windowMs > SET_TIMEOUT_MAX) {
+      throw new ValidationError(
+        "ERR_ERL_WINDOW_MS",
+        `Invalid windowMs value: ${windowMs}${typeof windowMs !== "number" ? ` (${typeof windowMs})` : ""}, must be a number between 1 and ${SET_TIMEOUT_MAX} when using the default MemoryStore`
+      );
+    }
+  }
+};
+var getValidations = (_enabled) => {
+  let enabled;
+  if (typeof _enabled === "boolean") {
+    enabled = {
+      default: _enabled
+    };
+  } else {
+    enabled = {
+      default: true,
+      ..._enabled
+    };
+  }
+  const wrappedValidations = { enabled };
+  for (const [name, validation] of Object.entries(validations)) {
+    if (typeof validation === "function")
+      wrappedValidations[name] = (...args) => {
+        if (!(enabled[name] ?? enabled.default)) {
+          return;
+        }
+        try {
+          ;
+          validation.apply(
+            wrappedValidations,
+            args
+          );
+        } catch (error) {
+          if (error instanceof ChangeWarning) console.warn(error);
+          else console.error(error);
+        }
+      };
+  }
+  return wrappedValidations;
+};
+var isLegacyStore = (store) => (
+  // Check that `incr` exists but `increment` does not - store authors might want
+  // to keep both around for backwards compatibility.
+  typeof store.incr === "function" && typeof store.increment !== "function"
+);
+var promisifyStore = (passedStore) => {
+  if (!isLegacyStore(passedStore)) {
+    return passedStore;
+  }
+  const legacyStore = passedStore;
+  class PromisifiedStore {
+    async increment(key) {
+      return new Promise((resolve, reject) => {
+        legacyStore.incr(
+          key,
+          (error, totalHits, resetTime) => {
+            if (error) reject(error);
+            resolve({ totalHits, resetTime });
+          }
+        );
+      });
+    }
+    async decrement(key) {
+      return legacyStore.decrement(key);
+    }
+    async resetKey(key) {
+      return legacyStore.resetKey(key);
+    }
+    /* istanbul ignore next */
+    async resetAll() {
+      if (typeof legacyStore.resetAll === "function")
+        return legacyStore.resetAll();
+    }
+  }
+  return new PromisifiedStore();
+};
+var getOptionsFromConfig = (config) => {
+  const { validations: validations2, ...directlyPassableEntries } = config;
+  return {
+    ...directlyPassableEntries,
+    validate: validations2.enabled
+  };
+};
+var parseOptions = (passedOptions) => {
+  const notUndefinedOptions = omitUndefinedProperties(passedOptions);
+  const validations2 = getValidations(notUndefinedOptions?.validate ?? true);
+  validations2.validationsConfig();
+  validations2.knownOptions(passedOptions);
+  validations2.draftPolliHeaders(
+    // @ts-expect-error see the note above.
+    notUndefinedOptions.draft_polli_ratelimit_headers
+  );
+  validations2.onLimitReached(notUndefinedOptions.onLimitReached);
+  if (notUndefinedOptions.ipv6Subnet !== void 0 && typeof notUndefinedOptions.ipv6Subnet !== "function") {
+    validations2.ipv6Subnet(notUndefinedOptions.ipv6Subnet);
+  }
+  validations2.keyGeneratorIpFallback(notUndefinedOptions.keyGenerator);
+  validations2.ipv6SubnetOrKeyGenerator(notUndefinedOptions);
+  let standardHeaders = notUndefinedOptions.standardHeaders ?? false;
+  if (standardHeaders === true) standardHeaders = "draft-6";
+  const config = {
+    windowMs: 60 * 1e3,
+    limit: passedOptions.max ?? 5,
+    // `max` is deprecated, but support it anyways.
+    message: "Too many requests, please try again later.",
+    statusCode: 429,
+    legacyHeaders: passedOptions.headers ?? true,
+    identifier(request, _response) {
+      let duration = "";
+      const property = config.requestPropertyName;
+      const { limit } = request[property];
+      const seconds = config.windowMs / 1e3;
+      const minutes = config.windowMs / (1e3 * 60);
+      const hours = config.windowMs / (1e3 * 60 * 60);
+      const days = config.windowMs / (1e3 * 60 * 60 * 24);
+      if (seconds < 60) duration = `${seconds}sec`;
+      else if (minutes < 60) duration = `${minutes}min`;
+      else if (hours < 24) duration = `${hours}hr${hours > 1 ? "s" : ""}`;
+      else duration = `${days}day${days > 1 ? "s" : ""}`;
+      return `${limit}-in-${duration}`;
+    },
+    requestPropertyName: "rateLimit",
+    skipFailedRequests: false,
+    skipSuccessfulRequests: false,
+    requestWasSuccessful: (_request, response) => response.statusCode < 400,
+    skip: (_request, _response) => false,
+    async keyGenerator(request, response) {
+      validations2.ip(request.ip);
+      validations2.trustProxy(request);
+      validations2.xForwardedForHeader(request);
+      validations2.forwardedHeader(request);
+      const ip = request.ip;
+      let subnet = 56;
+      if (isIPv62(ip)) {
+        subnet = typeof config.ipv6Subnet === "function" ? await config.ipv6Subnet(request, response) : config.ipv6Subnet;
+        if (typeof config.ipv6Subnet === "function")
+          validations2.ipv6Subnet(subnet);
+      }
+      return ipKeyGenerator(ip, subnet);
+    },
+    ipv6Subnet: 56,
+    async handler(request, response, _next, _optionsUsed) {
+      response.status(config.statusCode);
+      const message = typeof config.message === "function" ? await config.message(
+        request,
+        response
+      ) : config.message;
+      if (!response.writableEnded) response.send(message);
+    },
+    passOnStoreError: false,
+    // Allow the default options to be overridden by the passed options.
+    ...notUndefinedOptions,
+    // `standardHeaders` is resolved into a draft version above, use that.
+    standardHeaders,
+    // Note that this field is declared after the user's options are spread in,
+    // so that this field doesn't get overridden with an un-promisified store!
+    store: promisifyStore(
+      notUndefinedOptions.store ?? new MemoryStore(validations2)
+    ),
+    // Print an error to the console if a few known misconfigurations are detected.
+    validations: validations2
+  };
+  if (typeof config.store.increment !== "function" || typeof config.store.decrement !== "function" || typeof config.store.resetKey !== "function" || config.store.resetAll !== void 0 && typeof config.store.resetAll !== "function" || config.store.init !== void 0 && typeof config.store.init !== "function") {
+    throw new TypeError(
+      "An invalid store was passed. Please ensure that the store is a class that implements the `Store` interface."
+    );
+  }
+  return config;
+};
+var handleAsyncErrors = (fn) => async (request, response, next) => {
+  try {
+    await Promise.resolve(fn(request, response, next)).catch(next);
+  } catch (error) {
+    next(error);
+  }
+};
+var rateLimit = (passedOptions) => {
+  const config = parseOptions(passedOptions ?? {});
+  const options = getOptionsFromConfig(config);
+  config.validations.creationStack(config.store);
+  config.validations.unsharedStore(config.store);
+  if (typeof config.store.init === "function") config.store.init(options);
+  const middleware = handleAsyncErrors(
+    async (request, response, next) => {
+      const closePromise = config.skipFailedRequests && new Promise((resolve) => response.once("close", resolve));
+      const finishPromise = (config.skipFailedRequests || config.skipSuccessfulRequests) && new Promise((resolve) => response.once("finish", resolve));
+      const errorPromise = config.skipFailedRequests && new Promise((resolve) => response.once("error", resolve));
+      const skip = await config.skip(request, response);
+      if (skip) {
+        next();
+        return;
+      }
+      const augmentedRequest = request;
+      const key = await config.keyGenerator(request, response);
+      let totalHits = 0;
+      let resetTime;
+      try {
+        const incrementResult = await config.store.increment(key);
+        totalHits = incrementResult.totalHits;
+        resetTime = incrementResult.resetTime;
+      } catch (error) {
+        if (config.passOnStoreError) {
+          console.error(
+            "express-rate-limit: error from store, allowing request without rate-limiting.",
+            error
+          );
+          next();
+          return;
+        }
+        throw error;
+      }
+      config.validations.positiveHits(totalHits);
+      config.validations.singleCount(request, config.store, key);
+      const retrieveLimit = typeof config.limit === "function" ? config.limit(request, response) : config.limit;
+      const limit = await retrieveLimit;
+      config.validations.limit(limit);
+      const info = {
+        limit,
+        used: totalHits,
+        remaining: Math.max(limit - totalHits, 0),
+        resetTime,
+        key
+      };
+      Object.defineProperty(info, "current", {
+        configurable: false,
+        enumerable: false,
+        value: totalHits
+      });
+      augmentedRequest[config.requestPropertyName] = info;
+      if (config.legacyHeaders && !response.headersSent) {
+        setLegacyHeaders(response, info);
+      }
+      if (config.standardHeaders && !response.headersSent) {
+        switch (config.standardHeaders) {
+          case "draft-6": {
+            setDraft6Headers(response, info, config.windowMs);
+            break;
+          }
+          case "draft-7": {
+            config.validations.headersResetTime(info.resetTime);
+            setDraft7Headers(response, info, config.windowMs);
+            break;
+          }
+          case "draft-8": {
+            const retrieveName = typeof config.identifier === "function" ? config.identifier(request, response) : config.identifier;
+            const name = await retrieveName;
+            config.validations.headersResetTime(info.resetTime);
+            setDraft8Headers(response, info, config.windowMs, name, key);
+            break;
+          }
+          default: {
+            config.validations.headersDraftVersion(config.standardHeaders);
+            break;
+          }
+        }
+      }
+      if (config.skipFailedRequests || config.skipSuccessfulRequests) {
+        let decremented = false;
+        const decrementKey = async () => {
+          if (!decremented) {
+            await config.store.decrement(key);
+            decremented = true;
+          }
+        };
+        if (config.skipFailedRequests) {
+          if (finishPromise) {
+            void finishPromise.then(async () => {
+              if (!await config.requestWasSuccessful(request, response))
+                await decrementKey();
+            });
+          }
+          if (closePromise) {
+            void closePromise.then(async () => {
+              if (!response.writableEnded) await decrementKey();
+            });
+          }
+          if (errorPromise) {
+            void errorPromise.then(async () => {
+              await decrementKey();
+            });
+          }
+        }
+        if (config.skipSuccessfulRequests) {
+          if (finishPromise) {
+            void finishPromise.then(async () => {
+              if (await config.requestWasSuccessful(request, response))
+                await decrementKey();
+            });
+          }
+        }
+      }
+      config.validations.disable();
+      if (totalHits > limit) {
+        if (config.legacyHeaders || config.standardHeaders) {
+          setRetryAfterHeader(response, info, config.windowMs);
+        }
+        config.handler(request, response, next, options);
+        return;
+      }
+      next();
+    }
+  );
+  const getThrowFn = () => {
+    throw new Error("The current store does not support the get/getKey method");
+  };
+  middleware.resetKey = config.store.resetKey.bind(config.store);
+  middleware.getKey = typeof config.store.get === "function" ? config.store.get.bind(config.store) : getThrowFn;
+  return middleware;
+};
+var rate_limit_default = rateLimit;
+
+// src/routes/twitter.ts
 var router2 = (0, import_express2.Router)();
-router2.get("/twitter/timeline/:username", async (req, res) => {
+var USERNAME_RE = /^[A-Za-z0-9_]{1,50}$/;
+var twitterLimiter = rate_limit_default({
+  windowMs: 60 * 1e3,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" }
+});
+router2.get("/twitter/timeline/:username", twitterLimiter, async (req, res) => {
   try {
     const { username } = req.params;
+    if (!USERNAME_RE.test(username)) {
+      res.status(400).json({ error: "Invalid username" });
+      return;
+    }
     const url = `https://syndication.twitter.com/srv/timeline-profile/screen-name/${username}?dnt=true&lang=en&showReplies=false`;
     const response = await fetch(url, {
       headers: {
@@ -79797,10 +82831,18 @@ router3.get(
   (req, res) => {
     const user = req.user;
     if (user) {
-      req.session.userId = user.id;
-      req.session.userEmail = user.email;
+      req.session.regenerate((err) => {
+        if (err) {
+          res.redirect("/admin?error=session_error");
+          return;
+        }
+        req.session.userId = user.id;
+        req.session.userEmail = user.email;
+        res.redirect("/admin/dashboard");
+      });
+    } else {
+      res.redirect("/admin?error=unauthorized");
     }
-    res.redirect("/admin/dashboard");
   }
 );
 router3.get("/auth/me", (req, res) => {
@@ -79815,6 +82857,7 @@ router3.get("/auth/me", (req, res) => {
 });
 router3.post("/auth/logout", (req, res) => {
   req.session.destroy(() => {
+    res.clearCookie("__pwife_sid", { path: "/" });
     res.json({ success: true });
   });
 });
@@ -79835,9 +82878,42 @@ function requireAdminAuth(req, res, next) {
   next();
 }
 
+// src/lib/logger.ts
+var import_pino = __toESM(require_pino(), 1);
+var isProduction = process.env.NODE_ENV === "production";
+var logger = (0, import_pino.default)({
+  level: process.env.LOG_LEVEL ?? "info",
+  redact: [
+    "req.headers.authorization",
+    "req.headers.cookie",
+    "res.headers['set-cookie']"
+  ],
+  ...isProduction ? {} : {
+    transport: {
+      target: "pino-pretty",
+      options: { colorize: true }
+    }
+  }
+});
+
 // src/routes/admin.ts
+var SOLANA_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+var adminLimiter = rate_limit_default({
+  windowMs: 5 * 60 * 1e3,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many admin requests, slow down" }
+});
+function auditLog(req, action, details) {
+  const userId = req.session?.userId ?? "unknown";
+  const userEmail = req.session?.userEmail ?? "unknown";
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? req.socket?.remoteAddress ?? "unknown";
+  logger.info({ audit: true, action, userId, userEmail, ip, ...details }, `ADMIN_ACTION: ${action}`);
+}
 var router4 = (0, import_express4.Router)();
 router4.use(requireAdminAuth);
+router4.use(adminLimiter);
 router4.get("/admin/stats", async (_req, res) => {
   try {
     const [totalVisits] = await db.select({ count: count() }).from(pageVisits);
@@ -79922,8 +82998,8 @@ router4.get("/admin/stats", async (_req, res) => {
 });
 router4.get("/admin/buyers", async (req, res) => {
   try {
-    const page = Number(req.query.page ?? 1);
-    const limit = Number(req.query.limit ?? 50);
+    const page = Math.max(1, Number(req.query.page ?? 1) || 1);
+    const limit = Math.min(200, Math.max(1, Number(req.query.limit ?? 50) || 50));
     const offset = (page - 1) * limit;
     const buyers = await db.select({
       walletAddress: purchases.walletAddress,
@@ -79962,59 +83038,68 @@ router4.get("/admin/config", async (_req, res) => {
     res.status(500).json({ error: "Failed to fetch config" });
   }
 });
-router4.post("/admin/presale/pause", async (_req, res) => {
+router4.post("/admin/presale/pause", async (req, res) => {
   try {
     await db.insert(presaleConfig).values({ id: 1, isActive: false, updatedAt: /* @__PURE__ */ new Date() }).onConflictDoUpdate({ target: presaleConfig.id, set: { isActive: false, updatedAt: /* @__PURE__ */ new Date() } });
+    auditLog(req, "presale.pause");
     res.json({ success: true, message: "Presale paused successfully" });
   } catch (err) {
-    console.error("pause error", err);
+    logger.error({ err }, "presale pause error");
     res.status(500).json({ success: false, message: "Failed to pause presale" });
   }
 });
-router4.post("/admin/presale/resume", async (_req, res) => {
+router4.post("/admin/presale/resume", async (req, res) => {
   try {
     await db.insert(presaleConfig).values({ id: 1, isActive: true, updatedAt: /* @__PURE__ */ new Date() }).onConflictDoUpdate({ target: presaleConfig.id, set: { isActive: true, updatedAt: /* @__PURE__ */ new Date() } });
+    auditLog(req, "presale.resume");
     res.json({ success: true, message: "Presale resumed successfully" });
   } catch (err) {
-    console.error("resume error", err);
+    logger.error({ err }, "presale resume error");
     res.status(500).json({ success: false, message: "Failed to resume presale" });
   }
 });
 router4.post("/admin/presale/claim", async (req, res) => {
   try {
     const { enabled } = req.body;
+    if (typeof enabled !== "boolean") {
+      res.status(400).json({ success: false, message: "enabled must be a boolean" });
+      return;
+    }
     await db.insert(presaleConfig).values({ id: 1, claimEnabled: enabled, updatedAt: /* @__PURE__ */ new Date() }).onConflictDoUpdate({ target: presaleConfig.id, set: { claimEnabled: enabled, updatedAt: /* @__PURE__ */ new Date() } });
+    auditLog(req, "presale.claim_toggle", { enabled });
     res.json({ success: true, message: `Claim ${enabled ? "enabled" : "disabled"} successfully` });
   } catch (err) {
-    console.error("claim error", err);
+    logger.error({ err }, "presale claim error");
     res.status(500).json({ success: false, message: "Failed to update claim status" });
   }
 });
 router4.post("/admin/presale/staking", async (req, res) => {
   try {
     const { enabled } = req.body;
+    if (typeof enabled !== "boolean") {
+      res.status(400).json({ success: false, message: "enabled must be a boolean" });
+      return;
+    }
     await db.insert(presaleConfig).values({ id: 1, stakingEnabled: enabled, updatedAt: /* @__PURE__ */ new Date() }).onConflictDoUpdate({ target: presaleConfig.id, set: { stakingEnabled: enabled, updatedAt: /* @__PURE__ */ new Date() } });
+    auditLog(req, "presale.staking_toggle", { enabled });
     res.json({ success: true, message: `Staking ${enabled ? "enabled" : "disabled"} successfully` });
   } catch (err) {
-    console.error("staking error", err);
+    logger.error({ err }, "presale staking error");
     res.status(500).json({ success: false, message: "Failed to update staking status" });
   }
 });
-router4.post("/admin/presale/withdraw", async (_req, res) => {
-  try {
-    res.json({
-      success: true,
-      message: "Withdrawal initiated. Please complete the transaction on-chain.",
-      note: "This is a record-keeping action. Execute the actual withdrawal via your Solana/EVM wallet."
-    });
-  } catch {
-    res.status(500).json({ error: "Failed" });
-  }
+router4.post("/admin/presale/withdraw", async (req, res) => {
+  auditLog(req, "presale.withdraw_initiated");
+  res.json({
+    success: true,
+    message: "Withdrawal initiated. Please complete the transaction on-chain.",
+    note: "This is a record-keeping action. Execute the actual withdrawal via your Solana/EVM wallet."
+  });
 });
 router4.get("/admin/referrals", async (req, res) => {
   try {
-    const page = Number(req.query.page ?? 1);
-    const limit = Number(req.query.limit ?? 50);
+    const page = Math.max(1, Number(req.query.page ?? 1) || 1);
+    const limit = Math.min(200, Math.max(1, Number(req.query.limit ?? 50) || 50));
     const offset = (page - 1) * limit;
     const statusFilter = req.query.status;
     const whereClause = statusFilter && ["pending", "paid"].includes(statusFilter) ? eq(referrals.status, statusFilter) : void 0;
@@ -80057,7 +83142,12 @@ router4.get("/admin/referrals", async (req, res) => {
 router4.post("/admin/referrals/mark-paid", async (req, res) => {
   try {
     const { walletAddress } = req.body;
+    if (walletAddress !== void 0 && !SOLANA_ADDRESS_RE.test(walletAddress)) {
+      res.status(400).json({ error: "Invalid wallet address format" });
+      return;
+    }
     if (walletAddress) {
+      auditLog(req, "referral.mark_paid_single", { walletAddress: walletAddress.slice(0, 8) + "..." });
       await db.update(referrals).set({ status: "paid" }).where(sql`${referrals.referrerWallet} = ${walletAddress} AND ${referrals.status} = 'pending'`);
       const [referrerCode] = await db.select({ pendingTokens: referralCodes.pendingTokens, paidTokens: referralCodes.paidTokens }).from(referralCodes).where(eq(referralCodes.walletAddress, walletAddress)).limit(1);
       if (referrerCode) {
@@ -80072,10 +83162,11 @@ router4.post("/admin/referrals/mark-paid", async (req, res) => {
         const newPaid = Number(rc.paidTokens) + Number(rc.pendingTokens);
         await db.update(referralCodes).set({ paidTokens: String(newPaid), pendingTokens: "0" }).where(eq(referralCodes.walletAddress, rc.walletAddress));
       }
+      auditLog(req, "referral.mark_paid_all", { count: allCodes.length });
       res.json({ success: true, message: "All pending referral rewards marked as paid" });
     }
   } catch (err) {
-    console.error(err);
+    logger.error({ err }, "mark-paid error");
     res.status(500).json({ error: "Failed to mark referrals as paid" });
   }
 });
@@ -80091,50 +83182,157 @@ var admin_default = router4;
 
 // src/routes/tracker.ts
 var import_express5 = __toESM(require_express2(), 1);
+var import_web3 = __toESM(require_index_cjs(), 1);
 var router5 = (0, import_express5.Router)();
-var SOLANA_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-router5.post("/track/visit", async (req, res) => {
+var SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+var connection = new import_web3.Connection(SOLANA_RPC, "confirmed");
+var PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
+var ALLOWED_WALLET_TYPES = /* @__PURE__ */ new Set(["phantom", "solflare", "backpack", "okx", "unknown"]);
+var SOLANA_ADDRESS_RE2 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+var TX_HASH_RE = /^[1-9A-HJ-NP-Za-km-z]{80,90}$/;
+function getIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded === "string") {
+    return forwarded.split(",")[0]?.trim() ?? null;
+  }
+  return req.socket?.remoteAddress ?? null;
+}
+var visitLimiter = rate_limit_default({
+  windowMs: 60 * 1e3,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" }
+});
+var walletLimiter = rate_limit_default({
+  windowMs: 60 * 1e3,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" }
+});
+var purchaseLimiter = rate_limit_default({
+  windowMs: 60 * 1e3,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" }
+});
+async function verifyTransaction(txHash, expectedWallet) {
+  try {
+    const tx = await connection.getTransaction(txHash, {
+      commitment: "confirmed",
+      maxSupportedTransactionVersion: 0
+    });
+    if (!tx) {
+      return { valid: false, reason: "Transaction not found on-chain" };
+    }
+    if (tx.meta?.err !== null) {
+      return { valid: false, reason: "Transaction failed on-chain" };
+    }
+    const accountKeys = "accountKeys" in tx.transaction.message ? tx.transaction.message.accountKeys.map((k) => k.toString()) : tx.transaction.message.staticAccountKeys.map((k) => k.toString());
+    const involvesProgram = accountKeys.includes(PRESALE_PROGRAM_ID);
+    if (!involvesProgram) {
+      return { valid: false, reason: "Transaction does not involve presale program" };
+    }
+    const signerKey = accountKeys[0];
+    if (signerKey !== expectedWallet) {
+      return { valid: false, reason: "Wallet mismatch in transaction" };
+    }
+    return { valid: true };
+  } catch (err) {
+    return { valid: false, reason: `Verification error: ${String(err)}` };
+  }
+}
+router5.post("/track/visit", visitLimiter, async (req, res) => {
   try {
     const { page = "/", visitorId, referrer } = req.body;
-    const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? req.socket?.remoteAddress ?? null;
-    const userAgent = req.headers["user-agent"] ?? null;
-    await db.insert(pageVisits).values({ page, visitorId, ip, userAgent, referrer });
+    const safePage = String(page).slice(0, 200);
+    const safeVisitorId = visitorId ? String(visitorId).slice(0, 64) : void 0;
+    const safeReferrer = referrer ? String(referrer).slice(0, 200) : void 0;
+    const ip = getIp(req);
+    const userAgent = req.headers["user-agent"]?.slice(0, 300) ?? null;
+    await db.insert(pageVisits).values({
+      page: safePage,
+      visitorId: safeVisitorId,
+      ip,
+      userAgent,
+      referrer: safeReferrer
+    });
     res.json({ success: true });
   } catch {
     res.json({ success: false });
   }
 });
-router5.post("/track/wallet", async (req, res) => {
+router5.post("/track/wallet", walletLimiter, async (req, res) => {
   try {
     const { walletAddress, walletType, network = "unknown" } = req.body;
     if (!walletAddress || !walletType) {
       res.status(400).json({ error: "Missing required fields" });
       return;
     }
-    const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? req.socket?.remoteAddress ?? null;
-    await db.insert(walletConnections).values({ walletAddress, walletType, network, ip });
+    if (!SOLANA_ADDRESS_RE2.test(walletAddress)) {
+      res.status(400).json({ error: "Invalid wallet address" });
+      return;
+    }
+    const safeWalletType = ALLOWED_WALLET_TYPES.has(walletType.toLowerCase()) ? walletType.toLowerCase() : "unknown";
+    const ip = getIp(req);
+    await db.insert(walletConnections).values({
+      walletAddress,
+      walletType: safeWalletType,
+      network: String(network).slice(0, 20),
+      ip
+    });
     res.json({ success: true });
   } catch {
     res.json({ success: false });
   }
 });
-router5.post("/track/purchase", async (req, res) => {
+router5.post("/track/purchase", purchaseLimiter, async (req, res) => {
   try {
     const { walletAddress, walletType, network, amountUsd, amountTokens, txHash, stage, referralCode } = req.body;
     if (!walletAddress || !network) {
       res.status(400).json({ error: "Missing required fields" });
       return;
     }
+    if (!SOLANA_ADDRESS_RE2.test(walletAddress)) {
+      res.status(400).json({ error: "Invalid wallet address" });
+      return;
+    }
+    if (!txHash) {
+      res.status(400).json({ error: "txHash is required" });
+      return;
+    }
+    if (!TX_HASH_RE.test(txHash)) {
+      res.status(400).json({ error: "Invalid transaction hash format" });
+      return;
+    }
+    const verification = await verifyTransaction(txHash, walletAddress);
+    if (!verification.valid) {
+      res.status(400).json({
+        error: "Transaction verification failed",
+        reason: verification.reason
+      });
+      return;
+    }
+    const existing = await db.select({ id: purchases.id }).from(purchases).where(eq(purchases.txHash, txHash)).limit(1);
+    if (existing.length > 0) {
+      res.status(409).json({ error: "Transaction already recorded" });
+      return;
+    }
+    const safeWalletType = walletType && ALLOWED_WALLET_TYPES.has(walletType.toLowerCase()) ? walletType.toLowerCase() : "unknown";
+    const safeAmountUsd = Math.max(0, Number(amountUsd) || 0);
+    const safeAmountTokens = Math.max(0, Number(amountTokens) || 0);
     const [purchase] = await db.insert(purchases).values({
       walletAddress,
-      walletType,
-      network,
-      amountUsd: String(amountUsd),
-      amountTokens: String(amountTokens),
+      walletType: safeWalletType,
+      network: String(network).slice(0, 20),
+      amountUsd: String(safeAmountUsd),
+      amountTokens: String(safeAmountTokens),
       txHash,
       stage: stage ?? 1
     }).returning({ id: purchases.id });
-    if (referralCode && SOLANA_ADDRESS_RE.test(walletAddress)) {
+    if (referralCode && SOLANA_ADDRESS_RE2.test(walletAddress)) {
       const code = referralCode.trim().slice(0, 16);
       try {
         const codeRow = await db.select().from(referralCodes).where(eq(referralCodes.code, code)).limit(1);
@@ -80144,8 +83342,8 @@ router5.post("/track/purchase", async (req, res) => {
           const alreadyReferred = isSelf ? [1] : await db.select({ id: referrals.id }).from(referrals).where(eq(referrals.referredWallet, walletAddress)).limit(1);
           if (!isSelf && alreadyReferred.length === 0) {
             const REWARD_RATE = 5;
-            const rewardTokens = amountTokens ? (amountTokens * REWARD_RATE / 100).toFixed(6) : "0";
-            const rewardUsd = amountUsd ? (amountUsd * REWARD_RATE / 100).toFixed(6) : "0";
+            const rewardTokens = safeAmountTokens ? (safeAmountTokens * REWARD_RATE / 100).toFixed(6) : "0";
+            const rewardUsd = safeAmountUsd ? (safeAmountUsd * REWARD_RATE / 100).toFixed(6) : "0";
             const client = await pool.connect();
             try {
               await client.query("BEGIN");
@@ -80184,9 +83382,9 @@ var tracker_default = router5;
 // src/routes/referral.ts
 var import_express6 = __toESM(require_express2(), 1);
 var router6 = (0, import_express6.Router)();
-var SOLANA_ADDRESS_RE2 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+var SOLANA_ADDRESS_RE3 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 function isValidSolanaAddress(addr) {
-  return SOLANA_ADDRESS_RE2.test(addr);
+  return SOLANA_ADDRESS_RE3.test(addr);
 }
 var BASE58_CHARS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 function generateCode() {
@@ -80198,33 +83396,31 @@ function generateCode() {
   }
   return code;
 }
-var rateLimitMap = /* @__PURE__ */ new Map();
-function checkRateLimit(ip, limit = 10, windowMs = 6e4) {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-  if (entry.count >= limit) return false;
-  entry.count++;
-  return true;
-}
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, val] of rateLimitMap.entries()) {
-    if (now > val.resetAt) rateLimitMap.delete(key);
-  }
-}, 5 * 6e4);
-router6.get("/referral/code/:wallet", async (req, res) => {
+var codeLimiter = rate_limit_default({
+  windowMs: 60 * 1e3,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" }
+});
+var registerLimiter = rate_limit_default({
+  windowMs: 60 * 1e3,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" }
+});
+var readLimiter = rate_limit_default({
+  windowMs: 60 * 1e3,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" }
+});
+router6.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
   const { wallet } = req.params;
   if (!isValidSolanaAddress(wallet)) {
     res.status(400).json({ error: "Invalid wallet address" });
-    return;
-  }
-  const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? req.socket?.remoteAddress ?? "unknown";
-  if (!checkRateLimit(ip, 20, 6e4)) {
-    res.status(429).json({ error: "Too many requests. Please wait a moment." });
     return;
   }
   try {
@@ -80252,7 +83448,7 @@ router6.get("/referral/code/:wallet", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-router6.post("/referral/register", async (req, res) => {
+router6.post("/referral/register", registerLimiter, async (req, res) => {
   const { referrerCode, buyerWallet, purchaseId, amountUsd, amountTokens } = req.body;
   if (!referrerCode || !buyerWallet) {
     res.status(400).json({ error: "referrerCode and buyerWallet are required" });
@@ -80263,7 +83459,20 @@ router6.post("/referral/register", async (req, res) => {
     return;
   }
   const code = referrerCode.trim().slice(0, 16);
+  if (!purchaseId || !Number.isInteger(purchaseId) || purchaseId <= 0) {
+    res.status(400).json({ error: "Valid purchaseId is required" });
+    return;
+  }
   try {
+    const purchaseRow = await db.select({ id: purchases.id, walletAddress: purchases.walletAddress }).from(purchases).where(eq(purchases.id, purchaseId)).limit(1);
+    if (purchaseRow.length === 0) {
+      res.status(400).json({ error: "Purchase not found" });
+      return;
+    }
+    if (purchaseRow[0].walletAddress.toLowerCase() !== buyerWallet.toLowerCase()) {
+      res.status(400).json({ error: "Purchase does not belong to this wallet" });
+      return;
+    }
     const codeRow = await db.select().from(referralCodes).where(eq(referralCodes.code, code)).limit(1);
     if (codeRow.length === 0) {
       res.status(404).json({ error: "Invalid referral code" });
@@ -80318,7 +83527,7 @@ router6.post("/referral/register", async (req, res) => {
     res.status(500).json({ error: message });
   }
 });
-router6.get("/referral/stats/:wallet", async (req, res) => {
+router6.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
   const { wallet } = req.params;
   if (!isValidSolanaAddress(wallet)) {
     res.status(400).json({ error: "Invalid wallet address" });
@@ -80364,7 +83573,7 @@ router6.get("/referral/stats/:wallet", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-router6.get("/referral/leaderboard", async (_req, res) => {
+router6.get("/referral/leaderboard", readLimiter, async (_req, res) => {
   try {
     const top = await db.select({
       walletAddress: referralCodes.walletAddress,
@@ -80380,7 +83589,7 @@ router6.get("/referral/leaderboard", async (_req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-router6.get("/referral/resolve/:code", async (req, res) => {
+router6.get("/referral/resolve/:code", readLimiter, async (req, res) => {
   const code = req.params.code.trim().slice(0, 16);
   try {
     const row = await db.select({ walletAddress: referralCodes.walletAddress }).from(referralCodes).where(eq(referralCodes.code, code)).limit(1);
@@ -80402,16 +83611,48 @@ var referral_default = router6;
 // src/routes/rpc-proxy.ts
 var import_express7 = __toESM(require_express2(), 1);
 var router7 = (0, import_express7.Router)();
-var SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+var SOLANA_RPC2 = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+var ALLOWED_METHODS = /* @__PURE__ */ new Set([
+  "getAccountInfo",
+  "getBalance",
+  "getLatestBlockhash",
+  "getMinimumBalanceForRentExemption",
+  "getMultipleAccounts",
+  "getProgramAccounts",
+  "getRecentBlockhash",
+  "getSignatureStatuses",
+  "getTokenAccountsByOwner",
+  "getTokenSupply",
+  "getTransaction",
+  "getVersion",
+  "requestAirdrop",
+  "sendTransaction",
+  "simulateTransaction"
+]);
+var rpcLimiter = rate_limit_default({
+  windowMs: 60 * 1e3,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please slow down." }
+});
 router7.get("/rpc", (_req, res) => {
   res.json({ status: "ok" });
 });
-router7.post("/rpc", async (req, res) => {
+router7.post("/rpc", rpcLimiter, async (req, res) => {
   try {
-    const response = await fetch(SOLANA_RPC, {
+    const body = req.body;
+    if (!body.method || !ALLOWED_METHODS.has(body.method)) {
+      res.status(403).json({
+        error: "Method not allowed",
+        method: body.method ?? "(missing)"
+      });
+      return;
+    }
+    const response = await fetch(SOLANA_RPC2, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(body)
     });
     const data = await response.json();
     res.json(data);
@@ -80423,31 +83664,29 @@ var rpc_proxy_default = router7;
 
 // src/routes/sol-price-sync.ts
 var import_express8 = __toESM(require_express2(), 1);
-var import_web3 = __toESM(require_index_cjs(), 1);
-
-// src/lib/logger.ts
-var import_pino = __toESM(require_pino(), 1);
-var isProduction = process.env.NODE_ENV === "production";
-var logger = (0, import_pino.default)({
-  level: process.env.LOG_LEVEL ?? "info",
-  redact: [
-    "req.headers.authorization",
-    "req.headers.cookie",
-    "res.headers['set-cookie']"
-  ],
-  ...isProduction ? {} : {
-    transport: {
-      target: "pino-pretty",
-      options: { colorize: true }
-    }
-  }
-});
-
-// src/routes/sol-price-sync.ts
+var import_web32 = __toESM(require_index_cjs(), 1);
 var router8 = (0, import_express8.Router)();
-var PROGRAM_ID = new import_web3.PublicKey("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
-var CONFIG_PDA = new import_web3.PublicKey("BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi");
-var SOLANA_RPC2 = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+var CRON_SECRET = process.env.CRON_SECRET ?? null;
+var IS_PROD = process.env.NODE_ENV === "production";
+var syncLimiter = rate_limit_default({
+  windowMs: 5 * 60 * 1e3,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many sync requests" }
+});
+function isCronAuthorized(req) {
+  if (!CRON_SECRET) {
+    if (IS_PROD) return false;
+    const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? req.socket?.remoteAddress ?? "";
+    return ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1";
+  }
+  const auth = req.headers["authorization"] ?? "";
+  return auth === `Bearer ${CRON_SECRET}`;
+}
+var PROGRAM_ID = new import_web32.PublicKey("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
+var CONFIG_PDA = new import_web32.PublicKey("BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi");
+var SOLANA_RPC3 = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
 async function getDiscriminator2(name) {
   const encoder = new TextEncoder();
   const data = encoder.encode(`global:${name}`);
@@ -80471,13 +83710,13 @@ async function syncSolPriceOnChain(priceUsd) {
   const bytes = JSON.parse(raw);
   if (!Array.isArray(bytes) || bytes.length !== 64)
     throw new Error("ADMIN_KEYPAIR_JSON must be a JSON array of 64 numbers");
-  const keypair = import_web3.Keypair.fromSecretKey(new Uint8Array(bytes));
-  const connection = new import_web3.Connection(SOLANA_RPC2, "confirmed");
+  const keypair = import_web32.Keypair.fromSecretKey(new Uint8Array(bytes));
+  const connection2 = new import_web32.Connection(SOLANA_RPC3, "confirmed");
   const discriminator = await getDiscriminator2("update_sol_price");
   const priceE6 = BigInt(Math.round(priceUsd * 1e6));
   const argsBuf = Buffer.alloc(8);
   argsBuf.writeBigUInt64LE(priceE6, 0);
-  const ix = new import_web3.TransactionInstruction({
+  const ix = new import_web32.TransactionInstruction({
     programId: PROGRAM_ID,
     keys: [
       { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
@@ -80485,15 +83724,15 @@ async function syncSolPriceOnChain(priceUsd) {
     ],
     data: Buffer.concat([discriminator, argsBuf])
   });
-  const tx = new import_web3.Transaction();
+  const tx = new import_web32.Transaction();
   tx.feePayer = keypair.publicKey;
   tx.add(ix);
-  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+  const { blockhash, lastValidBlockHeight } = await connection2.getLatestBlockhash("confirmed");
   tx.recentBlockhash = blockhash;
   tx.lastValidBlockHeight = lastValidBlockHeight;
   tx.sign(keypair);
-  const sig = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false });
-  await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
+  const sig = await connection2.sendRawTransaction(tx.serialize(), { skipPreflight: false });
+  await connection2.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
   return sig;
 }
 var lastSyncAt = null;
@@ -80509,7 +83748,11 @@ async function runSolPriceSync() {
     logger.error({ err }, "SOL price sync failed");
   }
 }
-router8.post("/api/cron/sync-sol-price", async (_req, res) => {
+router8.post("/cron/sync-sol-price", syncLimiter, async (req, res) => {
+  if (!isCronAuthorized(req)) {
+    res.status(401).json({ ok: false, error: "Unauthorized \u2014 Bearer token required" });
+    return;
+  }
   if (!process.env.ADMIN_KEYPAIR_JSON) {
     res.status(503).json({ ok: false, error: "ADMIN_KEYPAIR_JSON not configured" });
     return;
@@ -80524,33 +83767,178 @@ router8.post("/api/cron/sync-sol-price", async (_req, res) => {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
-router8.get("/api/cron/sync-sol-price/status", (_req, res) => {
+router8.get("/cron/sync-sol-price/status", (_req, res) => {
   res.json({ lastSyncAt, lastPrice });
 });
 var sol_price_sync_default = router8;
 
-// src/routes/index.ts
+// src/routes/presale-chain.ts
+var import_express9 = __toESM(require_express2(), 1);
 var router9 = (0, import_express9.Router)();
-router9.use(rpc_proxy_default);
-router9.use(auth_default);
-router9.use(admin_default);
-router9.use(tracker_default);
-router9.use(referral_default);
-router9.use(health_default);
-router9.use(twitter_default);
-router9.use(sol_price_sync_default);
-var routes_default = router9;
+var chainLimiter = rate_limit_default({
+  windowMs: 60 * 1e3,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" }
+});
+var SOLANA_RPC4 = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+var CONFIG_PDA2 = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
+var solPriceCache = { price: 0, fetchedAt: 0 };
+var chainStateCache = null;
+var PRICE_TTL_MS = 60 * 1e3;
+var CHAIN_TTL_MS = 15 * 1e3;
+async function fetchSolPrice() {
+  const now = Date.now();
+  if (now - solPriceCache.fetchedAt < PRICE_TTL_MS) return solPriceCache.price;
+  try {
+    const r = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd",
+      { signal: AbortSignal.timeout(5e3) }
+    );
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    const price = d?.solana?.usd;
+    if (price && price > 0) {
+      solPriceCache = { price, fetchedAt: now };
+      return price;
+    }
+  } catch {
+  }
+  return solPriceCache.price;
+}
+async function fetchPresaleChainState() {
+  const now = Date.now();
+  if (chainStateCache && now - chainStateCache.fetchedAt < CHAIN_TTL_MS) {
+    return chainStateCache.data;
+  }
+  const body = JSON.stringify({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "getAccountInfo",
+    params: [CONFIG_PDA2, { encoding: "base64" }]
+  });
+  const rpcRes = await fetch(SOLANA_RPC4, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body,
+    signal: AbortSignal.timeout(8e3)
+  });
+  const rpcJson = await rpcRes.json();
+  const b64 = rpcJson?.result?.value?.data?.[0];
+  if (!b64) throw new Error("Account not found");
+  const raw = Buffer.from(b64, "base64");
+  let off = 8;
+  const readPk = () => {
+    const v = raw.slice(off, off + 32).toString("hex");
+    off += 32;
+    return v;
+  };
+  const readU8 = () => {
+    const v = raw[off];
+    off += 1;
+    return v;
+  };
+  const readBool = () => readU8() !== 0;
+  const readI64 = () => {
+    const v = raw.readBigInt64LE(off);
+    off += 8;
+    return v.toString();
+  };
+  const readU64 = () => {
+    const v = raw.readBigUInt64LE(off);
+    off += 8;
+    return v.toString();
+  };
+  readPk();
+  readPk();
+  readPk();
+  readPk();
+  const currentStage = readU8();
+  const isActive = readBool();
+  const isPaused = readBool();
+  const presaleStart = readI64();
+  const presaleEnd = readI64();
+  const claimOpensAt = readI64();
+  const totalTokensSold = readU64();
+  const totalSolRaised = readU64();
+  const totalUsdtRaised = readU64();
+  readU64();
+  const solPriceUsdE6 = readU64();
+  const stages = [];
+  for (let i = 0; i < 4; i++) {
+    stages.push({
+      tokensPerRawUsdtScaled: readU64(),
+      maxTokens: readU64(),
+      tokensSold: readU64()
+    });
+  }
+  const buyersCount = readU64();
+  const data = {
+    currentStage,
+    isActive,
+    isPaused,
+    presaleStart,
+    presaleEnd,
+    claimOpensAt,
+    totalTokensSold,
+    totalSolRaised,
+    totalUsdtRaised,
+    solPriceUsdE6,
+    buyersCount,
+    stages
+  };
+  chainStateCache = { data, fetchedAt: now };
+  return data;
+}
+router9.get("/sol-price", chainLimiter, async (_req, res) => {
+  try {
+    const price = await fetchSolPrice();
+    res.json({ price, currency: "USD", updatedAt: (/* @__PURE__ */ new Date()).toISOString() });
+  } catch {
+    res.json({ price: solPriceCache.price, currency: "USD", updatedAt: (/* @__PURE__ */ new Date()).toISOString() });
+  }
+});
+var IS_PROD2 = process.env.NODE_ENV === "production";
+router9.get("/presale/on-chain", chainLimiter, async (_req, res) => {
+  try {
+    const [state, solPrice] = await Promise.all([
+      fetchPresaleChainState(),
+      fetchSolPrice()
+    ]);
+    res.json({ ...state, solPriceUsd: solPrice });
+  } catch (err) {
+    res.status(502).json({
+      error: "Failed to fetch on-chain state",
+      ...IS_PROD2 ? {} : { detail: String(err) }
+    });
+  }
+});
+var presale_chain_default = router9;
+
+// src/routes/index.ts
+var router10 = (0, import_express10.Router)();
+router10.use(rpc_proxy_default);
+router10.use(presale_chain_default);
+router10.use(auth_default);
+router10.use(admin_default);
+router10.use(tracker_default);
+router10.use(referral_default);
+router10.use(health_default);
+router10.use(twitter_default);
+router10.use(sol_price_sync_default);
+var routes_default = router10;
 
 // src/app.ts
 var pinoHttpMiddleware = import_pino_http.default;
 var ConnectPgSimple = (0, import_connect_pg_simple.default)(import_express_session.default);
-var IS_PROD = process.env.NODE_ENV === "production";
-if (IS_PROD && !process.env.SESSION_SECRET) {
+var IS_PROD3 = process.env.NODE_ENV === "production";
+if (IS_PROD3 && !process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET environment variable is required in production");
 }
 var SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-production";
 var ALLOWED_ORIGINS_EXACT = [
-  ...IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000"],
+  ...IS_PROD3 ? [] : ["http://localhost:22793", "http://localhost:3000"],
   ...process.env.REPLIT_DEV_DOMAIN ? [`https://${process.env.REPLIT_DEV_DOMAIN}`] : [],
   ...process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []
 ];
@@ -80561,8 +83949,24 @@ var isOriginAllowed = (origin) => {
   if (VERCEL_PREVIEW_DOMAIN && origin === `https://${VERCEL_PREVIEW_DOMAIN}`) return true;
   return false;
 };
-var app = (0, import_express10.default)();
+var REQUIRED_PROD_VARS = IS_PROD3 ? ["SESSION_SECRET"] : [];
+for (const v of REQUIRED_PROD_VARS) {
+  if (!process.env[v]) {
+    throw new Error(`[STARTUP] Missing required environment variable: ${v}`);
+  }
+}
+if (IS_PROD3 && !process.env.CRON_SECRET) {
+  logger.warn("CRON_SECRET not set \u2014 cron endpoints will be disabled");
+}
+var app = (0, import_express11.default)();
 app.set("trust proxy", 1);
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    // API-only server — no HTML pages to protect
+    crossOriginEmbedderPolicy: false
+  })
+);
 app.use(
   pinoHttpMiddleware({
     logger,
@@ -80591,8 +83995,8 @@ app.use(
     credentials: true
   })
 );
-app.use(import_express10.default.json());
-app.use(import_express10.default.urlencoded({ extended: true }));
+app.use(import_express11.default.json({ limit: "64kb" }));
+app.use(import_express11.default.urlencoded({ extended: true, limit: "64kb" }));
 app.use((0, import_cookie_parser.default)());
 app.use(
   (0, import_express_session.default)({
@@ -80606,12 +84010,11 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: IS_PROD,
+      secure: IS_PROD3,
       httpOnly: true,
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1e3,
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1e3),
-      sameSite: IS_PROD ? "none" : "lax"
+      sameSite: IS_PROD3 ? "none" : "lax"
     }
   })
 );
@@ -80622,7 +84025,7 @@ app.use((err, _req, res, _next) => {
   const status = err.status ?? 500;
   const message = err.message ?? "Internal Server Error";
   logger.error({ err }, "Unhandled error");
-  res.status(status).json({ error: message, stack: IS_PROD ? void 0 : err.stack });
+  res.status(status).json({ error: message, stack: IS_PROD3 ? void 0 : err.stack });
 });
 if (process.env.ADMIN_KEYPAIR_JSON) {
   const SYNC_INTERVAL_MS = 5 * 60 * 1e3;

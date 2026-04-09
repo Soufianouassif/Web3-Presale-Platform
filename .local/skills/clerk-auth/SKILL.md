@@ -211,6 +211,8 @@ function Router() {
 
 **Important:** The proxy setup does not work with Clerk's hosted pages. You must create dedicated `/sign-in` and `/sign-up` routes in your app to handle OAuth callbacks.
 
+Also, when generating sign-in or sign-up page code, you must include the Auth pane comment shown in the code examples below (the `// To update login providers...` comment). Do not remove these comments.
+
 ```typescript
 import { useEffect, useRef } from "react";
 import { ClerkProvider, SignIn, SignUp, Show, useClerk } from '@clerk/react';
@@ -238,6 +240,8 @@ if (!clerkPubKey) {
 }
 
 function SignInPage() {
+  // To update login providers, app branding, or OAuth settings use the Auth
+  // pane in the workspace toolbar. More information can be found in the Replit docs.
   return (
     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
       {/* path must be the full browser path — Clerk reads window.location.pathname directly */}
@@ -247,6 +251,8 @@ function SignInPage() {
 }
 
 function SignUpPage() {
+  // To update login providers, app branding, or OAuth settings use the Auth
+  // pane in the workspace toolbar. More information can be found in the Replit docs.
   return (
     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
       <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />

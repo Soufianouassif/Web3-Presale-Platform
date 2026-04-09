@@ -40,13 +40,17 @@ const isOriginAllowed = (origin: string): boolean => {
 };
 
 // ── Startup validation — يفشل السيرفر بوضوح إذا غابت أسرار حساسة ──────────
+// CRON_SECRET is optional — if missing the cron endpoints simply won't work
 const REQUIRED_PROD_VARS = IS_PROD
-  ? (["SESSION_SECRET", "CRON_SECRET"] as const)
+  ? (["SESSION_SECRET"] as const)
   : ([] as const);
 for (const v of REQUIRED_PROD_VARS) {
   if (!process.env[v]) {
     throw new Error(`[STARTUP] Missing required environment variable: ${v}`);
   }
+}
+if (IS_PROD && !process.env.CRON_SECRET) {
+  logger.warn("CRON_SECRET not set — cron endpoints will be disabled");
 }
 
 const app: Express = express();

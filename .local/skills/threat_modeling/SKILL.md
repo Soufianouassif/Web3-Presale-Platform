@@ -203,7 +203,7 @@ Stripe's webhook signature mechanism.
 
 Product prices and order totals must be calculated server-side. The client sends a cart
 (product IDs and quantities) but the server must look up current prices from the database.
-Accepting client-supplied prices would allow purchasing items for arbitrary amounts.
+Accepting client-supplied prices would allow purchasing items for arbitrary amount(s).
 
 ### Information Disclosure
 

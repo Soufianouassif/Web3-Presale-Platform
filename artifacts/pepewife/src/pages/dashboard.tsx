@@ -1139,6 +1139,7 @@ export default function Dashboard() {
           currency={currency as "SOL" | "USDT_SPL"}
           presaleData={presaleData}
           tokensEstimate={tokensOut}
+          disableWalletSwitch={true}
           onClose={() => setShowBuyModal(false)}
           onSuccess={(sig) => {
             setDashTxSig(sig);

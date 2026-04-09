@@ -36,6 +36,7 @@ interface Props {
   tokensEstimate: number;
   onClose: () => void;
   onSuccess: (signature: string) => void;
+  disableWalletSwitch?: boolean;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -55,21 +56,24 @@ function friendlyError(msg: string): string {
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export default function WalletBuyModal({ amount, currency, presaleData, tokensEstimate, onClose, onSuccess }: Props) {
+export default function WalletBuyModal({ amount, currency, presaleData, tokensEstimate, onClose, onSuccess, disableWalletSwitch = false }: Props) {
   const { status, walletType: connectedWallet, address, connect, installedWallets, refreshDetection } = useWallet();
   const { dir } = useLanguage();
   const isRTL = dir === "rtl";
 
-  const [step, setStep]           = useState<ModalStep>("select");
-  const [selectedWallet, setSelectedWallet] = useState<WalletType | null>(null);
+  // If wallet is already connected when the modal opens → start at "confirm" directly
+  const isAlreadyConnected = status === "connected" && !!connectedWallet;
+  const [step, setStep]           = useState<ModalStep>(isAlreadyConnected ? "confirm" : "select");
+  const [selectedWallet, setSelectedWallet] = useState<WalletType | null>(isAlreadyConnected ? connectedWallet : null);
   const [errorMsg, setErrorMsg]   = useState("");
   const [signature, setSignature] = useState("");
   const [connectingId, setConnectingId] = useState<WalletType | null>(null);
 
-  // If already connected when modal opens → jump straight to confirm
+  // Refresh wallet detection and handle delayed session restore (wallet restores after 800ms)
   useEffect(() => {
     refreshDetection();
-    if (status === "connected" && connectedWallet) {
+    // Handle the case where wallet context restores connection asynchronously after modal opens
+    if (status === "connected" && connectedWallet && step === "select") {
       setSelectedWallet(connectedWallet);
       setStep("confirm");
     }
@@ -306,13 +310,15 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => { setStep("select"); setSelectedWallet(null); }}
-                className="flex items-center justify-center gap-2 h-12 rounded-xl border-2 border-[#1a1a2e] bg-white font-display text-base tracking-wider text-[#1a1a2e] hover:bg-[#FFFDE7] transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4" /> Change
-              </button>
+            <div className={`grid gap-3 ${disableWalletSwitch ? "grid-cols-1" : "grid-cols-2"}`}>
+              {!disableWalletSwitch && (
+                <button
+                  onClick={() => { setStep("select"); setSelectedWallet(null); }}
+                  className="flex items-center justify-center gap-2 h-12 rounded-xl border-2 border-[#1a1a2e] bg-white font-display text-base tracking-wider text-[#1a1a2e] hover:bg-[#FFFDE7] transition-colors"
+                >
+                  <ArrowLeft className="h-4 w-4" /> Change
+                </button>
+              )}
               <button
                 onClick={handleSign}
                 className="btn-meme h-12 rounded-xl font-display text-base tracking-wider text-white"
@@ -391,7 +397,15 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
             </div>
             <div className="grid grid-cols-2 gap-3 w-full">
               <button
-                onClick={() => { setErrorMsg(""); setStep("select"); setSelectedWallet(null); }}
+                onClick={() => {
+                  setErrorMsg("");
+                  if (disableWalletSwitch && selectedWallet) {
+                    setStep("confirm");
+                  } else {
+                    setStep("select");
+                    setSelectedWallet(null);
+                  }
+                }}
                 className="h-11 rounded-xl border-2 border-[#1a1a2e] bg-white font-display text-sm tracking-wider hover:bg-[#FFFDE7] transition-colors"
               >
                 Try Again
