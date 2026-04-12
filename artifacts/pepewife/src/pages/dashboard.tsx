@@ -369,6 +369,7 @@ export default function Dashboard() {
     { id: "overview", label: t.dashboard.overview, icon: "📊" },
     { id: "purchases", label: t.dashboard.myPurchases, icon: "🛒" },
     { id: "claim", label: t.dashboard.claim, icon: "🎁" },
+    { id: "airdrop", label: t.dashboard.airdrop, icon: "🪂" },
     { id: "referrals", label: t.dashboard.referrals, icon: "🤝" },
     { id: "transactions", label: t.dashboard.transactions, icon: "📜" },
   ];
@@ -984,6 +985,136 @@ export default function Dashboard() {
                       <p className="text-xs text-[#1a1a2e]/30 font-bold mt-4">{t.dashboard.claimDisclaimer}</p>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {activeTab === "airdrop" && (
+                <div className="space-y-5">
+                  {/* Header */}
+                  <div className="meme-card bg-gradient-to-br from-[#1a1a2e] to-[#311B92] rounded-2xl overflow-hidden">
+                    <div className="p-6 sm:p-8 text-center relative">
+                      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 30% 50%, #FF4D9D 0%, transparent 50%), radial-gradient(circle at 70% 50%, #4CAF50 0%, transparent 50%)" }} />
+                      <div className="relative z-10">
+                        <div className="text-5xl mb-3">🪂</div>
+                        <h3 className="text-3xl sm:text-4xl font-display text-white tracking-wider mb-2">{t.dashboard.airdropTitle}</h3>
+                        <p className="text-white/60 font-bold text-sm max-w-md mx-auto">{t.dashboard.airdropDesc}</p>
+                        <div className="grid grid-cols-2 gap-3 mt-5 max-w-xs mx-auto">
+                          <div className="bg-white/10 border border-white/20 rounded-xl p-3 text-center">
+                            <div className="text-[10px] font-display text-white/40 tracking-wider mb-1">{t.dashboard.airdropPool}</div>
+                            <div className="font-display text-sm text-[#4CAF50] tracking-wide">15T $PWIFE</div>
+                          </div>
+                          <div className="bg-white/10 border border-white/20 rounded-xl p-3 text-center">
+                            <div className="text-[10px] font-display text-white/40 tracking-wider mb-1">{t.dashboard.airdropStatus}</div>
+                            <div className="font-display text-sm text-[#FFD54F] tracking-wide">{t.dashboard.airdropComingSoon}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tasks */}
+                  <div className="meme-card bg-white rounded-2xl overflow-hidden">
+                    <div className="zigzag-border" />
+                    <div className="p-5 space-y-3">
+                      <h4 className="font-display text-xl text-[#1a1a2e] tracking-wider mb-4">✅ Qualification Tasks</h4>
+                      {[
+                        {
+                          task: t.dashboard.airdropTask1,
+                          icon: "🐦",
+                          color: "#1DA1F2",
+                          bg: "#E3F2FD",
+                          border: "#1DA1F2",
+                          done: false,
+                          link: "https://x.com/pepewifecoin",
+                          btnLabel: t.dashboard.airdropVerify,
+                        },
+                        {
+                          task: t.dashboard.airdropTask2,
+                          icon: "✈️",
+                          color: "#0088cc",
+                          bg: "#E3F2FD",
+                          border: "#0088cc",
+                          done: false,
+                          link: "https://t.me/pepewifecoin",
+                          btnLabel: t.dashboard.airdropVerify,
+                        },
+                        {
+                          task: t.dashboard.airdropTask3,
+                          icon: "🐸",
+                          color: "#4CAF50",
+                          bg: "#E8F5E9",
+                          border: "#4CAF50",
+                          done: address ? (buyerState ? Number(buyerState.tokensBought) > 0 : false) : false,
+                          autoVerified: true,
+                          btnLabel: t.dashboard.airdropAutoVerified,
+                        },
+                        {
+                          task: t.dashboard.airdropTask4,
+                          icon: "🔗",
+                          color: "#FF4D9D",
+                          bg: "#FCE4EC",
+                          border: "#FF4D9D",
+                          done: address ? (refStats ? refStats.totalReferrals > 0 : false) : false,
+                          btnLabel: t.dashboard.airdropVerify,
+                        },
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-center gap-3 rounded-xl border-2 px-4 py-3" style={{ background: item.bg, borderColor: item.done ? item.color : "#1a1a2e20" }}>
+                          <span className="text-2xl shrink-0">{item.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-display text-sm text-[#1a1a2e] tracking-wide">{item.task}</div>
+                            {item.done && <div className="text-[10px] font-display mt-0.5" style={{ color: item.color }}>{t.dashboard.airdropVerified}</div>}
+                          </div>
+                          {item.done ? (
+                            <span className="shrink-0 bg-white border-2 rounded-lg px-3 py-1 font-display text-xs tracking-wide" style={{ borderColor: item.color, color: item.color }}>✅</span>
+                          ) : item.autoVerified ? (
+                            <span className="shrink-0 text-[10px] font-display text-[#1a1a2e]/30 tracking-wider">{t.dashboard.airdropPending}</span>
+                          ) : (
+                            <a href={item.link} target="_blank" rel="noreferrer"
+                              className="shrink-0 btn-meme rounded-lg px-3 py-1.5 font-display text-xs tracking-wide text-white whitespace-nowrap"
+                              style={{ background: item.color }}>
+                              {item.btnLabel}
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Allocation estimate */}
+                  <div className="meme-card bg-[#FFFDE7] rounded-2xl overflow-hidden border-[#FFD54F] shadow-[3px_3px_0px_#F9A825]">
+                    <div className="p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-display text-lg text-[#1a1a2e] tracking-wider">{t.dashboard.airdropAllocation}</h4>
+                        <span className="text-2xl">🎯</span>
+                      </div>
+                      {!address ? (
+                        <p className="text-sm text-[#1a1a2e]/40 font-bold">{t.dashboard.airdropConnectWallet}</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {[
+                            { label: t.dashboard.airdropTask3, done: buyerState ? Number(buyerState.tokensBought) > 0 : false, pts: "1x" },
+                            { label: t.dashboard.airdropTask4, done: refStats ? refStats.totalReferrals > 0 : false, pts: "+0.5x" },
+                          ].map((row, i) => (
+                            <div key={i} className="flex items-center justify-between">
+                              <span className="text-sm font-bold text-[#1a1a2e]/60">{row.label}</span>
+                              <span className="font-display text-sm tracking-wide" style={{ color: row.done ? "#4CAF50" : "#1a1a2e30" }}>
+                                {row.done ? `✅ ${row.pts}` : `⏳ ${row.pts}`}
+                              </span>
+                            </div>
+                          ))}
+                          <div className="border-t-2 border-[#FFD54F] pt-2 mt-2 flex items-center justify-between">
+                            <span className="font-display text-sm text-[#1a1a2e] tracking-wider">{t.dashboard.airdropMultiplier}</span>
+                            <span className="font-display text-lg text-[#FF4D9D] tracking-wider">
+                              {buyerState && Number(buyerState.tokensBought) > 0 ? (refStats && refStats.totalReferrals > 0 ? "1.5x 🔥" : "1x") : "0x"}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Note */}
+                  <div className="text-center text-xs text-[#1a1a2e]/40 font-bold px-4">{t.dashboard.airdropNote}</div>
                 </div>
               )}
 
