@@ -85,7 +85,7 @@ export default function ConnectingPage() {
                 style={{ animation: "spin 1s linear infinite" }}
               />
               <div className="absolute inset-2 rounded-full bg-[#1a1a2e] border-2 border-white/10 flex items-center justify-center overflow-hidden">
-                <img src="/logo.png" alt="PEPEWIFE" className="w-full h-full object-cover rounded-full" />
+                <img src="/logo.webp" alt="PEPEWIFE" className="w-full h-full object-cover rounded-full" />
               </div>
             </div>
           ) : (

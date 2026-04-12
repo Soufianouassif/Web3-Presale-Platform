@@ -5,11 +5,11 @@ import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
 
 const sectionImages: Record<number, { src: string; alt: string }> = {
-  5: { src: "/wp-token-details.png", alt: "Token Details" },
-  6: { src: "/wp-tokenomics.png", alt: "Tokenomics" },
-  9: { src: "/wp-utility.png", alt: "Token Utility" },
-  11: { src: "/wp-roadmap.png", alt: "Roadmap" },
-  12: { src: "/wp-security.png", alt: "Security" },
+  5: { src: "/wp-token-details.webp", alt: "Token Details" },
+  6: { src: "/wp-tokenomics.webp", alt: "Tokenomics" },
+  9: { src: "/wp-utility.webp", alt: "Token Utility" },
+  11: { src: "/wp-roadmap.webp", alt: "Roadmap" },
+  12: { src: "/wp-security.webp", alt: "Security" },
 };
 
 const sectionIcons: Record<number, string> = {
@@ -83,7 +83,7 @@ export default function Whitepaper() {
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer wiggle-hover shrink-0" onClick={() => navigate("/")}>
-                <img src="/logo.png" alt="PEPEWIFE" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
+                <img src="/logo.webp" alt="PEPEWIFE" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
                 <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
               </div>
             </div>
@@ -100,7 +100,7 @@ export default function Whitepaper() {
       <div className="pt-16" style={{ background: "linear-gradient(180deg, #1a1a2e 0%, #311B92 50%, #1a1a2e 100%)" }}>
         <div className="relative overflow-hidden">
           <img
-            src="/whitepaper-cover.png"
+            src="/whitepaper-cover.webp"
             alt="PEPEWIFE Whitepaper cover – The Lady of Memes, Solana meme token documentation"
             className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover opacity-80"
           />
@@ -146,7 +146,7 @@ export default function Whitepaper() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-start">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="PEPEWIFE" className="w-12 h-12 rounded-full border-3 border-white/30" />
+              <img src="/logo.webp" alt="PEPEWIFE" className="w-12 h-12 rounded-full border-3 border-white/30" />
               <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPEWIFE</span>
             </div>
             <p className="text-white/40 text-sm font-bold">{t.footer.tagline}</p>
