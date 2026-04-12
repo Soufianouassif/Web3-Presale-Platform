@@ -87,7 +87,7 @@ export default function TwitterFeed({ username }: TwitterFeedProps) {
             className="meme-card bg-white rounded-2xl p-5 flex-shrink-0 w-[320px] block hover:scale-[1.03] transition-transform"
           >
             <div className="flex items-center gap-3 mb-3">
-              <img src="/logo.webp" alt="PW" className="w-10 h-10 rounded-full border-2 border-[#1a1a2e]" />
+              <img src="/logo.webp" alt="PW" width="40" height="40" className="w-10 h-10 rounded-full border-2 border-[#1a1a2e]" />
               <div>
                 <div className="font-display text-[#1a1a2e] text-sm tracking-wider">PEPEWIFE 🐸</div>
                 <div className="text-xs text-[#1a1a2e]/40 font-bold">@{username}</div>
