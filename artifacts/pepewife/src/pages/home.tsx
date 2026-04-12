@@ -988,89 +988,28 @@ export default function Home() {
             <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider">{t.roadmap.title}</h2>
             <p className="text-lg text-[#1a1a2e]/50 font-bold mt-2">{t.roadmap.subtitle}</p>
           </div>
-
-          {/* ─── التايم لاين ─── */}
-          <div className="relative">
-            {/* الخط الرأسي الوسطى */}
-            <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-1 bg-[#1a1a2e]/15 rounded-full hidden md:block" />
-
-            <div className="space-y-10">
-              {[
-                { phase: t.roadmap.phase1, title: t.roadmap.phase1Title, desc: t.roadmap.phase1Desc, active: true,  img: "/roadmap-phase1.webp", color: "#4CAF50", meme: t.roadmap.phase1Meme, num: "01" },
-                { phase: t.roadmap.phase2, title: t.roadmap.phase2Title, desc: t.roadmap.phase2Desc, active: false, img: "/roadmap-phase2.webp", color: "#FF4D9D", meme: t.roadmap.phase2Meme, num: "02" },
-                { phase: t.roadmap.phase3, title: t.roadmap.phase3Title, desc: t.roadmap.phase3Desc, active: false, img: "/roadmap-phase3.webp", color: "#42A5F5", meme: t.roadmap.phase3Meme, num: "03" },
-                { phase: t.roadmap.phase4, title: t.roadmap.phase4Title, desc: t.roadmap.phase4Desc, active: false, img: "/roadmap-phase4.webp", color: "#AB47BC", meme: t.roadmap.phase4Meme, num: "04" },
-                { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: "/roadmap-phase4.webp", color: "#FF9800", meme: t.roadmap.phase5Meme, num: "05" },
-              ].map((step, i) => {
-                const isRight = i % 2 === 0;
-                return (
-                  <div key={i} className="relative flex items-center gap-0 md:gap-6">
-
-                    {/* ─── الكارد (يسار/يمين بالتناوب) ─── */}
-                    <div className={`w-full md:w-[calc(50%-2.5rem)] ${isRight ? "md:ml-0 md:mr-auto" : "md:ml-auto md:mr-0"} order-2 md:order-none`}>
-                      <div
-                        className={`meme-card bg-white rounded-3xl overflow-hidden transition-transform hover:-translate-y-1`}
-                        style={{
-                          border: `3px solid ${step.active ? step.color : "#1a1a2e"}`,
-                          boxShadow: step.active
-                            ? `6px 6px 0px ${step.color}88`
-                            : "4px 4px 0px #1a1a2e",
-                        }}
-                      >
-                        {/* صورة عرض كامل */}
-                        <div className="relative overflow-hidden">
-                          <img
-                            src={step.img}
-                            alt={`PEPEWIFE roadmap ${step.title}`}
-                            loading="lazy"
-                            className="w-full h-auto object-contain block"
-                          />
-                          {/* شريط لون أسفل الصورة */}
-                          <div className="h-1.5 w-full" style={{ background: step.color }} />
-                          {/* شارة "ACTIVE" للمرحلة الحالية */}
-                          {step.active && (
-                            <div
-                              className="absolute top-3 right-3 sticker text-white text-xs font-display tracking-wide px-3 py-1"
-                              style={{ background: step.color, transform: "rotate(2deg)" }}
-                            >
-                              🔥 {step.meme}
-                            </div>
-                          )}
-                        </div>
-                        {/* المحتوى */}
-                        <div className="p-5">
-                          <span
-                            className="inline-block text-xs font-display tracking-widest text-white px-3 py-1 rounded-full mb-2"
-                            style={{ background: step.color }}
-                          >
-                            {step.phase}
-                          </span>
-                          <h3 className="text-xl font-display text-[#1a1a2e] tracking-wider mb-1">{step.title}</h3>
-                          <p className="text-[#1a1a2e]/60 text-sm font-bold leading-relaxed">{step.desc}</p>
-                          {!step.active && (
-                            <p className="text-xs font-display mt-2 tracking-wider" style={{ color: step.color }}>{step.meme}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* ─── نقطة الخط الوسطى ─── */}
-                    <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 z-10 flex-col items-center">
-                      <div
-                        className="w-14 h-14 rounded-full border-4 border-white flex items-center justify-center font-nums font-bold text-white text-base shadow-lg"
-                        style={{ background: step.color, boxShadow: `0 0 0 3px ${step.color}` }}
-                      >
-                        {step.num}
-                      </div>
-                    </div>
-
-                    {/* ─── عمود فارغ الجانب الآخر ─── */}
-                    <div className="hidden md:block w-[calc(50%-2.5rem)]" />
-
+          <div className="space-y-6">
+            {[
+              { phase: t.roadmap.phase1, title: t.roadmap.phase1Title, desc: t.roadmap.phase1Desc, active: true,  img: "/roadmap-phase1.webp", color: "#4CAF50", meme: t.roadmap.phase1Meme },
+              { phase: t.roadmap.phase2, title: t.roadmap.phase2Title, desc: t.roadmap.phase2Desc, active: false, img: "/roadmap-phase2.webp", color: "#FF4D9D", meme: t.roadmap.phase2Meme },
+              { phase: t.roadmap.phase3, title: t.roadmap.phase3Title, desc: t.roadmap.phase3Desc, active: false, img: "/roadmap-phase3.webp", color: "#42A5F5", meme: t.roadmap.phase3Meme },
+              { phase: t.roadmap.phase4, title: t.roadmap.phase4Title, desc: t.roadmap.phase4Desc, active: false, img: "/roadmap-phase4.webp", color: "#AB47BC", meme: t.roadmap.phase4Meme },
+              { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: "/roadmap-phase4.webp", color: "#FF9800", meme: t.roadmap.phase5Meme },
+            ].map((step, i) => (
+              <div key={i} className={`meme-card flex flex-col md:flex-row items-center gap-6 p-6 rounded-3xl bg-white ${step.active ? `border-[#4CAF50] ${isRTL ? "shadow-[-6px_6px_0px_#2E7D32]" : "shadow-[6px_6px_0px_#2E7D32]"}` : ""}`}>
+                <img src={step.img} alt={`PEPEWIFE roadmap ${step.title}`} loading="lazy" className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
+                <div className="flex-1 text-center md:text-start">
+                  <div className="flex items-center gap-2 justify-center md:justify-start mb-1">
+                    <span className="sticker text-white text-xs" style={{ backgroundColor: step.color, transform: "rotate(-1deg)" }}>{step.phase}</span>
+                    {step.active && <span className="sticker bg-[#FFD54F] text-[#1a1a2e] text-xs" style={{ transform: "rotate(2deg)" }}>{step.meme}</span>}
                   </div>
-                );
-              })}
-            </div>
+                  <h3 className="text-2xl font-display text-[#1a1a2e] tracking-wider mb-1">{step.title}</h3>
+                  <p className="text-[#1a1a2e]/60 text-sm font-bold">{step.desc}</p>
+                  {!step.active && <span className="text-xs font-display text-[#1a1a2e]/30 tracking-wider">{step.meme}</span>}
+                </div>
+                {step.active && <ChevronRight className="h-8 w-8 text-[#4CAF50] hidden md:block" />}
+              </div>
+            ))}
           </div>
         </div>
       </section>
