@@ -3,7 +3,7 @@ import rateLimit from "express-rate-limit";
 import { Connection } from "@solana/web3.js";
 import { db, pool } from "@workspace/db";
 import { pageVisits, walletConnections, purchases, referralCodes, referrals } from "@workspace/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
 
 const router = Router();
@@ -836,6 +836,56 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
   } catch (err) {
     logger.error({ err }, "[PURCHASE] Unhandled error");
     res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+
+// ── Public activity feed (last 50 purchases, anonymized) ─────────────────
+const activityLimiter = rateLimit({
+  windowMs: 60 * 1_000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" },
+});
+
+router.get("/activity", activityLimiter, async (req: Request, res: Response) => {
+  try {
+    const PAGE_SIZE = 20;
+    const offset = Math.max(0, parseInt(String(req.query.offset ?? "0"), 10) || 0);
+    const { sql: sqlFn, count: countFn } = await import("drizzle-orm");
+
+    const [totalRow] = await db.select({ total: countFn() }).from(purchases);
+    const total = Number(totalRow?.total ?? 0);
+
+    const rows = await db
+      .select({
+        id: purchases.id,
+        walletAddress: purchases.walletAddress,
+        network: purchases.network,
+        amountUsd: purchases.amountUsd,
+        amountTokens: purchases.amountTokens,
+        stage: purchases.stage,
+        createdAt: purchases.createdAt,
+      })
+      .from(purchases)
+      .orderBy(desc(purchases.createdAt))
+      .limit(PAGE_SIZE)
+      .offset(offset);
+
+    const activity = rows.map((r) => ({
+      id: r.id,
+      wallet: r.walletAddress.slice(0, 4) + "…" + r.walletAddress.slice(-4),
+      network: r.network,
+      amountUsd: r.amountUsd,
+      amountTokens: r.amountTokens,
+      stage: r.stage ?? 1,
+      createdAt: r.createdAt,
+    }));
+
+    res.json({ activity, total, offset, hasMore: offset + PAGE_SIZE < total });
+  } catch (err) {
+    logger.error({ err }, "[ACTIVITY] Failed to fetch activity");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

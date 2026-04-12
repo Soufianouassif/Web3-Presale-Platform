@@ -596,7 +596,7 @@ function StageBar({ label, sold, max, isCurrent, price }: { label: string; sold:
         </div>
         <span className="text-xs text-gray-500">{fmtTokens(sold)} / {fmtTokens(max)} <span className="text-gray-600">({pct.toFixed(1)}%)</span></span>
       </div>
-      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+      <div dir="ltr" className="h-2 bg-white/10 rounded-full overflow-hidden">
         <div className={`h-full rounded-full transition-all ${isCurrent ? "bg-[#9945FF]" : "bg-white/20"}`} style={{ width: `${pct}%` }} />
       </div>
     </div>

@@ -541,7 +541,7 @@ export default function Home() {
                     <span className="text-sm text-[#1a1a2e]/70 font-nums tracking-wide font-bold">{presaleFilled}% — Stage {currentStage + 1}/4</span>
                   </div>
                   {/* شريط المراحل الأربع */}
-                  <div className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">
+                  <div dir="ltr" className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">
                     {STAGE_DATA.map((s, i) => {
                       const pct = Math.min(100, Math.round((s.sold / s.tokens) * 100));
                       return (

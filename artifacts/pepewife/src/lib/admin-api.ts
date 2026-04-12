@@ -181,6 +181,33 @@ export interface SessionInfo {
   isCurrent: boolean;
 }
 
+export interface PublicActivity {
+  id: number;
+  wallet: string;
+  network: string;
+  amountUsd: string;
+  amountTokens: string;
+  stage: number;
+  createdAt: string;
+}
+
+export interface ActivityResponse {
+  activity: PublicActivity[];
+  total: number;
+  offset: number;
+  hasMore: boolean;
+}
+
+export async function fetchPublicActivity(offset = 0): Promise<ActivityResponse> {
+  try {
+    const res = await fetch(`${API_BASE}/activity?offset=${offset}`, { credentials: "include" });
+    if (!res.ok) return { activity: [], total: 0, offset, hasMore: false };
+    return res.json() as Promise<ActivityResponse>;
+  } catch {
+    return { activity: [], total: 0, offset, hasMore: false };
+  }
+}
+
 export const tracker = {
   visit: (page: string) => {
     const visitorId = getOrCreateVisitorId();

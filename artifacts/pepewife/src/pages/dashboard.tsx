@@ -9,7 +9,7 @@ import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
 import { useWallet } from "@/contexts/wallet-context";
 import { useToast } from "@/components/wallet-toast";
-import { tracker, fetchPublicPresaleConfig, type PublicPresaleConfig } from "@/lib/admin-api";
+import { tracker, fetchPublicPresaleConfig, fetchPublicActivity, type PublicPresaleConfig, type PublicActivity, type ActivityResponse } from "@/lib/admin-api";
 import WalletBuyModal from "@/components/wallet-buy-modal";
 import {
   fetchPresaleState,
@@ -53,6 +53,11 @@ export default function Dashboard() {
   const [buyerLoading, setBuyerLoading] = useState(false);
   const [buyerTxs, setBuyerTxs] = useState<BuyerTx[]>([]);
   const [buyerTxsLoading, setBuyerTxsLoading] = useState(false);
+  const [activityFeed, setActivityFeed] = useState<PublicActivity[]>([]);
+  const [activityLoading, setActivityLoading] = useState(false);
+  const [activityHasMore, setActivityHasMore] = useState(false);
+  const [activityOffset, setActivityOffset] = useState(0);
+  const [txView, setTxView] = useState<"mine" | "all">("all");
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
   const { status, shortAddress, address, network, disconnect } = useWallet();
@@ -152,6 +157,19 @@ export default function Dashboard() {
     refresh();
     fetchPublicPresaleConfig().then(cfg => setSiteConfig(cfg));
     const iv = setInterval(refresh, 30_000);
+    return () => clearInterval(iv);
+  }, []);
+
+  // ── Global activity feed (auto-refresh every 30s, resets to first page) ──
+  useEffect(() => {
+    const load = () => {
+      setActivityLoading(true);
+      fetchPublicActivity(0)
+        .then(res => { setActivityFeed(res.activity); setActivityHasMore(res.hasMore); setActivityOffset(res.activity.length); })
+        .finally(() => setActivityLoading(false));
+    };
+    load();
+    const iv = setInterval(load, 30_000);
     return () => clearInterval(iv);
   }, []);
 
@@ -551,7 +569,7 @@ export default function Dashboard() {
                             </span>
                             <span className="text-[#1a1a2e]/60 font-nums tracking-wide">{presaleFilled}% — Stage {currentStage + 1}/4</span>
                           </div>
-                          <div className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">
+                          <div dir="ltr" className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">
                             {STAGE_DATA.map((s, i) => {
                               const pct = Math.min(100, Math.round((s.sold / s.tokens) * 100));
                               return (
@@ -758,7 +776,7 @@ export default function Dashboard() {
                                   </span>
                                 </div>
                               </div>
-                              <div className="h-2.5 rounded-full bg-[#1a1a2e]/10 overflow-hidden border border-[#1a1a2e]/15">
+                              <div dir="ltr" className="h-2.5 rounded-full bg-[#1a1a2e]/10 overflow-hidden border border-[#1a1a2e]/15">
                                 <div className="h-full rounded-full transition-all duration-500" style={{ width: `${s.pct}%`, backgroundColor: s.color }} />
                               </div>
                               <div className="flex justify-between mt-1">
@@ -775,7 +793,7 @@ export default function Dashboard() {
                           <div className="text-3xl">📊</div>
                           <div className="flex-1">
                             <div className="font-display text-sm text-[#b8860b] tracking-wider">{t.dashboard.totalPresaleProgress}</div>
-                            <div className="h-3 rounded-full bg-[#1a1a2e]/10 overflow-hidden mt-1 border border-[#1a1a2e]/15">
+                            <div dir="ltr" className="h-3 rounded-full bg-[#1a1a2e]/10 overflow-hidden mt-1 border border-[#1a1a2e]/15">
                               <div className="h-full rounded-full bg-gradient-to-r from-[#4CAF50] via-[#FF4D9D] to-[#42A5F5] transition-all duration-700" style={{ width: `${presaleFilled}%` }} />
                             </div>
                             <div className="flex justify-between mt-1">
@@ -800,7 +818,7 @@ export default function Dashboard() {
                         <div key={ti.tier} className={`flex items-center gap-3 p-3 rounded-xl border-2 ${ti.active ? "border-[#4CAF50] bg-[#E8F5E9] shadow-[3px_3px_0px_#2E7D32]" : "border-[#1a1a2e]/10 bg-[#FFFDE7]/50"}`}>
                           <span className="text-lg font-display tracking-wider shrink-0">{ti.tier}</span>
                           <div className="flex-1">
-                            <div className="h-2 rounded-full bg-[#1a1a2e]/10 overflow-hidden">
+                            <div dir="ltr" className="h-2 rounded-full bg-[#1a1a2e]/10 overflow-hidden">
                               <div className="h-full rounded-full bg-[#4CAF50] transition-all" style={{ width: `${ti.progress}%` }} />
                             </div>
                           </div>
@@ -1072,7 +1090,7 @@ export default function Dashboard() {
                               <span className="text-[#1a1a2e]">{p.reward}</span>
                               <span className="text-[#1a1a2e]/40">{current}/{p.target} {t.dashboard.referralsLabel}</span>
                             </div>
-                            <div className="h-3 rounded-full bg-[#1a1a2e]/10 overflow-hidden border border-[#1a1a2e]/20">
+                            <div dir="ltr" className="h-3 rounded-full bg-[#1a1a2e]/10 overflow-hidden border border-[#1a1a2e]/20">
                               <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: p.color }} />
                             </div>
                           </div>
@@ -1128,58 +1146,143 @@ export default function Dashboard() {
               )}
 
               {activeTab === "transactions" && (
-                <div className="space-y-6">
+                <div className="space-y-4">
+                  {/* ── Toggle ── */}
+                  <div className="flex rounded-xl border-2 border-[#1a1a2e]/10 overflow-hidden">
+                    <button
+                      onClick={() => setTxView("all")}
+                      className={`flex-1 py-2.5 font-display text-sm tracking-wider transition-colors ${txView === "all" ? "bg-[#FF4D9D] text-white" : "bg-white text-[#1a1a2e]/50 hover:bg-[#FFFDE7]"}`}
+                    >
+                      🌍 كل المعاملات
+                    </button>
+                    <button
+                      onClick={() => setTxView("mine")}
+                      className={`flex-1 py-2.5 font-display text-sm tracking-wider transition-colors ${txView === "mine" ? "bg-[#4CAF50] text-white" : "bg-white text-[#1a1a2e]/50 hover:bg-[#FFFDE7]"}`}
+                    >
+                      👤 معاملاتي
+                    </button>
+                  </div>
+
                   <div className="meme-card bg-white rounded-2xl overflow-hidden">
                     <div className="zigzag-border" />
                     <div className="p-5">
                       <div className="flex items-center justify-between mb-5">
-                        <h3 className="font-display text-xl text-[#1a1a2e] tracking-wider">{t.dashboard.transactionHistory}</h3>
-                        <button onClick={refreshBuyerData} className="text-xs font-display text-[#1a1a2e]/40 hover:text-[#FF4D9D] transition-colors tracking-wide">
+                        <h3 className="font-display text-xl text-[#1a1a2e] tracking-wider">
+                          {txView === "all" ? "🌍 نشاط البيع العام" : t.dashboard.transactionHistory}
+                        </h3>
+                        <button
+                          onClick={() => {
+                            if (txView === "all") {
+                              setActivityLoading(true);
+                              fetchPublicActivity(0).then(res => {
+                                setActivityFeed(res.activity);
+                                setActivityHasMore(res.hasMore);
+                                setActivityOffset(res.activity.length);
+                              }).finally(() => setActivityLoading(false));
+                            } else {
+                              refreshBuyerData();
+                            }
+                          }}
+                          className="text-xs font-display text-[#1a1a2e]/40 hover:text-[#FF4D9D] transition-colors tracking-wide"
+                        >
                           🔄 {t.dashboard.refresh ?? "Refresh"}
                         </button>
                       </div>
 
-                      {buyerTxsLoading ? (
-                        <div className="text-center py-8">
-                          <div className="text-3xl mb-2 animate-spin inline-block">⏳</div>
-                          <p className="font-display text-[#1a1a2e]/40 tracking-wider text-sm">Loading transactions…</p>
-                        </div>
-                      ) : buyerTxs.length === 0 ? (
-                        <div className="text-center py-10">
-                          <div className="text-5xl mb-3">📜</div>
-                          <p className="font-display text-lg text-[#1a1a2e]/40 tracking-wider">{t.dashboard.noTransactions}</p>
-                          <p className="text-sm text-[#1a1a2e]/30 font-bold">{t.dashboard.noTransactionsDesc}</p>
-                        </div>
+                      {txView === "all" ? (
+                        activityLoading && activityFeed.length === 0 ? (
+                          <div className="text-center py-8">
+                            <div className="text-3xl mb-2 animate-spin inline-block">⏳</div>
+                            <p className="font-display text-[#1a1a2e]/40 tracking-wider text-sm">جارٍ التحميل…</p>
+                          </div>
+                        ) : activityFeed.length === 0 ? (
+                          <div className="text-center py-10">
+                            <div className="text-5xl mb-3">🛒</div>
+                            <p className="font-display text-lg text-[#1a1a2e]/40 tracking-wider">لا توجد معاملات بعد</p>
+                            <p className="text-sm text-[#1a1a2e]/30 font-bold">كن أول من يشتري $PWIFE!</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {activityFeed.map((tx) => {
+                              const usd = parseFloat(tx.amountUsd);
+                              const tokens = parseFloat(tx.amountTokens);
+                              const date = new Date(tx.createdAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+                              return (
+                                <div key={tx.id} className="flex items-center gap-3 rounded-xl border-2 border-[#1a1a2e]/10 bg-[#FFFDE7]/50 px-4 py-3">
+                                  <div className="w-8 h-8 rounded-full bg-[#FF4D9D]/10 border-2 border-[#FF4D9D]/30 flex items-center justify-center shrink-0 text-base">🐸</div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="font-display text-xs text-[#1a1a2e] tracking-wide">{tx.wallet}</div>
+                                    <div className="text-[10px] text-[#1a1a2e]/40 font-bold">{date} · Stage {tx.stage}</div>
+                                  </div>
+                                  <div className="text-end shrink-0">
+                                    <div className="font-display text-sm text-[#FF4D9D] tracking-wider">${usd.toFixed(2)}</div>
+                                    <div className="text-[10px] text-[#4CAF50] font-nums font-bold">+{tokens >= 1e9 ? (tokens/1e9).toFixed(2)+"B" : tokens >= 1e6 ? (tokens/1e6).toFixed(2)+"M" : tokens.toLocaleString()} $PWIFE</div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            <p className="text-center text-[10px] text-[#1a1a2e]/30 font-bold pt-2">{activityFeed.length} عملية شراء</p>
+                            {activityHasMore && (
+                              <button
+                                onClick={() => {
+                                  setActivityLoading(true);
+                                  fetchPublicActivity(activityOffset).then(res => {
+                                    setActivityFeed(prev => [...prev, ...res.activity]);
+                                    setActivityHasMore(res.hasMore);
+                                    setActivityOffset(prev => prev + res.activity.length);
+                                  }).finally(() => setActivityLoading(false));
+                                }}
+                                disabled={activityLoading}
+                                className="w-full mt-2 py-3 rounded-xl border-2 border-dashed border-[#FF4D9D]/40 text-[#FF4D9D] font-display text-sm tracking-wider hover:bg-[#FF4D9D]/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {activityLoading ? "⏳ جارٍ التحميل…" : "⬇️ عرض المزيد"}
+                              </button>
+                            )}
+                          </div>
+                        )
                       ) : (
-                        <div className="space-y-2">
-                          {buyerTxs.map((tx, i) => {
-                            const date = tx.blockTime
-                              ? new Date(tx.blockTime * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
-                              : "—";
-                            return (
-                              <div key={tx.signature} className="flex items-center gap-3 rounded-xl border-2 border-[#1a1a2e]/10 bg-[#FFFDE7]/50 px-4 py-3 hover:bg-[#FFFDE7] transition-colors">
-                                <div className="w-6 h-6 rounded-full bg-[#4CAF50]/15 border border-[#4CAF50]/30 flex items-center justify-center shrink-0">
-                                  <span className="text-[10px] font-display text-[#4CAF50]">#{i + 1}</span>
+                        buyerTxsLoading ? (
+                          <div className="text-center py-8">
+                            <div className="text-3xl mb-2 animate-spin inline-block">⏳</div>
+                            <p className="font-display text-[#1a1a2e]/40 tracking-wider text-sm">Loading transactions…</p>
+                          </div>
+                        ) : buyerTxs.length === 0 ? (
+                          <div className="text-center py-10">
+                            <div className="text-5xl mb-3">📜</div>
+                            <p className="font-display text-lg text-[#1a1a2e]/40 tracking-wider">{t.dashboard.noTransactions}</p>
+                            <p className="text-sm text-[#1a1a2e]/30 font-bold">{t.dashboard.noTransactionsDesc}</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {buyerTxs.map((tx, i) => {
+                              const date = tx.blockTime
+                                ? new Date(tx.blockTime * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+                                : "—";
+                              return (
+                                <div key={tx.signature} className="flex items-center gap-3 rounded-xl border-2 border-[#1a1a2e]/10 bg-[#FFFDE7]/50 px-4 py-3 hover:bg-[#FFFDE7] transition-colors">
+                                  <div className="w-6 h-6 rounded-full bg-[#4CAF50]/15 border border-[#4CAF50]/30 flex items-center justify-center shrink-0">
+                                    <span className="text-[10px] font-display text-[#4CAF50]">#{i + 1}</span>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="font-mono text-[11px] text-[#1a1a2e]/70 truncate">{tx.signature.slice(0, 20)}…{tx.signature.slice(-8)}</div>
+                                    <div className="text-[10px] text-[#1a1a2e]/40 font-bold">{date}</div>
+                                  </div>
+                                  <a
+                                    href={buildExplorerUrl(tx.signature)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="shrink-0 bg-[#4CAF50]/10 hover:bg-[#4CAF50]/20 border border-[#4CAF50]/30 text-[#0a9060] rounded-lg px-2 py-1 text-[10px] font-display tracking-wide flex items-center gap-1 transition-colors"
+                                  >
+                                    View <ExternalLink size={10} />
+                                  </a>
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="font-mono text-[11px] text-[#1a1a2e]/70 truncate">{tx.signature.slice(0, 20)}…{tx.signature.slice(-8)}</div>
-                                  <div className="text-[10px] text-[#1a1a2e]/40 font-bold">{date}</div>
-                                </div>
-                                <a
-                                  href={buildExplorerUrl(tx.signature)}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="shrink-0 bg-[#4CAF50]/10 hover:bg-[#4CAF50]/20 border border-[#4CAF50]/30 text-[#0a9060] rounded-lg px-2 py-1 text-[10px] font-display tracking-wide flex items-center gap-1 transition-colors"
-                                >
-                                  View <ExternalLink size={10} />
-                                </a>
-                              </div>
-                            );
-                          })}
-                          <p className="text-center text-[10px] text-[#1a1a2e]/30 font-bold pt-2">
-                            {buyerTxs.length} transaction{buyerTxs.length !== 1 ? "s" : ""} on Solana Devnet
-                          </p>
-                        </div>
+                              );
+                            })}
+                            <p className="text-center text-[10px] text-[#1a1a2e]/30 font-bold pt-2">
+                              {buyerTxs.length} transaction{buyerTxs.length !== 1 ? "s" : ""} on Solana Devnet
+                            </p>
+                          </div>
+                        )
                       )}
                     </div>
                   </div>
