@@ -413,13 +413,12 @@ export default function Home() {
       </nav>
 
       <section id="hero" className="relative overflow-hidden" style={{ backgroundImage: "url('/pepewife-bg.webp')", backgroundSize: "cover", backgroundPosition: isRTL ? "left center" : "right center", backgroundRepeat: "no-repeat" }}>
-        <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/60 to-transparent pointer-events-none" />
-        <div className="pt-24 pb-0 lg:pb-0 px-4">
+        <div className="pt-24 pb-0 lg:pb-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-8 items-center">
+            <div className="grid grid-cols-1 gap-0">
 
               {/* ─── المحتوى ─── */}
-              <div dir="ltr">
+              <div dir="ltr" className="max-w-2xl">
                 <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-4 animate-pulse text-sm sm:text-base" style={{ transform: "rotate(-2deg)" }}>
                   {!siteConfig.isActive
                     ? "⏸️ PRESALE TEMPORARILY PAUSED — COMING BACK SOON"
@@ -478,34 +477,9 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* ─── ديسكتوب: الشخصية المفردة ─── */}
-              <div className="hidden lg:flex justify-center items-end">
-                <img
-                  src="/pepewife-hero.webp"
-                  alt="PEPEWIFE character"
-                  width="600"
-                  height="600"
-                  className="w-full max-w-full object-contain drop-shadow-2xl"
-                  fetchPriority="high"
-                />
-              </div>
-
             </div>
           </div>
         </div>
-
-        {/* ─── موبايل: صورة العائلة عرض كامل ─── */}
-        <div className="lg:hidden w-full mt-2">
-          <img
-            src="/pepewife-family.webp"
-            alt="PEPEWIFE Family — Pepe the Frog with his wife and kids"
-            width="1200"
-            height="675"
-            className="w-full h-auto block"
-            loading="eager"
-          />
-        </div>
-
       </section>
 
       <div className="zigzag-border" />
