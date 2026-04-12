@@ -188,6 +188,10 @@ After `addIntegration` or `viewIntegration`, the `renderedContent` contains a co
 
 ---
 
+## Databricks
+
+When the user wants to connect to Databricks, use the `databricks-m2m` connector (not the plain `databricks` connector). The `databricks-m2m` connector provides machine-to-machine access and works in all contexts. The only exception is inside a Databricks App (see the `databricks-app` skill), where either connector may be used.
+
 ## Common Pitfalls
 
 - **Not logging results:** `searchIntegrations` and all other functions return silently unless you `console.log()` the output

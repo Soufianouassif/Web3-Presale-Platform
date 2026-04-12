@@ -211,6 +211,10 @@ const issue = await client.createIssue({
 console.log(`Created ${issue.issue?.identifier}: New feature request`);
 ```
 
+## Databricks
+
+When the user wants to connect to Databricks, use the `databricks-m2m` connector (not the plain `databricks` connector).
+
 ## Warehouse Data Exploration
 
 When querying data warehouses (BigQuery, Snowflake, Databricks), large schemas can make serial exploration slow (7-10s per query round-trip). Use the parallel subagent pattern to explore schemas faster.

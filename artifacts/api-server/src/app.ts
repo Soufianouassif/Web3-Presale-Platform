@@ -55,14 +55,36 @@ if (IS_PROD && !process.env.CRON_SECRET) {
 const app: Express = express();
 
 app.set("trust proxy", 1);
+app.disable("x-powered-by"); // Remove X-Powered-By: Express header
 
 // ── Helmet: HTTP security headers ────────────────────────────────────────────
 app.use(
   helmet({
-    contentSecurityPolicy: false, // API-only server — no HTML pages to protect
+    // API-only server — no HTML pages, so CSP is not applicable here
+    contentSecurityPolicy: false,
+    // Disabled: wallet browser extensions (Phantom, Solflare, etc.) require this to be off
     crossOriginEmbedderPolicy: false,
+    // X-Frame-Options: SAMEORIGIN
+    frameguard: { action: "sameorigin" },
+    // X-Content-Type-Options: nosniff (Helmet default, made explicit)
+    noSniff: true,
+    // Referrer-Policy: strict-origin-when-cross-origin
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    // Strict-Transport-Security: 1 year with preload in production; disabled in dev (HTTP)
+    hsts: IS_PROD
+      ? { maxAge: 31_536_000, includeSubDomains: true, preload: true }
+      : false,
   }),
 );
+
+// Permissions-Policy — not yet built into Helmet v8, added manually
+app.use((_req, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), payment=(self), usb=(), interest-cohort=()",
+  );
+  next();
+});
 
 app.use(
   pinoHttpMiddleware({

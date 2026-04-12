@@ -57,7 +57,7 @@ const task = await getProjectTask({ taskRef: "#1" });
 // "Task #1 (Add authentication)"
 ```
 
-### updateProjectTask(taskRef, title=None, description=None, dependsOn=None)
+### updateProjectTask(taskRef, title=None, description=None, dependsOn=None, artifactKinds=None)
 
 Update an existing project task's content. All fields are optional - only provided fields are updated.
 
@@ -69,13 +69,18 @@ Update an existing project task's content. All fields are optional - only provid
 | `title` | str | No | New title |
 | `description` | str | No | New description |
 | `dependsOn` | array of str | No | Full list of dependency task refs (replaces existing) |
+| `artifactKinds` | array | No | Updated artifact kind tags for the task. Pass `[]` to clear stale artifact tags when the task is no longer artifact-producing. |
 
 **Returns:** Dict with `taskRef`, `title`, `description`, `state`, `createdAt`, `updatedAt`
 
 **Example:**
 
 ```javascript
-await updateProjectTask({ taskRef: "#1", title: "Updated title" });
+await updateProjectTask({
+  taskRef: "#1",
+  title: "Updated title",
+  artifactKinds: ["web"],
+});
 ```
 
 ### markTaskInProgress(taskRef)
@@ -173,6 +178,7 @@ Each task object:
 | `title` | str | Yes | Short title for the task |
 | `filePath` | str | Yes | Path to the plan file (e.g. `.local/tasks/payment-integration.md`). The file content becomes the task description. |
 | `dependsOn` | array | No | List of `id` values from other tasks in this batch, or task refs (`"#1"`, `"#2"`) of already-existing accepted tasks. Never depend on existing PROPOSED tasks — only on tasks that are PENDING or later. Tasks within the same batch may depend on each other freely. |
+| `artifactKinds` | array | No | Artifact kind strings for tasks that create one or more new artifacts. Valid values: `web`, `mobile`, `video`, `slides`, `automation`, `data-app`, `design`. Omit this field for code-only or non-artifact work. |
 
 **Returns:** List of created task dicts with `taskRef`, `title`, `description`, `state`, `dependsOn`, `createdAt`, `updatedAt`
 
@@ -183,8 +189,9 @@ Each task object:
 const created = await bulkCreateProjectTasks({
     tasks: [
         {
-            title: "Payment integration",
-            filePath: ".local/tasks/payment-integration.md",
+            title: "Launch microsite",
+            filePath: ".local/tasks/launch-microsite.md",
+            artifactKinds: ["web"],
         },
     ]
 });
@@ -218,7 +225,9 @@ multiple tasks if the user explicitly asks for them or the request contains
 clearly independent, unrelated goals.
 
 Dependencies are not declared in the plan file. Pass them via `dependsOn`
-when creating or updating tasks.
+when creating or updating tasks. Artifact tags are also not declared in the
+plan file. Pass them via `artifactKinds` when a task creates one or more new
+artifacts.
 
 ### Plan body
 
@@ -348,8 +357,9 @@ Task management is how you coordinate work with the user. Follow these rules str
 const created = await bulkCreateProjectTasks({
     tasks: [
         {
-            title: "Payment integration",
-            filePath: ".local/tasks/payment-integration.md",
+            title: "Launch microsite",
+            filePath: ".local/tasks/launch-microsite.md",
+            artifactKinds: ["web"],
         },
     ]
 });

@@ -334,6 +334,12 @@ await applyCanvasActions({ actions: [
 ] });
 ```
 
+**Note: `create` and `update` actions have different payload structures.**
+
+- **Create** defines a new shape from scratch, so it takes a full `shape` object: `shape: { type: "iframe", ... }`
+- **Update** patches an existing shape, so it takes a partial `updates` object: `updates: { shapeType: "iframe", ... }` -- the field is `shapeType` (not `type`) because `type` is already the action discriminator
+- Do not copy the payload key from a create into an update or vice versa -- the wrong key passes validation but the action will fail when applied.
+
 To get the URL for a Replit dev server, run `echo $REPLIT_DOMAINS` in the shell to get the domain, then construct the full URL. For the main app on port 5000, no port suffix is needed. For other ports, append `:<port>`.
 
 - `url` -- Full `https://` URL to embed. Required when `state` is `"live"`.

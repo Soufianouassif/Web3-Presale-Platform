@@ -16,6 +16,8 @@ Always follow these guidelines when building a React + Vite web application:
 
 ## First Build
 
+**You must use the design subagent for every react-vite first build — no exceptions.** This applies regardless of app size, complexity, or whether a backend is needed. "No backend" means skip OpenAPI/codegen, not skip the design subagent. "Simple app" means the subagent gets a simpler brief, not that you build the frontend yourself. Never build the frontend yourself to save time — the design subagent is the fast path.
+
 ### Step 1: Classify the app
 
 Before building, classify the app to decide how you and the DESIGN subagent split work. **The design subagent is always used** — the question is how much it owns.

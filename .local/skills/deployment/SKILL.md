@@ -1,6 +1,6 @@
 ---
 name: deployment
-description: Use when the user asks to publish, deploy, or configure deployment settings, or when the user reports their deployed app is broken, asks about production errors, or wants to check server logs.
+description: Use when the user asks to publish, deploy, or configure deployment settings, deployment geography or regions, or when the user reports their deployed app is broken, asks about production errors, or wants to check server logs.
 ---
 
 # Deployment Skill
@@ -96,6 +96,27 @@ Each artifact's `[services.production]` section controls:
 - `publicDir` — directory containing static files (for static serve mode)
 
 To update these settings, use `verifyAndReplaceArtifactToml` from the `artifacts` skill.
+
+## Publishing Geography
+
+Users can choose the geographic region where their app is published. This is configured in the **Advanced** settings of the Publishing tool, not in code. The agent cannot set this programmatically — the user selects it in the Publishing UI before clicking Publish.
+
+Key points:
+
+- **Available on Core, Pro, and Enterprise plans.** Free plan users publish to North America by default.
+- **Geography is permanent.** Once a project is published to a geography, it cannot be changed. Inform the user of this before they publish for the first time.
+- **Compute, database, and Object Storage are colocated** in the selected region automatically.
+- **Enterprise admins can enforce a geography** for all new projects across their organization.
+- **Available regions may change over time.** For the current list of supported geographies, refer the user to the [Publishing Geography docs](https://docs.replit.com/cloud-services/deployments/publishing-geography).
+
+If the user asks about deploying to a specific region (e.g. Europe, Asia, Australia):
+
+- **Not yet published & on Core/Pro/Enterprise:** They can select their preferred geography in the **Advanced** section of the Publishing tool before their first publish.
+- **Not yet published & on the Free plan:** Geography selection is not available — they will publish to North America by default. They can upgrade their plan to choose a region.
+- **Already published:** The geography cannot be changed. Let the user know the selection was locked at first publish.
+- **Enterprise org with enforced geography:** The admin-set geography overrides individual choice. The user publishes to whatever geography their org requires.
+
+Do **not** tell users that Replit only supports US-based infrastructure — multiple geographies are available.
 
 ## Best Practices
 
