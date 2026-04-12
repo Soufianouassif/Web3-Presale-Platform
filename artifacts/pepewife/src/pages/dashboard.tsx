@@ -60,6 +60,7 @@ export default function Dashboard() {
   const [myDbPurchases, setMyDbPurchases] = useState<MyPurchase[]>([]);
   const [myDbLoading, setMyDbLoading] = useState(false);
   const [txView, setTxView] = useState<"mine" | "all">("all");
+  const [calcAmount, setCalcAmount] = useState("");
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
   const { status, shortAddress, address, network, disconnect } = useWallet();
@@ -266,6 +267,10 @@ export default function Dashboard() {
   const presaleFilled = Math.round((totalSold / totalTokens) * 100);
 
   const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace(/\$/g, ""));
+  const calcAmountNum = parseFloat(calcAmount);
+  const calcTokensResult = stagePrice > 0 && !isNaN(calcAmountNum) && calcAmountNum > 0
+    ? Math.floor(calcAmountNum / stagePrice)
+    : 0;
 
   const amountUSD = !isNaN(amountNum) && buyAmount !== ""
     ? currency === "SOL" ? amountNum * solPrice
@@ -369,6 +374,7 @@ export default function Dashboard() {
     { id: "overview", label: t.dashboard.overview, icon: "📊" },
     { id: "purchases", label: t.dashboard.myPurchases, icon: "🛒" },
     { id: "claim", label: t.dashboard.claim, icon: "🎁" },
+    { id: "calculator", label: t.calculator.title.replace(" 🧮", ""), icon: "🧮" },
     { id: "airdrop", label: t.dashboard.airdrop, icon: "🪂" },
     { id: "referrals", label: t.dashboard.referrals, icon: "🤝" },
     { id: "transactions", label: t.dashboard.transactions, icon: "📜" },
@@ -985,6 +991,122 @@ export default function Dashboard() {
                       <p className="text-xs text-[#1a1a2e]/30 font-bold mt-4">{t.dashboard.claimDisclaimer}</p>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {activeTab === "calculator" && (
+                <div className="space-y-5">
+                  {/* Header */}
+                  <div className="text-center">
+                    <div className="sticker bg-[#AB47BC] text-white mb-3 text-base inline-block" style={{ transform: "rotate(-1deg)" }}>💰 {t.calculator.potentialReturns}</div>
+                    <h3 className="text-3xl sm:text-4xl font-display text-[#1a1a2e] comic-shadow tracking-wider">{t.calculator.title}</h3>
+                    <p className="text-[#1a1a2e]/50 font-bold text-sm mt-1">{t.calculator.subtitle}</p>
+                  </div>
+
+                  {/* Input Card */}
+                  <div className="meme-card bg-white rounded-2xl overflow-hidden">
+                    <div className="zigzag-border" />
+                    <div className="p-5 space-y-4">
+                      {/* Amount input */}
+                      <div>
+                        <label className="block text-xs font-display text-[#1a1a2e]/50 tracking-wider mb-2">{t.calculator.amountLabel}</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 font-display text-lg text-[#1a1a2e]/40">$</span>
+                          <input
+                            type="number"
+                            min="0"
+                            value={calcAmount}
+                            onChange={e => setCalcAmount(e.target.value)}
+                            placeholder={t.calculator.placeholder}
+                            className="w-full h-14 pl-8 pr-4 rounded-xl border-2 border-[#1a1a2e] bg-[#FFFDE7] font-nums text-2xl text-[#1a1a2e] focus:outline-none focus:border-[#FF4D9D] transition-colors"
+                          />
+                        </div>
+                      </div>
+                      {/* Quick amounts */}
+                      <div className="flex flex-wrap gap-2">
+                        {["50", "100", "250", "500", "1000", "5000"].map(v => (
+                          <button key={v} onClick={() => setCalcAmount(v)}
+                            className={`btn-meme rounded-xl px-3 py-1.5 font-display text-sm tracking-wide border-2 transition-colors ${calcAmount === v ? "bg-[#FF4D9D] text-white border-[#1a1a2e]" : "bg-[#FFFDE7] text-[#1a1a2e] border-[#1a1a2e]/20 hover:border-[#FF4D9D]"}`}>
+                            ${v}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Price info row */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-[#E8F5E9] border-2 border-[#4CAF50] rounded-2xl p-3">
+                          <div className="text-[10px] font-display text-[#4CAF50] tracking-wider">{t.calculator.currentPrice}</div>
+                          <div className="font-nums text-lg text-[#1a1a2e] tracking-wider" dir="ltr">{STAGE_DATA[currentStage].price}</div>
+                          <div className="text-[10px] text-[#1a1a2e]/40 font-display">Stage {currentStage + 1} / $PWIFE</div>
+                        </div>
+                        <div className="bg-[#FCE4EC] border-2 border-[#FF4D9D] rounded-2xl p-3">
+                          <div className="text-[10px] font-display text-[#FF4D9D] tracking-wider">{t.calculator.listingPrice}</div>
+                          <div className="font-nums text-lg text-[#1a1a2e] tracking-wider" dir="ltr">{LISTING_PRICE}</div>
+                          <div className="text-[10px] text-[#1a1a2e]/40 font-display">CEX / $PWIFE</div>
+                        </div>
+                      </div>
+                      {/* Tokens you get */}
+                      {calcTokensResult > 0 && (
+                        <div className="bg-[#FFFDE7] border-2 border-[#FFD54F] rounded-2xl p-4 shadow-[3px_3px_0px_#F9A825]">
+                          <div className="text-xs font-display text-[#b8860b] tracking-wider mb-1">{t.calculator.youGet}</div>
+                          <div className="font-nums text-3xl text-[#1a1a2e] tracking-wider" dir="ltr">
+                            {calcTokensResult >= 1e12 ? (calcTokensResult / 1e12).toFixed(2) + "T"
+                              : calcTokensResult >= 1e9 ? (calcTokensResult / 1e9).toFixed(2) + "B"
+                              : calcTokensResult >= 1e6 ? (calcTokensResult / 1e6).toFixed(2) + "M"
+                              : calcTokensResult.toLocaleString()}
+                          </div>
+                          <div className="text-xs text-[#1a1a2e]/40 font-display tracking-wide">$PWIFE tokens</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ROI Table */}
+                  <div className="meme-card bg-white rounded-2xl overflow-hidden">
+                    <div className="zigzag-border" />
+                    <div className="p-5">
+                      <div className="text-xs font-display text-[#1a1a2e]/50 tracking-wider mb-3">{t.calculator.potentialReturns}</div>
+                      {calcTokensResult === 0 ? (
+                        <div className="text-center py-10 text-[#1a1a2e]/30 font-display text-sm tracking-wider">
+                          👆 {t.calculator.enterAmount}
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {[
+                            { label: t.calculator.atListing, price: parseFloat(LISTING_PRICE.replace("$", "")),       color: "#4CAF50", bg: "#E8F5E9", border: "#4CAF50" },
+                            { label: "5x",                   price: parseFloat(LISTING_PRICE.replace("$", "")) * 5,   color: "#42A5F5", bg: "#E3F2FD", border: "#42A5F5" },
+                            { label: "10x",                  price: parseFloat(LISTING_PRICE.replace("$", "")) * 10,  color: "#AB47BC", bg: "#F3E5F5", border: "#AB47BC" },
+                            { label: "50x",                  price: parseFloat(LISTING_PRICE.replace("$", "")) * 50,  color: "#FF4D9D", bg: "#FCE4EC", border: "#FF4D9D" },
+                            { label: "100x",                 price: parseFloat(LISTING_PRICE.replace("$", "")) * 100, color: "#FFD54F", bg: "#FFFDE7", border: "#F9A825" },
+                          ].map(row => {
+                            const val = calcTokensResult * row.price;
+                            const invested = parseFloat(calcAmount || "0");
+                            const profit = val - invested;
+                            const fmtVal = (n: number) =>
+                              n >= 1e9 ? "$" + (n / 1e9).toFixed(2) + "B"
+                              : n >= 1e6 ? "$" + (n / 1e6).toFixed(2) + "M"
+                              : "$" + n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+                            return (
+                              <div key={row.label} className="flex items-center justify-between rounded-xl border-2 px-4 py-3" style={{ background: row.bg, borderColor: row.border }}>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-display text-sm tracking-wider" style={{ color: row.color }}>{row.label}</span>
+                                  <span className="text-[10px] text-[#1a1a2e]/30 font-display" dir="ltr">@ ${row.price >= 1 ? row.price.toFixed(2) : row.price < 0.001 ? row.price.toFixed(8) : row.price.toFixed(4)}</span>
+                                </div>
+                                <div className="text-end" dir="ltr">
+                                  <div className="font-nums text-base text-[#1a1a2e] tracking-wider font-bold">{fmtVal(val)}</div>
+                                  <div className="text-[10px] font-display" style={{ color: row.color }}>+{fmtVal(profit)}</div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Disclaimer */}
+                  <p className="text-center text-[10px] text-[#1a1a2e]/30 font-bold px-4">
+                    * Projections are illustrative only and do not constitute financial advice. Crypto investments carry risk.
+                  </p>
                 </div>
               )}
 

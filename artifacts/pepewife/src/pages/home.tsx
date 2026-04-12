@@ -489,19 +489,20 @@ export default function Home() {
 
       <div className="zigzag-border" />
 
-      <section className="py-6 pattern-dots" style={{ background: "linear-gradient(90deg, #FFF9C4, #E8F5E9)" }}>
-        <div className="max-w-7xl mx-auto px-4 text-center mb-3">
-          <p className="font-display text-sm text-[#1a1a2e] tracking-wider">{t.partners.title}</p>
-        </div>
+      {/* ── FOMO Ticker ── */}
+      <section className="py-5 pattern-dots" style={{ background: "linear-gradient(90deg, #FCE4EC, #FFF9C4, #FCE4EC)" }}>
         <div className="ticker-wrap">
-          <div className="ticker-content space-x-12 items-center">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex space-x-12 items-center shrink-0">
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiCoinmarketcap size={24} /> CoinMarketCap</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiSolana size={24} /> Solana</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiBinance size={24} /> Binance</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">Orcal</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">Raydium</div>
+          <div className="ticker-content space-x-10 items-center">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex space-x-10 items-center shrink-0">
+                <div className="flex items-center gap-2 font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">🔥 PRESALE LIVE — APE IN BEFORE IT'S TOO LATE!</div>
+                <div className="flex items-center gap-2 font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">⏰ PRICE GOES UP EVERY STAGE — NGMI IF YOU WAIT</div>
+                <div className="flex items-center gap-2 font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">💎 EARLY BUYERS MAKE THE MOST — ARE YOU IN?</div>
+                <div className="flex items-center gap-2 font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">🚀 STAGE 1 ALMOST SOLD OUT — LAST CHANCE AT THIS PRICE</div>
+                <div className="flex items-center gap-2 font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">💰 WHALES LOADING BAGS — STAY POOR OR APE IN NOW</div>
+                <div className="flex items-center gap-2 font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">🐸 GET IN NOW OR WATCH FROM THE SIDELINES — WAGMI!</div>
+                <div className="flex items-center gap-2 font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">🔒 LIQUIDITY LOCKED · MINT REVOKED · 100% SAFU</div>
+                <div className="flex items-center gap-2 font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">⚡ SOLANA SPEED — BUY IN SECONDS — NO GAS PAIN</div>
               </div>
             ))}
           </div>
@@ -822,31 +823,24 @@ export default function Home() {
       </section>
 
       {/* ── Featured In ── */}
-      <section className="py-10 px-4 border-y-4 border-[#1a1a2e]" style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #1e1e3a 50%, #1a1a2e 100%)" }}>
-        <div className="max-w-5xl mx-auto">
-          <p className="text-center text-[10px] font-display tracking-[0.3em] text-white/30 uppercase mb-6">As Seen In</p>
-          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4">
-            {[
-              { name: "CoinMarketCap", icon: <SiCoinmarketcap size={18} /> },
-              { name: "Binance Square", icon: <SiBinance size={18} /> },
-              { name: "CoinGecko",      icon: "🦎" },
-              { name: "NewsBTC",        icon: "₿" },
-              { name: "Bitcoinist",     icon: "₿" },
-              { name: "Techbullion",    icon: "📰" },
-              { name: "BeInCrypto",     icon: "🔐" },
-              { name: "CryptoSlate",    icon: "📊" },
-            ].map(m => (
-              <div key={m.name} className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors cursor-default select-none">
-                <span className="text-base">{m.icon}</span>
-                <span className="font-display text-sm tracking-wider whitespace-nowrap">{m.name}</span>
+      <section className="py-6 pattern-dots" style={{ background: "linear-gradient(90deg, #FFF9C4, #E8F5E9)" }}>
+        <div className="max-w-7xl mx-auto px-4 text-center mb-3">
+          <p className="font-display text-sm text-[#1a1a2e] tracking-wider">🗞️ AS SEEN IN</p>
+        </div>
+        <div className="ticker-wrap">
+          <div className="ticker-content space-x-12 items-center">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex space-x-12 items-center shrink-0">
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiCoinmarketcap size={24} /> CoinMarketCap</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiBinance size={24} /> Binance Square</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">🦎 CoinGecko</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">₿ NewsBTC</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">₿ Bitcoinist</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">📰 Techbullion</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">🔐 BeInCrypto</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">📊 CryptoSlate</div>
               </div>
             ))}
-          </div>
-          <div className="mt-6 flex justify-center">
-            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] animate-pulse" />
-              <span className="text-[10px] font-display text-white/40 tracking-widest uppercase">Coverage Growing</span>
-            </div>
           </div>
         </div>
       </section>
@@ -1052,6 +1046,28 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="zigzag-border" />
+
+      {/* ── Ecosystem Partners ── */}
+      <section className="py-6 pattern-dots" style={{ background: "linear-gradient(90deg, #FFF9C4, #E8F5E9)" }}>
+        <div className="max-w-7xl mx-auto px-4 text-center mb-3">
+          <p className="font-display text-sm text-[#1a1a2e] tracking-wider">{t.partners.title}</p>
+        </div>
+        <div className="ticker-wrap">
+          <div className="ticker-content space-x-12 items-center">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex space-x-12 items-center shrink-0">
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiCoinmarketcap size={24} /> CoinMarketCap</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiSolana size={24} /> Solana</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiBinance size={24} /> Binance</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">Orcal</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">Raydium</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
