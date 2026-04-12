@@ -22,27 +22,27 @@ const wallets: {
     id: "phantom",
     name: "Phantom",
     descKey: "phantomDesc",
-    color: "#AB47BC",
-    shadow: "#7B1FA2",
-    bg: "bg-[#F3E5F5]",
+    color: "#FF4D9D",
+    shadow: "#C2185B",
+    bg: "bg-[#FCE4EC]",
     iconSrc: "/wallet-phantom.png",
   },
   {
     id: "solflare",
     name: "Solflare",
     descKey: "solflareDesc",
-    color: "#FC6E21",
-    shadow: "#C94F0A",
-    bg: "bg-[#FFF3E0]",
+    color: "#FFD54F",
+    shadow: "#C2185B",
+    bg: "bg-[#FFFDE7]",
     iconSrc: "/wallet-solflare.svg",
   },
   {
     id: "backpack",
     name: "Backpack",
     descKey: "backpackDesc",
-    color: "#E05CFF",
-    shadow: "#9B1DCC",
-    bg: "bg-[#FAF0FF]",
+    color: "#FF4D9D",
+    shadow: "#FF4D9D",
+    bg: "bg-[#FFFDE7]",
     iconSrc: "/wallet-backpack.svg",
   },
   {
@@ -268,7 +268,7 @@ export default function ConnectPage() {
 
           <div className="mt-6 text-center space-y-3">
             <p className="text-xs text-[#1a1a2e]/40 font-bold">
-              {t.connect.noWallet} <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" className="text-[#AB47BC] font-display tracking-wide hover:underline inline-flex items-center gap-1">{t.connect.getPhantom} <ExternalLink className="h-3 w-3" /></a>
+              {t.connect.noWallet} <a href="https://phantom.app" target="_blank" rel="noopener noreferrer" className="text-[#FF4D9D] font-display tracking-wide hover:underline inline-flex items-center gap-1">{t.connect.getPhantom} <ExternalLink className="h-3 w-3" /></a>
             </p>
 
             <div className="flex items-center justify-center gap-4 text-[#1a1a2e]/30">

@@ -125,7 +125,7 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    background: linear-gradient(180deg, #FFFDE7 0%, #E8F5E9 30%, #FFF9C4 60%, #F3E5F5 100%);
+    background: linear-gradient(180deg, #FFFDE7 0%, #E8F5E9 30%, #FFF9C4 60%, #FCE4EC 100%);
     background-attachment: fixed;
   }
   h1, h2, h3, h4, h5, h6 {
@@ -187,7 +187,7 @@
 }
 .ticker-content {
   display: flex;
-  animation: ticker 20s linear infinite;
+  animation: ticker 40s linear infinite;
 }
 @keyframes ticker {
   0% { transform: translateX(0); }
@@ -245,7 +245,7 @@
 }
 
 .rainbow-text {
-  background: linear-gradient(90deg, #4CAF50, #FFD54F, #FF4D9D, #42A5F5, #AB47BC, #4CAF50);
+  background: linear-gradient(90deg, #4CAF50, #FFD54F, #FF4D9D, #4CAF50, #FF4D9D, #4CAF50);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -305,7 +305,7 @@
     #4CAF50 0px, #4CAF50 20px,
     #FFD54F 20px, #FFD54F 40px,
     #FF4D9D 40px, #FF4D9D 60px,
-    #42A5F5 60px, #42A5F5 80px
+    #4CAF50 60px, #4CAF50 80px
   );
   height: 6px;
 }

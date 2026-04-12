@@ -20,9 +20,9 @@ const sectionIcons: Record<number, string> = {
 };
 
 const sectionColors: Record<number, string> = {
-  0: "#4CAF50", 1: "#FF4D9D", 2: "#42A5F5", 3: "#AB47BC", 4: "#FFD54F",
-  5: "#4CAF50", 6: "#FF4D9D", 7: "#42A5F5", 8: "#AB47BC", 9: "#4CAF50",
-  10: "#FFD54F", 11: "#FF4D9D", 12: "#42A5F5", 13: "#AB47BC", 14: "#4CAF50",
+  0: "#4CAF50", 1: "#FF4D9D", 2: "#4CAF50", 3: "#FF4D9D", 4: "#FFD54F",
+  5: "#4CAF50", 6: "#FF4D9D", 7: "#4CAF50", 8: "#FF4D9D", 9: "#4CAF50",
+  10: "#FFD54F", 11: "#FF4D9D", 12: "#4CAF50", 13: "#FF4D9D", 14: "#4CAF50",
 };
 
 export default function Whitepaper() {
@@ -176,7 +176,7 @@ export default function Whitepaper() {
         <main className={`flex-1 min-w-0 ${isRTL ? "lg:me-64" : "lg:ms-64"}`}>
 
           {/* Hero Banner */}
-          <div style={{ background: "linear-gradient(180deg, #1a1a2e 0%, #311B92 60%, #1a1a2e 100%)" }}>
+          <div style={{ background: "linear-gradient(180deg, #1a1a2e 0%, #1a1a2e 60%, #1a1a2e 100%)" }}>
             <div className="relative overflow-hidden">
               <img
                 src="/whitepaper-cover.webp"
@@ -254,7 +254,7 @@ export default function Whitepaper() {
           </div>
 
           {/* Footer */}
-          <footer className="py-10 px-4 border-t-4 border-[#1a1a2e]" style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #311B92 100%)" }}>
+          <footer className="py-10 px-4 border-t-4 border-[#1a1a2e]" style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #1a1a2e 100%)" }}>
             <div className="max-w-3xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
               <div className="text-center md:text-start">
                 <div className="flex items-center gap-3">
@@ -269,8 +269,8 @@ export default function Whitepaper() {
                 <button onClick={() => navigate("/terms")} className="text-white/50 hover:text-[#FFD54F] font-display text-base tracking-wide transition-colors">{t.footer.terms}</button>
               </div>
               <div className="flex gap-3">
-                <button className="btn-meme w-9 h-9 rounded-full bg-white/10 text-white/60 hover:text-[#1DA1F2] hover:bg-white/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
-                <button className="btn-meme w-9 h-9 rounded-full bg-white/10 text-white/60 hover:text-[#0088cc] hover:bg-white/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
+                <button className="btn-meme w-9 h-9 rounded-full bg-white/10 text-white/60 hover:text-[#4CAF50] hover:bg-white/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
+                <button className="btn-meme w-9 h-9 rounded-full bg-white/10 text-white/60 hover:text-[#4CAF50] hover:bg-white/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
               </div>
             </div>
             <div className="max-w-3xl mx-auto mt-6 pt-4 border-t border-white/10 text-center text-xs text-white/30 font-display tracking-wide">

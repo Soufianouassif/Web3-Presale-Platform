@@ -179,7 +179,7 @@ export default function Home() {
   };
 
   const STAGE_FALLBACK_PRICES = ["$0.00000001", "$0.00000002", "$0.00000004", "$0.00000006"];
-  const STAGE_COLORS = ["#4CAF50", "#FF4D9D", "#FFD54F", "#42A5F5"];
+  const STAGE_COLORS = ["#4CAF50", "#FF4D9D", "#FFD54F", "#4CAF50"];
   const STAGE_DATA = STAGE_FALLBACK_PRICES.map((fallbackPrice, i) => {
     const cs = presaleData?.stages[i];
     const tokens = cs ? Number(cs.maxTokens)  : 5_000_000_000_000;
@@ -220,9 +220,9 @@ export default function Home() {
     { name: t.tokenomics.community, value: 40, color: "#4CAF50" },
     { name: t.tokenomics.presale, value: 20, color: "#FF4D9D" },
     { name: t.tokenomics.liquidity, value: 15, color: "#FFD54F" },
-    { name: t.tokenomics.marketing, value: 10, color: "#42A5F5" },
-    { name: t.tokenomics.ecosystem, value: 10, color: "#AB47BC" },
-    { name: t.tokenomics.team, value: 5, color: "#FF9800" },
+    { name: t.tokenomics.marketing, value: 10, color: "#4CAF50" },
+    { name: t.tokenomics.ecosystem, value: 10, color: "#FF4D9D" },
+    { name: t.tokenomics.team, value: 5, color: "#FFD54F" },
   ];
 
   useEffect(() => {
@@ -367,7 +367,7 @@ export default function Home() {
                   </button>
                 ))}
                 <div className="relative group">
-                  <button className="flex items-center gap-1.5 font-display text-base text-[#FF9800] tracking-wide wiggle-hover whitespace-nowrap border-2 border-[#FF9800] rounded-full px-3 py-1 bg-[#FF9800]/10 hover:bg-[#FF9800]/20 transition-colors">
+                  <button className="flex items-center gap-1.5 font-display text-base text-[#FFD54F] tracking-wide wiggle-hover whitespace-nowrap border-2 border-[#FFD54F] rounded-full px-3 py-1 bg-[#FFD54F]/10 hover:bg-[#FFD54F]/20 transition-colors">
                     <ShieldCheck className="h-4 w-4 animate-pulse" />
                     <span>{t.nav.audit}</span>
                   </button>
@@ -404,10 +404,10 @@ export default function Home() {
                   <span>{s.icon}</span> <span>{s.label}</span>
                 </button>
               ))}
-              <div className="flex items-center gap-2 py-2 text-[#FF9800]">
+              <div className="flex items-center gap-2 py-2 text-[#FFD54F]">
                 <ShieldCheck className="h-5 w-5 animate-pulse" />
                 <span className="font-display text-lg tracking-wide">{t.nav.audit}</span>
-                <span className="text-xs font-display bg-[#FF9800]/15 border border-[#FF9800] text-[#FF9800] px-2 py-0.5 rounded-full">{t.nav.auditPending}</span>
+                <span className="text-xs font-display bg-[#FFD54F]/15 border border-[#FFD54F] text-[#FFD54F] px-2 py-0.5 rounded-full">{t.nav.auditPending}</span>
               </div>
               <button onClick={handleConnect} className="sm:hidden flex items-center justify-center gap-2 w-full mt-2 bg-[#4CAF50] text-white rounded-xl py-3 font-display text-lg border-2 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e]">
                 <span>🔌</span> <span>{t.nav.connectWallet}</span>
@@ -492,17 +492,17 @@ export default function Home() {
       {/* ── FOMO Ticker ── */}
       <section className="py-5 pattern-dots" style={{ background: "linear-gradient(90deg, #FCE4EC, #FFF9C4, #FCE4EC)" }}>
         <div className="ticker-wrap">
-          <div className="ticker-content space-x-10 items-center">
+          <div className="ticker-content" style={{ gap: "3rem" }}>
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex space-x-10 items-center shrink-0">
-                <div className="flex items-center gap-2 font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">🔥 PRESALE LIVE — APE IN BEFORE IT'S TOO LATE!</div>
-                <div className="flex items-center gap-2 font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">⏰ PRICE GOES UP EVERY STAGE — NGMI IF YOU WAIT</div>
-                <div className="flex items-center gap-2 font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">💎 EARLY BUYERS MAKE THE MOST — ARE YOU IN?</div>
-                <div className="flex items-center gap-2 font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">🚀 STAGE 1 ALMOST SOLD OUT — LAST CHANCE AT THIS PRICE</div>
-                <div className="flex items-center gap-2 font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">💰 WHALES LOADING BAGS — STAY POOR OR APE IN NOW</div>
-                <div className="flex items-center gap-2 font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">🐸 GET IN NOW OR WATCH FROM THE SIDELINES — WAGMI!</div>
-                <div className="flex items-center gap-2 font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">🔒 LIQUIDITY LOCKED · MINT REVOKED · 100% SAFU</div>
-                <div className="flex items-center gap-2 font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">⚡ SOLANA SPEED — BUY IN SECONDS — NO GAS PAIN</div>
+              <div key={i} className="flex shrink-0" style={{ gap: "3rem" }}>
+                <span className="font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">🔥 PRESALE LIVE — APE IN BEFORE IT'S TOO LATE!</span>
+                <span className="font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">⏰ PRICE GOES UP EVERY STAGE — NGMI IF YOU WAIT</span>
+                <span className="font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">💎 EARLY BUYERS MAKE THE MOST — ARE YOU IN?</span>
+                <span className="font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">🚀 STAGE 1 ALMOST SOLD OUT — LAST CHANCE AT THIS PRICE</span>
+                <span className="font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">💰 WHALES LOADING BAGS — STAY POOR OR APE IN NOW</span>
+                <span className="font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">🐸 GET IN NOW OR WATCH FROM THE SIDELINES — WAGMI!</span>
+                <span className="font-display text-lg text-[#C2185B] tracking-wide whitespace-nowrap">🔒 LIQUIDITY LOCKED · MINT REVOKED · 100% SAFU</span>
+                <span className="font-display text-lg text-[#1a1a2e]/70 tracking-wide whitespace-nowrap">⚡ SOLANA SPEED — BUY IN SECONDS — NO GAS PAIN</span>
               </div>
             ))}
           </div>
@@ -678,7 +678,7 @@ export default function Home() {
                     <p className="text-xs text-[#1a1a2e]/50 font-bold px-1">
                       {t.presale.inputMin}: <span className="text-[#0a9060]">{lim.min} {currSym}</span>
                       {"  ·  "}
-                      {t.presale.inputMax}: <span className="text-[#c0392b]">{lim.max.toLocaleString()} {currSym}</span>
+                      {t.presale.inputMax}: <span className="text-[#C2185B]">{lim.max.toLocaleString()} {currSym}</span>
                     </p>
                   )}
 
@@ -708,7 +708,7 @@ export default function Home() {
                     <div className="bg-[#E8F5E9] border-2 border-[#4CAF50] rounded-xl p-3 flex items-start gap-2">
                       <Check className="h-4 w-4 text-[#4CAF50] shrink-0 mt-0.5" />
                       <div className="min-w-0">
-                        <p className="text-xs font-display text-[#1a4a1e] tracking-wide font-bold">Transaction confirmed! 🎉</p>
+                        <p className="text-xs font-display text-[#2E7D32] tracking-wide font-bold">Transaction confirmed! 🎉</p>
                         <a
                           href={buildExplorerUrl(txSignature)}
                           target="_blank" rel="noreferrer"
@@ -822,136 +822,34 @@ export default function Home() {
         </div>
       </section>
 
+      <div className="zigzag-border" />
+
       {/* ── Featured In ── */}
       <section className="py-6 pattern-dots" style={{ background: "linear-gradient(90deg, #FFF9C4, #E8F5E9)" }}>
         <div className="max-w-7xl mx-auto px-4 text-center mb-3">
           <p className="font-display text-sm text-[#1a1a2e] tracking-wider">🗞️ AS SEEN IN</p>
         </div>
         <div className="ticker-wrap">
-          <div className="ticker-content space-x-12 items-center">
+          <div className="ticker-content" style={{ gap: "3rem" }}>
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex space-x-12 items-center shrink-0">
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiCoinmarketcap size={24} /> CoinMarketCap</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiBinance size={24} /> Binance Square</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">🦎 CoinGecko</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">₿ NewsBTC</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">₿ Bitcoinist</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">📰 Techbullion</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">🔐 BeInCrypto</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">📊 CryptoSlate</div>
+              <div key={i} className="flex shrink-0" style={{ gap: "3rem" }}>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap"><SiCoinmarketcap size={24} /> CoinMarketCap</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap"><SiBinance size={24} /> Binance Square</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap">🦎 CoinGecko</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap">₿ NewsBTC</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap">₿ Bitcoinist</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap">📰 Techbullion</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap">🔐 BeInCrypto</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap">📊 CryptoSlate</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── ROI Calculator ── */}
-      <section className="py-20 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #FFFDE7, #F3E5F5)" }}>
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10">
-            <div className="sticker bg-[#AB47BC] text-white mb-4 text-lg inline-block" style={{ transform: "rotate(1deg)" }}>💰 POTENTIAL GAINS</div>
-            <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-2">{t.calculator.title}</h2>
-            <p className="font-bold text-[#1a1a2e]/60 text-lg">{t.calculator.subtitle}</p>
-          </div>
-          <div className="meme-card bg-white rounded-3xl overflow-hidden">
-            <div className="zigzag-border" />
-            <div className="p-6 sm:p-8">
-              <div className="grid md:grid-cols-2 gap-6 items-start">
-                {/* Left: Input */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-display text-[#1a1a2e]/50 tracking-wider mb-2">{t.calculator.amountLabel}</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 font-display text-lg text-[#1a1a2e]/40">$</span>
-                      <input
-                        type="number"
-                        min="0"
-                        value={calcAmount}
-                        onChange={e => setCalcAmount(e.target.value)}
-                        placeholder={t.calculator.placeholder}
-                        className="w-full h-14 pl-8 pr-4 rounded-xl border-2 border-[#1a1a2e] bg-[#FFFDE7] font-nums text-2xl text-[#1a1a2e] focus:outline-none focus:border-[#FF4D9D] transition-colors"
-                      />
-                    </div>
-                  </div>
-                  {/* Quick amounts */}
-                  <div className="flex flex-wrap gap-2">
-                    {["50", "100", "500", "1000", "5000"].map(v => (
-                      <button key={v} onClick={() => setCalcAmount(v)}
-                        className={`btn-meme rounded-xl px-3 py-1.5 font-display text-sm tracking-wide border-2 transition-colors ${calcAmount === v ? "bg-[#FF4D9D] text-white border-[#1a1a2e]" : "bg-[#FFFDE7] text-[#1a1a2e] border-[#1a1a2e]/20 hover:border-[#FF4D9D]"}`}>
-                        ${v}
-                      </button>
-                    ))}
-                  </div>
-                  {/* Stage price info */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-[#E8F5E9] border-2 border-[#4CAF50] rounded-2xl p-3">
-                      <div className="text-[10px] font-display text-[#4CAF50] tracking-wider">{t.calculator.currentPrice}</div>
-                      <div className="font-nums text-lg text-[#1a1a2e] tracking-wider" dir="ltr">{STAGE_DATA[currentStage].price}</div>
-                      <div className="text-[10px] text-[#1a1a2e]/40 font-display">Stage {currentStage + 1} / $PWIFE</div>
-                    </div>
-                    <div className="bg-[#FCE4EC] border-2 border-[#FF4D9D] rounded-2xl p-3">
-                      <div className="text-[10px] font-display text-[#FF4D9D] tracking-wider">{t.calculator.listingPrice}</div>
-                      <div className="font-nums text-lg text-[#1a1a2e] tracking-wider" dir="ltr">{LISTING_PRICE}</div>
-                      <div className="text-[10px] text-[#1a1a2e]/40 font-display">Target / $PWIFE</div>
-                    </div>
-                  </div>
-                  {calcTokens > 0 && (
-                    <div className="bg-[#FFFDE7] border-2 border-[#FFD54F] rounded-2xl p-4 shadow-[3px_3px_0px_#F9A825]">
-                      <div className="text-xs font-display text-[#b8860b] tracking-wider mb-1">{t.calculator.youGet}</div>
-                      <div className="font-nums text-3xl text-[#1a1a2e] tracking-wider" dir="ltr">
-                        {calcTokens >= 1e12 ? (calcTokens / 1e12).toFixed(2) + "T"
-                          : calcTokens >= 1e9 ? (calcTokens / 1e9).toFixed(2) + "B"
-                          : calcTokens >= 1e6 ? (calcTokens / 1e6).toFixed(2) + "M"
-                          : calcTokens.toLocaleString()}
-                      </div>
-                      <div className="text-xs text-[#1a1a2e]/40 font-display tracking-wide">$PWIFE tokens</div>
-                    </div>
-                  )}
-                </div>
-                {/* Right: ROI Table */}
-                <div>
-                  <div className="text-xs font-display text-[#1a1a2e]/50 tracking-wider mb-3">{t.calculator.potentialReturns}</div>
-                  {calcTokens === 0 ? (
-                    <div className="text-center py-10 text-[#1a1a2e]/30 font-display text-sm tracking-wider">
-                      👆 {t.calculator.enterAmount}
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {[
-                        { label: t.calculator.atListing, price: parseFloat(LISTING_PRICE.replace("$", "")), color: "#4CAF50", bg: "#E8F5E9", border: "#4CAF50" },
-                        { label: "5x", price: parseFloat(LISTING_PRICE.replace("$", "")) * 5,   color: "#42A5F5", bg: "#E3F2FD", border: "#42A5F5" },
-                        { label: "10x", price: parseFloat(LISTING_PRICE.replace("$", "")) * 10,  color: "#AB47BC", bg: "#F3E5F5", border: "#AB47BC" },
-                        { label: "50x", price: parseFloat(LISTING_PRICE.replace("$", "")) * 50,  color: "#FF4D9D", bg: "#FCE4EC", border: "#FF4D9D" },
-                        { label: "100x", price: parseFloat(LISTING_PRICE.replace("$", "")) * 100, color: "#FFD54F", bg: "#FFFDE7", border: "#F9A825" },
-                      ].map(row => {
-                        const val = calcTokens * row.price;
-                        const profit = val - parseFloat(calcAmount || "0");
-                        const fmtVal = (n: number) => n >= 1e9 ? "$" + (n / 1e9).toFixed(2) + "B" : n >= 1e6 ? "$" + (n / 1e6).toFixed(2) + "M" : "$" + n.toLocaleString(undefined, { maximumFractionDigits: 2 });
-                        return (
-                          <div key={row.label} className="flex items-center justify-between rounded-xl border-2 px-4 py-2.5" style={{ background: row.bg, borderColor: row.border }}>
-                            <div className="flex items-center gap-2">
-                              <span className="font-display text-sm tracking-wider" style={{ color: row.color }}>{row.label}</span>
-                              <span className="text-[10px] text-[#1a1a2e]/30 font-display" dir="ltr">${row.price.toFixed(row.price < 0.01 ? 8 : row.price < 1 ? 4 : 2)}</span>
-                            </div>
-                            <div className="text-end" dir="ltr">
-                              <div className="font-nums text-base text-[#1a1a2e] tracking-wider font-bold">{fmtVal(val)}</div>
-                              <div className="text-[10px] font-display" style={{ color: row.color }}>+{fmtVal(profit)}</div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <div className="zigzag-border" />
 
-      <section id="why" className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #F3E5F5, #FFFDE7)" }}>
+      <section id="why" className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #FCE4EC, #FFFDE7)" }}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
             <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-4 text-lg inline-block" style={{ transform: "rotate(1deg)" }}>{t.whyBuy.banner}</div>
@@ -964,7 +862,7 @@ export default function Home() {
                 { emoji: "📈", c: "#4CAF50", title: t.whyBuy.card1Title, desc: t.whyBuy.card1Desc },
                 { emoji: "🫂", c: "#FF4D9D", title: t.whyBuy.card2Title, desc: t.whyBuy.card2Desc },
                 { emoji: "⚡", c: "#FFD54F", title: t.whyBuy.card3Title, desc: t.whyBuy.card3Desc },
-                { emoji: "🧠", c: "#AB47BC", title: t.whyBuy.card4Title, desc: t.whyBuy.card4Desc },
+                { emoji: "🧠", c: "#FF4D9D", title: t.whyBuy.card4Title, desc: t.whyBuy.card4Desc },
               ].map(card => (
                 <div key={card.title} className="meme-card bg-white rounded-2xl p-6 cursor-pointer">
                   <div className="text-4xl mb-3">{card.emoji}</div>
@@ -974,7 +872,7 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="meme-card bg-gradient-to-br from-[#1a1a2e] to-[#311B92] rounded-3xl p-8 text-white relative overflow-hidden">
+            <div className="meme-card bg-gradient-to-br from-[#1a1a2e] to-[#1a1a2e] rounded-3xl p-8 text-white relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#4CAF50]/10 rounded-full blur-3xl" />
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#FF4D9D]/10 rounded-full blur-3xl" />
               <div className="relative z-10">
@@ -987,9 +885,9 @@ export default function Home() {
                 <div className="space-y-4 mb-6">
                   {[
                     { icon: "🔒", title: t.security.liquidityLock, desc: t.security.liquidityLockDesc, color: "#4CAF50", duration: "12M" },
-                    { icon: "⏳", title: t.security.teamVesting, desc: t.security.teamVestingDesc, color: "#FF9800", duration: "12M" },
+                    { icon: "⏳", title: t.security.teamVesting, desc: t.security.teamVestingDesc, color: "#FFD54F", duration: "12M" },
                     { icon: "🚫", title: t.security.freezeDisabled, desc: t.security.freezeDisabledDesc, color: "#FF4D9D", duration: "∞" },
-                    { icon: "🛡️", title: t.security.mintRevoked, desc: t.security.mintRevokedDesc, color: "#42A5F5", duration: "∞" },
+                    { icon: "🛡️", title: t.security.mintRevoked, desc: t.security.mintRevokedDesc, color: "#4CAF50", duration: "∞" },
                   ].map((item, idx) => (
                     <div key={idx} className="flex items-start gap-3 bg-white/5 rounded-2xl p-3 backdrop-blur-sm border border-white/10">
                       <div className="text-2xl shrink-0">{item.icon}</div>
@@ -1007,7 +905,7 @@ export default function Home() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
                     <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.network}</div>
-                    <div className="font-display text-[#AB47BC] tracking-wider text-sm">Solana (SPL)</div>
+                    <div className="font-display text-[#FF4D9D] tracking-wider text-sm">Solana (SPL)</div>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
                     <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.symbol}</div>
@@ -1058,14 +956,14 @@ export default function Home() {
           <p className="font-display text-sm text-[#1a1a2e] tracking-wider">{t.partners.title}</p>
         </div>
         <div className="ticker-wrap">
-          <div className="ticker-content space-x-12 items-center">
+          <div className="ticker-content" style={{ gap: "3rem" }}>
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex space-x-12 items-center shrink-0">
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiCoinmarketcap size={24} /> CoinMarketCap</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiSolana size={24} /> Solana</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide"><SiBinance size={24} /> Binance</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">Orcal</div>
-                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide">Raydium</div>
+              <div key={i} className="flex shrink-0" style={{ gap: "3rem" }}>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap"><SiCoinmarketcap size={24} /> CoinMarketCap</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap"><SiSolana size={24} /> Solana</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap"><SiBinance size={24} /> Binance</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap">🌊 Orca</div>
+                <div className="flex items-center gap-2 font-display text-xl text-[#1a1a2e]/40 tracking-wide whitespace-nowrap">⚡ Raydium</div>
               </div>
             ))}
           </div>
@@ -1074,7 +972,7 @@ export default function Home() {
 
       <div className="zigzag-border" />
 
-      <section id="how" className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #E8F5E9, #E3F2FD)" }}>
+      <section id="how" className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #E8F5E9, #FFFDE7)" }}>
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <div className="sticker bg-[#4CAF50] text-white mb-4 text-lg inline-block" style={{ transform: "rotate(-1deg)" }}>{t.howTo.banner}</div>
@@ -1137,7 +1035,7 @@ export default function Home() {
 
       <div className="zigzag-border" />
 
-      <section id="roadmap" className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #E3F2FD, #E8F5E9)" }}>
+      <section id="roadmap" className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #FFFDE7, #E8F5E9)" }}>
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider">{t.roadmap.title}</h2>
@@ -1147,9 +1045,9 @@ export default function Home() {
             {[
               { phase: t.roadmap.phase1, title: t.roadmap.phase1Title, desc: t.roadmap.phase1Desc, active: true,  img: "/roadmap-phase1.webp", color: "#4CAF50", meme: t.roadmap.phase1Meme },
               { phase: t.roadmap.phase2, title: t.roadmap.phase2Title, desc: t.roadmap.phase2Desc, active: false, img: "/roadmap-phase2.webp", color: "#FF4D9D", meme: t.roadmap.phase2Meme },
-              { phase: t.roadmap.phase3, title: t.roadmap.phase3Title, desc: t.roadmap.phase3Desc, active: false, img: "/roadmap-phase3.webp", color: "#42A5F5", meme: t.roadmap.phase3Meme },
-              { phase: t.roadmap.phase4, title: t.roadmap.phase4Title, desc: t.roadmap.phase4Desc, active: false, img: "/roadmap-phase4.webp", color: "#AB47BC", meme: t.roadmap.phase4Meme },
-              { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: "/roadmap-phase4.webp", color: "#FF9800", meme: t.roadmap.phase5Meme },
+              { phase: t.roadmap.phase3, title: t.roadmap.phase3Title, desc: t.roadmap.phase3Desc, active: false, img: "/roadmap-phase3.webp", color: "#4CAF50", meme: t.roadmap.phase3Meme },
+              { phase: t.roadmap.phase4, title: t.roadmap.phase4Title, desc: t.roadmap.phase4Desc, active: false, img: "/roadmap-phase4.webp", color: "#FF4D9D", meme: t.roadmap.phase4Meme },
+              { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: "/roadmap-phase4.webp", color: "#FFD54F", meme: t.roadmap.phase5Meme },
             ].map((step, i) => (
               <div key={i} className={`meme-card flex flex-col md:flex-row items-center gap-6 p-6 rounded-3xl bg-white ${step.active ? `border-[#4CAF50] ${isRTL ? "shadow-[-6px_6px_0px_#2E7D32]" : "shadow-[6px_6px_0px_#2E7D32]"}` : ""}`}>
                 <img src={step.img} alt={`PEPEWIFE roadmap ${step.title}`} loading="lazy" className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
@@ -1171,16 +1069,16 @@ export default function Home() {
 
       <div className="zigzag-border" />
 
-      <section className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #FFF9C4, #F3E5F5)" }}>
+      <section className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #FFF9C4, #FCE4EC)" }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-5xl font-display text-center mb-4 text-[#1a1a2e] comic-shadow tracking-wider">{t.social.title}</h2>
           <div className="flex items-center justify-center gap-2 mb-10">
-            <Twitter className="h-5 w-5 text-[#1DA1F2]" />
+            <Twitter className="h-5 w-5 text-[#4CAF50]" />
             <a
               href="https://twitter.com/ThePepeWife"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-display text-[#1DA1F2] text-lg tracking-wide hover:underline"
+              className="font-display text-[#4CAF50] text-lg tracking-wide hover:underline"
             >
               @ThePepeWife
             </a>
@@ -1204,7 +1102,7 @@ export default function Home() {
 
       <div className="zigzag-border" />
 
-      <footer className="py-10 px-4 border-t-4 border-[#1a1a2e]" style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #311B92 100%)" }}>
+      <footer className="py-10 px-4 border-t-4 border-[#1a1a2e]" style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #1a1a2e 100%)" }}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-start">
             <div className="flex items-center gap-3">
@@ -1219,8 +1117,8 @@ export default function Home() {
             <button onClick={() => navigate("/terms")} className="text-white/50 hover:text-[#FFD54F] font-display text-lg tracking-wide transition-colors">{t.footer.terms}</button>
           </div>
           <div className="flex gap-3">
-            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#1DA1F2] hover:bg-white/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
-            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#0088cc] hover:bg-white/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
+            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#4CAF50] hover:bg-white/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
+            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#4CAF50] hover:bg-white/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-5 border-t border-white/10 text-center text-sm text-white/30 font-display tracking-wide">

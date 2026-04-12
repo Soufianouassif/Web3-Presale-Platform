@@ -35,10 +35,10 @@ export default function Terms() {
         </div>
       </nav>
 
-      <div className="pt-24 pb-20 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #E3F2FD, #FFFDE7)" }}>
+      <div className="pt-24 pb-20 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #FFFDE7, #FFFDE7)" }}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <div className="sticker bg-[#42A5F5] text-white mb-4 text-lg inline-block" style={{ transform: "rotate(-1deg)" }}>📋</div>
+            <div className="sticker bg-[#4CAF50] text-white mb-4 text-lg inline-block" style={{ transform: "rotate(-1deg)" }}>📋</div>
             <h1 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-3">{t.termsPage.title}</h1>
             <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.termsPage.subtitle}</p>
           </div>
@@ -61,7 +61,7 @@ export default function Terms() {
         </div>
       </div>
 
-      <footer className="py-10 px-4 border-t-4 border-[#1a1a2e]" style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #311B92 100%)" }}>
+      <footer className="py-10 px-4 border-t-4 border-[#1a1a2e]" style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #1a1a2e 100%)" }}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-start">
             <div className="flex items-center gap-3">
@@ -76,8 +76,8 @@ export default function Terms() {
             <button onClick={() => navigate("/terms")} className="text-[#FFD54F] font-display text-lg tracking-wide">{t.footer.terms}</button>
           </div>
           <div className="flex gap-3">
-            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#1DA1F2] hover:bg-white/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
-            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#0088cc] hover:bg-white/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
+            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#4CAF50] hover:bg-white/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
+            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#4CAF50] hover:bg-white/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-5 border-t border-white/10 text-center text-sm text-white/30 font-display tracking-wide">

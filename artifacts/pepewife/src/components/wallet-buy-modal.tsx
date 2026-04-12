@@ -14,9 +14,9 @@ const WALLETS: {
   shadow: string;
   bg: string;
 }[] = [
-  { id: "phantom",  name: "Phantom",     iconSrc: "/wallet-phantom.png",  color: "#AB47BC", shadow: "#7B1FA2", bg: "bg-[#F3E5F5]" },
-  { id: "solflare", name: "Solflare",    iconSrc: "/wallet-solflare.svg", color: "#FC6E21", shadow: "#C94F0A", bg: "bg-[#FFF3E0]" },
-  { id: "backpack", name: "Backpack",    iconSrc: "/wallet-backpack.svg", color: "#E05CFF", shadow: "#9B1DCC", bg: "bg-[#FAF0FF]" },
+  { id: "phantom",  name: "Phantom",     iconSrc: "/wallet-phantom.png",  color: "#FF4D9D", shadow: "#C2185B", bg: "bg-[#FCE4EC]" },
+  { id: "solflare", name: "Solflare",    iconSrc: "/wallet-solflare.svg", color: "#FFD54F", shadow: "#C2185B", bg: "bg-[#FFFDE7]" },
+  { id: "backpack", name: "Backpack",    iconSrc: "/wallet-backpack.svg", color: "#FF4D9D", shadow: "#FF4D9D", bg: "bg-[#FFFDE7]" },
   { id: "okx",      name: "OKX Wallet", iconSrc: "/wallet-okx.svg",      color: "#000000", shadow: "#333333", bg: "bg-[#F5F5F5]" },
 ];
 
@@ -357,7 +357,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
                 Approve the transaction in your wallet popup.
               </p>
             </div>
-            <div className="bg-[#FFF3E0] border-2 border-[#FC6E21]/30 rounded-xl p-3 w-full text-xs text-[#1a1a2e]/50 font-bold text-center">
+            <div className="bg-[#FFFDE7] border-2 border-[#FFD54F]/30 rounded-xl p-3 w-full text-xs text-[#1a1a2e]/50 font-bold text-center">
               ⚠️ Do not close this window until the transaction is confirmed.
             </div>
           </div>

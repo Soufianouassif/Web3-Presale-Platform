@@ -92,7 +92,7 @@ export default function TwitterFeed({ username }: TwitterFeedProps) {
                 <div className="font-display text-[#1a1a2e] text-sm tracking-wider">PEPEWIFE 🐸</div>
                 <div className="text-xs text-[#1a1a2e]/40 font-bold">@{username}</div>
               </div>
-              <Twitter className="ms-auto text-[#1DA1F2] h-5 w-5" />
+              <Twitter className="ms-auto text-[#4CAF50] h-5 w-5" />
             </div>
             <div className="rounded-xl overflow-hidden mb-3 border-2 border-[#1a1a2e]/10">
               <img
@@ -115,7 +115,7 @@ export default function TwitterFeed({ username }: TwitterFeedProps) {
           href={`https://x.com/${username}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1DA1F2] text-white font-display tracking-wide text-sm hover:bg-[#1a91da] transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#4CAF50] text-white font-display tracking-wide text-sm hover:bg-[#4CAF50] transition-colors"
         >
           <Twitter className="h-4 w-4" />
           Follow @{username}

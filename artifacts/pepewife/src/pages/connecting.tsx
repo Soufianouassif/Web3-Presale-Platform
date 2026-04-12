@@ -15,8 +15,8 @@ export default function ConnectingPage() {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const steps = [
-    { text: t.connecting.step1, emoji: "🔌", color: "#AB47BC" },
-    { text: t.connecting.step2, emoji: "🔍", color: "#42A5F5" },
+    { text: t.connecting.step1, emoji: "🔌", color: "#FF4D9D" },
+    { text: t.connecting.step2, emoji: "🔍", color: "#4CAF50" },
     { text: t.connecting.step3, emoji: "🛡️", color: "#FFD54F" },
     { text: t.connecting.step4, emoji: "📊", color: "#FF4D9D" },
     { text: t.connecting.step5, emoji: "🚀", color: "#4CAF50" },
@@ -67,7 +67,7 @@ export default function ConnectingPage() {
 
   return (
     <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#1a1a2e] transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"}`}>
-      <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e] via-[#2d1b4e] to-[#1a1a2e]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e] via-[#1a1a2e] to-[#1a1a2e]" />
       <div className="absolute inset-0 pattern-dots opacity-5 pointer-events-none" />
 
       <div aria-hidden="true" className="absolute top-[8%] left-[10%] text-4xl opacity-10 animate-bounce" style={{ animationDuration: "3s" }}>⚡</div>
@@ -100,7 +100,7 @@ export default function ConnectingPage() {
             <h2 className="text-3xl sm:text-4xl font-display text-white tracking-wider comic-shadow mb-2">
               {t.connecting.title}
             </h2>
-            <div className="sticker bg-[#AB47BC] text-white text-xs px-3 py-1 mb-6" style={{ transform: "rotate(-1deg)" }}>
+            <div className="sticker bg-[#FF4D9D] text-white text-xs px-3 py-1 mb-6" style={{ transform: "rotate(-1deg)" }}>
               {t.connecting.securingBag}
             </div>
           </>
@@ -155,7 +155,7 @@ export default function ConnectingPage() {
               className="h-full rounded-full transition-all duration-100 ease-out"
               style={{
                 width: `${progress}%`,
-                background: `linear-gradient(90deg, #AB47BC 0%, #FF4D9D 33%, #4CAF50 66%, #FFD54F 100%)`,
+                background: `linear-gradient(90deg, #FF4D9D 0%, #FF4D9D 33%, #4CAF50 66%, #FFD54F 100%)`,
               }}
             />
           </div>

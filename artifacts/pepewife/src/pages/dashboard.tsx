@@ -248,7 +248,7 @@ export default function Dashboard() {
   };
 
   const STAGE_FALLBACK_PRICES = ["$0.00000001", "$0.00000002", "$0.00000004", "$0.00000006"];
-  const STAGE_COLORS = ["#4CAF50", "#FF4D9D", "#FFD54F", "#42A5F5"];
+  const STAGE_COLORS = ["#4CAF50", "#FF4D9D", "#FFD54F", "#4CAF50"];
   const STAGE_DATA = STAGE_FALLBACK_PRICES.map((fallbackPrice, i) => {
     const cs = presaleData?.stages[i];
     const tokens = cs ? Number(cs.maxTokens)  : 5_000_000_000_000;
@@ -366,8 +366,8 @@ export default function Dashboard() {
   const presaleStages: Array<{ stage: number; name: string; price: string; tokens: string; soldRaw: number; pct: number; total: string; status: StageStatus; color: string; shadow: string; emoji: string }> = [
     { stage: 1, name: t.dashboard.earlyBird, price: STAGE_DATA[0].price, tokens: fmt(STAGE_DATA[0].tokens), soldRaw: STAGE_DATA[0].sold, pct: Math.min(100, Math.round((STAGE_DATA[0].sold / STAGE_DATA[0].tokens) * 100)), total: fmtUsd(STAGE_DATA[0].soldUsd), status: currentStage === 0 ? "active" : currentStage > 0 ? "sold-out" : "upcoming", color: "#4CAF50", shadow: "#2E7D32", emoji: currentStage > 0 ? "✅" : currentStage === 0 ? "🔥" : "🔒" },
     { stage: 2, name: t.dashboard.community, price: STAGE_DATA[1].price, tokens: fmt(STAGE_DATA[1].tokens), soldRaw: STAGE_DATA[1].sold, pct: Math.min(100, Math.round((STAGE_DATA[1].sold / STAGE_DATA[1].tokens) * 100)), total: fmtUsd(STAGE_DATA[1].soldUsd), status: currentStage === 1 ? "active" : currentStage > 1 ? "sold-out" : "upcoming", color: "#FF4D9D", shadow: "#C2185B", emoji: currentStage > 1 ? "✅" : currentStage === 1 ? "🔥" : "🔒" },
-    { stage: 3, name: t.dashboard.growth, price: STAGE_DATA[2].price, tokens: fmt(STAGE_DATA[2].tokens), soldRaw: STAGE_DATA[2].sold, pct: Math.min(100, Math.round((STAGE_DATA[2].sold / STAGE_DATA[2].tokens) * 100)), total: fmtUsd(STAGE_DATA[2].soldUsd), status: currentStage === 2 ? "active" : currentStage > 2 ? "sold-out" : "upcoming", color: "#42A5F5", shadow: "#1565C0", emoji: currentStage > 2 ? "✅" : currentStage === 2 ? "🔥" : "🔒" },
-    { stage: 4, name: t.dashboard.final, price: STAGE_DATA[3].price, tokens: fmt(STAGE_DATA[3].tokens), soldRaw: STAGE_DATA[3].sold, pct: Math.min(100, Math.round((STAGE_DATA[3].sold / STAGE_DATA[3].tokens) * 100)), total: fmtUsd(STAGE_DATA[3].soldUsd), status: currentStage === 3 ? "active" : currentStage > 3 ? "sold-out" : "upcoming", color: "#AB47BC", shadow: "#7B1FA2", emoji: currentStage > 3 ? "✅" : currentStage === 3 ? "🔥" : "🔒" },
+    { stage: 3, name: t.dashboard.growth, price: STAGE_DATA[2].price, tokens: fmt(STAGE_DATA[2].tokens), soldRaw: STAGE_DATA[2].sold, pct: Math.min(100, Math.round((STAGE_DATA[2].sold / STAGE_DATA[2].tokens) * 100)), total: fmtUsd(STAGE_DATA[2].soldUsd), status: currentStage === 2 ? "active" : currentStage > 2 ? "sold-out" : "upcoming", color: "#4CAF50", shadow: "#2E7D32", emoji: currentStage > 2 ? "✅" : currentStage === 2 ? "🔥" : "🔒" },
+    { stage: 4, name: t.dashboard.final, price: STAGE_DATA[3].price, tokens: fmt(STAGE_DATA[3].tokens), soldRaw: STAGE_DATA[3].sold, pct: Math.min(100, Math.round((STAGE_DATA[3].sold / STAGE_DATA[3].tokens) * 100)), total: fmtUsd(STAGE_DATA[3].soldUsd), status: currentStage === 3 ? "active" : currentStage > 3 ? "sold-out" : "upcoming", color: "#FF4D9D", shadow: "#C2185B", emoji: currentStage > 3 ? "✅" : currentStage === 3 ? "🔥" : "🔒" },
   ];
 
   const tabs = [
@@ -381,7 +381,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen font-sans overflow-x-hidden" style={{ background: "linear-gradient(180deg, #FFFDE7 0%, #E8F5E9 30%, #FFF9C4 60%, #F3E5F5 100%)", backgroundAttachment: "fixed" }}>
+    <div className="min-h-screen font-sans overflow-x-hidden" style={{ background: "linear-gradient(180deg, #FFFDE7 0%, #E8F5E9 30%, #FFF9C4 60%, #FCE4EC 100%)", backgroundAttachment: "fixed" }}>
       <SEOHead
         title="Investor Dashboard – PEPEWIFE Presale"
         description="Track your PEPEWIFE presale investment, referral rewards, and token allocation. View presale stages and claim your $PWIFE tokens."
@@ -429,7 +429,7 @@ export default function Dashboard() {
                               setTimeout(() => setWalletCopied(false), 2000);
                             }
                           }}
-                          className="flex items-center gap-1 text-[10px] font-display tracking-wider text-[#42A5F5] hover:text-[#1565C0] transition-colors"
+                          className="flex items-center gap-1 text-[10px] font-display tracking-wider text-[#4CAF50] hover:text-[#2E7D32] transition-colors"
                         >
                           {walletCopied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                           {walletCopied ? t.nav.copied : t.nav.copyAddress}
@@ -439,7 +439,7 @@ export default function Dashboard() {
                           href={`https://solscan.io/account/${address}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-[10px] font-display tracking-wider text-[#AB47BC] hover:text-[#7B1FA2] transition-colors"
+                          className="flex items-center gap-1 text-[10px] font-display tracking-wider text-[#FF4D9D] hover:text-[#C2185B] transition-colors"
                         >
                           <ExternalLink className="h-3 w-3" />
                           {t.nav.viewExplorer}
@@ -532,13 +532,13 @@ export default function Dashboard() {
                         label: t.dashboard.referralRewards,
                         value: "0",
                         sub: "$PWIFE",
-                        color: "#AB47BC", shadow: "#7B1FA2", bg: "bg-[#F3E5F5]",
+                        color: "#FF4D9D", shadow: "#C2185B", bg: "bg-[#FCE4EC]",
                       },
                       {
                         label: t.dashboard.currentStage,
                         value: presaleData ? `Stage ${presaleData.currentStage + 1}` : "—",
                         sub: presaleData?.isActive ? "🟢 LIVE" : t.dashboard.notStarted,
-                        color: "#42A5F5", shadow: "#1565C0", bg: "bg-[#E3F2FD]",
+                        color: "#4CAF50", shadow: "#2E7D32", bg: "bg-[#FFFDE7]",
                       },
                       {
                         label: t.dashboard.totalInvested,
@@ -712,7 +712,7 @@ export default function Dashboard() {
                             <p className="text-[10px] text-[#1a1a2e]/40 font-bold px-1">
                               {t.presale.inputMin}: <span className="text-[#0a9060]">{lim.min} {currSym}</span>
                               {"  ·  "}
-                              {t.presale.inputMax}: <span className="text-[#c0392b]">{lim.max.toLocaleString()} {currSym}</span>
+                              {t.presale.inputMax}: <span className="text-[#C2185B]">{lim.max.toLocaleString()} {currSym}</span>
                             </p>
                           )}
 
@@ -728,7 +728,7 @@ export default function Dashboard() {
                                 <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
                                   1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
                                 </p>
-                                <p className="text-[9px] text-[#FF9800]/70 font-bold mt-0.5 text-end">
+                                <p className="text-[9px] text-[#FFD54F]/70 font-bold mt-0.5 text-end">
                                   ⚠ Estimate only — final token amount is calculated on-chain at execution time
                                 </p>
                               </>
@@ -744,7 +744,7 @@ export default function Dashboard() {
                             <div className="bg-[#E8F5E9] border-2 border-[#4CAF50] rounded-xl p-3 flex items-start gap-2">
                               <Check className="h-4 w-4 text-[#4CAF50] shrink-0 mt-0.5" />
                               <div className="min-w-0">
-                                <p className="text-xs font-display text-[#1a4a1e] tracking-wide font-bold">Purchase confirmed! 🎉</p>
+                                <p className="text-xs font-display text-[#2E7D32] tracking-wide font-bold">Purchase confirmed! 🎉</p>
                                 <a href={buildExplorerUrl(dashTxSig)} target="_blank" rel="noreferrer" className="text-[10px] text-[#4CAF50] underline break-all flex items-center gap-1 mt-0.5">
                                   {dashTxSig.slice(0, 16)}…<ExternalLink className="h-3 w-3 shrink-0" />
                                 </a>
@@ -807,7 +807,7 @@ export default function Dashboard() {
                           <div className="flex-1">
                             <div className="font-display text-sm text-[#b8860b] tracking-wider">{t.dashboard.totalPresaleProgress}</div>
                             <div dir="ltr" className="h-3 rounded-full bg-[#1a1a2e]/10 overflow-hidden mt-1 border border-[#1a1a2e]/15">
-                              <div className="h-full rounded-full bg-gradient-to-r from-[#4CAF50] via-[#FF4D9D] to-[#42A5F5] transition-all duration-700" style={{ width: `${presaleFilled}%` }} />
+                              <div className="h-full rounded-full bg-gradient-to-r from-[#4CAF50] via-[#FF4D9D] to-[#4CAF50] transition-all duration-700" style={{ width: `${presaleFilled}%` }} />
                             </div>
                             <div className="flex justify-between mt-1">
                               <span className="text-[10px] font-display text-[#b8860b] tracking-wider">{fmt(totalSold)} / {fmt(totalTokens)} $PWIFE</span>
@@ -998,7 +998,7 @@ export default function Dashboard() {
                 <div className="space-y-5">
                   {/* Header */}
                   <div className="text-center">
-                    <div className="sticker bg-[#AB47BC] text-white mb-3 text-base inline-block" style={{ transform: "rotate(-1deg)" }}>💰 {t.calculator.potentialReturns}</div>
+                    <div className="sticker bg-[#FF4D9D] text-white mb-3 text-base inline-block" style={{ transform: "rotate(-1deg)" }}>💰 {t.calculator.potentialReturns}</div>
                     <h3 className="text-3xl sm:text-4xl font-display text-[#1a1a2e] comic-shadow tracking-wider">{t.calculator.title}</h3>
                     <p className="text-[#1a1a2e]/50 font-bold text-sm mt-1">{t.calculator.subtitle}</p>
                   </div>
@@ -1073,8 +1073,8 @@ export default function Dashboard() {
                         <div className="space-y-2">
                           {[
                             { label: t.calculator.atListing, price: parseFloat(LISTING_PRICE.replace("$", "")),       color: "#4CAF50", bg: "#E8F5E9", border: "#4CAF50" },
-                            { label: "5x",                   price: parseFloat(LISTING_PRICE.replace("$", "")) * 5,   color: "#42A5F5", bg: "#E3F2FD", border: "#42A5F5" },
-                            { label: "10x",                  price: parseFloat(LISTING_PRICE.replace("$", "")) * 10,  color: "#AB47BC", bg: "#F3E5F5", border: "#AB47BC" },
+                            { label: "5x",                   price: parseFloat(LISTING_PRICE.replace("$", "")) * 5,   color: "#4CAF50", bg: "#FFFDE7", border: "#4CAF50" },
+                            { label: "10x",                  price: parseFloat(LISTING_PRICE.replace("$", "")) * 10,  color: "#FF4D9D", bg: "#FCE4EC", border: "#FF4D9D" },
                             { label: "50x",                  price: parseFloat(LISTING_PRICE.replace("$", "")) * 50,  color: "#FF4D9D", bg: "#FCE4EC", border: "#FF4D9D" },
                             { label: "100x",                 price: parseFloat(LISTING_PRICE.replace("$", "")) * 100, color: "#FFD54F", bg: "#FFFDE7", border: "#F9A825" },
                           ].map(row => {
@@ -1113,7 +1113,7 @@ export default function Dashboard() {
               {activeTab === "airdrop" && (
                 <div className="space-y-5">
                   {/* Header */}
-                  <div className="meme-card bg-gradient-to-br from-[#1a1a2e] to-[#311B92] rounded-2xl overflow-hidden">
+                  <div className="meme-card bg-gradient-to-br from-[#1a1a2e] to-[#1a1a2e] rounded-2xl overflow-hidden">
                     <div className="p-6 sm:p-8 text-center relative">
                       <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 30% 50%, #FF4D9D 0%, transparent 50%), radial-gradient(circle at 70% 50%, #4CAF50 0%, transparent 50%)" }} />
                       <div className="relative z-10">
@@ -1143,9 +1143,9 @@ export default function Dashboard() {
                         {
                           task: t.dashboard.airdropTask1,
                           icon: "🐦",
-                          color: "#1DA1F2",
-                          bg: "#E3F2FD",
-                          border: "#1DA1F2",
+                          color: "#4CAF50",
+                          bg: "#FFFDE7",
+                          border: "#4CAF50",
                           done: false,
                           link: "https://x.com/pepewifecoin",
                           btnLabel: t.dashboard.airdropVerify,
@@ -1153,9 +1153,9 @@ export default function Dashboard() {
                         {
                           task: t.dashboard.airdropTask2,
                           icon: "✈️",
-                          color: "#0088cc",
-                          bg: "#E3F2FD",
-                          border: "#0088cc",
+                          color: "#4CAF50",
+                          bg: "#FFFDE7",
+                          border: "#4CAF50",
                           done: false,
                           link: "https://t.me/pepewifecoin",
                           btnLabel: t.dashboard.airdropVerify,
@@ -1311,9 +1311,9 @@ export default function Dashboard() {
                           {
                             l: t.dashboard.earnedTotal,
                             v: refStats ? formatTokens(refStats.totalRewardTokens) : "…",
-                            c: "text-[#AB47BC]",
-                            bg: "bg-[#F3E5F5]",
-                            bc: "border-[#AB47BC]",
+                            c: "text-[#FF4D9D]",
+                            bg: "bg-[#FCE4EC]",
+                            bc: "border-[#FF4D9D]",
                           },
                           {
                             l: t.dashboard.rewardRate,
@@ -1573,7 +1573,7 @@ export default function Dashboard() {
 
       <div className="zigzag-border" />
 
-      <footer className="py-10 px-4 border-t-4 border-[#1a1a2e]" style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #311B92 100%)" }}>
+      <footer className="py-10 px-4 border-t-4 border-[#1a1a2e]" style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #1a1a2e 100%)" }}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-start">
             <div className="flex items-center gap-3">
@@ -1588,8 +1588,8 @@ export default function Dashboard() {
             <button onClick={() => navigate("/terms")} className="text-white/50 hover:text-[#FFD54F] font-display text-lg tracking-wide transition-colors">{t.footer.terms}</button>
           </div>
           <div className="flex gap-3">
-            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#1DA1F2] hover:bg-white/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
-            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#0088cc] hover:bg-white/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
+            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#4CAF50] hover:bg-white/20 flex items-center justify-center border-white/20"><Twitter className="h-4 w-4" /></button>
+            <button className="btn-meme w-10 h-10 rounded-full bg-white/10 text-white/60 hover:text-[#4CAF50] hover:bg-white/20 flex items-center justify-center border-white/20"><Send className="h-4 w-4" /></button>
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-5 border-t border-white/10 text-center text-sm text-white/30 font-display tracking-wide">
