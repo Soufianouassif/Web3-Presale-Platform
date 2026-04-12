@@ -1009,12 +1009,12 @@ export default function Home() {
       <div className="zigzag-border" />
 
       <section id="roadmap" className="py-24 px-4 pattern-dots" style={{ background: "linear-gradient(180deg, #E3F2FD, #E8F5E9)" }}>
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider">{t.roadmap.title}</h2>
             <p className="text-lg text-[#1a1a2e]/50 font-bold mt-2">{t.roadmap.subtitle}</p>
           </div>
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               { phase: t.roadmap.phase1, title: t.roadmap.phase1Title, desc: t.roadmap.phase1Desc, active: true, img: "/roadmap-phase1.webp", color: "#4CAF50", meme: t.roadmap.phase1Meme },
               { phase: t.roadmap.phase2, title: t.roadmap.phase2Title, desc: t.roadmap.phase2Desc, active: false, img: "/roadmap-phase2.webp", color: "#FF4D9D", meme: t.roadmap.phase2Meme },
@@ -1022,18 +1022,26 @@ export default function Home() {
               { phase: t.roadmap.phase4, title: t.roadmap.phase4Title, desc: t.roadmap.phase4Desc, active: false, img: "/roadmap-phase4.webp", color: "#AB47BC", meme: t.roadmap.phase4Meme },
               { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: "/roadmap-phase4.webp", color: "#FF9800", meme: t.roadmap.phase5Meme },
             ].map((step, i) => (
-              <div key={i} className={`meme-card flex flex-col md:flex-row items-center gap-6 p-6 rounded-3xl bg-white ${step.active ? `border-[#4CAF50] ${isRTL ? "shadow-[-6px_6px_0px_#2E7D32]" : "shadow-[6px_6px_0px_#2E7D32]"}` : ""}`}>
-                <img src={step.img} alt={`PEPEWIFE roadmap ${step.title}`} loading="lazy" className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
-                <div className="flex-1 text-center md:text-start">
-                  <div className="flex items-center gap-2 justify-center md:justify-start mb-1">
-                    <span className="sticker text-white text-xs" style={{ backgroundColor: step.color, transform: "rotate(-1deg)" }}>{step.phase}</span>
-                    {step.active && <span className="sticker bg-[#FFD54F] text-[#1a1a2e] text-xs" style={{ transform: "rotate(2deg)" }}>{step.meme}</span>}
+              <div key={i} className={`meme-card overflow-hidden rounded-3xl bg-white ${step.active ? `border-[#4CAF50] ${isRTL ? "shadow-[-6px_6px_0px_#2E7D32]" : "shadow-[6px_6px_0px_#2E7D32]"}` : ""}`}>
+                <img
+                  src={step.img}
+                  alt={`PEPEWIFE roadmap ${step.title}`}
+                  loading="lazy"
+                  className="w-full h-56 object-cover block"
+                  style={{ borderBottom: `4px solid ${step.color}` }}
+                />
+                <div className="p-6 flex items-start gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="sticker text-white text-xs" style={{ backgroundColor: step.color, transform: "rotate(-1deg)" }}>{step.phase}</span>
+                      {step.active && <span className="sticker bg-[#FFD54F] text-[#1a1a2e] text-xs" style={{ transform: "rotate(2deg)" }}>{step.meme}</span>}
+                    </div>
+                    <h3 className="text-2xl font-display text-[#1a1a2e] tracking-wider mb-1">{step.title}</h3>
+                    <p className="text-[#1a1a2e]/60 text-sm font-bold">{step.desc}</p>
+                    {!step.active && <span className="text-xs font-display text-[#1a1a2e]/30 tracking-wider">{step.meme}</span>}
                   </div>
-                  <h3 className="text-2xl font-display text-[#1a1a2e] tracking-wider mb-1">{step.title}</h3>
-                  <p className="text-[#1a1a2e]/60 text-sm font-bold">{step.desc}</p>
-                  {!step.active && <span className="text-xs font-display text-[#1a1a2e]/30 tracking-wider">{step.meme}</span>}
+                  {step.active && <ChevronRight className="h-8 w-8 text-[#4CAF50] shrink-0 mt-1" />}
                 </div>
-                {step.active && <ChevronRight className="h-8 w-8 text-[#4CAF50] hidden md:block" />}
               </div>
             ))}
           </div>
