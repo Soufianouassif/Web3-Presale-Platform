@@ -334,11 +334,11 @@ export default function Dashboard() {
     if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
     return `$${n.toFixed(2)}`;
   }
-  const presaleStages: Array<{ stage: number; name: string; price: string; tokens: string; sold: number; total: string; status: StageStatus; color: string; shadow: string; emoji: string }> = [
-    { stage: 1, name: t.dashboard.earlyBird, price: STAGE_DATA[0].price, tokens: fmt(STAGE_DATA[0].tokens), sold: STAGE_DATA[0].sold, total: fmtUsd(STAGE_DATA[0].soldUsd), status: currentStage === 0 ? "active" : currentStage > 0 ? "sold-out" : "upcoming", color: "#4CAF50", shadow: "#2E7D32", emoji: currentStage > 0 ? "✅" : currentStage === 0 ? "🔥" : "🔒" },
-    { stage: 2, name: t.dashboard.community, price: STAGE_DATA[1].price, tokens: fmt(STAGE_DATA[1].tokens), sold: STAGE_DATA[1].sold, total: fmtUsd(STAGE_DATA[1].soldUsd), status: currentStage === 1 ? "active" : currentStage > 1 ? "sold-out" : "upcoming", color: "#FF4D9D", shadow: "#C2185B", emoji: currentStage > 1 ? "✅" : currentStage === 1 ? "🔥" : "🔒" },
-    { stage: 3, name: t.dashboard.growth, price: STAGE_DATA[2].price, tokens: fmt(STAGE_DATA[2].tokens), sold: STAGE_DATA[2].sold, total: fmtUsd(STAGE_DATA[2].soldUsd), status: currentStage === 2 ? "active" : currentStage > 2 ? "sold-out" : "upcoming", color: "#42A5F5", shadow: "#1565C0", emoji: currentStage > 2 ? "✅" : currentStage === 2 ? "🔥" : "🔒" },
-    { stage: 4, name: t.dashboard.final, price: STAGE_DATA[3].price, tokens: fmt(STAGE_DATA[3].tokens), sold: STAGE_DATA[3].sold, total: fmtUsd(STAGE_DATA[3].soldUsd), status: currentStage === 3 ? "active" : currentStage > 3 ? "sold-out" : "upcoming", color: "#AB47BC", shadow: "#7B1FA2", emoji: currentStage > 3 ? "✅" : currentStage === 3 ? "🔥" : "🔒" },
+  const presaleStages: Array<{ stage: number; name: string; price: string; tokens: string; soldRaw: number; pct: number; total: string; status: StageStatus; color: string; shadow: string; emoji: string }> = [
+    { stage: 1, name: t.dashboard.earlyBird, price: STAGE_DATA[0].price, tokens: fmt(STAGE_DATA[0].tokens), soldRaw: STAGE_DATA[0].sold, pct: Math.min(100, Math.round((STAGE_DATA[0].sold / STAGE_DATA[0].tokens) * 100)), total: fmtUsd(STAGE_DATA[0].soldUsd), status: currentStage === 0 ? "active" : currentStage > 0 ? "sold-out" : "upcoming", color: "#4CAF50", shadow: "#2E7D32", emoji: currentStage > 0 ? "✅" : currentStage === 0 ? "🔥" : "🔒" },
+    { stage: 2, name: t.dashboard.community, price: STAGE_DATA[1].price, tokens: fmt(STAGE_DATA[1].tokens), soldRaw: STAGE_DATA[1].sold, pct: Math.min(100, Math.round((STAGE_DATA[1].sold / STAGE_DATA[1].tokens) * 100)), total: fmtUsd(STAGE_DATA[1].soldUsd), status: currentStage === 1 ? "active" : currentStage > 1 ? "sold-out" : "upcoming", color: "#FF4D9D", shadow: "#C2185B", emoji: currentStage > 1 ? "✅" : currentStage === 1 ? "🔥" : "🔒" },
+    { stage: 3, name: t.dashboard.growth, price: STAGE_DATA[2].price, tokens: fmt(STAGE_DATA[2].tokens), soldRaw: STAGE_DATA[2].sold, pct: Math.min(100, Math.round((STAGE_DATA[2].sold / STAGE_DATA[2].tokens) * 100)), total: fmtUsd(STAGE_DATA[2].soldUsd), status: currentStage === 2 ? "active" : currentStage > 2 ? "sold-out" : "upcoming", color: "#42A5F5", shadow: "#1565C0", emoji: currentStage > 2 ? "✅" : currentStage === 2 ? "🔥" : "🔒" },
+    { stage: 4, name: t.dashboard.final, price: STAGE_DATA[3].price, tokens: fmt(STAGE_DATA[3].tokens), soldRaw: STAGE_DATA[3].sold, pct: Math.min(100, Math.round((STAGE_DATA[3].sold / STAGE_DATA[3].tokens) * 100)), total: fmtUsd(STAGE_DATA[3].soldUsd), status: currentStage === 3 ? "active" : currentStage > 3 ? "sold-out" : "upcoming", color: "#AB47BC", shadow: "#7B1FA2", emoji: currentStage > 3 ? "✅" : currentStage === 3 ? "🔥" : "🔒" },
   ];
 
   const tabs = [
@@ -759,10 +759,10 @@ export default function Dashboard() {
                                 </div>
                               </div>
                               <div className="h-2.5 rounded-full bg-[#1a1a2e]/10 overflow-hidden border border-[#1a1a2e]/15">
-                                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${s.sold}%`, backgroundColor: s.color }} />
+                                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${s.pct}%`, backgroundColor: s.color }} />
                               </div>
                               <div className="flex justify-between mt-1">
-                                <span className="text-[10px] font-nums tracking-wider" style={{ color: s.color }}>{s.sold}% {t.dashboard.soldPercent}</span>
+                                <span className="text-[10px] font-nums tracking-wider" style={{ color: s.color }}>{s.pct}% {t.dashboard.soldPercent}</span>
                                 <span className="text-[10px] text-[#1a1a2e]/30 font-nums">{s.tokens} $PWIFE</span>
                               </div>
                             </div>
@@ -776,11 +776,11 @@ export default function Dashboard() {
                           <div className="flex-1">
                             <div className="font-display text-sm text-[#b8860b] tracking-wider">{t.dashboard.totalPresaleProgress}</div>
                             <div className="h-3 rounded-full bg-[#1a1a2e]/10 overflow-hidden mt-1 border border-[#1a1a2e]/15">
-                              <div className="h-full rounded-full bg-gradient-to-r from-[#4CAF50] via-[#FF4D9D] to-[#42A5F5]" style={{ width: "0%" }} />
+                              <div className="h-full rounded-full bg-gradient-to-r from-[#4CAF50] via-[#FF4D9D] to-[#42A5F5] transition-all duration-700" style={{ width: `${presaleFilled}%` }} />
                             </div>
                             <div className="flex justify-between mt-1">
-                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">0 / 0 $PWIFE</span>
-                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">0%</span>
+                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">{fmt(totalSold)} / {fmt(totalTokens)} $PWIFE</span>
+                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">{presaleFilled}%</span>
                             </div>
                           </div>
                         </div>
