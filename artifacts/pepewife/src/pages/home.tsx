@@ -404,74 +404,91 @@ export default function Home() {
         )}
       </nav>
 
-      <section id="hero" className="relative overflow-hidden" style={{ backgroundImage: "url('/pepewife-bg.webp')", backgroundSize: "cover", backgroundPosition: isRTL ? "left center" : "right center", backgroundRepeat: "no-repeat" }}>
-        {/* gradient overlay for mobile readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/60 to-transparent pointer-events-none" />
-        <div className="relative pt-24 pb-16 px-4">
-          <div className="max-w-7xl mx-auto" dir="ltr">
-            <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-4 animate-pulse text-sm sm:text-base" style={{ transform: "rotate(-2deg)" }}>
-              {!siteConfig.isActive
-                ? "⏸️ PRESALE TEMPORARILY PAUSED — COMING BACK SOON"
-                : presaleData
-                  ? presaleData.isActive
-                    ? `🔥 STAGE ${presaleData.currentStage + 1}/4 — PRESALE LIVE — APE IN NOW!! 🚀`
-                    : presaleData.isPaused
-                    ? `⏸️ STAGE ${presaleData.currentStage + 1}/4 — PRESALE PAUSED — COMING BACK SOON`
-                    : `✅ PRESALE ENDED — CLAIM YOUR $PWIFE SOON!`
-                  : "🔥 STAGE 1 — PRESALE COMING SOON — NGMI IF U MISS THIS!!"}
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-8xl font-display leading-tight mb-4 text-[#1a1a2e] comic-shadow tracking-wider max-w-3xl">
-              {"Be Early..."}<br /><span className="text-[#FF4D9D]" style={{ textShadow: "3px 3px 0px #1a1a2e" }}>{"Or Cry Later 😭"}</span>
-            </h1>
-            <div className="speech-bubble inline-block p-3 sm:p-4 mb-6 max-w-xs sm:max-w-xl">
-              <p className="text-base sm:text-lg lg:text-xl font-bold text-[#1a1a2e]">
-                {"PEPE built the meme. SHE builds the future. 💅"}<br />
-                <span className="text-[#FF4D9D]">{"Join the most BASED presale on Solana. LFG! 🚀"}</span>
-              </p>
-            </div>
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 mb-6">
-              <div className="bg-white/95 rounded-2xl px-3 sm:px-5 py-2 sm:py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                <div className="text-xs font-display text-gray-500 tracking-wide font-bold">💰 Total Raised</div>
-                <div className="text-xl sm:text-2xl font-nums text-[#1a1a2e] tracking-wider">
-                  {presaleData
-                    ? `$${totalRaisedUSD >= 1000 ? (totalRaisedUSD / 1000).toFixed(1) + "K" : totalRaisedUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
-                    : <span className="text-base text-gray-400 animate-pulse">Loading...</span>}
+      <section id="hero" className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #E8F5E9 0%, #FFFDE7 50%, #E3F2FD 100%)" }}>
+        <div className="pt-24 pb-0 lg:pb-0 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-8 items-center">
+
+              {/* ─── المحتوى ─── */}
+              <div dir="ltr">
+                <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-4 animate-pulse text-sm sm:text-base" style={{ transform: "rotate(-2deg)" }}>
+                  {!siteConfig.isActive
+                    ? "⏸️ PRESALE TEMPORARILY PAUSED — COMING BACK SOON"
+                    : presaleData
+                      ? presaleData.isActive
+                        ? `🔥 STAGE ${presaleData.currentStage + 1}/4 — PRESALE LIVE — APE IN NOW!! 🚀`
+                        : presaleData.isPaused
+                        ? `⏸️ STAGE ${presaleData.currentStage + 1}/4 — PRESALE PAUSED — COMING BACK SOON`
+                        : `✅ PRESALE ENDED — CLAIM YOUR $PWIFE SOON!`
+                      : "🔥 STAGE 1 — PRESALE COMING SOON — NGMI IF U MISS THIS!!"}
                 </div>
-                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">USD • SOL ${solPrice.toFixed(0)}</div>
-              </div>
-              <div className="bg-white/95 rounded-2xl px-3 sm:px-5 py-2 sm:py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                <div className="text-xs font-display text-gray-500 tracking-wide font-bold">🐸 $PWIFE Sold</div>
-                <div className="text-xl sm:text-2xl font-nums text-[#1a1a2e] tracking-wider">
-                  {presaleData
-                    ? (totalSold >= 1_000_000_000
-                        ? (totalSold / 1_000_000_000).toFixed(2) + "B"
-                        : totalSold >= 1_000_000
-                          ? (totalSold / 1_000_000).toFixed(1) + "M"
-                          : totalSold.toLocaleString())
-                    : <span className="text-base text-gray-400 animate-pulse">Loading...</span>}
+                <h1 className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-display leading-tight mb-4 text-[#1a1a2e] comic-shadow tracking-wider">
+                  {"Be Early..."}<br /><span className="text-[#FF4D9D]" style={{ textShadow: "3px 3px 0px #1a1a2e" }}>{"Or Cry Later 😭"}</span>
+                </h1>
+                <div className="speech-bubble inline-block p-3 sm:p-4 mb-5 max-w-sm sm:max-w-xl">
+                  <p className="text-base sm:text-lg lg:text-xl font-bold text-[#1a1a2e]">
+                    {"PEPE built the meme. SHE builds the future. 💅"}<br />
+                    <span className="text-[#FF4D9D]">{"Join the most BASED presale on Solana. LFG! 🚀"}</span>
+                  </p>
                 </div>
-                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">tokens</div>
-              </div>
-              <div className="bg-white/95 rounded-2xl px-3 sm:px-5 py-2 sm:py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                <div className="text-xs font-display text-gray-500 tracking-wide font-bold">👥 Buyers</div>
-                <div className="text-xl sm:text-2xl font-nums text-[#1a1a2e] tracking-wider">
-                  {presaleData ? Number(presaleData.buyersCount).toLocaleString() : <span className="text-base text-gray-400 animate-pulse">—</span>}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
+                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
+                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">💰 Total Raised</div>
+                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider">
+                      {presaleData
+                        ? `$${totalRaisedUSD >= 1000 ? (totalRaisedUSD / 1000).toFixed(1) + "K" : totalRaisedUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+                        : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
+                    </div>
+                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">USD • SOL ${solPrice.toFixed(0)}</div>
+                  </div>
+                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
+                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">🐸 $PWIFE Sold</div>
+                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider">
+                      {presaleData
+                        ? (totalSold >= 1_000_000_000
+                            ? (totalSold / 1_000_000_000).toFixed(2) + "B"
+                            : totalSold >= 1_000_000
+                              ? (totalSold / 1_000_000).toFixed(1) + "M"
+                              : totalSold.toLocaleString())
+                        : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
+                    </div>
+                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">tokens</div>
+                  </div>
+                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
+                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">👥 Buyers</div>
+                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider">
+                      {presaleData ? Number(presaleData.buyersCount).toLocaleString() : <span className="text-sm text-gray-400 animate-pulse">—</span>}
+                    </div>
+                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">unique wallets</div>
+                  </div>
+                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
+                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">💎 Stage {currentStage + 1} Price</div>
+                    <P v={STAGE_DATA[currentStage].price} className="text-base sm:text-lg font-nums text-[#1a1a2e] tracking-wider" />
+                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">per $PWIFE</div>
+                  </div>
                 </div>
-                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">unique wallets</div>
+                <div className="flex flex-col sm:flex-row gap-3 pb-8 lg:pb-16">
+                  <button onClick={() => scrollTo('presale')} className="btn-meme bg-[#4CAF50] text-white rounded-2xl h-12 sm:h-14 px-8 sm:px-10 text-xl sm:text-2xl font-display tracking-wider" style={{ animation: "pulse-glow 2s infinite" }}>
+                    {"🚀 APE IN NOW"}
+                  </button>
+                  <button className="btn-meme bg-white text-[#1a1a2e] rounded-2xl h-12 sm:h-14 px-6 sm:px-8 text-xl sm:text-2xl font-display tracking-wider">
+                    {"🐸 Join The Fam"} <ArrowRight className="ml-2 h-5 w-5 inline" />
+                  </button>
+                </div>
               </div>
-              <div className="bg-white/95 rounded-2xl px-3 sm:px-5 py-2 sm:py-3 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                <div className="text-xs font-display text-gray-500 tracking-wide font-bold">💎 Stage {currentStage + 1} Price</div>
-                <P v={STAGE_DATA[currentStage].price} className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" />
-                <div className="text-xs text-gray-500 font-display tracking-wide font-bold">per $PWIFE</div>
+
+              {/* ─── الشخصية ─── */}
+              <div className="flex justify-center items-end">
+                <img
+                  src="/pepewife-hero.webp"
+                  alt="PEPEWIFE character"
+                  width="600"
+                  height="600"
+                  className="w-full max-w-xs sm:max-w-sm lg:max-w-full object-contain drop-shadow-2xl"
+                  fetchPriority="high"
+                />
               </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button onClick={() => scrollTo('presale')} className="btn-meme bg-[#4CAF50] text-white rounded-2xl h-12 sm:h-14 px-8 sm:px-10 text-xl sm:text-2xl font-display tracking-wider" style={{ animation: "pulse-glow 2s infinite" }}>
-                {"🚀 APE IN NOW"}
-              </button>
-              <button className="btn-meme bg-white text-[#1a1a2e] rounded-2xl h-12 sm:h-14 px-6 sm:px-8 text-xl sm:text-2xl font-display tracking-wider">
-                {"🐸 Join The Fam"} <ArrowRight className="ml-2 h-5 w-5 inline" />
-              </button>
+
             </div>
           </div>
         </div>
