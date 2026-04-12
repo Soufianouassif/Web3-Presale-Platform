@@ -14,16 +14,21 @@ declare global {
   }
 }
 
+const TAWK_DIRECT = "https://tawk.to/chat/69dbf5fb13132a1c36615ecc/1jm1jhnui";
+
 function openTawkSupport() {
   try {
-    if (typeof window.Tawk_API?.maximize === "function") {
-      window.Tawk_API.showWidget();
-      setTimeout(() => window.Tawk_API!.maximize(), 100);
+    const api = window.Tawk_API;
+    if (api && typeof api.maximize === "function") {
+      if (typeof api.showWidget === "function") api.showWidget();
+      setTimeout(() => {
+        try { window.Tawk_API!.maximize(); } catch { window.open(TAWK_DIRECT, "_blank"); }
+      }, 150);
     } else {
-      window.open("https://t.me/pepewifecoin", "_blank");
+      window.open(TAWK_DIRECT, "_blank");
     }
   } catch {
-    window.open("https://t.me/pepewifecoin", "_blank");
+    window.open(TAWK_DIRECT, "_blank");
   }
 }
 
@@ -296,14 +301,24 @@ const newMsg = (from: Message["from"], text: string, actions?: Message["actions"
   id: ++msgId, from, text, actions, suggestions,
 });
 
+const TAWK_IFRAME = `https://tawk.to/chat/69dbf5fb13132a1c36615ecc/1jm1jhnui`;
+
+const LIVE_UI = {
+  en: { title: "Live Support 💬", connecting: "Connecting you to our team...", back: "← Back to Assistant", note: "Our team will respond shortly. You can go back to the assistant anytime." },
+  ar: { title: "دعم مباشر 💬", connecting: "جاري التواصل مع الفريق...", back: "← العودة للمساعد", note: "سيرد فريقنا قريباً. يمكنك العودة للمساعد في أي وقت." },
+  fr: { title: "Support Live 💬", connecting: "Connexion à notre équipe...", back: "← Retour à l'assistant", note: "Notre équipe répondra bientôt. Vous pouvez revenir à l'assistant à tout moment." },
+};
+
 export default function Chatbot() {
   const [open, setOpen]         = useState(false);
   const [minimized, setMin]     = useState(false);
+  const [mode, setMode]         = useState<"bot" | "tawk">("bot");
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput]       = useState("");
   const [typing, setTyping]     = useState(false);
   const [lang, setLang]         = useState<Lang>("en");
   const [unread, setUnread]     = useState(0);
+  const [tawkReady, setTawkReady] = useState(false);
   const endRef   = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -319,6 +334,23 @@ export default function Chatbot() {
       setUnread(0);
     }
   }, [messages, open, minimized]);
+
+  const switchToTawk = useCallback(() => {
+    setMode("tawk");
+    setTawkReady(false);
+    setTimeout(() => setTawkReady(true), 1200);
+  }, []);
+
+  const switchToBot = useCallback(() => {
+    setMode("bot");
+    const backMsg = newMsg("bot",
+      lang === "ar" ? "مرحباً مجدداً! كيف يمكنني مساعدتك؟ 🐸" :
+      lang === "fr" ? "Bienvenue de retour! Comment puis-je vous aider? 🐸" :
+      "Welcome back! How can I help you? 🐸",
+      undefined, WELCOME_SUGGESTIONS
+    );
+    setMessages(prev => [...prev, backMsg]);
+  }, [lang]);
 
   const sendText = useCallback((text: string, autoLang?: Lang) => {
     const trimmed = text.trim();
@@ -336,14 +368,14 @@ export default function Chatbot() {
       const botMsg = result
         ? newMsg("bot", result.answer, result.actions, result.suggestions)
         : newMsg("bot", UI[detectedLang].noMatch, [
-            { label: UI[detectedLang].supportBtn, onClick: openTawkSupport },
+            { label: UI[detectedLang].supportBtn, onClick: switchToTawk },
             { label: UI[detectedLang].twitterBtn, href: TWITTER_URL },
           ], WELCOME_SUGGESTIONS);
       setMessages(prev => [...prev, botMsg]);
       setTyping(false);
       if (minimized) setUnread(n => n + 1);
     }, 600 + Math.random() * 400);
-  }, [lang, minimized]);
+  }, [lang, minimized, switchToTawk]);
 
   const handleSend = () => {
     const detectedLang = detectLang(input);
@@ -381,17 +413,32 @@ export default function Chatbot() {
           style={{ width: "min(370px, calc(100vw - 24px))", maxHeight: "min(560px, calc(100vh - 80px))" }}
           dir={isRTL ? "rtl" : "ltr"}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b-4 border-[#1a1a2e] shrink-0" style={{ background: "linear-gradient(90deg, #FF4D9D, #FFD54F)" }}>
+          {/* Header — changes based on mode */}
+          <div
+            className="flex items-center justify-between px-4 py-3 border-b-4 border-[#1a1a2e] shrink-0"
+            style={{ background: mode === "tawk" ? "linear-gradient(90deg, #4CAF50, #FFD54F)" : "linear-gradient(90deg, #FF4D9D, #FFD54F)" }}
+          >
             <div className="flex items-center gap-2">
-              <img src="/logo.webp" alt="PWIFE" className="w-8 h-8 rounded-full border-2 border-[#1a1a2e]" />
-              <div>
-                <div className="font-display text-sm font-bold text-[#1a1a2e] tracking-wide leading-none">{UI[lang].title}</div>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#2E7D32] animate-pulse" />
-                  <span className="text-[10px] font-bold text-[#1a1a2e]/70">{UI[lang].online}</span>
-                </div>
-              </div>
+              {mode === "tawk" ? (
+                <button onClick={switchToBot} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                  <span className="text-[#1a1a2e] text-sm font-display font-bold">←</span>
+                  <div>
+                    <div className="font-display text-sm font-bold text-[#1a1a2e] tracking-wide leading-none">{LIVE_UI[lang].title}</div>
+                    <div className="text-[10px] font-bold text-[#1a1a2e]/70">{LIVE_UI[lang].back}</div>
+                  </div>
+                </button>
+              ) : (
+                <>
+                  <img src="/logo.webp" alt="PWIFE" className="w-8 h-8 rounded-full border-2 border-[#1a1a2e]" />
+                  <div>
+                    <div className="font-display text-sm font-bold text-[#1a1a2e] tracking-wide leading-none">{UI[lang].title}</div>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2E7D32] animate-pulse" />
+                      <span className="text-[10px] font-bold text-[#1a1a2e]/70">{UI[lang].online}</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             <div className="flex items-center gap-1">
               <button
@@ -401,7 +448,7 @@ export default function Chatbot() {
                 <ChevronDown className={`h-4 w-4 text-[#1a1a2e] transition-transform ${minimized ? "rotate-180" : ""}`} />
               </button>
               <button
-                onClick={() => { setOpen(false); setMessages([]); msgId = 0; setLang("en"); }}
+                onClick={() => { setOpen(false); setMessages([]); setMode("bot"); msgId = 0; setLang("en"); }}
                 className="w-7 h-7 rounded-lg border-2 border-[#1a1a2e] bg-white/30 hover:bg-white/50 flex items-center justify-center transition-colors"
               >
                 <X className="h-4 w-4 text-[#1a1a2e]" />
@@ -409,13 +456,40 @@ export default function Chatbot() {
             </div>
           </div>
 
-          {!minimized && (
+          {!minimized && mode === "tawk" && (
+            <div className="flex-1 flex flex-col min-h-0" style={{ background: "#FFFDE7" }}>
+              {!tawkReady ? (
+                <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6">
+                  <div className="flex gap-1.5">
+                    {[0, 150, 300].map(d => (
+                      <span key={d} className="w-3 h-3 rounded-full bg-[#4CAF50] animate-bounce" style={{ animationDelay: `${d}ms` }} />
+                    ))}
+                  </div>
+                  <p className="text-sm font-bold text-[#1a1a2e]/70 text-center">{LIVE_UI[lang].connecting}</p>
+                </div>
+              ) : (
+                <iframe
+                  src={TAWK_IFRAME}
+                  className="flex-1 w-full border-0 min-h-0"
+                  style={{ height: "100%" }}
+                  allow="microphone; camera"
+                  title="Live Support"
+                />
+              )}
+              <div className="shrink-0 px-3 py-2 border-t-2 border-[#1a1a2e]/10 text-center" style={{ background: "#FFF9C4" }}>
+                <button onClick={switchToBot} className="text-xs font-bold text-[#FF4D9D] hover:underline">
+                  {LIVE_UI[lang].back}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {!minimized && mode === "bot" && (
             <>
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0" style={{ background: "#FFFDE7" }}>
                 {messages.map(msg => (
                   <div key={msg.id} className={`flex flex-col gap-1.5 ${msg.from === "user" ? (isRTL ? "items-start" : "items-end") : (isRTL ? "items-end" : "items-start")}`}>
-                    {/* Bubble */}
                     <div
                       className={`max-w-[88%] rounded-2xl px-3 py-2.5 text-sm leading-relaxed border-2 border-[#1a1a2e] whitespace-pre-line ${
                         msg.from === "user"
@@ -426,7 +500,6 @@ export default function Chatbot() {
                       {msg.text}
                     </div>
 
-                    {/* Action buttons */}
                     {msg.actions && msg.actions.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 max-w-[88%]">
                         {msg.actions.map((a, i) =>
@@ -445,7 +518,6 @@ export default function Chatbot() {
                       </div>
                     )}
 
-                    {/* Smart suggestions — only on bot messages */}
                     {msg.from === "bot" && msg.suggestions && msg.suggestions.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 max-w-[95%]">
                         {msg.suggestions.map(key => (
