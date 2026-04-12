@@ -85,14 +85,21 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const t1 = setTimeout(refreshDetection, 500);
     const t2 = setTimeout(refreshDetection, 1500);
+    const t3 = setTimeout(refreshDetection, 3000);
 
     const onSolflareReady = () => refreshDetection();
+    const onBackpackReady = () => refreshDetection();
     document.addEventListener("solflare#initialized", onSolflareReady);
+    document.addEventListener("backpack#initialized", onBackpackReady);
+    window.addEventListener("load", refreshDetection);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
+      clearTimeout(t3);
       document.removeEventListener("solflare#initialized", onSolflareReady);
+      document.removeEventListener("backpack#initialized", onBackpackReady);
+      window.removeEventListener("load", refreshDetection);
     };
   }, [refreshDetection]);
 

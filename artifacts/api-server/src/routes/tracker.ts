@@ -839,6 +839,45 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
   }
 });
 
+// ── Public: user's own purchases from DB (by wallet address) ─────────────
+const myPurchasesLimiter = rateLimit({
+  windowMs: 60 * 1_000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests" },
+});
+
+const SOLANA_ADDR_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+
+router.get("/my-purchases/:wallet", myPurchasesLimiter, async (req: Request, res: Response) => {
+  const { wallet } = req.params;
+  if (!wallet || !SOLANA_ADDR_RE.test(wallet)) {
+    return res.status(400).json({ error: "Invalid wallet address" });
+  }
+  try {
+    const rows = await db
+      .select({
+        id: purchases.id,
+        network: purchases.network,
+        amountUsd: purchases.amountUsd,
+        amountTokens: purchases.amountTokens,
+        txHash: purchases.txHash,
+        stage: purchases.stage,
+        createdAt: purchases.createdAt,
+      })
+      .from(purchases)
+      .where(eq(purchases.walletAddress, wallet))
+      .orderBy(desc(purchases.createdAt))
+      .limit(50);
+
+    return res.json({ purchases: rows });
+  } catch (err) {
+    logger.error({ err }, "[MY-PURCHASES] Failed");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // ── Public activity feed (last 50 purchases, anonymized) ─────────────────
 const activityLimiter = rateLimit({
   windowMs: 60 * 1_000,
@@ -864,6 +903,7 @@ router.get("/activity", activityLimiter, async (req: Request, res: Response) => 
         network: purchases.network,
         amountUsd: purchases.amountUsd,
         amountTokens: purchases.amountTokens,
+        txHash: purchases.txHash,
         stage: purchases.stage,
         createdAt: purchases.createdAt,
       })
@@ -878,6 +918,7 @@ router.get("/activity", activityLimiter, async (req: Request, res: Response) => 
       network: r.network,
       amountUsd: r.amountUsd,
       amountTokens: r.amountTokens,
+      txHash: r.txHash ?? null,
       stage: r.stage ?? 1,
       createdAt: r.createdAt,
     }));

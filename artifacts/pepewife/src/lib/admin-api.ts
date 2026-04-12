@@ -187,6 +187,7 @@ export interface PublicActivity {
   network: string;
   amountUsd: string;
   amountTokens: string;
+  txHash: string | null;
   stage: number;
   createdAt: string;
 }
@@ -196,6 +197,27 @@ export interface ActivityResponse {
   total: number;
   offset: number;
   hasMore: boolean;
+}
+
+export interface MyPurchase {
+  id: number;
+  network: string;
+  amountUsd: string;
+  amountTokens: string;
+  txHash: string | null;
+  stage: number;
+  createdAt: string;
+}
+
+export async function fetchMyPurchases(wallet: string): Promise<MyPurchase[]> {
+  try {
+    const res = await fetch(`${API_BASE}/my-purchases/${wallet}`, { credentials: "include" });
+    if (!res.ok) return [];
+    const json = await res.json() as { purchases: MyPurchase[] };
+    return json.purchases ?? [];
+  } catch {
+    return [];
+  }
 }
 
 export async function fetchPublicActivity(offset = 0): Promise<ActivityResponse> {

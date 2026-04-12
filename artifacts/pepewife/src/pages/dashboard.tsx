@@ -9,7 +9,7 @@ import LanguageSwitcher from "@/components/language-switcher";
 import SEOHead from "@/components/seo-head";
 import { useWallet } from "@/contexts/wallet-context";
 import { useToast } from "@/components/wallet-toast";
-import { tracker, fetchPublicPresaleConfig, fetchPublicActivity, type PublicPresaleConfig, type PublicActivity, type ActivityResponse } from "@/lib/admin-api";
+import { tracker, fetchPublicPresaleConfig, fetchPublicActivity, fetchMyPurchases, type PublicPresaleConfig, type PublicActivity, type ActivityResponse, type MyPurchase } from "@/lib/admin-api";
 import WalletBuyModal from "@/components/wallet-buy-modal";
 import {
   fetchPresaleState,
@@ -57,6 +57,8 @@ export default function Dashboard() {
   const [activityLoading, setActivityLoading] = useState(false);
   const [activityHasMore, setActivityHasMore] = useState(false);
   const [activityOffset, setActivityOffset] = useState(0);
+  const [myDbPurchases, setMyDbPurchases] = useState<MyPurchase[]>([]);
+  const [myDbLoading, setMyDbLoading] = useState(false);
   const [txView, setTxView] = useState<"mine" | "all">("all");
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
@@ -175,7 +177,7 @@ export default function Dashboard() {
 
   // ── Buyer on-chain data — تحديث تلقائي كل 30 ثانية ──────────────────────────
   useEffect(() => {
-    if (!address) { setBuyerState(null); setBuyerTxs([]); return; }
+    if (!address) { setBuyerState(null); setBuyerTxs([]); setMyDbPurchases([]); return; }
     const load = () => {
       setBuyerLoading(true);
       fetchBuyerState(address)
@@ -185,6 +187,10 @@ export default function Dashboard() {
       fetchBuyerTransactions(address)
         .then(txs => setBuyerTxs(txs))
         .finally(() => setBuyerTxsLoading(false));
+      setMyDbLoading(true);
+      fetchMyPurchases(address)
+        .then(p => setMyDbPurchases(p))
+        .finally(() => setMyDbLoading(false));
     };
     load();
     const iv = setInterval(load, 30_000);
@@ -1153,13 +1159,13 @@ export default function Dashboard() {
                       onClick={() => setTxView("all")}
                       className={`flex-1 py-2.5 font-display text-sm tracking-wider transition-colors ${txView === "all" ? "bg-[#FF4D9D] text-white" : "bg-white text-[#1a1a2e]/50 hover:bg-[#FFFDE7]"}`}
                     >
-                      🌍 كل المعاملات
+                      {t.dashboard.allTransactions}
                     </button>
                     <button
                       onClick={() => setTxView("mine")}
                       className={`flex-1 py-2.5 font-display text-sm tracking-wider transition-colors ${txView === "mine" ? "bg-[#4CAF50] text-white" : "bg-white text-[#1a1a2e]/50 hover:bg-[#FFFDE7]"}`}
                     >
-                      👤 معاملاتي
+                      {t.dashboard.myTransactions}
                     </button>
                   </div>
 
@@ -1168,7 +1174,7 @@ export default function Dashboard() {
                     <div className="p-5">
                       <div className="flex items-center justify-between mb-5">
                         <h3 className="font-display text-xl text-[#1a1a2e] tracking-wider">
-                          {txView === "all" ? "🌍 نشاط البيع العام" : t.dashboard.transactionHistory}
+                          {txView === "all" ? t.dashboard.globalActivityFeed : t.dashboard.transactionHistory}
                         </h3>
                         <button
                           onClick={() => {
@@ -1193,13 +1199,13 @@ export default function Dashboard() {
                         activityLoading && activityFeed.length === 0 ? (
                           <div className="text-center py-8">
                             <div className="text-3xl mb-2 animate-spin inline-block">⏳</div>
-                            <p className="font-display text-[#1a1a2e]/40 tracking-wider text-sm">جارٍ التحميل…</p>
+                            <p className="font-display text-[#1a1a2e]/40 tracking-wider text-sm">{t.dashboard.loadingDots}</p>
                           </div>
                         ) : activityFeed.length === 0 ? (
                           <div className="text-center py-10">
                             <div className="text-5xl mb-3">🛒</div>
-                            <p className="font-display text-lg text-[#1a1a2e]/40 tracking-wider">لا توجد معاملات بعد</p>
-                            <p className="text-sm text-[#1a1a2e]/30 font-bold">كن أول من يشتري $PWIFE!</p>
+                            <p className="font-display text-lg text-[#1a1a2e]/40 tracking-wider">{t.dashboard.noActivityYet}</p>
+                            <p className="text-sm text-[#1a1a2e]/30 font-bold">{t.dashboard.beFirstToBuy}</p>
                           </div>
                         ) : (
                           <div className="space-y-2">
@@ -1207,6 +1213,7 @@ export default function Dashboard() {
                               const usd = parseFloat(tx.amountUsd);
                               const tokens = parseFloat(tx.amountTokens);
                               const date = new Date(tx.createdAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+                              const fmtTokens = (n: number) => n >= 1e9 ? (n/1e9).toFixed(2)+"B" : n >= 1e6 ? (n/1e6).toFixed(2)+"M" : n.toLocaleString();
                               return (
                                 <div key={tx.id} className="flex items-center gap-3 rounded-xl border-2 border-[#1a1a2e]/10 bg-[#FFFDE7]/50 px-4 py-3">
                                   <div className="w-8 h-8 rounded-full bg-[#FF4D9D]/10 border-2 border-[#FF4D9D]/30 flex items-center justify-center shrink-0 text-base">🐸</div>
@@ -1214,14 +1221,26 @@ export default function Dashboard() {
                                     <div className="font-display text-xs text-[#1a1a2e] tracking-wide">{tx.wallet}</div>
                                     <div className="text-[10px] text-[#1a1a2e]/40 font-bold">{date} · Stage {tx.stage}</div>
                                   </div>
-                                  <div className="text-end shrink-0">
-                                    <div className="font-display text-sm text-[#FF4D9D] tracking-wider">${usd.toFixed(2)}</div>
-                                    <div className="text-[10px] text-[#4CAF50] font-nums font-bold">+{tokens >= 1e9 ? (tokens/1e9).toFixed(2)+"B" : tokens >= 1e6 ? (tokens/1e6).toFixed(2)+"M" : tokens.toLocaleString()} $PWIFE</div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <div className="text-end">
+                                      <div className="font-display text-sm text-[#FF4D9D] tracking-wider">${usd.toFixed(2)}</div>
+                                      <div className="text-[10px] text-[#4CAF50] font-nums font-bold">+{fmtTokens(tokens)} $PWIFE</div>
+                                    </div>
+                                    {tx.txHash && (
+                                      <a
+                                        href={buildExplorerUrl(tx.txHash)}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="bg-[#FF4D9D]/10 hover:bg-[#FF4D9D]/20 border border-[#FF4D9D]/30 text-[#FF4D9D] rounded-lg px-2 py-1 text-[10px] font-display tracking-wide flex items-center gap-1 transition-colors"
+                                      >
+                                        {t.dashboard.viewTx} <ExternalLink size={10} />
+                                      </a>
+                                    )}
                                   </div>
                                 </div>
                               );
                             })}
-                            <p className="text-center text-[10px] text-[#1a1a2e]/30 font-bold pt-2">{activityFeed.length} عملية شراء</p>
+                            <p className="text-center text-[10px] text-[#1a1a2e]/30 font-bold pt-2">{activityFeed.length} {t.dashboard.purchaseCount}</p>
                             {activityHasMore && (
                               <button
                                 onClick={() => {
@@ -1235,18 +1254,18 @@ export default function Dashboard() {
                                 disabled={activityLoading}
                                 className="w-full mt-2 py-3 rounded-xl border-2 border-dashed border-[#FF4D9D]/40 text-[#FF4D9D] font-display text-sm tracking-wider hover:bg-[#FF4D9D]/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                               >
-                                {activityLoading ? "⏳ جارٍ التحميل…" : "⬇️ عرض المزيد"}
+                                {activityLoading ? t.dashboard.loadingDots : t.dashboard.loadMore}
                               </button>
                             )}
                           </div>
                         )
                       ) : (
-                        buyerTxsLoading ? (
+                        (myDbLoading || buyerTxsLoading) && myDbPurchases.length === 0 ? (
                           <div className="text-center py-8">
                             <div className="text-3xl mb-2 animate-spin inline-block">⏳</div>
-                            <p className="font-display text-[#1a1a2e]/40 tracking-wider text-sm">Loading transactions…</p>
+                            <p className="font-display text-[#1a1a2e]/40 tracking-wider text-sm">{t.dashboard.loadingDots}</p>
                           </div>
-                        ) : buyerTxs.length === 0 ? (
+                        ) : myDbPurchases.length === 0 ? (
                           <div className="text-center py-10">
                             <div className="text-5xl mb-3">📜</div>
                             <p className="font-display text-lg text-[#1a1a2e]/40 tracking-wider">{t.dashboard.noTransactions}</p>
@@ -1254,32 +1273,38 @@ export default function Dashboard() {
                           </div>
                         ) : (
                           <div className="space-y-2">
-                            {buyerTxs.map((tx, i) => {
-                              const date = tx.blockTime
-                                ? new Date(tx.blockTime * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
-                                : "—";
+                            {myDbPurchases.map((p, i) => {
+                              const usd = parseFloat(p.amountUsd);
+                              const tokens = parseFloat(p.amountTokens);
+                              const date = new Date(p.createdAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+                              const fmtTok = (n: number) => n >= 1e9 ? (n/1e9).toFixed(2)+"B" : n >= 1e6 ? (n/1e6).toFixed(2)+"M" : n.toLocaleString();
                               return (
-                                <div key={tx.signature} className="flex items-center gap-3 rounded-xl border-2 border-[#1a1a2e]/10 bg-[#FFFDE7]/50 px-4 py-3 hover:bg-[#FFFDE7] transition-colors">
+                                <div key={p.id} className="flex items-center gap-3 rounded-xl border-2 border-[#1a1a2e]/10 bg-[#FFFDE7]/50 px-4 py-3 hover:bg-[#FFFDE7] transition-colors">
                                   <div className="w-6 h-6 rounded-full bg-[#4CAF50]/15 border border-[#4CAF50]/30 flex items-center justify-center shrink-0">
                                     <span className="text-[10px] font-display text-[#4CAF50]">#{i + 1}</span>
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <div className="font-mono text-[11px] text-[#1a1a2e]/70 truncate">{tx.signature.slice(0, 20)}…{tx.signature.slice(-8)}</div>
-                                    <div className="text-[10px] text-[#1a1a2e]/40 font-bold">{date}</div>
+                                    <div className="font-display text-xs text-[#FF4D9D] tracking-wider">+{fmtTok(tokens)} $PWIFE</div>
+                                    <div className="text-[10px] text-[#1a1a2e]/40 font-bold">${usd.toFixed(2)} · Stage {p.stage} · {date}</div>
+                                    {p.txHash && (
+                                      <div className="font-mono text-[9px] text-[#1a1a2e]/30 truncate mt-0.5">{p.txHash.slice(0, 16)}…{p.txHash.slice(-8)}</div>
+                                    )}
                                   </div>
-                                  <a
-                                    href={buildExplorerUrl(tx.signature)}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="shrink-0 bg-[#4CAF50]/10 hover:bg-[#4CAF50]/20 border border-[#4CAF50]/30 text-[#0a9060] rounded-lg px-2 py-1 text-[10px] font-display tracking-wide flex items-center gap-1 transition-colors"
-                                  >
-                                    View <ExternalLink size={10} />
-                                  </a>
+                                  {p.txHash && (
+                                    <a
+                                      href={buildExplorerUrl(p.txHash)}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="shrink-0 bg-[#4CAF50]/10 hover:bg-[#4CAF50]/20 border border-[#4CAF50]/30 text-[#0a9060] rounded-lg px-2 py-1 text-[10px] font-display tracking-wide flex items-center gap-1 transition-colors"
+                                    >
+                                      {t.dashboard.viewTx} <ExternalLink size={10} />
+                                    </a>
+                                  )}
                                 </div>
                               );
                             })}
                             <p className="text-center text-[10px] text-[#1a1a2e]/30 font-bold pt-2">
-                              {buyerTxs.length} transaction{buyerTxs.length !== 1 ? "s" : ""} on Solana Devnet
+                              {myDbPurchases.length} {t.dashboard.purchaseCount}
                             </p>
                           </div>
                         )

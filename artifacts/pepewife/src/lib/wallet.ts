@@ -28,6 +28,7 @@ declare global {
     phantom?: { solana?: SolanaProvider };
     solflare?: SolanaProvider;
     backpack?: SolanaProvider;
+    xnft?: { solana?: SolanaProvider };
     okxwallet?: { solana?: SolanaProvider };
   }
 }
@@ -42,7 +43,7 @@ export function getSolanaProvider(walletType: WalletType = "phantom"): SolanaPro
   }
 
   if (walletType === "backpack") {
-    const provider = window.backpack;
+    const provider = window.backpack ?? window.xnft?.solana;
     if (provider) return provider;
     return null;
   }
@@ -66,7 +67,7 @@ export function detectWallets(): Record<WalletType, boolean> {
   return {
     phantom: !!(window.phantom?.solana?.isPhantom || window.solana?.isPhantom),
     solflare: !!(window.solflare?.isSolflare || window.solflare),
-    backpack: !!window.backpack,
+    backpack: !!(window.backpack ?? window.xnft?.solana),
     okx: !!window.okxwallet?.solana,
   };
 }
