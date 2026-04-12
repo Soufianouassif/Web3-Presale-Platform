@@ -180,6 +180,12 @@ uri = "file://artifacts/pepewife/public/meme-posts/meme10.png"
 type = "image"
 title = "pepe wife couple sunset"
 
+[[generated]]
+id = "LJHs49egOvJjwPM2kjEM5"
+uri = "file://artifacts/pepewife/public/pepewife-family.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "enG-yn5f3oQ2SCQFxzrS0"
 uri = "file://PEPEWIFE-GUIDE.md"

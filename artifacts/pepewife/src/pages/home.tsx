@@ -149,10 +149,18 @@ export default function Home() {
   const isConnected = status === "connected";
   const walletAddress = shortAddress || "7xKp...4mNr";
   const fmt = (n: number) => {
-    if (n >= 1e12) return (n / 1e12).toFixed(2) + "T";
-    if (n >= 1e9)  return (n / 1e9).toFixed(2) + "B";
-    if (n >= 1e6)  return (n / 1e6).toFixed(2) + "M";
-    return n.toLocaleString();
+    if (n >= 1e12) return (n / 1e12).toFixed(1) + "T";
+    if (n >= 1e9)  return (n / 1e9).toFixed(1) + "B";
+    if (n >= 1e6)  return (n / 1e6).toFixed(1) + "M";
+    if (n >= 1e3)  return (n / 1e3).toFixed(1) + "K";
+    return n.toFixed(0);
+  };
+  const fmtUSD = (n: number) => {
+    if (n >= 1e12) return "$" + (n / 1e12).toFixed(1) + "T";
+    if (n >= 1e9)  return "$" + (n / 1e9).toFixed(1) + "B";
+    if (n >= 1e6)  return "$" + (n / 1e6).toFixed(1) + "M";
+    if (n >= 1e3)  return "$" + (n / 1e3).toFixed(1) + "K";
+    return "$" + n.toFixed(0);
   };
 
   const P = ({ v, className = "", style }: { v: string; className?: string; style?: React.CSSProperties }) => {
@@ -435,29 +443,21 @@ export default function Home() {
                   <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                     <div className="text-xs font-display text-gray-500 tracking-wide font-bold">💰 Total Raised</div>
                     <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider">
-                      {presaleData
-                        ? `$${totalRaisedUSD >= 1000 ? (totalRaisedUSD / 1000).toFixed(1) + "K" : totalRaisedUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
-                        : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
+                      {presaleData ? fmtUSD(totalRaisedUSD) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
                     </div>
                     <div className="text-xs text-gray-500 font-display tracking-wide font-bold">USD • SOL ${solPrice.toFixed(0)}</div>
                   </div>
                   <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                     <div className="text-xs font-display text-gray-500 tracking-wide font-bold">🐸 $PWIFE Sold</div>
                     <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider">
-                      {presaleData
-                        ? (totalSold >= 1_000_000_000
-                            ? (totalSold / 1_000_000_000).toFixed(2) + "B"
-                            : totalSold >= 1_000_000
-                              ? (totalSold / 1_000_000).toFixed(1) + "M"
-                              : totalSold.toLocaleString())
-                        : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
+                      {presaleData ? fmt(totalSold) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
                     </div>
                     <div className="text-xs text-gray-500 font-display tracking-wide font-bold">tokens</div>
                   </div>
                   <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                     <div className="text-xs font-display text-gray-500 tracking-wide font-bold">👥 Buyers</div>
                     <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider">
-                      {presaleData ? Number(presaleData.buyersCount).toLocaleString() : <span className="text-sm text-gray-400 animate-pulse">—</span>}
+                      {presaleData ? fmt(Number(presaleData.buyersCount)) : <span className="text-sm text-gray-400 animate-pulse">—</span>}
                     </div>
                     <div className="text-xs text-gray-500 font-display tracking-wide font-bold">unique wallets</div>
                   </div>
@@ -477,14 +477,14 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* ─── الشخصية ─── */}
-              <div className="flex justify-center items-end">
+              {/* ─── ديسكتوب: الشخصية المفردة ─── */}
+              <div className="hidden lg:flex justify-center items-end">
                 <img
                   src="/pepewife-hero.webp"
                   alt="PEPEWIFE character"
                   width="600"
                   height="600"
-                  className="w-full max-w-xs sm:max-w-sm lg:max-w-full object-contain drop-shadow-2xl"
+                  className="w-full max-w-full object-contain drop-shadow-2xl"
                   fetchPriority="high"
                 />
               </div>
@@ -492,6 +492,19 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* ─── موبايل: صورة العائلة عرض كامل ─── */}
+        <div className="lg:hidden w-full mt-2">
+          <img
+            src="/pepewife-family.webp"
+            alt="PEPEWIFE Family — Pepe the Frog with his wife and kids"
+            width="1200"
+            height="675"
+            className="w-full h-auto block"
+            loading="eager"
+          />
+        </div>
+
       </section>
 
       <div className="zigzag-border" />
@@ -528,7 +541,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-8 items-start">
             <div className="meme-card bg-white rounded-3xl overflow-hidden">
               <div className="zigzag-border" />
-              <div className="p-7 space-y-6">
+              <div className="p-4 sm:p-7 space-y-4 sm:space-y-6">
                 <div>
                   <p className="font-display text-center text-[#1a1a2e]/50 tracking-wider mb-3">{t.presale.tickTock}</p>
                   <div className="grid grid-cols-4 gap-2">
@@ -688,28 +701,23 @@ export default function Home() {
                     </p>
                   )}
 
-                  <div className={`border-2 rounded-xl px-3 py-2.5 transition-colors ${tokensOut > 0 ? "bg-[#E8F5E9] border-[#4CAF50]/50" : "bg-gray-50 border-gray-200"}`}>
-                    <div className="flex justify-between items-center">
+                  <div className={`border-2 rounded-xl px-3 py-3 transition-colors ${tokensOut > 0 ? "bg-[#E8F5E9] border-[#4CAF50]/50" : "bg-gray-50 border-gray-200"}`}>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                       <span className="text-xs text-[#1a1a2e]/50 font-bold">{t.presale.youGet}</span>
-                      <span className={`font-nums text-lg tracking-wider ${tokensOut > 0 ? "text-[#4CAF50]" : "text-gray-300"}`}>
-                        ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} $PWIFE
+                      <span className={`font-nums text-xl sm:text-2xl tracking-wider font-bold ${tokensOut > 0 ? "text-[#4CAF50]" : "text-gray-300"}`}>
+                        ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} <span className="text-sm sm:text-base">$PWIFE</span>
                       </span>
                     </div>
-                    {tokensOut > 0 && currency === "SOL" && (
-                      <p className="text-xs text-[#1a1a2e]/50 font-bold mt-1 text-end">
-                        1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
-                      </p>
-                    )}
-                    {tokensOut > 0 && currency === "USDT_SPL" && (
-                      <p className="text-xs text-[#1a1a2e]/50 font-bold mt-1 text-end">
-                        Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
+                    {tokensOut > 0 && (
+                      <p className="text-[10px] text-[#1a1a2e]/40 font-bold mt-1">
+                        {currency === "SOL" ? `1 SOL ≈ $${solPrice.toFixed(0)} · ` : ""}Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
                       </p>
                     )}
                   </div>
                   <button
                     onClick={handleApeIn}
                     disabled={!!amountError || amount === "" || !siteConfig.isActive}
-                    className="btn-meme w-full h-14 text-2xl rounded-xl font-display tracking-wider text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+                    className="btn-meme w-full h-12 sm:h-14 text-base sm:text-xl md:text-2xl rounded-xl font-display tracking-wider text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity truncate px-3"
                     style={{ background: "linear-gradient(135deg, #4CAF50 0%, #FF4D9D 100%)" }}
                   >
                     {t.presale.apeIn}
