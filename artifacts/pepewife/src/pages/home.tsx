@@ -1001,7 +1001,7 @@ export default function Home() {
                   src={step.img}
                   alt={`PEPEWIFE roadmap ${step.title}`}
                   loading="lazy"
-                  className="w-full h-56 object-cover block"
+                  className="w-full h-auto object-contain block"
                   style={{ borderBottom: `4px solid ${step.color}` }}
                 />
                 <div className="p-6 flex items-start gap-4">
