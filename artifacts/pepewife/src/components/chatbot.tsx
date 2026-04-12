@@ -16,9 +16,9 @@ declare global {
 
 function openTawkSupport() {
   try {
-    if (window.Tawk_API) {
+    if (typeof window.Tawk_API?.maximize === "function") {
       window.Tawk_API.showWidget();
-      window.Tawk_API.maximize();
+      setTimeout(() => window.Tawk_API!.maximize(), 100);
     } else {
       window.open("https://t.me/pepewifecoin", "_blank");
     }
