@@ -412,7 +412,8 @@ export default function Home() {
         )}
       </nav>
 
-      <section id="hero" className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #E8F5E9 0%, #FFFDE7 50%, #E3F2FD 100%)" }}>
+      <section id="hero" className="relative overflow-hidden" style={{ backgroundImage: "url('/pepewife-bg.webp')", backgroundSize: "cover", backgroundPosition: isRTL ? "left center" : "right center", backgroundRepeat: "no-repeat" }}>
+        <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/60 to-transparent pointer-events-none" />
         <div className="pt-24 pb-0 lg:pb-0 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-8 items-center">
