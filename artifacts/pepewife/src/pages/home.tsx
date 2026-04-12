@@ -418,61 +418,61 @@ export default function Home() {
             <div className="grid grid-cols-1 gap-0">
 
               {/* ─── المحتوى ─── */}
-              <div dir="ltr" className="max-w-2xl">
+              <div dir={dir} className="max-w-2xl">
                 <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-4 animate-pulse text-sm sm:text-base" style={{ transform: "rotate(-2deg)" }}>
                   {!siteConfig.isActive
-                    ? "⏸️ PRESALE TEMPORARILY PAUSED — COMING BACK SOON"
+                    ? t.hero.presaleSysPaused
                     : presaleData
                       ? presaleData.isActive
-                        ? `🔥 STAGE ${presaleData.currentStage + 1}/4 — PRESALE LIVE — APE IN NOW!! 🚀`
+                        ? t.hero.presaleLive.replace("{0}", String(presaleData.currentStage + 1))
                         : presaleData.isPaused
-                        ? `⏸️ STAGE ${presaleData.currentStage + 1}/4 — PRESALE PAUSED — COMING BACK SOON`
-                        : `✅ PRESALE ENDED — CLAIM YOUR $PWIFE SOON!`
-                      : "🔥 STAGE 1 — PRESALE COMING SOON — NGMI IF U MISS THIS!!"}
+                        ? t.hero.presalePaused.replace("{0}", String(presaleData.currentStage + 1))
+                        : t.hero.presaleEnded
+                      : t.hero.banner}
                 </div>
                 <h1 className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-display leading-tight mb-4 text-[#1a1a2e] comic-shadow tracking-wider">
-                  {"Be Early..."}<br /><span className="text-[#FF4D9D]" style={{ textShadow: "3px 3px 0px #1a1a2e" }}>{"Or Cry Later 😭"}</span>
+                  {t.hero.titleLine1}<br /><span className="text-[#FF4D9D]" style={{ textShadow: "3px 3px 0px #1a1a2e" }}>{t.hero.titleLine2}</span>
                 </h1>
                 <div className="speech-bubble inline-block p-3 sm:p-4 mb-5 max-w-sm sm:max-w-xl">
                   <p className="text-base sm:text-lg lg:text-xl font-bold text-[#1a1a2e]">
-                    {"PEPE built the meme. SHE builds the future. 💅"}<br />
-                    <span className="text-[#FF4D9D]">{"Join the most BASED presale on Solana. LFG! 🚀"}</span>
+                    {t.hero.subtitle1}<br />
+                    <span className="text-[#FF4D9D]">{t.hero.subtitle2}</span>
                   </p>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
                   <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">💰 Total Raised</div>
-                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider">
+                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.totalRaised}</div>
+                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
                       {presaleData ? fmtUSD(totalRaisedUSD) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
                     </div>
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">USD • SOL ${solPrice.toFixed(0)}</div>
+                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold" dir="ltr">USD • SOL ${solPrice.toFixed(0)}</div>
                   </div>
                   <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">🐸 $PWIFE Sold</div>
-                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider">
+                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.tokensSold}</div>
+                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
                       {presaleData ? fmt(totalSold) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
                     </div>
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">tokens</div>
+                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">{t.hero.tokens}</div>
                   </div>
                   <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">👥 Buyers</div>
-                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider">
+                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.buyers}</div>
+                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
                       {presaleData ? fmt(Number(presaleData.buyersCount)) : <span className="text-sm text-gray-400 animate-pulse">—</span>}
                     </div>
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">unique wallets</div>
+                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">{t.hero.uniqueWallets}</div>
                   </div>
                   <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">💎 Stage {currentStage + 1} Price</div>
+                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.stagePrice.replace("{0}", String(currentStage + 1))}</div>
                     <P v={STAGE_DATA[currentStage].price} className="text-base sm:text-lg font-nums text-[#1a1a2e] tracking-wider" />
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">per $PWIFE</div>
+                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold" dir="ltr">per $PWIFE</div>
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 pb-8 lg:pb-16">
                   <button onClick={() => scrollTo('presale')} className="btn-meme bg-[#4CAF50] text-white rounded-2xl h-12 sm:h-14 px-8 sm:px-10 text-xl sm:text-2xl font-display tracking-wider" style={{ animation: "pulse-glow 2s infinite" }}>
-                    {"🚀 APE IN NOW"}
+                    {t.hero.apeInNow}
                   </button>
                   <button className="btn-meme bg-white text-[#1a1a2e] rounded-2xl h-12 sm:h-14 px-6 sm:px-8 text-xl sm:text-2xl font-display tracking-wider">
-                    {"🐸 Join The Fam"} <ArrowRight className="ml-2 h-5 w-5 inline" />
+                    {t.hero.joinTheFam} <ArrowRight className={`${isRTL ? "me-2 rotate-180" : "ms-2"} h-5 w-5 inline`} />
                   </button>
                 </div>
               </div>
