@@ -7,6 +7,7 @@ import { LanguageProvider } from "@/i18n/context";
 import { WalletProvider } from "@/contexts/wallet-context";
 import { ToastProvider } from "@/components/wallet-toast";
 import LoadingPage from "@/components/loading-page";
+import Chatbot from "@/components/chatbot";
 
 import Home from "@/pages/home";
 import ConnectPage from "@/pages/connect";
@@ -66,6 +67,7 @@ function AdminRouteGuard({ children }: { children: React.ReactNode }) {
     <>
       {loading && <LoadingPage onComplete={() => setLoading(false)} />}
       {children}
+      <Chatbot />
     </>
   );
 }
