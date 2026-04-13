@@ -16292,9 +16292,9 @@ var require_object_inspect = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/side-channel-list@1.0.0/node_modules/side-channel-list/index.js
+// ../../node_modules/.pnpm/side-channel-list@1.0.1/node_modules/side-channel-list/index.js
 var require_side_channel_list = __commonJS({
-  "../../node_modules/.pnpm/side-channel-list@1.0.0/node_modules/side-channel-list/index.js"(exports, module) {
+  "../../node_modules/.pnpm/side-channel-list@1.0.1/node_modules/side-channel-list/index.js"(exports, module) {
     "use strict";
     var inspect = require_object_inspect();
     var $TypeError = require_type();
@@ -16354,9 +16354,8 @@ var require_side_channel_list = __commonJS({
           }
         },
         "delete": function(key) {
-          var root = $o && $o.next;
           var deletedNode = listDelete($o, key);
-          if (deletedNode && root && root === deletedNode) {
+          if (deletedNode && $o && !$o.next) {
             $o = void 0;
           }
           return !!deletedNode;
@@ -17372,9 +17371,9 @@ var require_side_channel = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/formats.js
+// ../../node_modules/.pnpm/qs@6.15.1/node_modules/qs/lib/formats.js
 var require_formats = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/formats.js"(exports, module) {
+  "../../node_modules/.pnpm/qs@6.15.1/node_modules/qs/lib/formats.js"(exports, module) {
     "use strict";
     var replace = String.prototype.replace;
     var percentTwenties = /%20/g;
@@ -17398,9 +17397,9 @@ var require_formats = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/utils.js
+// ../../node_modules/.pnpm/qs@6.15.1/node_modules/qs/lib/utils.js
 var require_utils2 = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/utils.js"(exports, module) {
+  "../../node_modules/.pnpm/qs@6.15.1/node_modules/qs/lib/utils.js"(exports, module) {
     "use strict";
     var formats = require_formats();
     var getSideChannel = require_side_channel();
@@ -17662,9 +17661,9 @@ var require_utils2 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/stringify.js
+// ../../node_modules/.pnpm/qs@6.15.1/node_modules/qs/lib/stringify.js
 var require_stringify = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/stringify.js"(exports, module) {
+  "../../node_modules/.pnpm/qs@6.15.1/node_modules/qs/lib/stringify.js"(exports, module) {
     "use strict";
     var getSideChannel = require_side_channel();
     var utils = require_utils2();
@@ -17945,9 +17944,9 @@ var require_stringify = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/parse.js
+// ../../node_modules/.pnpm/qs@6.15.1/node_modules/qs/lib/parse.js
 var require_parse = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/parse.js"(exports, module) {
+  "../../node_modules/.pnpm/qs@6.15.1/node_modules/qs/lib/parse.js"(exports, module) {
     "use strict";
     var utils = require_utils2();
     var has = Object.prototype.hasOwnProperty;
@@ -17999,9 +17998,9 @@ var require_parse = __commonJS({
       var limit = options.parameterLimit === Infinity ? void 0 : options.parameterLimit;
       var parts = cleanStr.split(
         options.delimiter,
-        options.throwOnLimitExceeded ? limit + 1 : limit
+        options.throwOnLimitExceeded && typeof limit !== "undefined" ? limit + 1 : limit
       );
-      if (options.throwOnLimitExceeded && parts.length > limit) {
+      if (options.throwOnLimitExceeded && typeof limit !== "undefined" && parts.length > limit) {
         throw new RangeError("Parameter limit exceeded. Only " + limit + " parameter" + (limit === 1 ? "" : "s") + " allowed.");
       }
       var skipIndex = -1;
@@ -18244,9 +18243,9 @@ var require_parse = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/index.js
+// ../../node_modules/.pnpm/qs@6.15.1/node_modules/qs/lib/index.js
 var require_lib2 = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/index.js"(exports, module) {
+  "../../node_modules/.pnpm/qs@6.15.1/node_modules/qs/lib/index.js"(exports, module) {
     "use strict";
     var stringify2 = require_stringify();
     var parse2 = require_parse();
@@ -22043,16 +22042,14 @@ var require_request = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/content-disposition@1.0.1/node_modules/content-disposition/index.js
+// ../../node_modules/.pnpm/content-disposition@1.1.0/node_modules/content-disposition/index.js
 var require_content_disposition = __commonJS({
-  "../../node_modules/.pnpm/content-disposition@1.0.1/node_modules/content-disposition/index.js"(exports, module) {
+  "../../node_modules/.pnpm/content-disposition@1.1.0/node_modules/content-disposition/index.js"(exports, module) {
     "use strict";
     module.exports = contentDisposition;
     module.exports.parse = parse2;
-    var basename = __require("path").basename;
+    var utf8Decoder = new TextDecoder("utf-8");
     var ENCODE_URL_ATTR_CHAR_REGEXP = /[\x00-\x20"'()*,/:;<=>?@[\\\]{}\x7f]/g;
-    var HEX_ESCAPE_REGEXP = /%[0-9A-Fa-f]{2}/;
-    var HEX_ESCAPE_REPLACE_REGEXP = /%([0-9A-Fa-f]{2})/g;
     var NON_LATIN1_REGEXP = /[^\x20-\x7e\xa0-\xff]/g;
     var QESC_REGEXP = /\\([\u0000-\u007f])/g;
     var QUOTE_REGEXP = /([\\"])/g;
@@ -22088,7 +22085,7 @@ var require_content_disposition = __commonJS({
       var isQuotedString = TEXT_REGEXP.test(name);
       var fallbackName = typeof fallback !== "string" ? fallback && getlatin1(name) : basename(fallback);
       var hasFallback = typeof fallbackName === "string" && fallbackName !== name;
-      if (hasFallback || !isQuotedString || HEX_ESCAPE_REGEXP.test(name)) {
+      if (hasFallback || !isQuotedString || hasHexEscape(name)) {
         params["filename*"] = name;
       }
       if (isQuotedString || hasFallback) {
@@ -22115,26 +22112,32 @@ var require_content_disposition = __commonJS({
       return string;
     }
     function decodefield(str) {
-      var match = EXT_VALUE_REGEXP.exec(str);
+      const match = EXT_VALUE_REGEXP.exec(str);
       if (!match) {
         throw new TypeError("invalid extended field value");
       }
-      var charset = match[1].toLowerCase();
-      var encoded = match[2];
-      var value;
-      var binary = encoded.replace(HEX_ESCAPE_REPLACE_REGEXP, pdecode);
+      const charset = match[1].toLowerCase();
+      const encoded = match[2];
       switch (charset) {
-        case "iso-8859-1":
-          value = getlatin1(binary);
-          break;
+        case "iso-8859-1": {
+          const binary = decodeHexEscapes(encoded);
+          return getlatin1(binary);
+        }
         case "utf-8":
-        case "utf8":
-          value = Buffer.from(binary, "binary").toString("utf8");
-          break;
-        default:
-          throw new TypeError("unsupported charset in extended field");
+        case "utf8": {
+          try {
+            return decodeURIComponent(encoded);
+          } catch {
+            const binary = decodeHexEscapes(encoded);
+            const bytes = new Uint8Array(binary.length);
+            for (let idx = 0; idx < binary.length; idx++) {
+              bytes[idx] = binary.charCodeAt(idx);
+            }
+            return utf8Decoder.decode(bytes);
+          }
+        }
       }
-      return value;
+      throw new TypeError("unsupported charset in extended field");
     }
     function getlatin1(val) {
       return String(val).replace(NON_LATIN1_REGEXP, "?");
@@ -22184,9 +22187,6 @@ var require_content_disposition = __commonJS({
       }
       return new ContentDisposition(type, params);
     }
-    function pdecode(str, hex) {
-      return String.fromCharCode(parseInt(hex, 16));
-    }
     function pencode(char2) {
       return "%" + String(char2).charCodeAt(0).toString(16).toUpperCase();
     }
@@ -22202,6 +22202,51 @@ var require_content_disposition = __commonJS({
     function ContentDisposition(type, parameters) {
       this.type = type;
       this.parameters = parameters;
+    }
+    function basename(path) {
+      const normalized = path.replaceAll("\\", "/");
+      let end = normalized.length;
+      while (end > 0 && normalized[end - 1] === "/") {
+        end--;
+      }
+      if (end === 0) {
+        return "";
+      }
+      let start = end - 1;
+      while (start >= 0 && normalized[start] !== "/") {
+        start--;
+      }
+      return normalized.slice(start + 1, end);
+    }
+    function isHexDigit(char2) {
+      const code = char2.charCodeAt(0);
+      return code >= 48 && code <= 57 || // 0-9
+      code >= 65 && code <= 70 || // A-F
+      code >= 97 && code <= 102;
+    }
+    function hasHexEscape(str) {
+      const maxIndex = str.length - 3;
+      let lastIndex = -1;
+      while ((lastIndex = str.indexOf("%", lastIndex + 1)) !== -1 && lastIndex <= maxIndex) {
+        if (isHexDigit(str[lastIndex + 1]) && isHexDigit(str[lastIndex + 2])) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function decodeHexEscapes(str) {
+      const firstEscape = str.indexOf("%");
+      if (firstEscape === -1) return str;
+      let result = str.slice(0, firstEscape);
+      for (let idx = firstEscape; idx < str.length; idx++) {
+        if (str[idx] === "%" && idx + 2 < str.length && isHexDigit(str[idx + 1]) && isHexDigit(str[idx + 2])) {
+          result += String.fromCharCode(Number.parseInt(str[idx + 1] + str[idx + 2], 16));
+          idx += 2;
+        } else {
+          result += str[idx];
+        }
+      }
+      return result;
     }
   }
 });
@@ -58418,9 +58463,9 @@ var require_cjs = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/rpc-websockets@9.3.7/node_modules/rpc-websockets/dist/index.cjs
+// ../../node_modules/.pnpm/rpc-websockets@9.3.8/node_modules/rpc-websockets/dist/index.cjs
 var require_dist4 = __commonJS({
-  "../../node_modules/.pnpm/rpc-websockets@9.3.7/node_modules/rpc-websockets/dist/index.cjs"(exports) {
+  "../../node_modules/.pnpm/rpc-websockets@9.3.8/node_modules/rpc-websockets/dist/index.cjs"(exports) {
     "use strict";
     var WebSocketImpl = require_ws();
     var eventemitter3 = require_eventemitter3();
@@ -81665,6 +81710,7 @@ var purchases = pgTable("purchases", {
   amountTokens: decimal("amount_tokens", { precision: 18, scale: 6 }).notNull().default("0"),
   txHash: text("tx_hash"),
   stage: integer("stage").default(1),
+  verificationStatus: text("verification_status").default("VERIFIED"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
 });
 var presaleConfig = pgTable("presale_config", {
@@ -82874,8 +82920,7 @@ function analyzeSessionBinding(req, res, ip, ua) {
       loginIp,
       currentIp: ip,
       ipChangeCount: s.ipChangeCount,
-      uniqueIps,
-      action: "FLAGGED + requireRecentAuth"
+      uniqueIps
     });
   }
   if (uaChanged) {
@@ -82885,8 +82930,7 @@ function analyzeSessionBinding(req, res, ip, ua) {
     securityAlert("UA_CHANGE_DETECTED", req, {
       loginUa: loginUa?.slice(0, 80),
       currentUa: ua.slice(0, 80),
-      uaChangeCount: s.uaChangeCount,
-      action: "FLAGGED + requireRecentAuth"
+      uaChangeCount: s.uaChangeCount
     });
   }
   if (!ipChanged && !uaChanged && (s.securityLevel ?? 0) === 0) {
@@ -82901,14 +82945,7 @@ function requireAdminAuth(req, res, next) {
   const ip = getClientIp(req);
   const ua = normalizeUa(req);
   if (!req.session?.userId || !req.session?.isAdmin) {
-    logger.warn(
-      {
-        ip,
-        path: req.path,
-        sessionId: sessionId(req)
-      },
-      "ADMIN_ACCESS_DENIED: not authenticated"
-    );
+    logger.warn({ ip, path: req.path, sessionId: sessionId(req) }, "ADMIN_ACCESS_DENIED: not authenticated");
     res.status(401).json({ error: "Unauthorized", code: "NOT_AUTHENTICATED" });
     return;
   }
@@ -83110,7 +83147,7 @@ router3.get(
           }
           logger.info(
             { userId: user.id, email: user.email, ip, ua: ua.slice(0, 80) },
-            "AUTH_LOGIN: admin login success \u2014 session bound to UA+IP"
+            "AUTH_LOGIN: admin login success"
           );
           res.redirect("/admin/dashboard");
         });
@@ -83413,7 +83450,7 @@ router4.get("/admin/referrals", async (req, res) => {
       createdAt: referrals.createdAt
     }).from(referrals).orderBy(desc(referrals.createdAt)).limit(limit).offset(offset);
     const [{ total }] = whereClause ? await db.select({ total: count() }).from(referrals).where(whereClause) : await db.select({ total: count() }).from(referrals);
-    logger.info({ rowCount: rows.length, total: Number(total), source: "DB_READ" }, "[ADMIN_REFERRALS] \u2713 Returned from DB");
+    logger.info({ rowCount: rows.length, total: Number(total), source: "DB_READ" }, "[ADMIN_REFERRALS] Returned from DB");
     res.json({
       referrals: rows.map((r) => ({
         ...r,
@@ -83604,22 +83641,10 @@ var import_express6 = __toESM(require_express2(), 1);
 var import_web3 = __toESM(require_index_cjs(), 1);
 var router6 = (0, import_express6.Router)();
 var SOLANA_NETWORK = (process.env.SOLANA_NETWORK ?? "devnet").toLowerCase();
-var SOLANA_RPC = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+var SOLANA_RPC = process.env.SOLANA_RPC_URL || process.env.SOLANA_RPC || "https://api.devnet.solana.com";
 var PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
 var CONFIG_PDA = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
-var REQUIRE_ONCHAIN_VERIFICATION = process.env.REQUIRE_ONCHAIN_VERIFICATION !== "false";
-if (!REQUIRE_ONCHAIN_VERIFICATION) {
-  logger.warn(
-    {
-      security: true,
-      alert: true,
-      alertType: "VERIFICATION_BYPASS_ACTIVE",
-      SOLANA_NETWORK,
-      message: "ON-CHAIN VERIFICATION IS DISABLED \u2014 DO NOT USE IN DEVNET/MAINNET"
-    },
-    "\u26D4 [TRACKER] REQUIRE_ONCHAIN_VERIFICATION=false \u2014 blockchain checks SKIPPED. This MUST only be used in isolated CI/unit-test environments, NEVER for devnet or mainnet testing."
-  );
-}
+var REQUIRE_ONCHAIN_VERIFICATION = process.env.REQUIRE_ONCHAIN_VERIFICATION !== void 0 ? process.env.REQUIRE_ONCHAIN_VERIFICATION !== "false" : SOLANA_NETWORK === "mainnet";
 var USDT_MINT = SOLANA_NETWORK === "mainnet" ? process.env.USDT_MINT ?? "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB" : process.env.USDT_MINT_DEVNET ?? "8PieQJ43S4PpVWQaBZp4TaHFZGoAA9FsDzYbPftVfo6X";
 var USDT_DECIMALS = 6;
 var MISMATCH_WARN_PCT = 0.15;
@@ -83662,7 +83687,7 @@ async function fetchSolPriceUsd() {
   }
   logger.warn(
     { security: true, source: "FALLBACK_$150" },
-    "[SOL_PRICE] \u26A0 CoinGecko unreachable and cache empty \u2014 using $150 fallback (server-defined, not client)"
+    "[SOL_PRICE] CoinGecko unreachable and cache empty \u2014 using $150 fallback"
   );
   return 150;
 }
@@ -83785,7 +83810,7 @@ async function verifyTransaction(txHash, expectedWallet, stageIndex, network) {
     }
     if (!tx) {
       logger.warn({ ...logCtx, totalAttempts: MAX_ATTEMPTS }, `[TX_VERIFY] Transaction not found on ${SOLANA_NETWORK} after ${MAX_ATTEMPTS} attempts`);
-      return { valid: false, reason: `Transaction not found on ${SOLANA_NETWORK} after ${MAX_ATTEMPTS} attempts` };
+      return { valid: false, isTimeout: true, reason: `Transaction not found on ${SOLANA_NETWORK} after ${MAX_ATTEMPTS} attempts` };
     }
     if (tx.meta?.err !== null) {
       logger.warn({ ...logCtx, txError: tx.meta?.err }, `[TX_VERIFY] Transaction FAILED on ${SOLANA_NETWORK}`);
@@ -83880,7 +83905,7 @@ async function verifyTransaction(txHash, expectedWallet, stageIndex, network) {
       { err, ...logCtx },
       `[TX_VERIFY] Unexpected error during ${SOLANA_NETWORK} verification`
     );
-    return { valid: false, reason: `Verification error: ${String(err)}` };
+    return { valid: false, isTimeout: true, reason: `Verification error: ${String(err)}` };
   }
 }
 function logAmountComparison(label, clientValue, serverValue, txHash) {
@@ -84035,213 +84060,180 @@ router6.post("/track/purchase", purchaseLimiter, async (req, res) => {
         {
           wallet: walletAddress.slice(0, 8) + "\u2026",
           txHash: txHash.slice(0, 16) + "\u2026",
-          acceptedUsd,
-          acceptedTokens,
+          safeClientUsd,
+          safeClientTokens,
+          REQUIRE_ONCHAIN_VERIFICATION,
           security: true,
-          alert: true,
-          alertType: "VERIFICATION_BYPASSED",
-          warning: "REQUIRE_ONCHAIN_VERIFICATION=false \u2014 client amounts accepted WITHOUT blockchain check"
+          alertType: "CI_UNVERIFIED_PURCHASE"
         },
-        "\u26D4 [PURCHASE] VERIFICATION BYPASSED \u2014 using client-provided amounts (CI only)"
+        "[PURCHASE] \u26A0 ONCHAIN VERIFICATION DISABLED \u2014 accepting client values (CI/test only)"
       );
     } else {
-      const stageIndex = Math.max(0, Math.min(3, (stage ?? 1) - 1));
-      const verification = await verifyTransaction(txHash, walletAddress, stageIndex, network);
-      if (!verification.valid) {
-        logger.warn(
-          {
-            txHash: txHash.slice(0, 16) + "\u2026",
-            reason: verification.reason,
-            ip,
-            network: SOLANA_NETWORK
-          },
-          "[PURCHASE] Rejected: TX_VERIFICATION_FAILED"
-        );
-        res.status(400).json({
-          error: `Transaction verification failed on ${SOLANA_NETWORK}`,
-          reason: verification.reason,
-          network: SOLANA_NETWORK,
-          code: "TX_VERIFICATION_FAILED"
-        });
-        return;
-      }
-      if (!verification.onChain) {
-        logger.error(
-          { txHash: txHash.slice(0, 16) + "\u2026" },
-          "[PURCHASE] CRITICAL: valid=true but onChain is undefined \u2014 internal bug"
-        );
-        res.status(500).json({ error: "Internal verification error", code: "INTERNAL_ERROR" });
-        return;
-      }
-      const oc = verification.onChain;
-      if (oc.estimatedUsd <= 0) {
-        logger.warn(
-          {
-            txHash: txHash.slice(0, 16) + "\u2026",
-            paymentType: oc.paymentType,
-            solSpentSol: oc.solSpentSol,
-            usdtSpentUnits: oc.usdtSpentUnits,
-            ip
-          },
-          "[PURCHASE] Rejected: AMOUNT_EXTRACTION_FAILED \u2014 could not determine USD from on-chain data"
-        );
-        res.status(400).json({
-          error: "Could not extract payment amount from transaction",
-          detail: "Balance delta was zero or negative. Ensure the transaction actually transferred funds to the presale vault.",
-          code: "AMOUNT_EXTRACTION_FAILED"
-        });
-        return;
-      }
-      logAmountComparison("amountUsd", safeClientUsd, oc.estimatedUsd, txHash);
-      const usdPct = safeClientUsd > 0 && oc.estimatedUsd > 0 ? Math.abs(safeClientUsd - oc.estimatedUsd) / oc.estimatedUsd : 0;
-      if (usdPct > MISMATCH_BLOCK_PCT) {
-        logger.warn(
-          {
-            clientUsd: safeClientUsd,
-            serverUsd: oc.estimatedUsd,
-            discrepancyPct: (usdPct * 100).toFixed(1) + "%",
-            txHash: txHash.slice(0, 16) + "\u2026",
-            ip,
-            security: true,
-            alert: true,
-            alertType: "AMOUNT_MANIPULATION"
-          },
-          "[PURCHASE] Rejected: AMOUNT_MANIPULATION \u2014 client USD exceeds 50% deviation from on-chain value"
-        );
-        res.status(400).json({
-          error: "Amount mismatch with on-chain data",
-          code: "AMOUNT_MANIPULATION",
-          detail: "The USD amount you provided differs significantly from what the transaction shows."
-        });
-        return;
-      }
-      acceptedUsd = oc.estimatedUsd;
-      logAmountComparison("amountTokens", safeClientTokens, oc.estimatedTokens ?? 0, txHash);
-      if (oc.estimatedTokens !== null && oc.estimatedTokens > 0) {
-        acceptedTokens = oc.estimatedTokens;
-        verificationSource = "SERVER_VERIFIED_ONCHAIN";
+      const stageIndex = typeof stage === "number" && stage >= 0 && stage <= 3 ? stage : 0;
+      const verifyResult = await verifyTransaction(txHash, walletAddress, stageIndex, network);
+      if (!verifyResult.valid) {
+        if (verifyResult.isTimeout) {
+          logger.warn(
+            { txHash: txHash.slice(0, 16) + "\u2026", wallet: walletAddress.slice(0, 8) + "\u2026", reason: verifyResult.reason, ip },
+            "[PURCHASE] Verification timeout \u2014 storing with timeout flag"
+          );
+          acceptedUsd = safeClientUsd;
+          acceptedTokens = safeClientTokens;
+          verificationSource = "CLIENT_TIMEOUT_FALLBACK";
+        } else {
+          logger.warn(
+            {
+              txHash: txHash.slice(0, 16) + "\u2026",
+              wallet: walletAddress.slice(0, 8) + "\u2026",
+              reason: verifyResult.reason,
+              ip,
+              security: true,
+              alertType: "TX_VERIFICATION_FAILED"
+            },
+            "[PURCHASE] Rejected: transaction verification FAILED"
+          );
+          res.status(400).json({ error: `Transaction verification failed: ${verifyResult.reason}` });
+          return;
+        }
       } else {
-        acceptedTokens = 0;
-        verificationSource = "SERVER_VERIFIED_ONCHAIN_TOKENS_PENDING";
-        logger.warn(
-          {
-            txHash: txHash.slice(0, 16) + "\u2026",
-            stageIndex,
-            acceptedUsd,
-            clientTokens: safeClientTokens,
-            note: "Stage price unavailable from PDA \u2014 acceptedTokens=0, needs admin correction. Client tokens REJECTED."
-          },
-          "[PURCHASE] WARN: Stage token price unavailable \u2014 acceptedTokens set to 0 (NOT from client)"
-        );
+        const oc = verifyResult.onChain;
+        acceptedUsd = oc.estimatedUsd;
+        acceptedTokens = oc.estimatedTokens ?? safeClientTokens;
+        verificationSource = "ONCHAIN_VERIFIED";
+        logAmountComparison("amountUsd", safeClientUsd, acceptedUsd, txHash);
+        logAmountComparison("amountTokens", safeClientTokens, acceptedTokens, txHash);
+        const pctUsd = acceptedUsd > 0 ? Math.abs(safeClientUsd - acceptedUsd) / acceptedUsd : 0;
+        if (pctUsd > MISMATCH_BLOCK_PCT) {
+          logger.warn(
+            {
+              txHash: txHash.slice(0, 16) + "\u2026",
+              wallet: walletAddress.slice(0, 8) + "\u2026",
+              clientUsd: safeClientUsd,
+              serverUsd: acceptedUsd,
+              discrepancyPct: (pctUsd * 100).toFixed(1) + "%",
+              ip,
+              security: true,
+              alertType: "AMOUNT_MANIPULATION_BLOCKED"
+            },
+            "[PURCHASE] Rejected: amount manipulation detected"
+          );
+          res.status(400).json({ error: "Amount manipulation detected" });
+          return;
+        }
       }
-      logger.info(
-        {
-          acceptedUsd,
-          acceptedTokens,
-          paymentType: oc.paymentType,
-          source: verificationSource,
-          network: SOLANA_NETWORK
-        },
-        "[PURCHASE] Accepted server-verified amounts"
-      );
     }
-    const safeWalletType = walletType && ALLOWED_WALLET_TYPES.has(walletType.toLowerCase()) ? walletType.toLowerCase() : "unknown";
-    const [purchase] = await db.insert(purchases).values({
+    const safeWalletType = ALLOWED_WALLET_TYPES.has((walletType ?? "").toLowerCase()) ? (walletType ?? "unknown").toLowerCase() : "unknown";
+    const [inserted] = await db.insert(purchases).values({
       walletAddress,
       walletType: safeWalletType,
-      network: SOLANA_NETWORK,
-      // always use server-side network, not client input
+      network: String(network).slice(0, 20),
       amountUsd: String(acceptedUsd),
       amountTokens: String(acceptedTokens),
       txHash,
-      stage: stage ?? 1
+      stage: typeof stage === "number" ? stage : null,
+      referralCode: referralCode ? String(referralCode).slice(0, 16) : null,
+      verificationSource,
+      ip
     }).returning({ id: purchases.id });
     logger.info(
       {
-        purchaseId: purchase?.id,
+        purchaseId: inserted.id,
         wallet: walletAddress.slice(0, 8) + "\u2026",
+        txHash: txHash.slice(0, 16) + "\u2026",
         acceptedUsd,
         acceptedTokens,
-        source: verificationSource,
-        network: SOLANA_NETWORK
+        verificationSource,
+        source: "DB_WRITE"
       },
-      "[PURCHASE] \u2713 Saved to DB"
+      "[PURCHASE] \u2713 Purchase saved to DB"
     );
     if (referralCode) {
-      const code = referralCode.trim().slice(0, 16);
-      logger.info({ code, buyer: walletAddress.slice(0, 8) + "\u2026" }, "[REFERRAL] Processing referral code");
       try {
-        const codeRow = await db.select().from(referralCodes).where(eq(referralCodes.code, code)).limit(1);
-        if (codeRow.length === 0) {
-          logger.warn({ code }, "[REFERRAL] Code not found in DB \u2014 no referral created");
-        } else {
+        const codeRow = await db.select({ walletAddress: referralCodes.walletAddress }).from(referralCodes).where(eq(referralCodes.code, referralCode.trim().slice(0, 16))).limit(1);
+        if (codeRow.length > 0) {
           const referrerWallet = codeRow[0].walletAddress;
-          logger.info({ code, referrer: referrerWallet.slice(0, 8) + "\u2026" }, "[REFERRAL] Code resolved to referrer");
-          if (referrerWallet.toLowerCase() === walletAddress.toLowerCase()) {
-            logger.warn({ referrer: referrerWallet.slice(0, 8) }, "[REFERRAL] SELF_REFERRAL_BLOCKED");
-          } else {
+          if (referrerWallet.toLowerCase() !== walletAddress.toLowerCase()) {
             const alreadyReferred = await db.select({ id: referrals.id }).from(referrals).where(eq(referrals.referredWallet, walletAddress)).limit(1);
-            if (alreadyReferred.length > 0) {
-              logger.warn(
-                { buyer: walletAddress.slice(0, 8) + "\u2026", existingReferralId: alreadyReferred[0].id },
-                "[REFERRAL] DOUBLE_REFERRAL_BLOCKED \u2014 wallet already has a referral"
-              );
-            } else {
+            if (alreadyReferred.length === 0) {
               const rewardTokens = acceptedTokens > 0 ? (acceptedTokens * REWARD_RATE / 100).toFixed(6) : "0";
               const rewardUsd = acceptedUsd > 0 ? (acceptedUsd * REWARD_RATE / 100).toFixed(6) : "0";
-              logger.info(
-                {
-                  referrer: referrerWallet.slice(0, 8) + "\u2026",
-                  buyer: walletAddress.slice(0, 8) + "\u2026",
-                  rewardTokens,
-                  rewardUsd,
-                  rewardRate: REWARD_RATE,
-                  basedOn: verificationSource,
-                  source: "SERVER_VERIFIED_REWARD"
-                },
-                "[REFERRAL] Reward calculated from server-verified amounts"
-              );
               const client = await pool.connect();
               try {
                 await client.query("BEGIN");
                 await client.query(
-                  `INSERT INTO referrals
-                     (referrer_wallet, referred_wallet, purchase_id, reward_rate, reward_tokens, reward_usd, status)
+                  `INSERT INTO referrals (referrer_wallet, referred_wallet, purchase_id, reward_rate, reward_tokens, reward_usd, status)
                    VALUES ($1, $2, $3, $4, $5, $6, 'pending')`,
-                  [referrerWallet, walletAddress, purchase?.id ?? null, REWARD_RATE, rewardTokens, rewardUsd]
+                  [referrerWallet, walletAddress, inserted.id, REWARD_RATE, rewardTokens, rewardUsd]
                 );
                 await client.query(
                   `UPDATE referral_codes
-                   SET total_referrals     = total_referrals + 1,
+                   SET total_referrals = total_referrals + 1,
                        total_reward_tokens = total_reward_tokens + $1,
-                       total_reward_usd    = total_reward_usd    + $2
+                       total_reward_usd = total_reward_usd + $2
                    WHERE wallet_address = $3`,
                   [rewardTokens, rewardUsd, referrerWallet]
                 );
                 await client.query("COMMIT");
-                logger.info(
-                  { referrer: referrerWallet.slice(0, 8) + "\u2026", rewardTokens, rewardUsd },
-                  "[REFERRAL] \u2713 Referral reward committed to DB"
-                );
               } catch (txErr) {
                 await client.query("ROLLBACK");
-                logger.error({ txErr }, "[REFERRAL] DB transaction ROLLBACK");
+                throw txErr;
               } finally {
                 client.release();
               }
+              logger.info(
+                { code: referralCode, referrer: referrerWallet.slice(0, 8), buyer: walletAddress.slice(0, 8), rewardTokens, rewardUsd },
+                "[PURCHASE] Referral reward recorded"
+              );
             }
           }
         }
       } catch (refErr) {
-        logger.error({ refErr }, "[REFERRAL] Unexpected error \u2014 purchase already saved");
+        logger.warn({ refErr, referralCode }, "[PURCHASE] Referral processing failed (non-fatal)");
       }
-    } else {
-      logger.info({ wallet: walletAddress.slice(0, 8) + "\u2026" }, "[PURCHASE] No referral code provided");
     }
-    res.json({ success: true, purchaseId: purchase?.id, network: SOLANA_NETWORK });
+    res.json({
+      success: true,
+      purchaseId: inserted.id,
+      acceptedUsd,
+      acceptedTokens,
+      verificationSource
+    });
   } catch (err) {
-    logger.error({ err }, "[PURCHASE] Unhandled error");
-    res.status(500).json({ success: false, error: "Internal server error" });
+    logger.error({ err }, "[PURCHASE] Unexpected error");
+    res.status(500).json({ error: "Server error" });
+  }
+});
+router6.get("/track/stats", async (_req, res) => {
+  try {
+    const result = await db.execute(
+      `SELECT
+        (SELECT COALESCE(SUM(amount_usd::numeric), 0) FROM purchases) as total_raised_usd,
+        (SELECT COALESCE(SUM(amount_tokens::numeric), 0) FROM purchases) as total_tokens_sold,
+        (SELECT COUNT(DISTINCT wallet_address) FROM purchases) as unique_buyers,
+        (SELECT COUNT(*) FROM purchases) as total_purchases`
+    );
+    res.json(result.rows[0] ?? {});
+  } catch (err) {
+    logger.error({ err }, "[STATS] Failed to fetch stats");
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
+});
+router6.get("/track/recent", async (_req, res) => {
+  try {
+    const rows = await db.select({
+      walletAddress: purchases.walletAddress,
+      amountUsd: purchases.amountUsd,
+      amountTokens: purchases.amountTokens,
+      network: purchases.network,
+      createdAt: purchases.createdAt
+    }).from(purchases).orderBy(desc(purchases.createdAt)).limit(10);
+    res.json(rows.map((r) => ({
+      ...r,
+      walletAddress: r.walletAddress.slice(0, 4) + "\u2026" + r.walletAddress.slice(-4)
+    })));
+  } catch (err) {
+    logger.error({ err }, "[RECENT] Failed to fetch recent purchases");
+    res.status(500).json({ error: "Failed to fetch recent purchases" });
   }
 });
 var tracker_default = router6;
@@ -84403,7 +84395,7 @@ router7.post("/referral/register", registerLimiter, async (req, res) => {
         rewardUsd,
         source: "DB_WRITE"
       },
-      "[REF_REGISTER] \u2713 Referral saved to DB \u2014 reward created"
+      "[REF_REGISTER] Referral saved to DB"
     );
     res.json({
       success: true,
@@ -84428,7 +84420,7 @@ router7.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
   try {
     const codeRow = await db.select().from(referralCodes).where(eq(referralCodes.walletAddress, wallet)).limit(1);
     if (codeRow.length === 0) {
-      logger.info({ wallet: wallet.slice(0, 8) }, "[REF_STATS] No referral code found \u2192 empty state returned");
+      logger.info({ wallet: wallet.slice(0, 8) }, "[REF_STATS] No referral code found");
       res.json({
         code: null,
         totalReferrals: 0,
@@ -84463,7 +84455,7 @@ router7.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
         recentCount: recent.length,
         source: "DB_READ"
       },
-      "[REF_STATS] \u2713 Stats returned from DB"
+      "[REF_STATS] Stats returned from DB"
     );
     res.json({
       code: row.code,
@@ -84491,7 +84483,7 @@ router7.get("/referral/leaderboard", readLimiter, async (_req, res) => {
       ...r,
       walletAddress: r.walletAddress.slice(0, 4) + "\u2026" + r.walletAddress.slice(-4)
     }));
-    logger.info({ count: masked.length, source: "DB_READ" }, "[REF_LEADERBOARD] \u2713 Returned from DB");
+    logger.info({ count: masked.length, source: "DB_READ" }, "[REF_LEADERBOARD] Returned from DB");
     res.json(masked);
   } catch (err) {
     logger.error({ err }, "[REF_LEADERBOARD] DB error");
@@ -84849,8 +84841,9 @@ if (IS_PROD4 && !process.env.SESSION_SECRET) {
 }
 var SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-production";
 var ALLOWED_ORIGINS_EXACT = [
+  "https://pwifecoin.fun",
+  "https://www.pwifecoin.fun",
   ...IS_PROD4 ? [] : ["http://localhost:22793", "http://localhost:3000"],
-  ...process.env.REPLIT_DEV_DOMAIN ? [`https://${process.env.REPLIT_DEV_DOMAIN}`] : [],
   ...process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []
 ];
 var VERCEL_PREVIEW_DOMAIN = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
@@ -84871,13 +84864,25 @@ if (IS_PROD4 && !process.env.CRON_SECRET) {
 }
 var app = (0, import_express12.default)();
 app.set("trust proxy", 1);
+app.disable("x-powered-by");
 app.use(
   helmet({
     contentSecurityPolicy: false,
-    // API-only server — no HTML pages to protect
-    crossOriginEmbedderPolicy: false
+    crossOriginEmbedderPolicy: false,
+    // wallet extensions need this off
+    frameguard: { action: "sameorigin" },
+    noSniff: true,
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    hsts: IS_PROD4 ? { maxAge: 31536e3, includeSubDomains: true, preload: true } : false
   })
 );
+app.use((_req, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), payment=(self), usb=(), interest-cohort=()"
+  );
+  next();
+});
 app.use(
   pinoHttpMiddleware({
     logger,

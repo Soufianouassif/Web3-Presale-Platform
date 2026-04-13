@@ -11,7 +11,6 @@ import { logger } from "../lib/logger.js";
 
 const router = Router();
 
-// ── حماية نقطة نهاية المزامنة: سر مشترك + rate limit ────────────────────────
 const CRON_SECRET = process.env.CRON_SECRET ?? null;
 const IS_PROD = process.env.NODE_ENV === "production";
 
@@ -24,11 +23,9 @@ const syncLimiter = rateLimit({
 });
 
 function isCronAuthorized(req: import("express").Request): boolean {
-  // في production يجب وجود CRON_SECRET دائماً
   if (!CRON_SECRET) {
-    // لا نسمح بأي طلب خارجي إذا لم يُضبط CRON_SECRET في production
+    // no secret set — only allow from localhost in dev
     if (IS_PROD) return false;
-    // في development فقط: نسمح من localhost
     const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim()
       ?? req.socket?.remoteAddress ?? "";
     return ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1";

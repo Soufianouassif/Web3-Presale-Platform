@@ -8,48 +8,40 @@ import { logger } from "../lib/logger.js";
 
 const router = Router();
 
-// ── Network / RPC configuration ────────────────────────────────────────────
-// SOLANA_NETWORK must be set in env ("devnet" | "mainnet").
-// Defaults to "devnet" — explicitly set this to "mainnet" only for production.
 const SOLANA_NETWORK    = (process.env.SOLANA_NETWORK ?? "devnet").toLowerCase();
 const SOLANA_RPC        = process.env.SOLANA_RPC_URL || process.env.SOLANA_RPC || "https://api.devnet.solana.com";
 const PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
 const CONFIG_PDA         = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
 
-// ── On-chain verification gate ─────────────────────────────────────────────
-// On devnet: verification is skipped by default (public RPC too slow for 30s serverless timeout).
-// On mainnet: verification is always required (use a fast private RPC).
-// Override with REQUIRE_ONCHAIN_VERIFICATION=true/false env var.
+// skip on-chain verification on devnet by default (public RPC too slow for serverless timeouts)
 const REQUIRE_ONCHAIN_VERIFICATION = process.env.REQUIRE_ONCHAIN_VERIFICATION !== undefined
   ? process.env.REQUIRE_ONCHAIN_VERIFICATION !== "false"
-  : SOLANA_NETWORK === "mainnet"; // devnet=false, mainnet=true by default
+  : SOLANA_NETWORK === "mainnet";
 
-// ── USDT mints (deterministic from network — NOT from client input) ────────
 const USDT_MINT = SOLANA_NETWORK === "mainnet"
   ? (process.env.USDT_MINT ?? "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB")
   : (process.env.USDT_MINT_DEVNET ?? "8PieQJ43S4PpVWQaBZp4TaHFZGoAA9FsDzYbPftVfo6X");
 
 const USDT_DECIMALS = 6;
 
-// ── Amount cross-check tolerance ──────────────────────────────────────────
-const MISMATCH_WARN_PCT  = 0.15; // log warning if client vs server > 15%
-const MISMATCH_BLOCK_PCT = 0.50; // reject if > 50% (manipulation)
+const MISMATCH_WARN_PCT  = 0.15;
+const MISMATCH_BLOCK_PCT = 0.50;
 
-const REWARD_RATE = 5.0; // 5% reward to referrer (server-side only)
+const REWARD_RATE = 5.0; // 5% to referrer
 
 logger.info(
   { SOLANA_NETWORK, SOLANA_RPC, PRESALE_PROGRAM_ID, CONFIG_PDA, USDT_MINT, REQUIRE_ONCHAIN_VERIFICATION },
   "[TRACKER] Network configuration loaded",
 );
 
-// ── Lazy Solana connection ─────────────────────────────────────────────────
+// lazy Solana connection
 let _connection: Connection | null = null;
 function getConnection(): Connection {
   if (!_connection) _connection = new Connection(SOLANA_RPC, "confirmed");
   return _connection;
 }
 
-// ── SOL price cache (CoinGecko, 2-minute TTL) ─────────────────────────────
+// SOL price cache, refreshed every 2 min
 let _solPriceCache: { price: number; fetchedAt: number } = { price: 0, fetchedAt: 0 };
 const SOL_PRICE_TTL_MS = 2 * 60 * 1_000;
 
@@ -78,16 +70,15 @@ async function fetchSolPriceUsd(): Promise<number> {
     return _solPriceCache.price;
   }
 
-  // Hard fallback — only if CoinGecko is down AND cache is empty
+  // last resort fallback if cache is also empty
   logger.warn(
     { security: true, source: "FALLBACK_$150" },
-    "[SOL_PRICE] ⚠ CoinGecko unreachable and cache empty — using $150 fallback (server-defined, not client)",
+    "[SOL_PRICE] CoinGecko unreachable and cache empty — using $150 fallback",
   );
   return 150;
 }
 
-// ── On-chain stage token price ─────────────────────────────────────────────
-// tokenPriceUsd = 0.001 / tokensPerRawUsdtScaled (matches frontend formula)
+// token price from on-chain presale config PDA (30s cache)
 let _chainStateCache: { tokensPerRawUsdtScaled: bigint[]; fetchedAt: number } | null = null;
 const CHAIN_STATE_TTL_MS = 30_000;
 
@@ -121,16 +112,16 @@ async function fetchStageTokenPriceUsd(stageIndex: number): Promise<number | nul
       const readI64  = () => { off += 8; };
       const readU64  = () => { const v = raw.readBigUInt64LE(off); off += 8; return v; };
 
-      readPk(); readPk(); readPk(); readPk(); // authority, treasury, usdt_treasury_ata, usdt_mint
-      readU8(); readBool(); readBool();        // currentStage, isActive, isPaused
-      readI64(); readI64(); readI64();         // presaleStart, presaleEnd, claimOpensAt
-      readU64(); readU64(); readU64(); readU64(); readU64(); // totalTokensSold, totalSolRaised, totalUsdtRaised, totalManualTokens, solPriceUsdE6
+      readPk(); readPk(); readPk(); readPk();
+      readU8(); readBool(); readBool();
+      readI64(); readI64(); readI64();
+      readU64(); readU64(); readU64(); readU64(); readU64();
 
       const tokensPerRawUsdtScaled: bigint[] = [];
       for (let i = 0; i < 4; i++) {
-        tokensPerRawUsdtScaled.push(readU64()); // tokensPerRawUsdtScaled
-        readU64(); // maxTokens
-        readU64(); // tokensSold
+        tokensPerRawUsdtScaled.push(readU64());
+        readU64();
+        readU64();
       }
 
       _chainStateCache = { tokensPerRawUsdtScaled, fetchedAt: now };
@@ -149,7 +140,6 @@ async function fetchStageTokenPriceUsd(stageIndex: number): Promise<number | nul
   return 0.001 / Number(scaled);
 }
 
-// ── Input validation regexes ───────────────────────────────────────────────
 const SOLANA_ADDRESS_RE    = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 const TX_HASH_RE           = /^[1-9A-HJ-NP-Za-km-z]{80,90}$/;
 const ALLOWED_WALLET_TYPES = new Set(["phantom", "solflare", "backpack", "okx", "unknown"]);
@@ -160,7 +150,6 @@ function getIp(req: Request): string | null {
   return req.socket?.remoteAddress ?? null;
 }
 
-// ── On-chain verification result ───────────────────────────────────────────
 interface OnChainAmounts {
   paymentType: "sol" | "usdt";
   solSpentLamports?: number;
@@ -176,13 +165,9 @@ interface VerifyResult {
   valid: boolean;
   reason?: string;
   onChain?: OnChainAmounts;
-  isTimeout?: boolean; // true = network/timeout failure (tx may be real), false = security failure
+  isTimeout?: boolean;
 }
 
-// ── verifyTransaction ──────────────────────────────────────────────────────
-// This function is the core security gate.
-// NO bypasses. NO DEV MODE. Always verifies on-chain.
-// If REQUIRE_ONCHAIN_VERIFICATION=false (CI only), it is the CALLER's responsibility to skip calling this.
 async function verifyTransaction(
   txHash: string,
   expectedWallet: string,
@@ -199,9 +184,9 @@ async function verifyTransaction(
   logger.info(logCtx, `[TX_VERIFY] Checking tx on ${SOLANA_NETWORK}`);
 
   try {
-    // ── Retry logic: devnet RPC is slow/unreliable. Retry up to 5× with delay ──
+    // devnet RPCs are slow, retry up to 5x
     const MAX_ATTEMPTS = 5;
-    const RETRY_DELAY_MS = 3_000; // 3 seconds between attempts
+    const RETRY_DELAY_MS = 3_000;
     let tx = null;
 
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
@@ -238,7 +223,7 @@ async function verifyTransaction(
 
     logger.info({ ...logCtx, slot: tx.slot }, `[TX_VERIFY] Transaction found and succeeded on ${SOLANA_NETWORK}`);
 
-    // ── 1. Verify signer (account[0] = fee payer = buyer) ─────────────────
+    // account[0] = fee payer = buyer
     const accountKeys =
       "accountKeys" in tx.transaction.message
         ? tx.transaction.message.accountKeys.map((k) => k.toString())
@@ -258,7 +243,6 @@ async function verifyTransaction(
 
     logger.info({ ...logCtx }, "[TX_VERIFY] Signer match ✓");
 
-    // ── 2. Verify presale program involvement ─────────────────────────────
     const logs            = tx.meta?.logMessages ?? [];
     const hasValidLog     = logs.some((l) => l.includes("SOL_BUY") || l.includes("USDT_BUY"));
     const involvesProgram = accountKeys.includes(PRESALE_PROGRAM_ID);
@@ -277,21 +261,19 @@ async function verifyTransaction(
       logger.info({ ...logCtx, logKey: hasValidLog ? "SOL_BUY/USDT_BUY found" : "program key" }, "[TX_VERIFY] Program match ✓");
     }
 
-    // ── 3. Extract on-chain amounts ───────────────────────────────────────
     const preBalances  = tx.meta?.preBalances  ?? [];
     const postBalances = tx.meta?.postBalances ?? [];
     const fee          = tx.meta?.fee ?? 0;
     const preTkn       = tx.meta?.preTokenBalances  ?? [];
     const postTkn      = tx.meta?.postTokenBalances ?? [];
 
-    // Always use the server-side USDT mint (NEVER trust client-sent network field for mint selection)
+    // use server-side USDT mint, never trust client
     const buyerPreUsdt  = preTkn.find( (b) => b.mint === USDT_MINT && b.owner === expectedWallet);
     const buyerPostUsdt = postTkn.find((b) => b.mint === USDT_MINT && b.owner === expectedWallet);
 
     let onChain: OnChainAmounts;
 
     if (buyerPreUsdt && buyerPostUsdt) {
-      // ── USDT purchase ────────────────────────────────────────────────────
       const preRaw  = BigInt(buyerPreUsdt.uiTokenAmount.amount);
       const postRaw = BigInt(buyerPostUsdt.uiTokenAmount.amount);
       const diffRaw   = preRaw > postRaw ? Number(preRaw - postRaw) : 0;
@@ -312,7 +294,6 @@ async function verifyTransaction(
         "[TX_VERIFY] Extracted amounts (USDT purchase)",
       );
     } else {
-      // ── SOL purchase ─────────────────────────────────────────────────────
       const preSol  = preBalances[0]  ?? 0;
       const postSol = postBalances[0] ?? 0;
       const lamportsDelta   = Math.max(0, preSol - postSol);
@@ -355,7 +336,7 @@ async function verifyTransaction(
   }
 }
 
-// ── Amount comparison (logging only — server values are authoritative) ─────
+// log discrepancies between client and server amounts (server values are authoritative)
 function logAmountComparison(
   label: string,
   clientValue: number,
@@ -382,7 +363,6 @@ function logAmountComparison(
   }
 }
 
-// ── Rate limiters ──────────────────────────────────────────────────────────
 const visitLimiter = rateLimit({
   windowMs: 60 * 1_000, max: 30,
   standardHeaders: true, legacyHeaders: false,
@@ -399,7 +379,6 @@ const purchaseLimiter = rateLimit({
   message: { error: "Too many requests" },
 });
 
-// ── POST /track/visit ──────────────────────────────────────────────────────
 router.post("/track/visit", visitLimiter, async (req: Request, res: Response) => {
   try {
     const { page = "/", visitorId, referrer } = req.body as {
@@ -418,7 +397,6 @@ router.post("/track/visit", visitLimiter, async (req: Request, res: Response) =>
   }
 });
 
-// ── POST /track/wallet ─────────────────────────────────────────────────────
 router.post("/track/wallet", walletLimiter, async (req: Request, res: Response) => {
   try {
     const { walletAddress, walletType, network = "unknown" } = req.body as {
@@ -445,7 +423,6 @@ router.post("/track/wallet", walletLimiter, async (req: Request, res: Response) 
   }
 });
 
-// ── POST /track/purchase ───────────────────────────────────────────────────
 router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Response) => {
   try {
     const {
@@ -481,7 +458,6 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
       "[PURCHASE] Incoming purchase request",
     );
 
-    // ── Input validation ─────────────────────────────────────────────────
     if (!walletAddress || !network) {
       logger.warn({ ip }, "[PURCHASE] Rejected: missing required fields");
       res.status(400).json({ error: "Missing required fields" }); return;
@@ -502,7 +478,7 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
       }); return;
     }
 
-    // ── Replay attack guard ──────────────────────────────────────────────
+    // prevent replay attacks
     const existing = await db
       .select({ id: purchases.id })
       .from(purchases)
@@ -517,7 +493,6 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
       res.status(409).json({ error: "Transaction already recorded" }); return;
     }
 
-    // ── Determine accepted amounts ───────────────────────────────────────
     const safeClientUsd    = Math.max(0, Number(clientUsd)    || 0);
     const safeClientTokens = Math.max(0, Number(clientTokens) || 0);
 
@@ -526,7 +501,7 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
     let verificationSource: string;
 
     if (!REQUIRE_ONCHAIN_VERIFICATION) {
-      // ── CI/unit-test mode only — accept client values with loud warnings ─
+      // CI/test mode only — not for production
       acceptedUsd    = safeClientUsd;
       acceptedTokens = safeClientTokens;
       verificationSource = "CLIENT_UNVERIFIED_CI_ONLY";
@@ -535,398 +510,208 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
         {
           wallet: walletAddress.slice(0, 8) + "…",
           txHash: txHash.slice(0, 16) + "…",
-          acceptedUsd, acceptedTokens,
+          safeClientUsd,
+          safeClientTokens,
+          REQUIRE_ONCHAIN_VERIFICATION,
           security: true,
-          alert: true,
-          alertType: "VERIFICATION_BYPASSED",
-          warning: "REQUIRE_ONCHAIN_VERIFICATION=false — client amounts accepted WITHOUT blockchain check",
+          alertType: "CI_UNVERIFIED_PURCHASE",
         },
-        "⛔ [PURCHASE] VERIFICATION BYPASSED — using client-provided amounts (CI only)",
+        "[PURCHASE] ⚠ ONCHAIN VERIFICATION DISABLED — accepting client values (CI/test only)",
       );
     } else {
-      // ── PRODUCTION PATH: Full on-chain verification ──────────────────────
-      const stageIndex = Math.max(0, Math.min(3, (stage ?? 1) - 1));
-      const verification = await verifyTransaction(txHash, walletAddress, stageIndex, network);
+      const stageIndex = typeof stage === "number" && stage >= 0 && stage <= 3 ? stage : 0;
+      const verifyResult = await verifyTransaction(txHash, walletAddress, stageIndex, network);
 
-      if (!verification.valid && verification.isTimeout) {
-        // ── Devnet timeout / RPC unreachable ─────────────────────────────
-        // The frontend already confirmed the tx on-chain via confirmTransaction().
-        // Save with client-provided amounts and flag for admin review.
-        logger.warn(
-          {
-            txHash:  txHash.slice(0, 16) + "…",
-            reason:  verification.reason,
-            ip,
-            network: SOLANA_NETWORK,
-            alert:   true,
-            alertType: "TIMEOUT_UNVERIFIED_PURCHASE",
-          },
-          "[PURCHASE] ⚠ Devnet timeout — saving with client amounts for admin review",
-        );
-
-        const safeWalletType = walletType && ALLOWED_WALLET_TYPES.has(walletType.toLowerCase())
-          ? walletType.toLowerCase() : "unknown";
-
-        const [purchase] = await db
-          .insert(purchases)
-          .values({
-            walletAddress,
-            walletType:          safeWalletType,
-            network:             SOLANA_NETWORK,
-            amountUsd:           String(safeClientUsd),
-            amountTokens:        String(safeClientTokens),
-            txHash,
-            stage:               stage ?? 1,
-            verificationStatus:  "TIMEOUT_UNVERIFIED",
-          })
-          .returning({ id: purchases.id });
-
-        logger.info(
-          { purchaseId: purchase?.id, wallet: walletAddress.slice(0, 8) + "…", clientUsd: safeClientUsd },
-          "[PURCHASE] ✓ Saved as TIMEOUT_UNVERIFIED — needs manual review",
-        );
-
-        if (referralCode) {
+      if (!verifyResult.valid) {
+        if (verifyResult.isTimeout) {
           logger.warn(
-            { referralCode, purchaseId: purchase?.id },
-            "[REFERRAL] Skipped for TIMEOUT_UNVERIFIED purchase — needs manual admin review",
+            { txHash: txHash.slice(0, 16) + "…", wallet: walletAddress.slice(0, 8) + "…", reason: verifyResult.reason, ip },
+            "[PURCHASE] Verification timeout — storing with timeout flag",
           );
+          acceptedUsd    = safeClientUsd;
+          acceptedTokens = safeClientTokens;
+          verificationSource = "CLIENT_TIMEOUT_FALLBACK";
+        } else {
+          logger.warn(
+            {
+              txHash: txHash.slice(0, 16) + "…",
+              wallet: walletAddress.slice(0, 8) + "…",
+              reason: verifyResult.reason,
+              ip,
+              security: true,
+              alertType: "TX_VERIFICATION_FAILED",
+            },
+            "[PURCHASE] Rejected: transaction verification FAILED",
+          );
+          res.status(400).json({ error: `Transaction verification failed: ${verifyResult.reason}` }); return;
         }
-
-        res.json({
-          success:    true,
-          purchaseId: purchase?.id,
-          note:       "Saved pending on-chain verification",
-        });
-        return;
-      }
-
-      if (!verification.valid) {
-        logger.warn(
-          {
-            txHash: txHash.slice(0, 16) + "…",
-            reason: verification.reason,
-            ip,
-            network: SOLANA_NETWORK,
-            security: true,
-          },
-          "[PURCHASE] Rejected: TX_VERIFICATION_FAILED",
-        );
-        res.status(400).json({
-          error:   `Transaction verification failed on ${SOLANA_NETWORK}`,
-          reason:  verification.reason,
-          network: SOLANA_NETWORK,
-          code:    "TX_VERIFICATION_FAILED",
-        }); return;
-      }
-
-      // `verification.valid === true` guarantees onChain is populated
-      if (!verification.onChain) {
-        // This should NEVER happen — if it does, it's a code bug
-        logger.error(
-          { txHash: txHash.slice(0, 16) + "…" },
-          "[PURCHASE] CRITICAL: valid=true but onChain is undefined — internal bug",
-        );
-        res.status(500).json({ error: "Internal verification error", code: "INTERNAL_ERROR" }); return;
-      }
-
-      const oc = verification.onChain;
-
-      // ── Server-extracted USD must be > 0 ──────────────────────────────
-      if (oc.estimatedUsd <= 0) {
-        logger.warn(
-          {
-            txHash:       txHash.slice(0, 16) + "…",
-            paymentType:  oc.paymentType,
-            solSpentSol:  oc.solSpentSol,
-            usdtSpentUnits: oc.usdtSpentUnits,
-            ip,
-          },
-          "[PURCHASE] Rejected: AMOUNT_EXTRACTION_FAILED — could not determine USD from on-chain data",
-        );
-        res.status(400).json({
-          error:  "Could not extract payment amount from transaction",
-          detail: "Balance delta was zero or negative. Ensure the transaction actually transferred funds to the presale vault.",
-          code:   "AMOUNT_EXTRACTION_FAILED",
-        }); return;
-      }
-
-      // ── Reject if client USD is manipulated (> 50% mismatch with server) ─
-      logAmountComparison("amountUsd", safeClientUsd, oc.estimatedUsd, txHash);
-      const usdPct = safeClientUsd > 0 && oc.estimatedUsd > 0
-        ? Math.abs(safeClientUsd - oc.estimatedUsd) / oc.estimatedUsd
-        : 0;
-
-      if (usdPct > MISMATCH_BLOCK_PCT) {
-        logger.warn(
-          {
-            clientUsd: safeClientUsd, serverUsd: oc.estimatedUsd,
-            discrepancyPct: (usdPct * 100).toFixed(1) + "%",
-            txHash: txHash.slice(0, 16) + "…", ip,
-            security: true, alert: true, alertType: "AMOUNT_MANIPULATION",
-          },
-          "[PURCHASE] Rejected: AMOUNT_MANIPULATION — client USD exceeds 50% deviation from on-chain value",
-        );
-        res.status(400).json({
-          error:  "Amount mismatch with on-chain data",
-          code:   "AMOUNT_MANIPULATION",
-          detail: "The USD amount you provided differs significantly from what the transaction shows.",
-        }); return;
-      }
-
-      // ── Always use server-extracted USD ───────────────────────────────
-      acceptedUsd = oc.estimatedUsd;
-
-      // ── Tokens: prefer server-computed, else store 0 (needs admin fix) ─
-      logAmountComparison("amountTokens", safeClientTokens, oc.estimatedTokens ?? 0, txHash);
-
-      if (oc.estimatedTokens !== null && oc.estimatedTokens > 0) {
-        acceptedTokens     = oc.estimatedTokens;
-        verificationSource = "SERVER_VERIFIED_ONCHAIN";
       } else {
-        // Stage price PDA temporarily unavailable — store 0 tokens, never client value
-        acceptedTokens     = 0;
-        verificationSource = "SERVER_VERIFIED_ONCHAIN_TOKENS_PENDING";
-        logger.warn(
-          {
-            txHash: txHash.slice(0, 16) + "…",
-            stageIndex,
-            acceptedUsd,
-            clientTokens: safeClientTokens,
-            note: "Stage price unavailable from PDA — acceptedTokens=0, needs admin correction. Client tokens REJECTED.",
-          },
-          "[PURCHASE] WARN: Stage token price unavailable — acceptedTokens set to 0 (NOT from client)",
-        );
-      }
+        const oc = verifyResult.onChain!;
+        acceptedUsd    = oc.estimatedUsd;
+        acceptedTokens = oc.estimatedTokens ?? safeClientTokens;
+        verificationSource = "ONCHAIN_VERIFIED";
 
-      logger.info(
-        {
-          acceptedUsd,
-          acceptedTokens,
-          paymentType:  oc.paymentType,
-          source:       verificationSource,
-          network:      SOLANA_NETWORK,
-        },
-        "[PURCHASE] Accepted server-verified amounts",
-      );
+        logAmountComparison("amountUsd",    safeClientUsd,    acceptedUsd,    txHash);
+        logAmountComparison("amountTokens", safeClientTokens, acceptedTokens, txHash);
+
+        const pctUsd = acceptedUsd > 0 ? Math.abs(safeClientUsd - acceptedUsd) / acceptedUsd : 0;
+        if (pctUsd > MISMATCH_BLOCK_PCT) {
+          logger.warn(
+            {
+              txHash: txHash.slice(0, 16) + "…",
+              wallet: walletAddress.slice(0, 8) + "…",
+              clientUsd: safeClientUsd,
+              serverUsd: acceptedUsd,
+              discrepancyPct: (pctUsd * 100).toFixed(1) + "%",
+              ip,
+              security: true,
+              alertType: "AMOUNT_MANIPULATION_BLOCKED",
+            },
+            "[PURCHASE] Rejected: amount manipulation detected",
+          );
+          res.status(400).json({ error: "Amount manipulation detected" }); return;
+        }
+      }
     }
 
-    // ── Save purchase to DB ──────────────────────────────────────────────
-    const safeWalletType = walletType && ALLOWED_WALLET_TYPES.has(walletType.toLowerCase())
-      ? walletType.toLowerCase() : "unknown";
+    const safeWalletType = ALLOWED_WALLET_TYPES.has((walletType ?? "").toLowerCase())
+      ? (walletType ?? "unknown").toLowerCase() : "unknown";
 
-    const [purchase] = await db
-      .insert(purchases)
-      .values({
-        walletAddress,
-        walletType:   safeWalletType,
-        network:      SOLANA_NETWORK, // always use server-side network, not client input
-        amountUsd:    String(acceptedUsd),
-        amountTokens: String(acceptedTokens),
-        txHash,
-        stage: stage ?? 1,
-      })
-      .returning({ id: purchases.id });
+    const [inserted] = await db.insert(purchases).values({
+      walletAddress,
+      walletType:    safeWalletType,
+      network:       String(network).slice(0, 20),
+      amountUsd:     String(acceptedUsd),
+      amountTokens:  String(acceptedTokens),
+      txHash,
+      stage:         typeof stage === "number" ? stage : null,
+      referralCode:  referralCode ? String(referralCode).slice(0, 16) : null,
+      verificationSource,
+      ip,
+    }).returning({ id: purchases.id });
 
     logger.info(
       {
-        purchaseId:    purchase?.id,
-        wallet:        walletAddress.slice(0, 8) + "…",
+        purchaseId: inserted.id,
+        wallet: walletAddress.slice(0, 8) + "…",
+        txHash: txHash.slice(0, 16) + "…",
         acceptedUsd,
         acceptedTokens,
-        source:        verificationSource,
-        network:       SOLANA_NETWORK,
+        verificationSource,
+        source: "DB_WRITE",
       },
-      "[PURCHASE] ✓ Saved to DB",
+      "[PURCHASE] ✓ Purchase saved to DB",
     );
 
-    // ── Referral processing ──────────────────────────────────────────────
+    // handle referral if code provided
     if (referralCode) {
-      const code = referralCode.trim().slice(0, 16);
-      logger.info({ code, buyer: walletAddress.slice(0, 8) + "…" }, "[REFERRAL] Processing referral code");
-
       try {
         const codeRow = await db
-          .select()
+          .select({ walletAddress: referralCodes.walletAddress })
           .from(referralCodes)
-          .where(eq(referralCodes.code, code))
+          .where(eq(referralCodes.code, referralCode.trim().slice(0, 16)))
           .limit(1);
 
-        if (codeRow.length === 0) {
-          logger.warn({ code }, "[REFERRAL] Code not found in DB — no referral created");
-        } else {
+        if (codeRow.length > 0) {
           const referrerWallet = codeRow[0].walletAddress;
-          logger.info({ code, referrer: referrerWallet.slice(0, 8) + "…" }, "[REFERRAL] Code resolved to referrer");
-
-          if (referrerWallet.toLowerCase() === walletAddress.toLowerCase()) {
-            logger.warn({ referrer: referrerWallet.slice(0, 8) }, "[REFERRAL] SELF_REFERRAL_BLOCKED");
-          } else {
+          if (referrerWallet.toLowerCase() !== walletAddress.toLowerCase()) {
             const alreadyReferred = await db
               .select({ id: referrals.id })
               .from(referrals)
               .where(eq(referrals.referredWallet, walletAddress))
               .limit(1);
 
-            if (alreadyReferred.length > 0) {
-              logger.warn(
-                { buyer: walletAddress.slice(0, 8) + "…", existingReferralId: alreadyReferred[0].id },
-                "[REFERRAL] DOUBLE_REFERRAL_BLOCKED — wallet already has a referral",
-              );
-            } else {
-              // ── Server-side reward calculation (from SERVER-VERIFIED values only) ─
-              const rewardTokens = acceptedTokens > 0
-                ? ((acceptedTokens * REWARD_RATE) / 100).toFixed(6)
-                : "0";
-              const rewardUsd = acceptedUsd > 0
-                ? ((acceptedUsd * REWARD_RATE) / 100).toFixed(6)
-                : "0";
-
-              logger.info(
-                {
-                  referrer:   referrerWallet.slice(0, 8) + "…",
-                  buyer:      walletAddress.slice(0, 8) + "…",
-                  rewardTokens,
-                  rewardUsd,
-                  rewardRate: REWARD_RATE,
-                  basedOn:    verificationSource,
-                  source:     "SERVER_VERIFIED_REWARD",
-                },
-                "[REFERRAL] Reward calculated from server-verified amounts",
-              );
+            if (alreadyReferred.length === 0) {
+              const rewardTokens = acceptedTokens > 0 ? ((acceptedTokens * REWARD_RATE) / 100).toFixed(6) : "0";
+              const rewardUsd    = acceptedUsd    > 0 ? ((acceptedUsd    * REWARD_RATE) / 100).toFixed(6) : "0";
 
               const client = await pool.connect();
               try {
                 await client.query("BEGIN");
                 await client.query(
-                  `INSERT INTO referrals
-                     (referrer_wallet, referred_wallet, purchase_id, reward_rate, reward_tokens, reward_usd, status)
+                  `INSERT INTO referrals (referrer_wallet, referred_wallet, purchase_id, reward_rate, reward_tokens, reward_usd, status)
                    VALUES ($1, $2, $3, $4, $5, $6, 'pending')`,
-                  [referrerWallet, walletAddress, purchase?.id ?? null, REWARD_RATE, rewardTokens, rewardUsd],
+                  [referrerWallet, walletAddress, inserted.id, REWARD_RATE, rewardTokens, rewardUsd],
                 );
                 await client.query(
                   `UPDATE referral_codes
-                   SET total_referrals     = total_referrals + 1,
+                   SET total_referrals = total_referrals + 1,
                        total_reward_tokens = total_reward_tokens + $1,
-                       total_reward_usd    = total_reward_usd    + $2
+                       total_reward_usd = total_reward_usd + $2
                    WHERE wallet_address = $3`,
                   [rewardTokens, rewardUsd, referrerWallet],
                 );
                 await client.query("COMMIT");
-                logger.info(
-                  { referrer: referrerWallet.slice(0, 8) + "…", rewardTokens, rewardUsd },
-                  "[REFERRAL] ✓ Referral reward committed to DB",
-                );
               } catch (txErr) {
                 await client.query("ROLLBACK");
-                logger.error({ txErr }, "[REFERRAL] DB transaction ROLLBACK");
+                throw txErr;
               } finally {
                 client.release();
               }
+
+              logger.info(
+                { code: referralCode, referrer: referrerWallet.slice(0, 8), buyer: walletAddress.slice(0, 8), rewardTokens, rewardUsd },
+                "[PURCHASE] Referral reward recorded",
+              );
             }
           }
         }
       } catch (refErr) {
-        logger.error({ refErr }, "[REFERRAL] Unexpected error — purchase already saved");
+        // don't fail the purchase if referral recording fails
+        logger.warn({ refErr, referralCode }, "[PURCHASE] Referral processing failed (non-fatal)");
       }
-    } else {
-      logger.info({ wallet: walletAddress.slice(0, 8) + "…" }, "[PURCHASE] No referral code provided");
     }
 
-    res.json({ success: true, purchaseId: purchase?.id, network: SOLANA_NETWORK });
+    res.json({
+      success: true,
+      purchaseId: inserted.id,
+      acceptedUsd,
+      acceptedTokens,
+      verificationSource,
+    });
   } catch (err) {
-    logger.error({ err }, "[PURCHASE] Unhandled error");
-    res.status(500).json({ success: false, error: "Internal server error" });
+    logger.error({ err }, "[PURCHASE] Unexpected error");
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// ── Public: user's own purchases from DB (by wallet address) ─────────────
-const myPurchasesLimiter = rateLimit({
-  windowMs: 60 * 1_000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: "Too many requests" },
+router.get("/track/stats", async (_req: Request, res: Response) => {
+  try {
+    const result = await db.execute(
+      `SELECT
+        (SELECT COALESCE(SUM(amount_usd::numeric), 0) FROM purchases) as total_raised_usd,
+        (SELECT COALESCE(SUM(amount_tokens::numeric), 0) FROM purchases) as total_tokens_sold,
+        (SELECT COUNT(DISTINCT wallet_address) FROM purchases) as unique_buyers,
+        (SELECT COUNT(*) FROM purchases) as total_purchases`
+    );
+    res.json(result.rows[0] ?? {});
+  } catch (err) {
+    logger.error({ err }, "[STATS] Failed to fetch stats");
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
 });
 
-const SOLANA_ADDR_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-
-router.get("/my-purchases/:wallet", myPurchasesLimiter, async (req: Request, res: Response) => {
-  const { wallet } = req.params;
-  if (!wallet || !SOLANA_ADDR_RE.test(wallet)) {
-    return res.status(400).json({ error: "Invalid wallet address" });
-  }
+router.get("/track/recent", async (_req: Request, res: Response) => {
   try {
     const rows = await db
       .select({
-        id: purchases.id,
-        network: purchases.network,
-        amountUsd: purchases.amountUsd,
-        amountTokens: purchases.amountTokens,
-        txHash: purchases.txHash,
-        stage: purchases.stage,
-        createdAt: purchases.createdAt,
-      })
-      .from(purchases)
-      .where(eq(purchases.walletAddress, wallet))
-      .orderBy(desc(purchases.createdAt))
-      .limit(50);
-
-    return res.json({ purchases: rows });
-  } catch (err) {
-    logger.error({ err }, "[MY-PURCHASES] Failed");
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// ── Public activity feed (last 50 purchases, anonymized) ─────────────────
-const activityLimiter = rateLimit({
-  windowMs: 60 * 1_000,
-  max: 30,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: "Too many requests" },
-});
-
-router.get("/activity", activityLimiter, async (req: Request, res: Response) => {
-  try {
-    const PAGE_SIZE = 20;
-    const offset = Math.max(0, parseInt(String(req.query.offset ?? "0"), 10) || 0);
-    const { sql: sqlFn, count: countFn } = await import("drizzle-orm");
-
-    const [totalRow] = await db.select({ total: countFn() }).from(purchases);
-    const total = Number(totalRow?.total ?? 0);
-
-    const rows = await db
-      .select({
-        id: purchases.id,
         walletAddress: purchases.walletAddress,
-        network: purchases.network,
-        amountUsd: purchases.amountUsd,
-        amountTokens: purchases.amountTokens,
-        txHash: purchases.txHash,
-        stage: purchases.stage,
-        createdAt: purchases.createdAt,
+        amountUsd:     purchases.amountUsd,
+        amountTokens:  purchases.amountTokens,
+        network:       purchases.network,
+        createdAt:     purchases.createdAt,
       })
       .from(purchases)
       .orderBy(desc(purchases.createdAt))
-      .limit(PAGE_SIZE)
-      .offset(offset);
+      .limit(10);
 
-    const activity = rows.map((r) => ({
-      id: r.id,
-      wallet: r.walletAddress.slice(0, 4) + "…" + r.walletAddress.slice(-4),
-      network: r.network,
-      amountUsd: r.amountUsd,
-      amountTokens: r.amountTokens,
-      txHash: r.txHash ?? null,
-      stage: r.stage ?? 1,
-      createdAt: r.createdAt,
-    }));
-
-    res.json({ activity, total, offset, hasMore: offset + PAGE_SIZE < total });
+    res.json(rows.map((r) => ({
+      ...r,
+      walletAddress: r.walletAddress.slice(0, 4) + "…" + r.walletAddress.slice(-4),
+    })));
   } catch (err) {
-    logger.error({ err }, "[ACTIVITY] Failed to fetch activity");
-    res.status(500).json({ error: "Internal server error" });
+    logger.error({ err }, "[RECENT] Failed to fetch recent purchases");
+    res.status(500).json({ error: "Failed to fetch recent purchases" });
   }
 });
 

@@ -8,7 +8,7 @@ import { tracker } from "@/lib/admin-api";
 export default function ConnectingPage() {
   const [, navigate] = useLocation();
   const { t } = useLanguage();
-  const { status, shortAddress, network } = useWallet();
+  const { status, shortAddress, network, isInitializing } = useWallet();
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
@@ -27,11 +27,11 @@ export default function ConnectingPage() {
   }, []);
 
   useEffect(() => {
+    if (isInitializing) return;
     if (status !== "connected") {
       navigate("/connect");
-      return;
     }
-  }, [status, navigate]);
+  }, [isInitializing, status, navigate]);
 
   useEffect(() => {
     const interval = setInterval(() => {

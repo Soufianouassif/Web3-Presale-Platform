@@ -95,7 +95,6 @@ passport.deserializeUser(async (id: number, done) => {
 
 const router = Router();
 
-// ── GET /auth/google ───────────────────────────────────────────────────────
 router.get("/auth/google", authLimiter, (req, res, next) => {
   if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
     res.status(503).json({ error: "Google OAuth not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET." });
@@ -105,7 +104,6 @@ router.get("/auth/google", authLimiter, (req, res, next) => {
   passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
 });
 
-// ── GET /auth/google/callback ──────────────────────────────────────────────
 router.get(
   "/auth/google/callback",
   authLimiter,
@@ -132,7 +130,6 @@ router.get(
         req.session.adminLastActivity  = now;
         req.session.sessionUserAgent   = ua;
         req.session.sessionLoginIp     = ip;
-        // Init security fields on fresh login
         req.session.securityLevel      = 0;
         req.session.sessionSuspicious  = false;
         req.session.ipChangeCount      = 0;
@@ -148,7 +145,7 @@ router.get(
           }
           logger.info(
             { userId: user.id, email: user.email, ip, ua: ua.slice(0, 80) },
-            "AUTH_LOGIN: admin login success — session bound to UA+IP",
+            "AUTH_LOGIN: admin login success",
           );
           res.redirect("/admin/dashboard");
         });
@@ -160,7 +157,6 @@ router.get(
   },
 );
 
-// ── GET /auth/me ───────────────────────────────────────────────────────────
 router.get("/auth/me", (req, res) => {
   const ip = getClientIp(req);
 
@@ -203,18 +199,17 @@ router.get("/auth/me", (req, res) => {
     authenticated: true,
     user:          req.user,
     security: {
-      level:           req.session.securityLevel ?? 0,
-      suspicious:      req.session.sessionSuspicious ?? false,
+      level:            req.session.securityLevel ?? 0,
+      suspicious:       req.session.sessionSuspicious ?? false,
       suspiciousReason: req.session.suspiciousReason,
-      ipChangeCount:   req.session.ipChangeCount   ?? 0,
-      uaChangeCount:   req.session.uaChangeCount   ?? 0,
-      requestCount:    req.session.requestCount,
-      loginAgeMinutes: loginAge,
+      ipChangeCount:    req.session.ipChangeCount   ?? 0,
+      uaChangeCount:    req.session.uaChangeCount   ?? 0,
+      requestCount:     req.session.requestCount,
+      loginAgeMinutes:  loginAge,
     },
   });
 });
 
-// ── POST /auth/logout ──────────────────────────────────────────────────────
 router.post("/auth/logout", authLimiter, (req, res) => {
   const userId    = req.session?.userId;
   const userEmail = req.session?.userEmail;

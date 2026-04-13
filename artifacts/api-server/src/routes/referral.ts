@@ -7,13 +7,12 @@ import { logger } from "../lib/logger.js";
 
 const router = Router();
 
-// ─── Solana address validation ────────────────────────────────────────────────
 const SOLANA_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 function isValidSolanaAddress(addr: string): boolean {
   return SOLANA_ADDRESS_RE.test(addr);
 }
 
-// ─── Referral code generator (base58, 8 chars) ────────────────────────────────
+// base58 code, 8 chars
 const BASE58_CHARS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 function generateCode(): string {
   let code = "";
@@ -25,7 +24,6 @@ function generateCode(): string {
   return code;
 }
 
-// ─── Rate limiters ──────────────────────────────────────────────────────────
 const codeLimiter = rateLimit({
   windowMs: 60 * 1_000,
   max: 20,
@@ -50,9 +48,7 @@ const readLimiter = rateLimit({
   message: { error: "Too many requests" },
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
 // GET /api/referral/code/:wallet
-// ─────────────────────────────────────────────────────────────────────────────
 router.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
   const wallet = String(req.params.wallet);
 
@@ -102,9 +98,7 @@ router.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
 // POST /api/referral/register
-// ─────────────────────────────────────────────────────────────────────────────
 router.post("/referral/register", registerLimiter, async (req, res) => {
   const { referrerCode, buyerWallet, purchaseId, amountUsd, amountTokens } =
     req.body as {
@@ -233,7 +227,7 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
         rewardUsd,
         source: "DB_WRITE",
       },
-      "[REF_REGISTER] ✓ Referral saved to DB — reward created",
+      "[REF_REGISTER] Referral saved to DB",
     );
 
     res.json({
@@ -250,10 +244,7 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
 // GET /api/referral/stats/:wallet
-// Referrer dashboard — pulls LIVE data from DB for this wallet
-// ─────────────────────────────────────────────────────────────────────────────
 router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
   const wallet = String(req.params.wallet);
 
@@ -272,7 +263,7 @@ router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
       .limit(1);
 
     if (codeRow.length === 0) {
-      logger.info({ wallet: wallet.slice(0, 8) }, "[REF_STATS] No referral code found → empty state returned");
+      logger.info({ wallet: wallet.slice(0, 8) }, "[REF_STATS] No referral code found");
       res.json({
         code: null,
         totalReferrals: 0,
@@ -323,7 +314,7 @@ router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
         recentCount: recent.length,
         source: "DB_READ",
       },
-      "[REF_STATS] ✓ Stats returned from DB",
+      "[REF_STATS] Stats returned from DB",
     );
 
     res.json({
@@ -341,10 +332,7 @@ router.get("/referral/stats/:wallet", readLimiter, async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
 // GET /api/referral/leaderboard
-// Admin + investor dashboards — top 10 from DB
-// ─────────────────────────────────────────────────────────────────────────────
 router.get("/referral/leaderboard", readLimiter, async (_req, res) => {
   logger.info({}, "[REF_LEADERBOARD] Querying top referrers from DB");
 
@@ -366,7 +354,7 @@ router.get("/referral/leaderboard", readLimiter, async (_req, res) => {
         r.walletAddress.slice(0, 4) + "…" + r.walletAddress.slice(-4),
     }));
 
-    logger.info({ count: masked.length, source: "DB_READ" }, "[REF_LEADERBOARD] ✓ Returned from DB");
+    logger.info({ count: masked.length, source: "DB_READ" }, "[REF_LEADERBOARD] Returned from DB");
     res.json(masked);
   } catch (err) {
     logger.error({ err }, "[REF_LEADERBOARD] DB error");
@@ -374,9 +362,7 @@ router.get("/referral/leaderboard", readLimiter, async (_req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
 // GET /api/referral/resolve/:code
-// ─────────────────────────────────────────────────────────────────────────────
 router.get("/referral/resolve/:code", readLimiter, async (req, res) => {
   const code = String(req.params.code).trim().slice(0, 16);
 

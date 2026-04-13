@@ -25,6 +25,8 @@ if (IS_PROD && !process.env.SESSION_SECRET) {
 const SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-production";
 
 const ALLOWED_ORIGINS_EXACT: string[] = [
+  "https://pwifecoin.fun",
+  "https://www.pwifecoin.fun",
   ...(IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000"]),
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ];
@@ -38,8 +40,7 @@ const isOriginAllowed = (origin: string): boolean => {
   return false;
 };
 
-// ── Startup validation — يفشل السيرفر بوضوح إذا غابت أسرار حساسة ──────────
-// CRON_SECRET is optional — if missing the cron endpoints simply won't work
+// check required env vars on startup
 const REQUIRED_PROD_VARS = IS_PROD
   ? (["SESSION_SECRET"] as const)
   : ([] as const);
@@ -55,29 +56,22 @@ if (IS_PROD && !process.env.CRON_SECRET) {
 const app: Express = express();
 
 app.set("trust proxy", 1);
-app.disable("x-powered-by"); // Remove X-Powered-By: Express header
+app.disable("x-powered-by");
 
-// ── Helmet: HTTP security headers ────────────────────────────────────────────
 app.use(
   helmet({
-    // API-only server — no HTML pages, so CSP is not applicable here
     contentSecurityPolicy: false,
-    // Disabled: wallet browser extensions (Phantom, Solflare, etc.) require this to be off
-    crossOriginEmbedderPolicy: false,
-    // X-Frame-Options: SAMEORIGIN
+    crossOriginEmbedderPolicy: false, // wallet extensions need this off
     frameguard: { action: "sameorigin" },
-    // X-Content-Type-Options: nosniff (Helmet default, made explicit)
     noSniff: true,
-    // Referrer-Policy: strict-origin-when-cross-origin
     referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-    // Strict-Transport-Security: 1 year with preload in production; disabled in dev (HTTP)
     hsts: IS_PROD
       ? { maxAge: 31_536_000, includeSubDomains: true, preload: true }
       : false,
   }),
 );
 
-// Permissions-Policy — not yet built into Helmet v8, added manually
+// Permissions-Policy not in Helmet v8 yet
 app.use((_req, res, next) => {
   res.setHeader(
     "Permissions-Policy",
@@ -146,7 +140,6 @@ app.use(passport.session());
 
 app.use("/api", router);
 
-// Global error handler — returns JSON so errors are visible in logs/browser
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   const status = (err as { status?: number }).status ?? 500;
   const message = err.message ?? "Internal Server Error";
@@ -154,13 +147,10 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(status).json({ error: message, stack: IS_PROD ? undefined : err.stack });
 });
 
-// ── مزامنة سعر SOL تلقائياً كل 5 دقائق ────────────────────────────────────
-// تعمل فقط عندما يكون ADMIN_KEYPAIR_JSON محدداً في متغيرات البيئة
+// sync SOL price every 5 min if admin keypair is configured
 if (process.env.ADMIN_KEYPAIR_JSON) {
-  const SYNC_INTERVAL_MS = 5 * 60 * 1_000; // 5 دقائق
-  // تشغيل أول مزامنة عند بدء السيرفر (بعد 10 ثواني للتهيئة)
+  const SYNC_INTERVAL_MS = 5 * 60 * 1_000;
   setTimeout(() => runSolPriceSync(), 10_000);
-  // ثم كل 5 دقائق
   setInterval(() => runSolPriceSync(), SYNC_INTERVAL_MS);
   logger.info("SOL price auto-sync enabled (every 5 minutes)");
 } else {

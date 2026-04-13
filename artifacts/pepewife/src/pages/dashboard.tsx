@@ -63,7 +63,7 @@ export default function Dashboard() {
   const [calcAmount, setCalcAmount] = useState("");
   const { t, dir } = useLanguage();
   const isRTL = dir === "rtl";
-  const { status, shortAddress, address, network, disconnect } = useWallet();
+  const { status, shortAddress, address, network, disconnect, isInitializing } = useWallet();
   const { showSuccess } = useToast();
   const [walletCopied, setWalletCopied] = useState(false);
 
@@ -81,11 +81,13 @@ export default function Dashboard() {
 
   const myRefUrl = myRefCode ? buildReferralUrl(myRefCode) : "";
 
+  // Wait for session restore before deciding to redirect
   useEffect(() => {
+    if (isInitializing) return;
     if (status === "disconnected" || status === "error") {
       navigate("/connect");
     }
-  }, [status, navigate]);
+  }, [isInitializing, status, navigate]);
 
   // ── Page visit tracking ──────────────────────────────────────────────────
   useEffect(() => {

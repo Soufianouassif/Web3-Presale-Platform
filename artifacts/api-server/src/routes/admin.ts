@@ -10,7 +10,6 @@ const REAUTH_WINDOW_MINUTES = 15;
 
 const SOLANA_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
-// ── Rate limiter for all admin routes (30 requests / 5 minutes) ───────────
 const adminLimiter = rateLimit({
   windowMs: 5 * 60 * 1_000,
   max: 30,
@@ -19,7 +18,6 @@ const adminLimiter = rateLimit({
   message: { error: "Too many admin requests, slow down" },
 });
 
-// ── Audit log helper ──────────────────────────────────────────────────────
 function auditLog(
   req: import("express").Request,
   action: string,
@@ -338,7 +336,7 @@ router.get("/admin/referrals", async (req, res) => {
       ? await db.select({ total: count() }).from(referrals).where(whereClause)
       : await db.select({ total: count() }).from(referrals);
 
-    logger.info({ rowCount: rows.length, total: Number(total), source: "DB_READ" }, "[ADMIN_REFERRALS] ✓ Returned from DB");
+    logger.info({ rowCount: rows.length, total: Number(total), source: "DB_READ" }, "[ADMIN_REFERRALS] Returned from DB");
     res.json({
       referrals: rows.map((r) => ({
         ...r,
@@ -362,7 +360,6 @@ router.post("/admin/referrals/mark-paid", requireRecentAuth(REAUTH_WINDOW_MINUTE
   try {
     const { walletAddress } = req.body as { walletAddress?: string };
 
-    // التحقق من صحة عنوان المحفظة إن وُجد
     if (walletAddress !== undefined && !SOLANA_ADDRESS_RE.test(walletAddress)) {
       res.status(400).json({ error: "Invalid wallet address format" });
       return;
