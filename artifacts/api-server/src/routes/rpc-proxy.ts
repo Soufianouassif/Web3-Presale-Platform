@@ -9,7 +9,13 @@ const IS_PROD = process.env.NODE_ENV === "production";
 const ALLOWED_ORIGINS_EXACT: string[] = [
   "https://pwifecoin.fun",
   "https://www.pwifecoin.fun",
-  ...(IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000", "http://localhost:3001"]),
+  ...(IS_PROD ? [] : [
+    "http://localhost",
+    "http://localhost:80",
+    "http://localhost:22793",
+    "http://localhost:3000",
+    "http://localhost:3001",
+  ]),
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ];
 const VERCEL_PREVIEW_DOMAIN = process.env.VERCEL_PREVIEW_DOMAIN ?? null;

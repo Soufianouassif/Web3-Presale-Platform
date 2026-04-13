@@ -24,11 +24,15 @@ if (IS_PROD && !process.env.SESSION_SECRET) {
 }
 const SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-production";
 
+const REPLIT_DEV_DOMAIN = process.env.REPLIT_DEV_DOMAIN ?? null;
+const REPLIT_DOMAINS = process.env.REPLIT_DOMAINS ?? null;
+
 const ALLOWED_ORIGINS_EXACT: string[] = [
   "https://pwifecoin.fun",
   "https://www.pwifecoin.fun",
   ...(IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000"]),
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+  ...(REPLIT_DEV_DOMAIN ? [`https://${REPLIT_DEV_DOMAIN}`] : []),
 ];
 
 const VERCEL_PREVIEW_DOMAIN = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
@@ -37,6 +41,8 @@ const isOriginAllowed = (origin: string): boolean => {
   if (ALLOWED_ORIGINS_EXACT.includes(origin)) return true;
   if (VERCEL_PREVIEW_DOMAIN && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN}`)) return true;
   if (VERCEL_PREVIEW_DOMAIN && origin === `https://${VERCEL_PREVIEW_DOMAIN}`) return true;
+  if (REPLIT_DEV_DOMAIN && origin.endsWith(`.${REPLIT_DEV_DOMAIN}`)) return true;
+  if (REPLIT_DOMAINS && origin.endsWith(`.${REPLIT_DOMAINS}`)) return true;
   return false;
 };
 

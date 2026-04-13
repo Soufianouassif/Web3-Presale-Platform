@@ -180,3 +180,16 @@ React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana.
   - API routes in `artifacts/api-server/src/routes/referral.ts`: `GET /api/referral/code/:wallet`, `GET /api/referral/stats/:wallet`, `GET /api/referral/leaderboard`, `GET /api/referral/resolve/:code`, `POST /api/referral/register`
   - Security: Solana address validation, self-referral prevention, double-referral prevention, atomic DB transactions, rate limiting (20 req/min/IP), code collision retry (5 attempts)
   - Bug fixed: `requireAdminAuth` middleware now only applies to `/admin/*` routes (was incorrectly blocking all public routes)
+- **Bug Fixes (April 2026)**:
+  - `dashboard.tsx` `handleDashBuySuccess`: Added retry logic (4 attempts, 3s delay) + graceful failure — if tracking fails after all retries, still shows success since on-chain tx was confirmed (same behavior as `home.tsx`)
+  - `home.tsx`: Added DB stats fallback — fetches `/api/track/stats` and uses DB totals (total raised USD, tokens sold, unique buyers) when blockchain data is 0 or unavailable. Stats update every 30 seconds alongside blockchain refresh.
+  - `artifacts/api-server/src/routes/rpc-proxy.ts`: Added `http://localhost` and `http://localhost:80` to allowed origins in dev mode — fixes 403 Forbidden errors for the Solana RPC proxy in development/testing environments
+  - `user_sessions` table: Created manually via SQL (connect-pg-simple creates it lazily on first session write; manually created to support admin sessions listing page immediately)
+  - **Root cause fix for Vercel+Neon production DB showing zeros**:
+    - `scripts/vercel-build.sh`: Added `pnpm --filter @workspace/db run push` — syncs DB schema (creates all tables) to Neon on every Vercel deploy
+    - `artifacts/api-server/src/routes/tracker.ts`: Added `getTransactionWithTimeout()` wrapper (9s timeout per attempt) to prevent Vercel's 30s function limit from being exceeded during on-chain verification
+    - Reduced verification retries from 5→3 and delay from 3s→2s for serverless compatibility
+    - When verification times out (`isTimeout: true`): purchase is NOW SAVED as `TIMEOUT_UNVERIFIED` (using client-provided amounts) instead of being rejected with 504 — on-chain TX was real, data is preserved for admin audit
+    - When token pricing unavailable: purchase saved as `ONCHAIN_VERIFIED_NO_PRICE` instead of returning 503
+    - Added `logger.error()` to tracking catch blocks (visit, wallet) so DB errors appear in Vercel function logs
+    - `vercel.json`: Increased `maxDuration` from 30→60 seconds for the Vercel serverless function

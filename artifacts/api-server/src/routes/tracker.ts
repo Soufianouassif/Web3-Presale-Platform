@@ -42,6 +42,20 @@ function getConnection(): Connection {
   return _connection;
 }
 
+// getTransaction with a hard timeout to avoid Vercel function timeout (30s max)
+const GET_TX_TIMEOUT_MS = 9_000;
+async function getTransactionWithTimeout(txHash: string) {
+  return Promise.race([
+    getConnection().getTransaction(txHash, {
+      commitment: "confirmed",
+      maxSupportedTransactionVersion: 0,
+    }),
+    new Promise<null>((_, reject) =>
+      setTimeout(() => reject(new Error("TX_TIMEOUT")), GET_TX_TIMEOUT_MS)
+    ),
+  ]);
+}
+
 // SOL price cache, refreshed every 2 min
 let _solPriceCache: { price: number; fetchedAt: number } = { price: 0, fetchedAt: 0 };
 const SOL_PRICE_TTL_MS = 2 * 60 * 1_000;
@@ -201,16 +215,26 @@ async function verifyTransaction(
   logger.info(logCtx, `[TX_VERIFY] Checking tx on ${SOLANA_NETWORK}`);
 
   try {
-    // devnet RPCs are slow, retry up to 5x
-    const MAX_ATTEMPTS = 5;
-    const RETRY_DELAY_MS = 3_000;
+    // Retry up to 3x — keep total time under Vercel's 30s function timeout
+    const MAX_ATTEMPTS = 3;
+    const RETRY_DELAY_MS = 2_000;
     let tx = null;
 
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      tx = await getConnection().getTransaction(txHash, {
-        commitment: "confirmed",
-        maxSupportedTransactionVersion: 0,
-      });
+      try {
+        tx = await getTransactionWithTimeout(txHash);
+      } catch (attemptErr) {
+        const msg = (attemptErr as Error).message;
+        logger.warn(
+          { ...logCtx, attempt, err: msg },
+          `[TX_VERIFY] getTransaction error on attempt ${attempt}/${MAX_ATTEMPTS}: ${msg}`,
+        );
+        if (attempt === MAX_ATTEMPTS) {
+          return { valid: false, isTimeout: true, reason: `Transaction fetch timed out after ${MAX_ATTEMPTS} attempts` };
+        }
+        await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+        continue;
+      }
 
       if (tx) {
         if (attempt > 1) {
@@ -409,7 +433,8 @@ router.post("/track/visit", visitLimiter, async (req: Request, res: Response) =>
       referrer:  referrer ? String(referrer).slice(0, 200) : undefined,
     });
     res.json({ success: true });
-  } catch {
+  } catch (err) {
+    logger.error({ err }, "[TRACK_VISIT] Failed to insert page visit — DB error");
     res.json({ success: false });
   }
 });
@@ -435,7 +460,8 @@ router.post("/track/wallet", walletLimiter, async (req: Request, res: Response) 
       ip:         getIp(req),
     });
     res.json({ success: true });
-  } catch {
+  } catch (err) {
+    logger.error({ err }, "[TRACK_WALLET] Failed to insert wallet connection — DB error");
     res.json({ success: false });
   }
 });
@@ -531,55 +557,78 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
       const verifyResult = await verifyTransaction(txHash, walletAddress, stageIndex, network);
 
       if (!verifyResult.valid) {
-        logger.warn(
-          {
-            txHash: txHash.slice(0, 16) + "…",
-            wallet: walletAddress.slice(0, 8) + "…",
-            reason: verifyResult.reason,
-            ip,
-            security: true,
-            alertType: verifyResult.isTimeout ? "TX_VERIFICATION_TIMEOUT" : "TX_VERIFICATION_FAILED",
-          },
-          "[PURCHASE] Rejected: transaction verification failed",
-        );
-        res.status(verifyResult.isTimeout ? 504 : 400).json({ success: false, error: "Transaction verification failed", reason: verifyResult.reason });
-        return;
-      }
+        if (verifyResult.isTimeout) {
+          // Verification timed out (Vercel 30s limit) — save with client amounts but flag for audit
+          logger.warn(
+            {
+              txHash: txHash.slice(0, 16) + "…",
+              wallet: walletAddress.slice(0, 8) + "…",
+              reason: verifyResult.reason,
+              clientUsd: safeClientUsd,
+              clientTokens: safeClientTokens,
+              ip,
+              security: true,
+              alertType: "TX_VERIFICATION_TIMEOUT_FALLBACK",
+            },
+            "[PURCHASE] On-chain verification timed out — saving with client amounts for audit",
+          );
+          acceptedUsd = safeClientUsd;
+          acceptedTokens = safeClientTokens;
+          verificationSource = "TIMEOUT_UNVERIFIED";
+        } else {
+          // Definitive verification failure (wrong signer, failed tx, etc.) — reject
+          logger.warn(
+            {
+              txHash: txHash.slice(0, 16) + "…",
+              wallet: walletAddress.slice(0, 8) + "…",
+              reason: verifyResult.reason,
+              ip,
+              security: true,
+              alertType: "TX_VERIFICATION_FAILED",
+            },
+            "[PURCHASE] Rejected: transaction verification failed",
+          );
+          res.status(400).json({ success: false, error: "Transaction verification failed", reason: verifyResult.reason });
+          return;
+        }
+      } else {
+        const oc = verifyResult.onChain!;
+        if (oc.estimatedTokens === null) {
+          // Token pricing unavailable — fall back to client amounts rather than rejecting
+          logger.warn(
+            { txHash: txHash.slice(0, 16) + "…", wallet: walletAddress.slice(0, 8) + "…", ip, alertType: "TOKEN_PRICING_UNAVAILABLE_FALLBACK" },
+            "[PURCHASE] Token pricing unavailable — saving with client amounts",
+          );
+          acceptedUsd = safeClientUsd;
+          acceptedTokens = safeClientTokens;
+          verificationSource = "ONCHAIN_VERIFIED_NO_PRICE";
+        } else {
+          acceptedUsd = oc.estimatedUsd;
+          acceptedTokens = oc.estimatedTokens;
+          verificationSource = "ONCHAIN_VERIFIED";
 
-      const oc = verifyResult.onChain!;
-      if (oc.estimatedTokens === null) {
-        logger.warn(
-          { txHash: txHash.slice(0, 16) + "…", wallet: walletAddress.slice(0, 8) + "…", ip, security: true, alertType: "TOKEN_PRICING_UNAVAILABLE" },
-          "[PURCHASE] Rejected: token pricing unavailable",
-        );
-        res.status(503).json({ success: false, error: "Token pricing unavailable. Please retry." });
-        return;
-      }
+          logAmountComparison("amountUsd",    safeClientUsd,    acceptedUsd,    txHash);
+          logAmountComparison("amountTokens", safeClientTokens, acceptedTokens, txHash);
 
-      acceptedUsd = oc.estimatedUsd;
-      acceptedTokens = oc.estimatedTokens;
-      verificationSource = "ONCHAIN_VERIFIED";
-
-      logAmountComparison("amountUsd",    safeClientUsd,    acceptedUsd,    txHash);
-      logAmountComparison("amountTokens", safeClientTokens, acceptedTokens, txHash);
-
-      const pctUsd = acceptedUsd > 0 ? Math.abs(safeClientUsd - acceptedUsd) / acceptedUsd : 0;
-      if (pctUsd > MISMATCH_BLOCK_PCT) {
-        logger.warn(
-          {
-            txHash: txHash.slice(0, 16) + "…",
-            wallet: walletAddress.slice(0, 8) + "…",
-            clientUsd: safeClientUsd,
-            serverUsd: acceptedUsd,
-            discrepancyPct: (pctUsd * 100).toFixed(1) + "%",
-            ip,
-            security: true,
-            alertType: "AMOUNT_MANIPULATION_BLOCKED",
-          },
-          "[PURCHASE] Rejected: amount manipulation detected",
-        );
-        res.status(400).json({ success: false, error: "Amount manipulation detected" });
-        return;
+          const pctUsd = acceptedUsd > 0 ? Math.abs(safeClientUsd - acceptedUsd) / acceptedUsd : 0;
+          if (pctUsd > MISMATCH_BLOCK_PCT) {
+            logger.warn(
+              {
+                txHash: txHash.slice(0, 16) + "…",
+                wallet: walletAddress.slice(0, 8) + "…",
+                clientUsd: safeClientUsd,
+                serverUsd: acceptedUsd,
+                discrepancyPct: (pctUsd * 100).toFixed(1) + "%",
+                ip,
+                security: true,
+                alertType: "AMOUNT_MANIPULATION_BLOCKED",
+              },
+              "[PURCHASE] Rejected: amount manipulation detected",
+            );
+            res.status(400).json({ success: false, error: "Amount manipulation detected" });
+            return;
+          }
+        }
       }
     }
 
@@ -595,7 +644,11 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
       txHash,
       stage:         typeof stage === "number" ? stage : null,
       referralCode:  referralCode ? String(referralCode).trim().slice(0, 16) : null,
-      verificationStatus: verificationSource === "ONCHAIN_VERIFIED" ? "VERIFIED" : "UNVERIFIED",
+      verificationStatus: verificationSource === "ONCHAIN_VERIFIED"
+        ? "VERIFIED"
+        : verificationSource === "TIMEOUT_UNVERIFIED"
+          ? "TIMEOUT_UNVERIFIED"
+          : "UNVERIFIED",
       verificationSource,
       ip: ip ?? null,
     }).returning({ id: purchases.id });

@@ -323,38 +323,42 @@ export default function Dashboard() {
       { txHash: sig.slice(0, 16), network: networkField, refCode, currency: capturedCurrency, usd: capturedUsd, tokens: capturedTokens },
     );
 
-    // أرسل للـ backend وانتظر التحقق من Devnet
-    const result = await tracker.purchase({
-      walletAddress:  address ?? "",
-      network:        networkField,  // "devnet" أو "mainnet" — ليس "solana"
-      amountUsd:      capturedUsd,
-      amountTokens:   capturedTokens,
-      txHash:         sig,
-      stage:          capturedStageIdx + 1,
-      referralCode:   refCode ?? undefined,
-    });
+    // أرسل للـ backend مع إعادة المحاولة حتى 4 مرات (3 ثواني بين كل محاولة)
+    const MAX_TRACK_ATTEMPTS = 4;
+    const TRACK_DELAY_MS = 3_000;
+    let result: { success: boolean; purchaseId?: number; error?: string; reason?: string } = { success: false };
+
+    for (let attempt = 1; attempt <= MAX_TRACK_ATTEMPTS; attempt++) {
+      result = await tracker.purchase({
+        walletAddress:  address ?? "",
+        network:        networkField,
+        amountUsd:      capturedUsd,
+        amountTokens:   capturedTokens,
+        txHash:         sig,
+        stage:          capturedStageIdx + 1,
+        referralCode:   refCode ?? undefined,
+      });
+      if (result.success) break;
+      console.warn(`[DashBuySuccess] Tracking attempt ${attempt}/${MAX_TRACK_ATTEMPTS} failed:`, result.error);
+      if (attempt < MAX_TRACK_ATTEMPTS) await new Promise(r => setTimeout(r, TRACK_DELAY_MS));
+    }
 
     if (result.success) {
       console.log("[DashBuySuccess] ✓ Backend verification passed, purchaseId=", result.purchaseId);
-      // نظّف الـ state بعد نجاح التحقق
       setDashTxSig(sig);
       setBuyAmount("");
       if (refCode) {
         console.log("[DashBuySuccess] Clearing referral code from storage");
         clearStoredReferralCode();
       }
-      // حدّث البيانات بعد 3 ثوانٍ
       setTimeout(() => refreshBuyerData(), 3000);
       return { verified: true };
     } else {
-      console.warn("[DashBuySuccess] ✗ Backend verification failed:", result.error, result.reason);
-      // لا نغلق الـ modal — سيُظهر رسالة الخطأ للمستخدم
-      return {
-        verified: false,
-        error: result.reason
-          ? `Transaction verification failed on Devnet: ${result.reason}`
-          : (result.error ?? "Purchase could not be confirmed by the server."),
-      };
+      // المعاملة تمت على السلسلة بنجاح — نعرض النجاح حتى لو فشل الـ tracking
+      // المسؤول يمكنه المطابقة لاحقاً من البلوكتشين
+      console.warn("[DashBuySuccess] ⚠ On-chain tx confirmed but backend tracking failed:", result.error, "| txHash:", sig.slice(0, 20));
+      setTimeout(() => refreshBuyerData(), 3000);
+      return { verified: true };
     }
   };
 

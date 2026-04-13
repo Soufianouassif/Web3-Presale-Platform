@@ -47,6 +47,7 @@ export default function Home() {
   const [txSignature, setTxSignature] = useState<string | null>(null);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [calcAmount, setCalcAmount] = useState("");
+  const [dbStats, setDbStats] = useState<{ totalRaisedUsd: number; totalTokensSold: number; uniqueBuyers: number } | null>(null);
 
   // ── Referral state ────────────────────────────────────────────────────────
   const [myRefCode, setMyRefCode] = useState<string | null>(null);
@@ -58,14 +59,29 @@ export default function Home() {
   const isRTL = dir === "rtl";
   const { status, shortAddress, address } = useWallet();
 
+  const fetchDbStats = () => {
+    fetch("/api/track/stats")
+      .then(r => r.json())
+      .then((d: { total_raised_usd?: string; total_tokens_sold?: string; unique_buyers?: string }) => {
+        setDbStats({
+          totalRaisedUsd:   parseFloat(d.total_raised_usd   ?? "0") || 0,
+          totalTokensSold:  parseFloat(d.total_tokens_sold  ?? "0") || 0,
+          uniqueBuyers:     parseInt(d.unique_buyers         ?? "0") || 0,
+        });
+      })
+      .catch(() => {});
+  };
+
   useEffect(() => {
     tracker.visit("/");
     fetchPresaleState().then(d => { if (d) setPresaleData(d); });
     fetchPublicPresaleConfig().then(cfg => setSiteConfig(cfg));
+    fetchDbStats();
 
     // Auto-refresh presale state every 30 seconds
     const chainInterval = setInterval(() => {
       fetchPresaleState().then(d => { if (d) setPresaleData(d); });
+      fetchDbStats();
     }, 30_000);
     return () => clearInterval(chainInterval);
   }, []);
@@ -195,9 +211,16 @@ export default function Home() {
   const totalTokens = STAGE_DATA.reduce((a, s) => a + s.tokens, 0);
   const presaleFilled = Math.round((totalSold / totalTokens) * 100);
 
-  const totalRaisedUSD = presaleData
+  const blockchainRaisedUSD = presaleData
     ? (Number(presaleData.totalSolRaised) / 1e9) * solPrice + Number(presaleData.totalUsdtRaised) / 1e6
     : 0;
+  // إذا كانت البيانات الـ blockchain صفراً أو غير محملة، نستخدم بيانات DB كـ fallback
+  const totalRaisedUSD = blockchainRaisedUSD > 0 ? blockchainRaisedUSD : (dbStats?.totalRaisedUsd ?? 0);
+  const effectiveTokensSold = totalSold > 0 ? totalSold : (dbStats?.totalTokensSold ?? 0);
+  const effectiveBuyers = presaleData
+    ? Number(presaleData.buyersCount)
+    : (dbStats?.uniqueBuyers ?? 0);
+  const hasAnyData = presaleData !== null || dbStats !== null;
 
   const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace(/\$/g, ""));
   const calcAmountNum = parseFloat(calcAmount);
@@ -448,21 +471,21 @@ export default function Home() {
                   <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                     <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.totalRaised}</div>
                     <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
-                      {presaleData ? fmtUSD(totalRaisedUSD) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
+                      {hasAnyData ? fmtUSD(totalRaisedUSD) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
                     </div>
                     <div className="text-xs text-gray-500 font-display tracking-wide font-bold" dir="ltr">USD • SOL ${solPrice.toFixed(0)}</div>
                   </div>
                   <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                     <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.tokensSold}</div>
                     <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
-                      {presaleData ? fmt(totalSold) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
+                      {hasAnyData ? fmt(effectiveTokensSold) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
                     </div>
                     <div className="text-xs text-gray-500 font-display tracking-wide font-bold">{t.hero.tokens}</div>
                   </div>
                   <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
                     <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.buyers}</div>
                     <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
-                      {presaleData ? fmt(Number(presaleData.buyersCount)) : <span className="text-sm text-gray-400 animate-pulse">—</span>}
+                      {hasAnyData ? fmt(effectiveBuyers) : <span className="text-sm text-gray-400 animate-pulse">—</span>}
                     </div>
                     <div className="text-xs text-gray-500 font-display tracking-wide font-bold">{t.hero.uniqueWallets}</div>
                   </div>
