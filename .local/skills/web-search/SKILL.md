@@ -1,6 +1,6 @@
 ---
 name: web-search
-description: Search the web, fetch content, extract branding profiles, and capture screenshots from URLs. Use for real-time information, API documentation, current events, design matching, and visual reference.
+description: Search the web and fetch content from URLs. Use for real-time information, API documentation, and current events.
 ---
 
 # Web Search Skill
@@ -91,8 +91,6 @@ console.log(content.markdown.slice(0, 1000));
 2. **Chain search and fetch**: Search first, then fetch specific pages for details
 3. **Be specific**: Include dates, versions, or other specifics in queries
 4. **Verify with fetch**: Don't rely only on search snippets for critical information
-5. **Use branding for design matching**: When replicating a site's visual style, use extractBranding to get exact colors, fonts, and spacing
-6. **Use screenshot for visual reference**: When you need to see what a site looks like before replicating its design
 
 ## Example Workflow
 
@@ -107,9 +105,6 @@ if (searchResult.resultPages.length > 0) {
     console.log(fullContent.markdown);
 }
 ```
-
-To match an existing site's brand, use the `extractBranding` tool directly, then
-apply the returned colors, fonts, and spacing when styling your site.
 
 ## Limitations
 

@@ -81777,11 +81777,45 @@ var pool = new Pool3({
 });
 var db = drizzle(pool, { schema: schema_exports });
 
+// src/lib/logger.ts
+var import_pino = __toESM(require_pino(), 1);
+var isProduction = process.env.NODE_ENV === "production";
+var logger = (0, import_pino.default)({
+  level: process.env.LOG_LEVEL ?? "info",
+  redact: [
+    "req.headers.authorization",
+    "req.headers.cookie",
+    "res.headers['set-cookie']"
+  ],
+  ...isProduction ? {} : {
+    transport: {
+      target: "pino-pretty",
+      options: { colorize: true }
+    }
+  }
+});
+
 // src/routes/health.ts
 var router = (0, import_express.Router)();
 router.get("/healthz", (_req, res) => {
   const data = HealthCheckResponse.parse({ status: "ok" });
   res.json(data);
+});
+router.get("/db-ping", async (req, res) => {
+  const secret = process.env.CRON_SECRET;
+  const auth = req.headers["authorization"];
+  if (secret && auth !== `Bearer ${secret}`) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  try {
+    await db.execute(sql`SELECT 1`);
+    logger.info("DB_PING: Neon keep-alive OK");
+    res.json({ ok: true, ts: (/* @__PURE__ */ new Date()).toISOString() });
+  } catch (err) {
+    logger.error({ err }, "DB_PING: failed");
+    res.status(503).json({ ok: false, error: err.message });
+  }
 });
 router.get("/presale/config", async (_req, res) => {
   try {
@@ -82816,24 +82850,6 @@ var twitter_default = router2;
 var import_express3 = __toESM(require_express2(), 1);
 var import_passport = __toESM(require_lib7(), 1);
 var import_passport_google_oauth20 = __toESM(require_lib9(), 1);
-
-// src/lib/logger.ts
-var import_pino = __toESM(require_pino(), 1);
-var isProduction = process.env.NODE_ENV === "production";
-var logger = (0, import_pino.default)({
-  level: process.env.LOG_LEVEL ?? "info",
-  redact: [
-    "req.headers.authorization",
-    "req.headers.cookie",
-    "res.headers['set-cookie']"
-  ],
-  ...isProduction ? {} : {
-    transport: {
-      target: "pino-pretty",
-      options: { colorize: true }
-    }
-  }
-});
 
 // src/middleware/admin-auth.ts
 var ADMIN_IDLE_TIMEOUT_MS = 8 * 60 * 60 * 1e3;

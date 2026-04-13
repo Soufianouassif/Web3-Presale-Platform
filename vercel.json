@@ -3,6 +3,12 @@
   "buildCommand": "chmod +x scripts/vercel-build.sh && sh scripts/vercel-build.sh",
   "outputDirectory": "dist",
   "framework": null,
+  "crons": [
+    {
+      "path": "/api/db-ping",
+      "schedule": "*/5 * * * *"
+    }
+  ],
   "functions": {
     "api/server.mjs": {
       "memory": 1024,
