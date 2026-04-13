@@ -1,0 +1,527 @@
+use anchor_lang::prelude::*;
+use anchor_lang::system_program;
+use anchor_spl::token::{self, Token, TokenAccount, Transfer};
+use anchor_spl::associated_token::AssociatedToken;
+use anchor_spl::token::Mint;
+
+declare_id!("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
+
+// ═══════════════════════════════════════════════════════════
+//  ERRORS
+// ═══════════════════════════════════════════════════════════
+#[error_code]
+pub enum PresaleError {
+    #[msg("Presale is not active")]             NotActive,
+    #[msg("Presale is paused")]                 Paused,
+    #[msg("Presale has not started yet")]       NotStarted,
+    #[msg("Presale has ended")]                 Ended,
+    #[msg("Payment amount is below the minimum")] BelowMinimum,
+    #[msg("Payment amount exceeds the maximum")]  ExceedsMaximum,
+    #[msg("Not enough tokens remaining")]       InsufficientStageTokens,
+    #[msg("Invalid stage index")]               InvalidStage,
+    #[msg("All stages are sold out")]           AllStagesSoldOut,
+    #[msg("Unauthorized")]                      Unauthorized,
+    #[msg("SOL price is not set")]              SolPriceNotSet,
+    #[msg("Token amount cannot be zero")]       ZeroTokens,
+    #[msg("Overflow in arithmetic")]            MathOverflow,
+    #[msg("Presale is already ended")]          AlreadyEnded,
+    #[msg("Presale is already active")]         AlreadyActive,
+    #[msg("Invalid time configuration")]        InvalidTime,
+    #[msg("USDT mint mismatch")]                WrongUsdtMint,
+    #[msg("Treasury ATA mismatch")]             WrongTreasuryAta,
+    #[msg("Insufficient funds in vault")]       InsufficientFunds,
+    #[msg("SOL vault mismatch")]                WrongSolVault,
+    #[msg("Withdrawal amount must be > 0")]     ZeroWithdrawAmount,
+}
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+pub const MAX_STAGES: usize = 4;
+pub const FLAG_SOL:    u8 = 0b001;
+pub const FLAG_USDT:   u8 = 0b010;
+pub const FLAG_MANUAL: u8 = 0b100;
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default)]
+pub struct Stage {
+    pub tokens_per_raw_usdt_scaled: u64,
+    pub max_tokens: u64,
+    pub tokens_sold: u64,
+}
+impl Stage {
+    pub const SIZE: usize = 24;
+    pub const PRICE_SCALE: u64 = 1_000;
+    pub fn remaining(&self) -> u64 { self.max_tokens.saturating_sub(self.tokens_sold) }
+    pub fn is_sold_out(&self) -> bool { self.tokens_sold >= self.max_tokens }
+}
+
+#[account]
+pub struct PresaleConfig {
+    pub authority: Pubkey,
+    pub treasury: Pubkey,
+    pub usdt_treasury_ata: Pubkey,
+    pub usdt_mint: Pubkey,
+    pub current_stage: u8,
+    pub is_active: bool,
+    pub is_paused: bool,
+    pub presale_start: i64,
+    pub presale_end: i64,
+    pub claim_opens_at: i64,
+    pub total_tokens_sold: u64,
+    pub total_sol_raised: u64,
+    pub total_usdt_raised: u64,
+    pub total_manual_tokens: u64,
+    pub sol_price_usd_e6: u64,
+    pub stages: [Stage; MAX_STAGES],
+    pub buyers_count: u64,
+    pub sol_vault_bump: u8,
+    pub vault_auth_bump: u8,
+    pub bump: u8,
+    pub _reserved: [u8; 54],
+}
+impl PresaleConfig {
+    pub const LEN: usize = 8 + 32+32+32+32 + 1+1+1 + 8+8+8 + 8+8+8+8+8
+        + MAX_STAGES * Stage::SIZE + 8 + 1+1+1+54;
+    pub fn tokens_for_usdt(&self, stage_idx: usize, usdt_raw: u64) -> u64 {
+        let s = &self.stages[stage_idx];
+        usdt_raw.saturating_mul(s.tokens_per_raw_usdt_scaled) / Stage::PRICE_SCALE
+    }
+    pub fn tokens_for_sol(&self, stage_idx: usize, lamports: u64) -> u64 {
+        if self.sol_price_usd_e6 == 0 { return 0; }
+        let usdt_e6 = lamports.saturating_mul(self.sol_price_usd_e6) / 1_000_000_000_u64;
+        self.tokens_for_usdt(stage_idx, usdt_e6)
+    }
+}
+
+#[account]
+pub struct SolVault {}
+impl SolVault { pub const LEN: usize = 8; }
+
+#[account]
+pub struct BuyerRecord {
+    pub presale: Pubkey,
+    pub wallet: Pubkey,
+    pub total_tokens: u64,
+    pub sol_paid: u64,
+    pub usdt_paid: u64,
+    pub last_is_manual: bool,
+    pub last_purchase_at: i64,
+    pub stage_at_first_purchase: u8,
+    pub payment_flags: u8,
+    pub bump: u8,
+    pub _reserved: [u8; 30],
+}
+impl BuyerRecord {
+    pub const LEN: usize = 8 + 32+32 + 8+8+8 + 1+8 + 1+1+1+30;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PROGRAM
+// ═══════════════════════════════════════════════════════════
+#[program]
+pub mod pepewife_presale {
+    use super::*;
+
+    pub fn initialize(
+        ctx: Context<Initialize>,
+        presale_start: i64,
+        presale_end: i64,
+        claim_opens_at: i64,
+        sol_price_usd_e6: u64,
+    ) -> Result<()> {
+        require!(presale_start < presale_end, PresaleError::InvalidTime);
+        require!(claim_opens_at >= presale_end, PresaleError::InvalidTime);
+        let config = &mut ctx.accounts.config;
+        config.authority         = ctx.accounts.authority.key();
+        config.treasury          = ctx.accounts.sol_vault.key();
+        config.usdt_treasury_ata = ctx.accounts.vault_usdt_ata.key();
+        config.usdt_mint         = ctx.accounts.usdt_mint.key();
+        config.current_stage     = 0;
+        config.is_active         = false;
+        config.is_paused         = false;
+        config.presale_start     = presale_start;
+        config.presale_end       = presale_end;
+        config.claim_opens_at    = claim_opens_at;
+        config.total_tokens_sold = 0;
+        config.total_sol_raised  = 0;
+        config.total_usdt_raised = 0;
+        config.total_manual_tokens = 0;
+        config.sol_price_usd_e6  = sol_price_usd_e6;
+        config.buyers_count      = 0;
+        config.sol_vault_bump    = ctx.bumps.sol_vault;
+        config.vault_auth_bump   = ctx.bumps.vault_auth;
+        config.bump              = ctx.bumps.config;
+        config._reserved         = [0u8; 54];
+        let prices: [u64; 4] = [100_000, 50_000, 25_000, 16_667];
+        for i in 0..MAX_STAGES {
+            config.stages[i] = Stage {
+                tokens_per_raw_usdt_scaled: prices[i],
+                max_tokens: 5_000_000_000_000,
+                tokens_sold: 0,
+            };
+        }
+        msg!("Presale initialized. SOL vault: {}", ctx.accounts.sol_vault.key());
+        Ok(())
+    }
+
+    pub fn buy_with_sol(ctx: Context<BuyWithSol>, lamports: u64) -> Result<()> {
+        let config = &mut ctx.accounts.config;
+        let now = Clock::get()?.unix_timestamp;
+        require!(config.is_active, PresaleError::NotActive);
+        require!(!config.is_paused, PresaleError::Paused);
+        require!(now >= config.presale_start, PresaleError::NotStarted);
+        require!(now < config.presale_end, PresaleError::Ended);
+        require!(lamports >= 1_000_000_000, PresaleError::BelowMinimum);
+        require!(lamports <= 50_000_000_000, PresaleError::ExceedsMaximum);
+        require!(config.sol_price_usd_e6 > 0, PresaleError::SolPriceNotSet);
+        let stage_idx = config.current_stage as usize;
+        require!(stage_idx < 4, PresaleError::InvalidStage);
+        let tokens = config.tokens_for_sol(stage_idx, lamports);
+        require!(tokens > 0, PresaleError::ZeroTokens);
+        require!(config.stages[stage_idx].remaining() >= tokens, PresaleError::InsufficientStageTokens);
+        system_program::transfer(
+            CpiContext::new(ctx.accounts.system_program.to_account_info(),
+                system_program::Transfer {
+                    from: ctx.accounts.buyer.to_account_info(),
+                    to:   ctx.accounts.sol_vault.to_account_info(),
+                }
+            ), lamports
+        )?;
+        config.stages[stage_idx].tokens_sold = config.stages[stage_idx].tokens_sold
+            .checked_add(tokens).ok_or(PresaleError::MathOverflow)?;
+        config.total_tokens_sold = config.total_tokens_sold
+            .checked_add(tokens).ok_or(PresaleError::MathOverflow)?;
+        config.total_sol_raised = config.total_sol_raised
+            .checked_add(lamports).ok_or(PresaleError::MathOverflow)?;
+        let record = &mut ctx.accounts.buyer_record;
+        if record.wallet == Pubkey::default() {
+            record.presale = config.key();
+            record.wallet = ctx.accounts.buyer.key();
+            record.bump = ctx.bumps.buyer_record;
+            record.stage_at_first_purchase = stage_idx as u8;
+            record.payment_flags = 0;
+            record._reserved = [0u8; 30];
+            config.buyers_count = config.buyers_count
+                .checked_add(1).ok_or(PresaleError::MathOverflow)?;
+        }
+        record.total_tokens = record.total_tokens
+            .checked_add(tokens).ok_or(PresaleError::MathOverflow)?;
+        record.sol_paid = record.sol_paid
+            .checked_add(lamports).ok_or(PresaleError::MathOverflow)?;
+        record.last_is_manual = false;
+        record.last_purchase_at = now;
+        record.payment_flags |= FLAG_SOL;
+        if config.stages[stage_idx].is_sold_out() && stage_idx < 3 {
+            config.current_stage += 1;
+        }
+        msg!("SOL_BUY lamports={} tokens={}", lamports, tokens);
+        Ok(())
+    }
+
+    pub fn buy_with_usdt(ctx: Context<BuyWithUsdt>, usdt_raw: u64) -> Result<()> {
+        let config = &mut ctx.accounts.config;
+        let now = Clock::get()?.unix_timestamp;
+        require!(config.is_active, PresaleError::NotActive);
+        require!(!config.is_paused, PresaleError::Paused);
+        require!(now >= config.presale_start, PresaleError::NotStarted);
+        require!(now < config.presale_end, PresaleError::Ended);
+        require!(usdt_raw >= 100_000_000, PresaleError::BelowMinimum);
+        require!(usdt_raw <= 10_000_000_000, PresaleError::ExceedsMaximum);
+        let stage_idx = config.current_stage as usize;
+        require!(stage_idx < 4, PresaleError::InvalidStage);
+        let tokens = config.tokens_for_usdt(stage_idx, usdt_raw);
+        require!(tokens > 0, PresaleError::ZeroTokens);
+        require!(config.stages[stage_idx].remaining() >= tokens, PresaleError::InsufficientStageTokens);
+        token::transfer(
+            CpiContext::new(ctx.accounts.token_program.to_account_info(),
+                Transfer {
+                    from:      ctx.accounts.buyer_usdt_ata.to_account_info(),
+                    to:        ctx.accounts.usdt_treasury.to_account_info(),
+                    authority: ctx.accounts.buyer.to_account_info(),
+                }
+            ), usdt_raw
+        )?;
+        config.stages[stage_idx].tokens_sold = config.stages[stage_idx].tokens_sold
+            .checked_add(tokens).ok_or(PresaleError::MathOverflow)?;
+        config.total_tokens_sold = config.total_tokens_sold
+            .checked_add(tokens).ok_or(PresaleError::MathOverflow)?;
+        config.total_usdt_raised = config.total_usdt_raised
+            .checked_add(usdt_raw).ok_or(PresaleError::MathOverflow)?;
+        let record = &mut ctx.accounts.buyer_record;
+        if record.wallet == Pubkey::default() {
+            record.presale = config.key();
+            record.wallet = ctx.accounts.buyer.key();
+            record.bump = ctx.bumps.buyer_record;
+            record.stage_at_first_purchase = stage_idx as u8;
+            record.payment_flags = 0;
+            record._reserved = [0u8; 30];
+            config.buyers_count = config.buyers_count
+                .checked_add(1).ok_or(PresaleError::MathOverflow)?;
+        }
+        record.total_tokens = record.total_tokens
+            .checked_add(tokens).ok_or(PresaleError::MathOverflow)?;
+        record.usdt_paid = record.usdt_paid
+            .checked_add(usdt_raw).ok_or(PresaleError::MathOverflow)?;
+        record.last_is_manual = false;
+        record.last_purchase_at = now;
+        record.payment_flags |= FLAG_USDT;
+        if config.stages[stage_idx].is_sold_out() && stage_idx < 3 {
+            config.current_stage += 1;
+        }
+        msg!("USDT_BUY usdt_raw={} tokens={}", usdt_raw, tokens);
+        Ok(())
+    }
+
+    pub fn manual_allocate(ctx: Context<ManualAllocate>, buyer_wallet: Pubkey, tokens: u64) -> Result<()> {
+        require!(tokens > 0, PresaleError::ZeroTokens);
+        let config = &mut ctx.accounts.config;
+        let now = Clock::get()?.unix_timestamp;
+        config.total_tokens_sold = config.total_tokens_sold
+            .checked_add(tokens).ok_or(PresaleError::MathOverflow)?;
+        config.total_manual_tokens = config.total_manual_tokens
+            .checked_add(tokens).ok_or(PresaleError::MathOverflow)?;
+        let record = &mut ctx.accounts.buyer_record;
+        if record.wallet == Pubkey::default() {
+            record.presale = config.key();
+            record.wallet = buyer_wallet;
+            record.bump = ctx.bumps.buyer_record;
+            record.stage_at_first_purchase = config.current_stage;
+            record.payment_flags = 0;
+            record._reserved = [0u8; 30];
+            config.buyers_count = config.buyers_count
+                .checked_add(1).ok_or(PresaleError::MathOverflow)?;
+        }
+        record.total_tokens = record.total_tokens
+            .checked_add(tokens).ok_or(PresaleError::MathOverflow)?;
+        record.last_is_manual = true;
+        record.last_purchase_at = now;
+        record.payment_flags |= FLAG_MANUAL;
+        msg!("MANUAL_ALLOC wallet={} tokens={}", buyer_wallet, tokens);
+        Ok(())
+    }
+
+    pub fn withdraw_sol(ctx: Context<WithdrawSol>) -> Result<()> {
+        let vault_info = ctx.accounts.sol_vault.to_account_info();
+        let admin_info = ctx.accounts.authority.to_account_info();
+        let rent_min = Rent::get()?.minimum_balance(SolVault::LEN);
+        let available = vault_info.lamports();
+        require!(available > rent_min, PresaleError::InsufficientFunds);
+        let amount = available.checked_sub(rent_min).ok_or(PresaleError::MathOverflow)?;
+        require!(amount > 0, PresaleError::ZeroWithdrawAmount);
+        **vault_info.try_borrow_mut_lamports()? -= amount;
+        **admin_info.try_borrow_mut_lamports()? += amount;
+        msg!("WITHDRAW_SOL amount_lamports={}", amount);
+        Ok(())
+    }
+
+    pub fn withdraw_usdt(ctx: Context<WithdrawUsdt>) -> Result<()> {
+        let amount = ctx.accounts.vault_usdt_ata.amount;
+        require!(amount > 0, PresaleError::InsufficientFunds);
+        let bump = ctx.accounts.config.vault_auth_bump;
+        let signer_seeds: &[&[&[u8]]] = &[&[b"vault_auth", &[bump]]];
+        token::transfer(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                Transfer {
+                    from:      ctx.accounts.vault_usdt_ata.to_account_info(),
+                    to:        ctx.accounts.admin_usdt_ata.to_account_info(),
+                    authority: ctx.accounts.vault_auth.to_account_info(),
+                },
+                signer_seeds,
+            ), amount
+        )?;
+        msg!("WITHDRAW_USDT amount_raw={}", amount);
+        Ok(())
+    }
+
+    pub fn activate(ctx: Context<AdminOnly>) -> Result<()> {
+        let c = &mut ctx.accounts.config;
+        require!(!c.is_active, PresaleError::AlreadyActive);
+        c.is_active = true;
+        msg!("ACTIVATED");
+        Ok(())
+    }
+    pub fn pause(ctx: Context<AdminOnly>) -> Result<()> {
+        ctx.accounts.config.is_paused = true;
+        msg!("PAUSED");
+        Ok(())
+    }
+    pub fn resume(ctx: Context<AdminOnly>) -> Result<()> {
+        ctx.accounts.config.is_paused = false;
+        msg!("RESUMED");
+        Ok(())
+    }
+    pub fn end_presale(ctx: Context<AdminOnly>) -> Result<()> {
+        let c = &mut ctx.accounts.config;
+        require!(c.is_active, PresaleError::NotActive);
+        c.is_active = false;
+        c.presale_end = Clock::get()?.unix_timestamp;
+        msg!("ENDED");
+        Ok(())
+    }
+    pub fn advance_stage(ctx: Context<AdminOnly>) -> Result<()> {
+        let c = &mut ctx.accounts.config;
+        let next = c.current_stage + 1;
+        require!((next as usize) < 4, PresaleError::AllStagesSoldOut);
+        c.current_stage = next;
+        msg!("Stage -> {}", next);
+        Ok(())
+    }
+    pub fn update_sol_price(ctx: Context<UpdateSolPrice>, new_price_usd_e6: u64) -> Result<()> {
+        ctx.accounts.config.sol_price_usd_e6 = new_price_usd_e6;
+        msg!("SOL price={}", new_price_usd_e6);
+        Ok(())
+    }
+    pub fn set_claim_time(ctx: Context<UpdateSolPrice>, new_claim_opens_at: i64) -> Result<()> {
+        ctx.accounts.config.claim_opens_at = new_claim_opens_at;
+        msg!("Claim at {}", new_claim_opens_at);
+        Ok(())
+    }
+
+    // ── NEW: تحديث عنوان العملة المقبولة ──────────────────
+    pub fn update_usdt_mint(ctx: Context<UpdateUsdtMint>) -> Result<()> {
+        let config = &mut ctx.accounts.config;
+        require!(
+            ctx.accounts.new_treasury_ata.mint == ctx.accounts.new_mint.key(),
+            PresaleError::WrongUsdtMint
+        );
+        config.usdt_mint         = ctx.accounts.new_mint.key();
+        config.usdt_treasury_ata = ctx.accounts.new_treasury_ata.key();
+        msg!("usdt_mint updated to {}", config.usdt_mint);
+        Ok(())
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ACCOUNT CONTEXTS
+// ═══════════════════════════════════════════════════════════
+#[derive(Accounts)]
+pub struct Initialize<'info> {
+    #[account(init, payer = authority, space = PresaleConfig::LEN, seeds = [b"presale_config"], bump)]
+    pub config: Account<'info, PresaleConfig>,
+    #[account(init, payer = authority, space = SolVault::LEN, seeds = [b"sol_vault"], bump)]
+    pub sol_vault: Account<'info, SolVault>,
+    /// CHECK: PDA signer only
+    #[account(seeds = [b"vault_auth"], bump)]
+    pub vault_auth: UncheckedAccount<'info>,
+    #[account(init, payer = authority, associated_token::mint = usdt_mint, associated_token::authority = vault_auth)]
+    pub vault_usdt_ata: Account<'info, TokenAccount>,
+    pub usdt_mint: Account<'info, Mint>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
+#[derive(Accounts)]
+pub struct BuyWithSol<'info> {
+    #[account(mut, seeds = [b"presale_config"], bump = config.bump)]
+    pub config: Account<'info, PresaleConfig>,
+    #[account(mut, seeds = [b"sol_vault"], bump = config.sol_vault_bump,
+        constraint = sol_vault.key() == config.treasury @ PresaleError::WrongSolVault)]
+    pub sol_vault: Account<'info, SolVault>,
+    #[account(init_if_needed, payer = buyer, space = BuyerRecord::LEN,
+        seeds = [b"buyer", config.key().as_ref(), buyer.key().as_ref()], bump)]
+    pub buyer_record: Account<'info, BuyerRecord>,
+    #[account(mut)]
+    pub buyer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct BuyWithUsdt<'info> {
+    #[account(mut, seeds = [b"presale_config"], bump = config.bump)]
+    pub config: Account<'info, PresaleConfig>,
+    #[account(mut,
+        constraint = usdt_treasury.key() == config.usdt_treasury_ata @ PresaleError::WrongTreasuryAta,
+        constraint = usdt_treasury.mint  == config.usdt_mint          @ PresaleError::WrongUsdtMint)]
+    pub usdt_treasury: Account<'info, TokenAccount>,
+    #[account(mut,
+        constraint = buyer_usdt_ata.owner == buyer.key(),
+        constraint = buyer_usdt_ata.mint  == config.usdt_mint @ PresaleError::WrongUsdtMint)]
+    pub buyer_usdt_ata: Account<'info, TokenAccount>,
+    #[account(init_if_needed, payer = buyer, space = BuyerRecord::LEN,
+        seeds = [b"buyer", config.key().as_ref(), buyer.key().as_ref()], bump)]
+    pub buyer_record: Account<'info, BuyerRecord>,
+    #[account(mut)]
+    pub buyer: Signer<'info>,
+    pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(buyer_wallet: Pubkey)]
+pub struct ManualAllocate<'info> {
+    #[account(mut, seeds = [b"presale_config"], bump = config.bump,
+        has_one = authority @ PresaleError::Unauthorized)]
+    pub config: Account<'info, PresaleConfig>,
+    #[account(init_if_needed, payer = authority, space = BuyerRecord::LEN,
+        seeds = [b"buyer", config.key().as_ref(), buyer_wallet.as_ref()], bump)]
+    pub buyer_record: Account<'info, BuyerRecord>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct AdminOnly<'info> {
+    #[account(mut, seeds = [b"presale_config"], bump = config.bump,
+        has_one = authority @ PresaleError::Unauthorized)]
+    pub config: Account<'info, PresaleConfig>,
+    pub authority: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct UpdateSolPrice<'info> {
+    #[account(mut, seeds = [b"presale_config"], bump = config.bump,
+        has_one = authority @ PresaleError::Unauthorized)]
+    pub config: Account<'info, PresaleConfig>,
+    pub authority: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct WithdrawSol<'info> {
+    #[account(seeds = [b"presale_config"], bump = config.bump,
+        has_one = authority @ PresaleError::Unauthorized)]
+    pub config: Account<'info, PresaleConfig>,
+    #[account(mut, seeds = [b"sol_vault"], bump = config.sol_vault_bump,
+        constraint = sol_vault.key() == config.treasury @ PresaleError::WrongSolVault)]
+    pub sol_vault: Account<'info, SolVault>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct WithdrawUsdt<'info> {
+    #[account(seeds = [b"presale_config"], bump = config.bump,
+        has_one = authority @ PresaleError::Unauthorized)]
+    pub config: Account<'info, PresaleConfig>,
+    /// CHECK: PDA signer only
+    #[account(seeds = [b"vault_auth"], bump = config.vault_auth_bump)]
+    pub vault_auth: UncheckedAccount<'info>,
+    #[account(mut,
+        constraint = vault_usdt_ata.key() == config.usdt_treasury_ata @ PresaleError::WrongTreasuryAta,
+        constraint = vault_usdt_ata.mint  == config.usdt_mint          @ PresaleError::WrongUsdtMint)]
+    pub vault_usdt_ata: Account<'info, TokenAccount>,
+    #[account(mut,
+        constraint = admin_usdt_ata.owner == authority.key(),
+        constraint = admin_usdt_ata.mint  == config.usdt_mint @ PresaleError::WrongUsdtMint)]
+    pub admin_usdt_ata: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    pub token_program: Program<'info, Token>,
+}
+
+// ── NEW: تحديث عنوان العملة المقبولة ──────────────────────
+// الـ new_treasury_ata يجب أن يكون ATA منشأ مسبقاً بـ:
+//   spl-token create-account <new_mint> --owner <vault_auth>
+#[derive(Accounts)]
+pub struct UpdateUsdtMint<'info> {
+    #[account(mut, seeds = [b"presale_config"], bump = config.bump,
+        has_one = authority @ PresaleError::Unauthorized)]
+    pub config: Account<'info, PresaleConfig>,
+    pub authority: Signer<'info>,
+    pub new_mint: Account<'info, Mint>,
+    pub new_treasury_ata: Account<'info, TokenAccount>,
+}

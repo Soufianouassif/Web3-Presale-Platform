@@ -150,3 +150,32 @@ pub fn handle_update_usdt_mint(ctx: Context<UpdateUsdtMint>) -> Result<()> {
     );
     Ok(())
 }
+
+// ──────────────────────────────────────────────────────────
+//  DevReset — reset all presale counters to zero
+//  ⚠️  FOR DEVNET / TESTING ONLY.
+//  Resets totals, stage sold amounts, buyers count, and
+//  moves back to stage 0. Does NOT close/reopen the account.
+//  Protected: only the `authority` signer can call this.
+// ──────────────────────────────────────────────────────────
+pub fn handle_dev_reset(ctx: Context<AdminOnly>) -> Result<()> {
+    let c = &mut ctx.accounts.config;
+
+    // Reset global totals
+    c.total_tokens_sold   = 0;
+    c.total_sol_raised    = 0;
+    c.total_usdt_raised   = 0;
+    c.total_manual_tokens = 0;
+    c.buyers_count        = 0;
+
+    // Reset to stage 0
+    c.current_stage = 0;
+
+    // Reset tokens_sold for each stage (keep prices and caps unchanged)
+    for stage in c.stages.iter_mut() {
+        stage.tokens_sold = 0;
+    }
+
+    msg!("DEV RESET: all presale counters cleared, back to stage 0");
+    Ok(())
+}

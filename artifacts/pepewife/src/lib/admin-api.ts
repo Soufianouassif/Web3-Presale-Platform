@@ -168,6 +168,8 @@ export const adminApi = {
     fetchApi<{ success: boolean; deleted: number; message: string }>("/admin/reset/referrals", { method: "DELETE" }),
   resetAll: () =>
     fetchApi<{ success: boolean; deleted: number; breakdown: Record<string, number>; message: string }>("/admin/reset/all", { method: "DELETE" }),
+  devReset: () =>
+    fetchApi<{ success: boolean; message: string; signature?: string }>("/admin/presale/dev-reset", { method: "POST" }),
 };
 
 export interface SessionInfo {

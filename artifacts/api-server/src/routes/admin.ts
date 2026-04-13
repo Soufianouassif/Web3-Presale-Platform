@@ -1,10 +1,67 @@
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from "@solana/web3.js";
 import { db } from "@workspace/db";
 import { pageVisits, walletConnections, purchases, presaleConfig, adminUsers, referralCodes, referrals } from "@workspace/db/schema";
 import { desc, sql, eq, count } from "drizzle-orm";
 import { requireAdminAuth, requireRecentAuth } from "../middleware/admin-auth.js";
 import { logger } from "../lib/logger.js";
+
+// ── Solana constants (same as sol-price-sync) ────────────────────────────────
+const PROGRAM_ID_STR = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
+const CONFIG_PDA_STR = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
+const SOLANA_RPC     = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
+
+async function getDiscriminator(name: string): Promise<Buffer> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(`global:${name}`);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Buffer.from(hashBuffer).slice(0, 8);
+}
+
+async function devResetOnChain(): Promise<string> {
+  const raw = process.env.ADMIN_KEYPAIR_JSON;
+  if (!raw) throw new Error("ADMIN_KEYPAIR_JSON env var not set");
+  const bytes: number[] = JSON.parse(raw);
+  if (!Array.isArray(bytes) || bytes.length !== 64)
+    throw new Error("ADMIN_KEYPAIR_JSON must be a JSON array of 64 numbers");
+
+  const keypair    = Keypair.fromSecretKey(new Uint8Array(bytes));
+  const connection = new Connection(SOLANA_RPC, "confirmed");
+  const programId  = new PublicKey(PROGRAM_ID_STR);
+  const configPda  = new PublicKey(CONFIG_PDA_STR);
+
+  const discriminator = await getDiscriminator("dev_reset");
+
+  const ix = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: configPda,         isSigner: false, isWritable: true  },
+      { pubkey: keypair.publicKey, isSigner: true,  isWritable: false },
+    ],
+    data: discriminator,
+  });
+
+  const tx = new Transaction();
+  tx.feePayer = keypair.publicKey;
+  tx.add(ix);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+  tx.sign(keypair);
+
+  const sig = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false });
+  await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
+  return sig;
+}
 
 const REAUTH_WINDOW_MINUTES = 15;
 
@@ -287,6 +344,32 @@ router.post("/admin/presale/withdraw", requireRecentAuth(REAUTH_WINDOW_MINUTES),
     message: "Withdrawal initiated. Please complete the transaction on-chain.",
     note: "This is a record-keeping action. Execute the actual withdrawal via your Solana/EVM wallet.",
   });
+});
+
+// ── DEV RESET — reset all on-chain counters to zero (devnet only) ─────────────
+router.post("/admin/presale/dev-reset", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    if (!process.env.ADMIN_KEYPAIR_JSON) {
+      res.status(503).json({
+        success: false,
+        message: "ADMIN_KEYPAIR_JSON is not configured — cannot send Solana transaction from server.",
+      });
+      return;
+    }
+
+    auditLog(req, "presale.dev_reset");
+    const sig = await devResetOnChain();
+    logger.info({ sig }, "DEV_RESET: on-chain presale counters cleared");
+    res.json({
+      success: true,
+      message: "On-chain reset complete — all counters zeroed, back to stage 0.",
+      signature: sig,
+    });
+  } catch (err) {
+    const msg = (err as Error).message ?? "Unknown error";
+    logger.error({ err }, "DEV_RESET: on-chain transaction failed");
+    res.status(500).json({ success: false, message: `Reset failed: ${msg}` });
+  }
 });
 
 router.get("/admin/referrals", async (req, res) => {

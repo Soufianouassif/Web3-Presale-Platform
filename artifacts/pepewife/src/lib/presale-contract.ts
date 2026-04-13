@@ -1,7 +1,7 @@
 /**
  * PEPEWIFE Presale Contract — Browser Integration
  *
- * Program ID : 4KpEeYVW8592GGpcNZLo7CinE1dnV9tJnKYc9JzpQSv7  (Devnet)
+ * Program ID : AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145  (Devnet)
  * Config PDA : 7tvmjEGj9k4QV7oVNeAD13CVxdjRPCNfYdtz1mXQ8sDs
  *
  * Uses @solana/web3.js directly (no Anchor runtime needed).
@@ -660,6 +660,47 @@ export async function advanceStageWithKeypair(
   tx.feePayer = admin;
   tx.add(advanceIx);
   tx.add(resumeIx);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+
+  tx.sign(keypair);
+  onSigned?.();
+
+  const signature = await sendAndConfirmTx(tx.serialize(), blockhash, lastValidBlockHeight);
+  return { signature };
+}
+
+// ─────────────────────────────────────────────────────────────
+//  ADMIN: DEV RESET  (dev_reset instruction)
+//  ⚠️  DEVNET ONLY — resets all counters to zero.
+//  Requires the authority keypair (never exposed to browser).
+//  Called from the admin backend via ADMIN_KEYPAIR_JSON.
+//  Accounts: config (mut, has_one=authority), authority (signer)
+// ─────────────────────────────────────────────────────────────
+
+export async function devResetWithKeypair(
+  keypairBytes: number[],
+  onSigned?: () => void,
+): Promise<{ signature: string }> {
+  const keypair       = Keypair.fromSecretKey(new Uint8Array(keypairBytes));
+  const admin         = keypair.publicKey;
+  const discriminator = await getDiscriminator("dev_reset");
+
+  const ix = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: admin,      isSigner: true,  isWritable: false },
+    ],
+    data: discriminator,
+  });
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
 
   const { blockhash, lastValidBlockHeight } =
     await connection.getLatestBlockhash("confirmed");

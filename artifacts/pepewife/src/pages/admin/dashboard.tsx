@@ -643,7 +643,7 @@ function StageBar({ label, sold, max, isCurrent, price }: { label: string; sold:
 }
 
 // ─── Sidebar nav items ────────────────────────────────────────────────────────
-type Section = "overview" | "blockchain" | "control" | "revenue" | "referrals" | "analytics";
+type Section = "overview" | "blockchain" | "control" | "revenue" | "referrals" | "analytics" | "danger";
 const NAV: { key: Section; icon: string; label: string }[] = [
   { key: "overview",   icon: "📊", label: "نظرة عامة" },
   { key: "blockchain", icon: "⛓",  label: "البلوكتشين" },
@@ -651,6 +651,7 @@ const NAV: { key: Section; icon: string; label: string }[] = [
   { key: "revenue",    icon: "💰",  label: "الإيرادات" },
   { key: "referrals",  icon: "🔗",  label: "الإحالات" },
   { key: "analytics",  icon: "📈",  label: "التحليلات" },
+  { key: "danger",     icon: "🗑",  label: "حذف البيانات" },
 ];
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -1259,6 +1260,220 @@ export default function AdminDashboard() {
     </div>
   );
 
+  // ─── Danger Zone Section ────────────────────────────────────────────────────
+  const [confirmModal, setConfirmModal] = useState<{
+    key: string;
+    title: string;
+    desc: string;
+    action: () => Promise<{ deleted: number; message: string }>;
+  } | null>(null);
+  const [confirmInput, setConfirmInput] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+
+  const [devResetModal, setDevResetModal]   = useState(false);
+  const [devResetInput, setDevResetInput]   = useState("");
+  const [devResetLoading, setDevResetLoading] = useState(false);
+
+  async function runReset(action: () => Promise<{ deleted: number; message: string }>) {
+    setResetLoading(true);
+    try {
+      const res = await action();
+      showNotification(`✅ ${res.message}`, "success");
+      setConfirmModal(null);
+      setConfirmInput("");
+      fetchStats();
+    } catch (err) {
+      showNotification(`❌ ${(err as Error).message}`, "error");
+    } finally {
+      setResetLoading(false);
+    }
+  }
+
+  async function runDevReset() {
+    setDevResetLoading(true);
+    try {
+      const res = await adminApi.devReset();
+      showNotification(`✅ ${res.message}`, "success");
+      setDevResetModal(false);
+      setDevResetInput("");
+      fetchStats();
+    } catch (err) {
+      showNotification(`❌ ${(err as Error).message}`, "error");
+    } finally {
+      setDevResetLoading(false);
+    }
+  }
+
+  const RESET_ACTIONS = [
+    {
+      key: "purchases",
+      icon: "🛒",
+      label: "حذف المشتريات",
+      desc: "يحذف جميع سجلات الشراء من قاعدة البيانات. لا يؤثر على البلوكتشين.",
+      color: "border-orange-500/30 bg-orange-500/5",
+      btnColor: "bg-orange-500/20 hover:bg-orange-500/30 border-orange-500/40 text-orange-300",
+      action: () => adminApi.resetPurchases(),
+    },
+    {
+      key: "visits",
+      icon: "👁",
+      label: "حذف الزيارات والمحافظ",
+      desc: "يحذف جميع سجلات زيارات الصفحات وجميع المحافظ المتصلة.",
+      color: "border-yellow-500/30 bg-yellow-500/5",
+      btnColor: "bg-yellow-500/20 hover:bg-yellow-500/30 border-yellow-500/40 text-yellow-300",
+      action: () => adminApi.resetVisits(),
+    },
+    {
+      key: "referrals",
+      icon: "🔗",
+      label: "حذف الإحالات",
+      desc: "يحذف جميع أكواد الإحالة وسجلات الأرباح والإحالات المرتبطة.",
+      color: "border-pink-500/30 bg-pink-500/5",
+      btnColor: "bg-pink-500/20 hover:bg-pink-500/30 border-pink-500/40 text-pink-300",
+      action: () => adminApi.resetReferrals(),
+    },
+    {
+      key: "all",
+      icon: "💥",
+      label: "حذف كل البيانات",
+      desc: "يحذف كل شيء: المشتريات، الزيارات، المحافظ، الإحالات. هذا الإجراء لا يمكن التراجع عنه.",
+      color: "border-red-500/40 bg-red-500/10",
+      btnColor: "bg-red-500/20 hover:bg-red-500/40 border-red-500/50 text-red-300",
+      action: () => adminApi.resetAll(),
+    },
+  ];
+
+  const SectionDanger = (
+    <div className="space-y-5">
+      {/* DB Confirmation Modal */}
+      {confirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-[#111118] border border-red-500/40 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center mb-4">
+              <span className="text-4xl">⚠️</span>
+              <h3 className="text-lg font-bold text-red-300 mt-2">{confirmModal.title}</h3>
+              <p className="text-sm text-gray-400 mt-2">{confirmModal.desc}</p>
+            </div>
+            <div className="bg-red-950/30 border border-red-500/20 rounded-xl p-3 mb-4">
+              <p className="text-xs text-red-300 text-center">اكتب <span className="font-mono font-bold text-white">CONFIRM</span> للتأكيد</p>
+              <input
+                type="text"
+                value={confirmInput}
+                onChange={e => setConfirmInput(e.target.value)}
+                placeholder="CONFIRM"
+                className="mt-2 w-full bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-sm text-white font-mono text-center placeholder-gray-600 focus:outline-none focus:border-red-500/60"
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setConfirmModal(null); setConfirmInput(""); }}
+                className="flex-1 px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm text-gray-300 transition-colors"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={() => runReset(confirmModal.action)}
+                disabled={confirmInput !== "CONFIRM" || resetLoading}
+                className="flex-1 px-4 py-2.5 bg-red-500/30 hover:bg-red-500/50 border border-red-500/50 rounded-xl text-sm text-red-200 font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {resetLoading ? "جاري الحذف..." : "تأكيد الحذف"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Dev-Reset Confirmation Modal */}
+      {devResetModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-[#111118] border border-purple-500/40 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center mb-4">
+              <span className="text-4xl">🔄</span>
+              <h3 className="text-lg font-bold text-purple-300 mt-2">إعادة ضبط العقد الذكي (Devnet)</h3>
+              <p className="text-sm text-gray-400 mt-2">سيتم إرسال معاملة Solana لإعادة جميع العدادات إلى صفر. يتطلب ADMIN_KEYPAIR_JSON مضبوطاً.</p>
+            </div>
+            <div className="bg-purple-950/30 border border-purple-500/20 rounded-xl p-3 mb-4">
+              <p className="text-xs text-purple-300 text-center">اكتب <span className="font-mono font-bold text-white">CONFIRM</span> للتأكيد</p>
+              <input
+                type="text"
+                value={devResetInput}
+                onChange={e => setDevResetInput(e.target.value)}
+                placeholder="CONFIRM"
+                className="mt-2 w-full bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-sm text-white font-mono text-center placeholder-gray-600 focus:outline-none focus:border-purple-500/60"
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setDevResetModal(false); setDevResetInput(""); }}
+                className="flex-1 px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm text-gray-300 transition-colors"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={runDevReset}
+                disabled={devResetInput !== "CONFIRM" || devResetLoading}
+                className="flex-1 px-4 py-2.5 bg-purple-500/30 hover:bg-purple-500/50 border border-purple-500/50 rounded-xl text-sm text-purple-200 font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {devResetLoading ? "⏳ جاري الإرسال..." : "🔄 تأكيد الإعادة"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Warning Banner */}
+      <div className="border border-red-500/30 bg-red-500/10 rounded-2xl p-4 flex gap-3">
+        <span className="text-2xl flex-shrink-0">⚠️</span>
+        <div>
+          <p className="text-red-300 font-semibold text-sm">منطقة الخطر — لا يمكن التراجع</p>
+          <p className="text-red-400/70 text-xs mt-1">هذه الأزرار تحذف بيانات قاعدة البيانات (Neon) أو تُعيد ضبط العقد الذكي على Solana Devnet نهائياً.</p>
+        </div>
+      </div>
+
+      {/* Blockchain (Devnet) Reset Card */}
+      <SectionCard title="⛓ إعادة ضبط البلوكتشين (Devnet)">
+        <div className="flex items-start gap-3 mb-4">
+          <span className="text-2xl">🔄</span>
+          <div>
+            <p className="text-sm text-gray-300 font-medium">إعادة ضبط عداد العقد الذكي على Solana Devnet</p>
+            <p className="text-xs text-gray-500 mt-1">
+              يُرسل معاملة <span className="font-mono text-purple-400">dev_reset</span> إلى العقد الذكي مباشرةً.
+              يُعيد: عدد التوكنز المباعة، SOL المُجمَّع، USDT المُجمَّع، عدد المشترين، المرحلة الحالية = 0.
+              يتطلب ADMIN_KEYPAIR_JSON مُكوَّناً في متغيرات البيئة.
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => setDevResetModal(true)}
+          className="w-full px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 rounded-xl text-sm font-bold text-purple-300 transition-all"
+        >
+          🔄 إعادة ضبط Devnet (On-Chain)
+        </button>
+      </SectionCard>
+
+      {/* Reset Buttons Grid */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {RESET_ACTIONS.map(a => (
+          <div key={a.key} className={`border rounded-2xl p-4 ${a.color}`}>
+            <div className="flex items-start gap-3 mb-4">
+              <span className="text-2xl">{a.icon}</span>
+              <div>
+                <p className="text-sm font-semibold text-white">{a.label}</p>
+                <p className="text-xs text-gray-400 mt-1">{a.desc}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setConfirmModal({ key: a.key, title: a.label, desc: a.desc, action: a.action })}
+              className={`w-full px-4 py-2.5 border rounded-xl text-sm font-bold transition-all ${a.btnColor}`}
+            >
+              {a.icon} {a.label}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   const SECTION_MAP: Record<Section, React.ReactNode> = {
     overview:   SectionOverview,
     blockchain: SectionBlockchain,
@@ -1266,6 +1481,7 @@ export default function AdminDashboard() {
     revenue:    SectionRevenue,
     referrals:  SectionReferrals,
     analytics:  SectionAnalytics,
+    danger:     SectionDanger,
   };
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -1307,7 +1523,15 @@ export default function AdminDashboard() {
               <button
                 key={n.key}
                 onClick={() => setActiveSection(n.key)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-right ${activeSection === n.key ? "bg-[#39ff14]/15 text-[#39ff14] border border-[#39ff14]/20" : "text-gray-400 hover:text-white hover:bg-white/5"}`}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-right ${
+                  n.key === "danger"
+                    ? activeSection === "danger"
+                      ? "bg-red-500/20 text-red-300 border border-red-500/30"
+                      : "text-red-500/70 hover:text-red-300 hover:bg-red-950/30"
+                    : activeSection === n.key
+                      ? "bg-[#39ff14]/15 text-[#39ff14] border border-[#39ff14]/20"
+                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                }`}
               >
                 <span className="text-base leading-none">{n.icon}</span>
                 <span>{n.label}</span>

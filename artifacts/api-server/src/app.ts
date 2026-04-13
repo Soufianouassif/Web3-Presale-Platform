@@ -12,6 +12,28 @@ import { logger } from "./lib/logger.js";
 import { runSolPriceSync } from "./routes/sol-price-sync.js";
 import { pool } from "@workspace/db";
 
+// ── Startup: ensure admin_users table exists ─────────────────────────────────
+// Drizzle push runs on Vercel build, but if the schema differs or it was skipped,
+// this guard creates the table so Google OAuth never fails with a missing-table error.
+(async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS admin_users (
+        id         SERIAL PRIMARY KEY,
+        google_id  TEXT   UNIQUE NOT NULL,
+        email      TEXT   UNIQUE NOT NULL,
+        name       TEXT,
+        avatar     TEXT,
+        last_login TIMESTAMPTZ DEFAULT NOW(),
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    logger.info("STARTUP: admin_users table ready");
+  } catch (err) {
+    logger.error({ err }, "STARTUP: failed to ensure admin_users table");
+  }
+})();
+
 type PinoHttpFactory = (opts?: Record<string, unknown>) => RequestHandler;
 const pinoHttpMiddleware = (pinoHttp as unknown as PinoHttpFactory);
 
