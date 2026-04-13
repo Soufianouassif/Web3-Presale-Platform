@@ -5,7 +5,7 @@ import { adminApi, type AdminStats } from "@/lib/admin-api";
 import {
   withdrawSol, withdrawSolWithKeypair, withdrawUsdt, updateSolPrice,
   pauseSaleWithKeypair, resumeSaleWithKeypair,
-  advanceStage, endPresale,
+  advanceStage, advanceStageWithKeypair, endPresale,
   connection, SOL_VAULT_PDA, VAULT_USDT_ATA,
   fetchPresaleState, stageTokenPriceUsd, buildExplorerUrl, type PresaleState,
 } from "@/lib/presale-contract";
@@ -409,23 +409,44 @@ function AdvanceStagePanel({
   onRefresh: () => void;
   showNotification: (msg: string, type?: "success" | "error") => void;
 }) {
-  const [step, setStep] = useState<"idle" | "connecting" | "signing" | "confirming" | "success" | "error">("idle");
+  const [step, setStep] = useState<"idle" | "signing" | "confirming" | "success" | "error">("idle");
   const [txSig, setTxSig] = useState("");
   const [errMsg, setErrMsg] = useState("");
+  const [keypairBytes, setKeypairBytes] = useState<number[] | null>(null);
+  const [fileAddr, setFileAddr] = useState("");
 
   const currentStage = chainData?.currentStage ?? 0;
   const isLastStage  = currentStage >= 3;
 
+  function handleKeypairFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      try {
+        const bytes = JSON.parse(ev.target?.result as string) as number[];
+        if (!Array.isArray(bytes) || bytes.length !== 64)
+          throw new Error("Keypair غير صالح: يجب أن يكون 64 byte");
+        setKeypairBytes(bytes);
+        const { Keypair } = await import("@solana/web3.js");
+        const kp = Keypair.fromSecretKey(new Uint8Array(bytes));
+        setFileAddr(kp.publicKey.toBase58());
+      } catch (err) {
+        showNotification((err as Error).message, "error");
+      }
+    };
+    reader.readAsText(file);
+  }
+
   async function handleAdvance() {
     try {
-      setStep("connecting");
-      const provider = (window as any).phantom?.solana ?? (window as any).solana;
-      if (!provider) throw new Error("Phantom not found");
-      const resp = await provider.connect();
-      const addr = resp.publicKey?.toString() ?? provider.publicKey?.toString();
-      if (addr !== PRESALE_AUTHORITY) throw new Error(`Need authority wallet: ${PRESALE_AUTHORITY.slice(0, 8)}...`);
+      if (!keypairBytes) { showNotification("ارفع ملف الـ Keypair أولاً", "error"); return; }
+      if (fileAddr !== PRESALE_AUTHORITY) {
+        showNotification(`خطأ: هذا ليس keypair الأدمن (${PRESALE_AUTHORITY.slice(0, 8)}...)`, "error");
+        return;
+      }
       setStep("signing");
-      const { signature } = await advanceStage(addr, "phantom", () => setStep("confirming"));
+      const { signature } = await advanceStageWithKeypair(keypairBytes, () => setStep("confirming"));
       setTxSig(signature);
       setStep("success");
       showNotification(`✅ تم الانتقال للمرحلة ${currentStage + 2}`, "success");
@@ -456,10 +477,29 @@ function AdvanceStagePanel({
         ))}
       </div>
 
+      {/* رفع ملف الـ Keypair */}
+      {!isLastStage && (
+        <div>
+          <p className="text-xs text-gray-500 mb-2 uppercase tracking-wider">ملف Keypair (للتوقيع على السلسلة)</p>
+          <label className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition-colors">
+            <span className="text-lg">📁</span>
+            <div className="text-sm">
+              {fileAddr
+                ? <span className={`font-mono text-xs ${fileAddr === PRESALE_AUTHORITY ? "text-[#39ff14]" : "text-red-400"}`}>
+                    {fileAddr === PRESALE_AUTHORITY ? "✅ " : "❌ "}{fileAddr.slice(0, 12)}...{fileAddr.slice(-6)}
+                  </span>
+                : <span className="text-gray-400">اضغط لرفع keypair.json</span>}
+            </div>
+            <input type="file" accept=".json" className="hidden" onChange={handleKeypairFile} />
+          </label>
+        </div>
+      )}
+
       {step === "idle" && !isLastStage && (
         <button
           onClick={handleAdvance}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium bg-blue-500/20 hover:bg-blue-500/30 border-blue-500/40 text-blue-300 transition-all"
+          disabled={!keypairBytes || fileAddr !== PRESALE_AUTHORITY}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium bg-blue-500/20 hover:bg-blue-500/30 border-blue-500/40 text-blue-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
           ⏭ الانتقال للمرحلة {currentStage + 2}
         </button>
@@ -467,9 +507,8 @@ function AdvanceStagePanel({
       {isLastStage && step === "idle" && (
         <p className="text-xs text-center text-gray-500 py-2">أنت في المرحلة الأخيرة — استخدم "إنهاء البيع" أدناه</p>
       )}
-      {step === "connecting"  && <p className="flex items-center gap-2 text-sm text-gray-400">{spinning} Connecting Phantom…</p>}
-      {step === "signing"     && <p className="flex items-center gap-2 text-sm text-yellow-300">{spinning} Signing…</p>}
-      {step === "confirming"  && <p className="flex items-center gap-2 text-sm text-blue-300">{spinning} Confirming on-chain…</p>}
+      {step === "signing"     && <p className="flex items-center gap-2 text-sm text-yellow-300">{spinning} جاري التوقيع…</p>}
+      {step === "confirming"  && <p className="flex items-center gap-2 text-sm text-blue-300">{spinning} جاري التأكيد على السلسلة…</p>}
       {step === "success" && (
         <div className="p-4 bg-[#39ff14]/10 border border-[#39ff14]/20 rounded-xl space-y-1">
           <p className="text-[#39ff14] text-sm font-medium">✅ تم الانتقال للمرحلة {currentStage + 2}</p>
@@ -481,7 +520,7 @@ function AdvanceStagePanel({
       {step === "error" && (
         <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
           <p className="text-red-400 text-xs">❌ {errMsg}</p>
-          <button onClick={() => setStep("idle")} className="text-xs text-gray-500 hover:text-white mt-1">Try again</button>
+          <button onClick={() => { setStep("idle"); setErrMsg(""); }} className="text-xs text-gray-500 hover:text-white mt-1">حاول مجدداً</button>
         </div>
       )}
     </div>

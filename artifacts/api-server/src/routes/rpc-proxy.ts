@@ -9,15 +9,19 @@ const IS_PROD = process.env.NODE_ENV === "production";
 const ALLOWED_ORIGINS_EXACT: string[] = [
   "https://pwifecoin.fun",
   "https://www.pwifecoin.fun",
-  ...(IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000"]),
+  ...(IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000", "http://localhost:3001"]),
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ];
 const VERCEL_PREVIEW_DOMAIN = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
+const REPLIT_DEV_DOMAIN = process.env.REPLIT_DEV_DOMAIN ?? null;
 
 function isOriginAllowed(origin: string): boolean {
   if (ALLOWED_ORIGINS_EXACT.includes(origin)) return true;
   if (VERCEL_PREVIEW_DOMAIN && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN}`)) return true;
   if (VERCEL_PREVIEW_DOMAIN && origin === `https://${VERCEL_PREVIEW_DOMAIN}`) return true;
+  // Allow Replit dev domains in development
+  if (!IS_PROD && origin.endsWith(".replit.dev")) return true;
+  if (!IS_PROD && REPLIT_DEV_DOMAIN && origin.includes(REPLIT_DEV_DOMAIN)) return true;
   return false;
 }
 

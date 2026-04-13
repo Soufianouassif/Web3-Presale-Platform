@@ -517,20 +517,15 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
     let acceptedTokens: number;
     let verificationSource: string;
 
-    const allowUnverified = !IS_PROD && process.env.ALLOW_UNVERIFIED_PURCHASES === "true";
     if (!REQUIRE_ONCHAIN_VERIFICATION) {
-      if (!allowUnverified) {
-        logger.warn(
-          { wallet: walletAddress.slice(0, 8) + "…", txHash: txHash.slice(0, 16) + "…", ip, security: true, alertType: "VERIFICATION_DISABLED" },
-          "[PURCHASE] Rejected: on-chain verification disabled",
-        );
-        res.status(503).json({ success: false, error: "On-chain verification is disabled" });
-        return;
-      }
-
+      // devnet / verification disabled — accept client-provided amounts directly
+      logger.info(
+        { wallet: walletAddress.slice(0, 8) + "…", txHash: txHash.slice(0, 16) + "…", network: SOLANA_NETWORK },
+        "[PURCHASE] Verification not required — accepting client amounts",
+      );
       acceptedUsd = safeClientUsd;
       acceptedTokens = safeClientTokens;
-      verificationSource = "CLIENT_UNVERIFIED_DEV_ONLY";
+      verificationSource = "CLIENT_UNVERIFIED";
     } else {
       const stageIndex = typeof stage === "number" && stage >= 0 && stage <= 3 ? stage : 0;
       const verifyResult = await verifyTransaction(txHash, walletAddress, stageIndex, network);

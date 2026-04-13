@@ -627,6 +627,40 @@ export async function advanceStage(
   return { signature };
 }
 
+/** الانتقال للمرحلة التالية — باستخدام ملف الـ Keypair */
+export async function advanceStageWithKeypair(
+  keypairBytes: number[],
+  onSigned?: () => void,
+): Promise<{ signature: string }> {
+  const keypair       = Keypair.fromSecretKey(new Uint8Array(keypairBytes));
+  const admin         = keypair.publicKey;
+  const discriminator = await getDiscriminator("advance_stage");
+
+  const ix = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: admin,      isSigner: true,  isWritable: false },
+    ],
+    data: discriminator,
+  });
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+
+  tx.sign(keypair);
+  onSigned?.();
+
+  const signature = await sendAndConfirmTx(tx.serialize(), blockhash, lastValidBlockHeight);
+  return { signature };
+}
+
 // ─────────────────────────────────────────────────────────────
 //  ADMIN: END PRESALE  (end_presale instruction)
 //  Accounts: config (mut, has_one=authority), authority (signer)

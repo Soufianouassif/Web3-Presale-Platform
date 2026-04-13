@@ -23699,10 +23699,10 @@ var require_lib3 = __commonJS({
       function isString(s) {
         return typeof s === "string" || s instanceof String;
       }
-      function isOriginAllowed2(origin, allowedOrigin) {
+      function isOriginAllowed4(origin, allowedOrigin) {
         if (Array.isArray(allowedOrigin)) {
           for (var i = 0; i < allowedOrigin.length; ++i) {
-            if (isOriginAllowed2(origin, allowedOrigin[i])) {
+            if (isOriginAllowed4(origin, allowedOrigin[i])) {
               return true;
             }
           }
@@ -23732,7 +23732,7 @@ var require_lib3 = __commonJS({
             value: "Origin"
           }]);
         } else {
-          isAllowed = isOriginAllowed2(requestOrigin, options.origin);
+          isAllowed = isOriginAllowed4(requestOrigin, options.origin);
           headers.push([{
             key: "Access-Control-Allow-Origin",
             value: isAllowed ? requestOrigin : false
@@ -81710,7 +81710,10 @@ var purchases = pgTable("purchases", {
   amountTokens: decimal("amount_tokens", { precision: 18, scale: 6 }).notNull().default("0"),
   txHash: text("tx_hash"),
   stage: integer("stage").default(1),
+  referralCode: text("referral_code"),
   verificationStatus: text("verification_status").default("VERIFIED"),
+  verificationSource: text("verification_source"),
+  ip: text("ip"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
 });
 var presaleConfig = pgTable("presale_config", {
@@ -81767,9 +81770,10 @@ if (!dbUrl) {
   );
 }
 var needsSsl = process.env.NODE_ENV === "production" || dbUrl.includes("neon.tech");
+var rejectUnauthorized = process.env.PG_SSL_REJECT_UNAUTHORIZED !== void 0 ? process.env.PG_SSL_REJECT_UNAUTHORIZED === "true" : false;
 var pool = new Pool3({
   connectionString: dbUrl,
-  ssl: needsSsl ? { rejectUnauthorized: false } : void 0
+  ssl: needsSsl ? { rejectUnauthorized } : void 0
 });
 var db = drizzle(pool, { schema: schema_exports });
 
@@ -82837,18 +82841,18 @@ var SUSPICIOUS_REAUTH_MINUTES = 10;
 var MAX_IP_CHANGES_BEFORE_KILL = 5;
 var MAX_UA_CHANGES_BEFORE_KILL = 2;
 var MAX_IP_HISTORY_SIZE = 10;
-var IS_PROD9 = process.env.NODE_ENV === "production";
-var ALLOWED_ORIGINS_EXACT3 = [
+var IS_PROD = process.env.NODE_ENV === "production";
+var ALLOWED_ORIGINS_EXACT = [
   "https://pwifecoin.fun",
   "https://www.pwifecoin.fun",
-  ...IS_PROD9 ? [] : ["http://localhost:22793", "http://localhost:3000"],
+  ...IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000"],
   ...process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []
 ];
-var VERCEL_PREVIEW_DOMAIN3 = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
-function isOriginAllowed3(origin) {
-  if (ALLOWED_ORIGINS_EXACT3.includes(origin)) return true;
-  if (VERCEL_PREVIEW_DOMAIN3 && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN3}`)) return true;
-  if (VERCEL_PREVIEW_DOMAIN3 && origin === `https://${VERCEL_PREVIEW_DOMAIN3}`) return true;
+var VERCEL_PREVIEW_DOMAIN = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
+function isOriginAllowed(origin) {
+  if (ALLOWED_ORIGINS_EXACT.includes(origin)) return true;
+  if (VERCEL_PREVIEW_DOMAIN && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN}`)) return true;
+  if (VERCEL_PREVIEW_DOMAIN && origin === `https://${VERCEL_PREVIEW_DOMAIN}`) return true;
   return false;
 }
 function getClientIp(req) {
@@ -82959,7 +82963,7 @@ function requireAdminAuth(req, res, next) {
   const isStateChanging = req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS";
   if (isStateChanging) {
     const origin = req.headers.origin;
-    if (!origin || typeof origin !== "string" || !isOriginAllowed3(origin)) {
+    if (!origin || typeof origin !== "string" || !isOriginAllowed(origin)) {
       logger.warn({ origin, path: req.path, ip: getClientIp(req) }, "ADMIN_ACCESS_DENIED: origin not allowed");
       res.status(403).json({ error: "Forbidden", code: "ORIGIN_NOT_ALLOWED" });
       return;
@@ -83059,11 +83063,11 @@ var ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim
 var GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID ?? "";
 var GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET ?? "";
 var CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL ?? "/api/auth/google/callback";
-var IS_PROD = process.env.NODE_ENV === "production";
+var IS_PROD2 = process.env.NODE_ENV === "production";
 var COOKIE_OPTS = {
   path: "/",
   httpOnly: true,
-  secure: IS_PROD,
+  secure: IS_PROD2,
   sameSite: "lax"
 };
 var ADMIN_IDLE_TIMEOUT_MS2 = 8 * 60 * 60 * 1e3;
@@ -83074,7 +83078,7 @@ var authLimiter = rate_limit_default({
   legacyHeaders: false,
   message: { error: "Too many auth requests. Please try again later." }
 });
-if (IS_PROD && ADMIN_EMAILS.length === 0) {
+if (IS_PROD2 && ADMIN_EMAILS.length === 0) {
   throw new Error("ADMIN_EMAILS must be set in production");
 }
 if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
@@ -83667,6 +83671,7 @@ var import_express6 = __toESM(require_express2(), 1);
 var import_web3 = __toESM(require_index_cjs(), 1);
 var router6 = (0, import_express6.Router)();
 var SOLANA_NETWORK = (process.env.SOLANA_NETWORK ?? "devnet").toLowerCase();
+var IS_PROD3 = process.env.NODE_ENV === "production";
 var SOLANA_RPC = process.env.SOLANA_RPC_URL || process.env.SOLANA_RPC || "https://api.devnet.solana.com";
 var PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
 var CONFIG_PDA = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
@@ -83711,10 +83716,28 @@ async function fetchSolPriceUsd() {
     logger.warn({ cachedPrice: _solPriceCache.price }, "[SOL_PRICE] CoinGecko unreachable \u2014 using cached price");
     return _solPriceCache.price;
   }
+  const chain = await fetchSolPriceUsdFromChain();
+  if (chain && chain > 0) {
+    logger.warn({ chainPrice: chain }, "[SOL_PRICE] Using on-chain cached price");
+    _solPriceCache = { price: chain, fetchedAt: now };
+    return chain;
+  }
   throw new Error("SOL price unavailable");
 }
 var _chainStateCache = null;
 var CHAIN_STATE_TTL_MS = 3e4;
+async function fetchSolPriceUsdFromChain() {
+  const now = Date.now();
+  if (_chainStateCache && now - _chainStateCache.fetchedAt < CHAIN_STATE_TTL_MS) {
+    const price2 = Number(_chainStateCache.solPriceUsdE6) / 1e6;
+    return price2 > 0 ? price2 : null;
+  }
+  const ok = await fetchStageTokenPriceUsd(0);
+  if (ok === null) return null;
+  if (!_chainStateCache) return null;
+  const price = Number(_chainStateCache.solPriceUsdE6) / 1e6;
+  return price > 0 ? price : null;
+}
 async function fetchStageTokenPriceUsd(stageIndex) {
   const now = Date.now();
   if (!_chainStateCache || now - _chainStateCache.fetchedAt > CHAIN_STATE_TTL_MS) {
@@ -83770,14 +83793,14 @@ async function fetchStageTokenPriceUsd(stageIndex) {
       readU64();
       readU64();
       readU64();
-      readU64();
+      const solPriceUsdE6 = readU64();
       const tokensPerRawUsdtScaled = [];
       for (let i = 0; i < 4; i++) {
         tokensPerRawUsdtScaled.push(readU64());
         readU64();
         readU64();
       }
-      _chainStateCache = { tokensPerRawUsdtScaled, fetchedAt: now };
+      _chainStateCache = { tokensPerRawUsdtScaled, solPriceUsdE6, fetchedAt: now };
       logger.info(
         { stageIndex, tokensPerRawUsdtScaled: tokensPerRawUsdtScaled.map(String), SOLANA_NETWORK },
         "[CHAIN_STATE] Presale config PDA fetched successfully"
@@ -84075,18 +84098,13 @@ router6.post("/track/purchase", purchaseLimiter, async (req, res) => {
     let acceptedTokens;
     let verificationSource;
     if (!REQUIRE_ONCHAIN_VERIFICATION) {
-      const allowUnverified = process.env.NODE_ENV !== "production" && process.env.ALLOW_UNVERIFIED_PURCHASES === "true";
-      if (!allowUnverified) {
-        logger.warn(
-          { wallet: walletAddress.slice(0, 8) + "\u2026", txHash: txHash.slice(0, 16) + "\u2026", ip, security: true, alertType: "VERIFICATION_DISABLED" },
-          "[PURCHASE] Rejected: on-chain verification disabled"
-        );
-        res.status(503).json({ success: false, error: "On-chain verification is disabled" });
-        return;
-      }
+      logger.info(
+        { wallet: walletAddress.slice(0, 8) + "\u2026", txHash: txHash.slice(0, 16) + "\u2026", network: SOLANA_NETWORK },
+        "[PURCHASE] Verification not required \u2014 accepting client amounts"
+      );
       acceptedUsd = safeClientUsd;
       acceptedTokens = safeClientTokens;
-      verificationSource = "CLIENT_UNVERIFIED_DEV_ONLY";
+      verificationSource = "CLIENT_UNVERIFIED";
     } else {
       const stageIndex = typeof stage === "number" && stage >= 0 && stage <= 3 ? stage : 0;
       const verifyResult = await verifyTransaction(txHash, walletAddress, stageIndex, network);
@@ -84104,39 +84122,38 @@ router6.post("/track/purchase", purchaseLimiter, async (req, res) => {
         );
         res.status(verifyResult.isTimeout ? 504 : 400).json({ success: false, error: "Transaction verification failed", reason: verifyResult.reason });
         return;
-      } else {
-        const oc = verifyResult.onChain;
-        acceptedUsd = oc.estimatedUsd;
-        if (oc.estimatedTokens === null) {
-          logger.warn(
-            { txHash: txHash.slice(0, 16) + "\u2026", wallet: walletAddress.slice(0, 8) + "\u2026", ip, security: true, alertType: "TOKEN_PRICING_UNAVAILABLE" },
-            "[PURCHASE] Rejected: token pricing unavailable"
-          );
-          res.status(503).json({ success: false, error: "Token pricing unavailable. Please retry." });
-          return;
-        }
-        acceptedTokens = oc.estimatedTokens;
-        verificationSource = "ONCHAIN_VERIFIED";
-        logAmountComparison("amountUsd", safeClientUsd, acceptedUsd, txHash);
-        logAmountComparison("amountTokens", safeClientTokens, acceptedTokens, txHash);
-        const pctUsd = acceptedUsd > 0 ? Math.abs(safeClientUsd - acceptedUsd) / acceptedUsd : 0;
-        if (pctUsd > MISMATCH_BLOCK_PCT) {
-          logger.warn(
-            {
-              txHash: txHash.slice(0, 16) + "\u2026",
-              wallet: walletAddress.slice(0, 8) + "\u2026",
-              clientUsd: safeClientUsd,
-              serverUsd: acceptedUsd,
-              discrepancyPct: (pctUsd * 100).toFixed(1) + "%",
-              ip,
-              security: true,
-              alertType: "AMOUNT_MANIPULATION_BLOCKED"
-            },
-            "[PURCHASE] Rejected: amount manipulation detected"
-          );
-          res.status(400).json({ success: false, error: "Amount manipulation detected" });
-          return;
-        }
+      }
+      const oc = verifyResult.onChain;
+      if (oc.estimatedTokens === null) {
+        logger.warn(
+          { txHash: txHash.slice(0, 16) + "\u2026", wallet: walletAddress.slice(0, 8) + "\u2026", ip, security: true, alertType: "TOKEN_PRICING_UNAVAILABLE" },
+          "[PURCHASE] Rejected: token pricing unavailable"
+        );
+        res.status(503).json({ success: false, error: "Token pricing unavailable. Please retry." });
+        return;
+      }
+      acceptedUsd = oc.estimatedUsd;
+      acceptedTokens = oc.estimatedTokens;
+      verificationSource = "ONCHAIN_VERIFIED";
+      logAmountComparison("amountUsd", safeClientUsd, acceptedUsd, txHash);
+      logAmountComparison("amountTokens", safeClientTokens, acceptedTokens, txHash);
+      const pctUsd = acceptedUsd > 0 ? Math.abs(safeClientUsd - acceptedUsd) / acceptedUsd : 0;
+      if (pctUsd > MISMATCH_BLOCK_PCT) {
+        logger.warn(
+          {
+            txHash: txHash.slice(0, 16) + "\u2026",
+            wallet: walletAddress.slice(0, 8) + "\u2026",
+            clientUsd: safeClientUsd,
+            serverUsd: acceptedUsd,
+            discrepancyPct: (pctUsd * 100).toFixed(1) + "%",
+            ip,
+            security: true,
+            alertType: "AMOUNT_MANIPULATION_BLOCKED"
+          },
+          "[PURCHASE] Rejected: amount manipulation detected"
+        );
+        res.status(400).json({ success: false, error: "Amount manipulation detected" });
+        return;
       }
     }
     const safeWalletType = ALLOWED_WALLET_TYPES.has((walletType ?? "").toLowerCase()) ? (walletType ?? "unknown").toLowerCase() : "unknown";
@@ -84149,8 +84166,9 @@ router6.post("/track/purchase", purchaseLimiter, async (req, res) => {
       txHash,
       stage: typeof stage === "number" ? stage : null,
       referralCode: referralCode ? String(referralCode).trim().slice(0, 16) : null,
+      verificationStatus: verificationSource === "ONCHAIN_VERIFIED" ? "VERIFIED" : "UNVERIFIED",
       verificationSource,
-      ip
+      ip: ip ?? null
     }).returning({ id: purchases.id });
     logger.info(
       {
@@ -84419,7 +84437,8 @@ router7.post("/referral/register", registerLimiter, async (req, res) => {
       id: purchases.id,
       walletAddress: purchases.walletAddress,
       amountUsd: purchases.amountUsd,
-      amountTokens: purchases.amountTokens
+      amountTokens: purchases.amountTokens,
+      verificationStatus: purchases.verificationStatus
     }).from(purchases).where(eq(purchases.id, purchaseId)).limit(1);
     if (purchaseRow.length === 0) {
       logger.warn({ purchaseId, buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] Purchase not found in DB");
@@ -84429,6 +84448,11 @@ router7.post("/referral/register", registerLimiter, async (req, res) => {
     if (purchaseRow[0].walletAddress.toLowerCase() !== buyerWallet.toLowerCase()) {
       logger.warn({ purchaseId, buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] Purchase wallet mismatch");
       res.status(400).json({ error: "Purchase does not belong to this wallet" });
+      return;
+    }
+    if ((purchaseRow[0].verificationStatus ?? "VERIFIED") !== "VERIFIED") {
+      logger.warn({ purchaseId, buyer: buyerWallet.slice(0, 8), status: purchaseRow[0].verificationStatus }, "[REF_REGISTER] Purchase not verified");
+      res.status(409).json({ error: "Purchase is not verified" });
       return;
     }
     const codeRow = await db.select().from(referralCodes).where(eq(referralCodes.code, code)).limit(1);
@@ -84606,21 +84630,24 @@ var referral_default = router7;
 var import_express8 = __toESM(require_express2(), 1);
 var router8 = (0, import_express8.Router)();
 var SOLANA_RPC2 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
-var IS_PROD8 = process.env.NODE_ENV === "production";
+var IS_PROD4 = process.env.NODE_ENV === "production";
 var ALLOWED_ORIGINS_EXACT2 = [
   "https://pwifecoin.fun",
   "https://www.pwifecoin.fun",
-  ...IS_PROD8 ? [] : ["http://localhost:22793", "http://localhost:3000"],
+  ...IS_PROD4 ? [] : ["http://localhost:22793", "http://localhost:3000", "http://localhost:3001"],
   ...process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []
 ];
 var VERCEL_PREVIEW_DOMAIN2 = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
+var REPLIT_DEV_DOMAIN = process.env.REPLIT_DEV_DOMAIN ?? null;
 function isOriginAllowed2(origin) {
   if (ALLOWED_ORIGINS_EXACT2.includes(origin)) return true;
   if (VERCEL_PREVIEW_DOMAIN2 && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN2}`)) return true;
   if (VERCEL_PREVIEW_DOMAIN2 && origin === `https://${VERCEL_PREVIEW_DOMAIN2}`) return true;
+  if (!IS_PROD4 && origin.endsWith(".replit.dev")) return true;
+  if (!IS_PROD4 && REPLIT_DEV_DOMAIN && origin.includes(REPLIT_DEV_DOMAIN)) return true;
   return false;
 }
-var READ_METHODS2 = /* @__PURE__ */ new Set([
+var READ_METHODS = /* @__PURE__ */ new Set([
   "getAccountInfo",
   "getBalance",
   "getLatestBlockhash",
@@ -84634,17 +84661,17 @@ var READ_METHODS2 = /* @__PURE__ */ new Set([
   "getTransaction",
   "getVersion"
 ]);
-var TX_METHODS2 = /* @__PURE__ */ new Set([
+var TX_METHODS = /* @__PURE__ */ new Set([
   "sendTransaction",
   "simulateTransaction"
 ]);
-var DEV_ONLY_METHODS2 = /* @__PURE__ */ new Set([
+var DEV_ONLY_METHODS = /* @__PURE__ */ new Set([
   "requestAirdrop"
 ]);
 var ALLOWED_METHODS = /* @__PURE__ */ new Set([
-  ...READ_METHODS2,
-  ...TX_METHODS2,
-  ...!IS_PROD8 ? DEV_ONLY_METHODS2 : []
+  ...READ_METHODS,
+  ...TX_METHODS,
+  ...!IS_PROD4 ? DEV_ONLY_METHODS : []
 ]);
 var rpcLimiter = rate_limit_default({
   windowMs: 60 * 1e3,
@@ -84660,7 +84687,7 @@ var txLimiter = rate_limit_default({
   legacyHeaders: false,
   message: { error: "Too many transaction requests, please slow down." }
 });
-function runLimiter2(limiter, req, res) {
+function runLimiter(limiter, req, res) {
   return new Promise((resolve, reject) => {
     limiter(req, res, (err) => {
       if (err) reject(err);
@@ -84686,8 +84713,8 @@ router8.post("/rpc", rpcLimiter, async (req, res) => {
       });
       return;
     }
-    if (TX_METHODS2.has(body.method)) {
-      await runLimiter2(txLimiter, req, res);
+    if (TX_METHODS.has(body.method)) {
+      await runLimiter(txLimiter, req, res);
       if (res.headersSent) return;
     }
     const response = await fetch(SOLANA_RPC2, {
@@ -84698,7 +84725,7 @@ router8.post("/rpc", rpcLimiter, async (req, res) => {
     const data = await response.json();
     res.json(data);
   } catch (err) {
-    res.status(502).json(IS_PROD8 ? { error: "RPC proxy error" } : { error: "RPC proxy error", detail: String(err) });
+    res.status(502).json(IS_PROD4 ? { error: "RPC proxy error" } : { error: "RPC proxy error", detail: String(err) });
   }
 });
 var rpc_proxy_default = router8;
@@ -84708,7 +84735,7 @@ var import_express9 = __toESM(require_express2(), 1);
 var import_web32 = __toESM(require_index_cjs(), 1);
 var router9 = (0, import_express9.Router)();
 var CRON_SECRET = process.env.CRON_SECRET ?? null;
-var IS_PROD2 = process.env.NODE_ENV === "production";
+var IS_PROD5 = process.env.NODE_ENV === "production";
 var syncLimiter = rate_limit_default({
   windowMs: 5 * 60 * 1e3,
   max: 3,
@@ -84718,7 +84745,7 @@ var syncLimiter = rate_limit_default({
 });
 function isCronAuthorized(req) {
   if (!CRON_SECRET) {
-    if (IS_PROD2) return false;
+    if (IS_PROD5) return false;
     const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? req.socket?.remoteAddress ?? "";
     return ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1";
   }
@@ -84940,7 +84967,7 @@ router10.get("/sol-price", chainLimiter, async (_req, res) => {
     res.json({ price: solPriceCache.price, currency: "USD", updatedAt: (/* @__PURE__ */ new Date()).toISOString() });
   }
 });
-var IS_PROD3 = process.env.NODE_ENV === "production";
+var IS_PROD6 = process.env.NODE_ENV === "production";
 router10.get("/presale/on-chain", chainLimiter, async (_req, res) => {
   try {
     const [state, solPrice] = await Promise.all([
@@ -84951,7 +84978,7 @@ router10.get("/presale/on-chain", chainLimiter, async (_req, res) => {
   } catch (err) {
     res.status(502).json({
       error: "Failed to fetch on-chain state",
-      ...IS_PROD3 ? {} : { detail: String(err) }
+      ...IS_PROD6 ? {} : { detail: String(err) }
     });
   }
 });
@@ -84974,31 +85001,31 @@ var routes_default = router11;
 // src/app.ts
 var pinoHttpMiddleware = import_pino_http.default;
 var ConnectPgSimple = (0, import_connect_pg_simple.default)(import_express_session.default);
-var IS_PROD4 = process.env.NODE_ENV === "production";
-if (IS_PROD4 && !process.env.SESSION_SECRET) {
+var IS_PROD7 = process.env.NODE_ENV === "production";
+if (IS_PROD7 && !process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET environment variable is required in production");
 }
 var SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-production";
-var ALLOWED_ORIGINS_EXACT = [
+var ALLOWED_ORIGINS_EXACT3 = [
   "https://pwifecoin.fun",
   "https://www.pwifecoin.fun",
-  ...IS_PROD4 ? [] : ["http://localhost:22793", "http://localhost:3000"],
+  ...IS_PROD7 ? [] : ["http://localhost:22793", "http://localhost:3000"],
   ...process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []
 ];
-var VERCEL_PREVIEW_DOMAIN = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
-var isOriginAllowed = (origin) => {
-  if (ALLOWED_ORIGINS_EXACT.includes(origin)) return true;
-  if (VERCEL_PREVIEW_DOMAIN && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN}`)) return true;
-  if (VERCEL_PREVIEW_DOMAIN && origin === `https://${VERCEL_PREVIEW_DOMAIN}`) return true;
+var VERCEL_PREVIEW_DOMAIN3 = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
+var isOriginAllowed3 = (origin) => {
+  if (ALLOWED_ORIGINS_EXACT3.includes(origin)) return true;
+  if (VERCEL_PREVIEW_DOMAIN3 && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN3}`)) return true;
+  if (VERCEL_PREVIEW_DOMAIN3 && origin === `https://${VERCEL_PREVIEW_DOMAIN3}`) return true;
   return false;
 };
-var REQUIRED_PROD_VARS = IS_PROD4 ? ["SESSION_SECRET"] : [];
+var REQUIRED_PROD_VARS = IS_PROD7 ? ["SESSION_SECRET"] : [];
 for (const v of REQUIRED_PROD_VARS) {
   if (!process.env[v]) {
     throw new Error(`[STARTUP] Missing required environment variable: ${v}`);
   }
 }
-if (IS_PROD4 && !process.env.CRON_SECRET) {
+if (IS_PROD7 && !process.env.CRON_SECRET) {
   logger.warn("CRON_SECRET not set \u2014 cron endpoints will be disabled");
 }
 var app = (0, import_express12.default)();
@@ -85012,7 +85039,7 @@ app.use(
     frameguard: { action: "sameorigin" },
     noSniff: true,
     referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-    hsts: IS_PROD4 ? { maxAge: 31536e3, includeSubDomains: true, preload: true } : false
+    hsts: IS_PROD7 ? { maxAge: 31536e3, includeSubDomains: true, preload: true } : false
   })
 );
 app.use((_req, res, next) => {
@@ -85044,7 +85071,7 @@ app.use(
 app.use(
   (0, import_cors.default)({
     origin: (origin, cb) => {
-      if (!origin || isOriginAllowed(origin)) return cb(null, true);
+      if (!origin || isOriginAllowed3(origin)) return cb(null, true);
       return cb(null, false);
     },
     credentials: true
@@ -85065,7 +85092,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: IS_PROD4,
+      secure: IS_PROD7,
       httpOnly: true,
       path: "/",
       maxAge: 24 * 60 * 60 * 1e3,
@@ -85078,9 +85105,9 @@ app.use(import_passport2.default.session());
 app.use("/api", routes_default);
 app.use((err, _req, res, _next) => {
   const status = err.status ?? 500;
-  const message = IS_PROD4 ? "Internal Server Error" : err.message ?? "Internal Server Error";
+  const message = IS_PROD7 ? "Internal Server Error" : err.message ?? "Internal Server Error";
   logger.error({ err }, "Unhandled error");
-  res.status(status).json({ error: message, stack: IS_PROD4 ? void 0 : err.stack });
+  res.status(status).json({ error: message, stack: IS_PROD7 ? void 0 : err.stack });
 });
 if (process.env.ADMIN_KEYPAIR_JSON) {
   const SYNC_INTERVAL_MS = 5 * 60 * 1e3;
