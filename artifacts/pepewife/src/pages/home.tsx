@@ -209,14 +209,25 @@ export default function Home() {
   const currentStage = presaleData ? presaleData.currentStage : 0;
   const totalSold = STAGE_DATA.reduce((a, s) => a + s.sold, 0);
   const totalTokens = STAGE_DATA.reduce((a, s) => a + s.tokens, 0);
-  const presaleFilled = Math.round((totalSold / totalTokens) * 100);
 
   const blockchainRaisedUSD = presaleData
     ? (Number(presaleData.totalSolRaised) / 1e9) * solPrice + Number(presaleData.totalUsdtRaised) / 1e6
     : 0;
   // إذا كانت البيانات الـ blockchain صفراً أو غير محملة، نستخدم بيانات DB كـ fallback
   const totalRaisedUSD = blockchainRaisedUSD > 0 ? blockchainRaisedUSD : (dbStats?.totalRaisedUsd ?? 0);
-  const effectiveTokensSold = totalSold > 0 ? totalSold : (dbStats?.totalTokensSold ?? 0);
+  // priority: per-stage sum → contract global field → DB fallback
+  const effectiveTokensSold =
+    totalSold > 0
+      ? totalSold
+      : presaleData?.totalTokensSold && Number(presaleData.totalTokensSold) > 0
+        ? Number(presaleData.totalTokensSold)
+        : (dbStats?.totalTokensSold ?? 0);
+  // for the progress bar: if per-stage data is missing but we have a total, fill stage 1
+  const effectiveStageData = totalSold === 0 && effectiveTokensSold > 0
+    ? STAGE_DATA.map((s, i) => i === 0 ? { ...s, sold: Math.min(effectiveTokensSold, s.tokens) } : s)
+    : STAGE_DATA;
+  const effectiveTotalSold = effectiveStageData.reduce((a, s) => a + s.sold, 0);
+  const presaleFilled = Math.round((effectiveTotalSold / totalTokens) * 100);
   const effectiveBuyers = presaleData
     ? Number(presaleData.buyersCount)
     : (dbStats?.uniqueBuyers ?? 0);
@@ -561,17 +572,17 @@ export default function Home() {
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm font-bold">
                     <span className="text-[#4CAF50] font-display tracking-wide">
-                      🐸 {presaleData
-                        ? (totalSold >= 1_000_000_000
-                            ? (totalSold / 1_000_000_000).toFixed(2) + "B"
-                            : fmt(totalSold))
+                      🐸 {hasAnyData
+                        ? (effectiveTokensSold >= 1_000_000_000
+                            ? (effectiveTokensSold / 1_000_000_000).toFixed(2) + "B"
+                            : fmt(effectiveTokensSold))
                         : "…"} {t.presale.sold}
                     </span>
                     <span className="text-sm text-[#1a1a2e]/70 font-nums tracking-wide font-bold">{presaleFilled}% — Stage {currentStage + 1}/4</span>
                   </div>
                   {/* شريط المراحل الأربع */}
                   <div dir="ltr" className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">
-                    {STAGE_DATA.map((s, i) => {
+                    {effectiveStageData.map((s, i) => {
                       const pct = Math.min(100, Math.round((s.sold / s.tokens) * 100));
                       return (
                         <div key={i} className="relative flex-1 bg-gray-100">
@@ -594,7 +605,7 @@ export default function Home() {
                     ))}
                   </div>
                   <div className="text-center text-xs font-sans text-[#1a1a2e]/50 font-semibold">
-                    {fmt(totalSold)} / {fmt(totalTokens)} $PWIFE
+                    {fmt(effectiveTokensSold)} / {fmt(totalTokens)} $PWIFE
                   </div>
                 </div>
 

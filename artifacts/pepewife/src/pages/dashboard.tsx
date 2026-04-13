@@ -266,7 +266,19 @@ export default function Dashboard() {
   const currentStage = presaleData ? presaleData.currentStage : 0;
   const totalSold = STAGE_DATA.reduce((a, s) => a + s.sold, 0);
   const totalTokens = STAGE_DATA.reduce((a, s) => a + s.tokens, 0);
-  const presaleFilled = Math.round((totalSold / totalTokens) * 100);
+  // priority: per-stage sum → contract global field → DB fallback
+  const effectiveTokensSold =
+    totalSold > 0
+      ? totalSold
+      : presaleData?.totalTokensSold && Number(presaleData.totalTokensSold) > 0
+        ? Number(presaleData.totalTokensSold)
+        : 0;
+  // if per-stage data is missing but we have a total, fill stage 1 proportionally
+  const effectiveStageData = totalSold === 0 && effectiveTokensSold > 0
+    ? STAGE_DATA.map((s, i) => i === 0 ? { ...s, sold: Math.min(effectiveTokensSold, s.tokens) } : s)
+    : STAGE_DATA;
+  const effectiveTotalSold = effectiveStageData.reduce((a, s) => a + s.sold, 0);
+  const presaleFilled = Math.round((effectiveTotalSold / totalTokens) * 100);
 
   const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace(/\$/g, ""));
   const calcAmountNum = parseFloat(calcAmount);
@@ -580,16 +592,16 @@ export default function Dashboard() {
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm font-bold">
                             <span className="text-[#4CAF50] font-display tracking-wide">
-                              🐸 {presaleData
-                                ? (totalSold >= 1_000_000_000
-                                    ? (totalSold / 1_000_000_000).toFixed(2) + "B"
-                                    : fmt(totalSold))
+                              🐸 {presaleData || effectiveTokensSold > 0
+                                ? (effectiveTokensSold >= 1_000_000_000
+                                    ? (effectiveTokensSold / 1_000_000_000).toFixed(2) + "B"
+                                    : fmt(effectiveTokensSold))
                                 : "…"} {t.presale.sold}
                             </span>
                             <span className="text-[#1a1a2e]/60 font-nums tracking-wide">{presaleFilled}% — Stage {currentStage + 1}/4</span>
                           </div>
                           <div dir="ltr" className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">
-                            {STAGE_DATA.map((s, i) => {
+                            {effectiveStageData.map((s, i) => {
                               const pct = Math.min(100, Math.round((s.sold / s.tokens) * 100));
                               return (
                                 <div key={i} className="relative flex-1 bg-gray-100">
@@ -608,7 +620,7 @@ export default function Dashboard() {
                             ))}
                           </div>
                           <div className="text-center text-[10px] font-display text-[#1a1a2e]/40 tracking-wider">
-                            {fmt(totalSold)} / {fmt(totalTokens)} $PWIFE
+                            {fmt(effectiveTokensSold)} / {fmt(totalTokens)} $PWIFE
                           </div>
                         </div>
 
@@ -816,7 +828,7 @@ export default function Dashboard() {
                               <div className="h-full rounded-full bg-gradient-to-r from-[#4CAF50] via-[#FF4D9D] to-[#4CAF50] transition-all duration-700" style={{ width: `${presaleFilled}%` }} />
                             </div>
                             <div className="flex justify-between mt-1">
-                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">{fmt(totalSold)} / {fmt(totalTokens)} $PWIFE</span>
+                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">{fmt(effectiveTokensSold)} / {fmt(totalTokens)} $PWIFE</span>
                               <span className="text-[10px] font-display text-[#b8860b] tracking-wider">{presaleFilled}%</span>
                             </div>
                           </div>

@@ -399,4 +399,75 @@ router.get("/admin/users", async (_req, res) => {
   }
 });
 
+// ─── DANGER ZONE: Data Reset Routes ──────────────────────────────────────────
+
+router.delete("/admin/reset/purchases", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const result = await db.delete(purchases).returning({ id: purchases.id });
+    auditLog(req as import("express").Request, "reset.purchases", { deleted: result.length });
+    logger.warn({ count: result.length }, "DANGER_ZONE: purchases table cleared");
+    res.json({ success: true, deleted: result.length, message: `Deleted ${result.length} purchases` });
+  } catch (err) {
+    logger.error({ err }, "reset/purchases error");
+    res.status(500).json({ error: "Failed to clear purchases" });
+  }
+});
+
+router.delete("/admin/reset/visits", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const [v, w] = await Promise.all([
+      db.delete(pageVisits).returning({ id: pageVisits.id }),
+      db.delete(walletConnections).returning({ id: walletConnections.id }),
+    ]);
+    auditLog(req as import("express").Request, "reset.visits", { visits: v.length, wallets: w.length });
+    logger.warn({ visits: v.length, wallets: w.length }, "DANGER_ZONE: visits + wallets cleared");
+    res.json({ success: true, deleted: v.length + w.length, message: `Deleted ${v.length} visits and ${w.length} wallet connections` });
+  } catch (err) {
+    logger.error({ err }, "reset/visits error");
+    res.status(500).json({ error: "Failed to clear visits" });
+  }
+});
+
+router.delete("/admin/reset/referrals", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const [refs, codes] = await Promise.all([
+      db.delete(referrals).returning({ id: referrals.id }),
+      db.delete(referralCodes).returning({ id: referralCodes.id }),
+    ]);
+    auditLog(req as import("express").Request, "reset.referrals", { referrals: refs.length, codes: codes.length });
+    logger.warn({ referrals: refs.length, codes: codes.length }, "DANGER_ZONE: referrals + codes cleared");
+    res.json({ success: true, deleted: refs.length + codes.length, message: `Deleted ${refs.length} referrals and ${codes.length} referral codes` });
+  } catch (err) {
+    logger.error({ err }, "reset/referrals error");
+    res.status(500).json({ error: "Failed to clear referrals" });
+  }
+});
+
+router.delete("/admin/reset/all", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const [p, v, w, refs, codes] = await Promise.all([
+      db.delete(purchases).returning({ id: purchases.id }),
+      db.delete(pageVisits).returning({ id: pageVisits.id }),
+      db.delete(walletConnections).returning({ id: walletConnections.id }),
+      db.delete(referrals).returning({ id: referrals.id }),
+      db.delete(referralCodes).returning({ id: referralCodes.id }),
+    ]);
+    const total = p.length + v.length + w.length + refs.length + codes.length;
+    auditLog(req as import("express").Request, "reset.ALL", {
+      purchases: p.length, visits: v.length, wallets: w.length,
+      referrals: refs.length, codes: codes.length, total,
+    });
+    logger.warn({ total }, "DANGER_ZONE: ALL tables cleared");
+    res.json({
+      success: true,
+      deleted: total,
+      breakdown: { purchases: p.length, visits: v.length, wallets: w.length, referrals: refs.length, codes: codes.length },
+      message: `Cleared all data — ${total} records deleted`,
+    });
+  } catch (err) {
+    logger.error({ err }, "reset/all error");
+    res.status(500).json({ error: "Failed to clear all data" });
+  }
+});
+
 export default router;

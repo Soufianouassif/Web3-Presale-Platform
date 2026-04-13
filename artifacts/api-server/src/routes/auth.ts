@@ -77,7 +77,13 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
 
           return done(null, user);
         } catch (err) {
-          return done(err as Error);
+          // Log the full error even in production so it appears in Vercel logs
+          logger.error(
+            { err, message: (err as Error).message, stack: (err as Error).stack },
+            "AUTH_GOOGLE: DB error — likely missing admin_users table (run drizzle-kit push)",
+          );
+          // Return false instead of the error to trigger failureRedirect instead of 500
+          return done(null, false, { message: "server_error" });
         }
       },
     ),
