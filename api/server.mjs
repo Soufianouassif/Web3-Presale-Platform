@@ -33083,7 +33083,7 @@ var require_connection = __commonJS({
     var flushBuffer = serialize.flush();
     var syncBuffer = serialize.sync();
     var endBuffer = serialize.end();
-    var Connection4 = class extends EventEmitter {
+    var Connection5 = class extends EventEmitter {
       constructor(config) {
         super();
         config = config || {};
@@ -33252,7 +33252,7 @@ var require_connection = __commonJS({
         this._send(serialize.copyFail(msg));
       }
     };
-    module.exports = Connection4;
+    module.exports = Connection5;
   }
 });
 
@@ -33560,7 +33560,7 @@ var require_client = __commonJS({
     var ConnectionParameters = require_connection_parameters();
     var Query2 = require_query();
     var defaults2 = require_defaults();
-    var Connection4 = require_connection();
+    var Connection5 = require_connection();
     var crypto5 = require_utils5();
     var activeQueryDeprecationNotice = nodeUtils.deprecate(
       () => {
@@ -33616,7 +33616,7 @@ var require_client = __commonJS({
         this._queryable = true;
         this._activeQuery = null;
         this.enableChannelBinding = Boolean(c.enableChannelBinding);
-        this.connection = c.connection || new Connection4({
+        this.connection = c.connection || new Connection5({
           stream: c.stream,
           ssl: this.connectionParameters.ssl,
           keepAlive: c.keepAlive || false,
@@ -35001,7 +35001,7 @@ var require_lib5 = __commonJS({
     "use strict";
     var Client2 = require_client();
     var defaults2 = require_defaults();
-    var Connection4 = require_connection();
+    var Connection5 = require_connection();
     var Result2 = require_result();
     var utils = require_utils4();
     var Pool4 = require_pg_pool();
@@ -35021,7 +35021,7 @@ var require_lib5 = __commonJS({
       this.Query = this.Client.Query;
       this.Pool = poolFactory(this.Client);
       this._pools = [];
-      this.Connection = Connection4;
+      this.Connection = Connection5;
       this.types = require_pg_types();
       this.DatabaseError = DatabaseError2;
       this.TypeOverrides = TypeOverrides2;
@@ -61201,7 +61201,7 @@ var require_index_cjs = __commonJS({
       return value._bn !== void 0;
     }
     var uniquePublicKeyCounter = 1;
-    var PublicKey2 = class _PublicKey2 extends Struct {
+    var PublicKey3 = class _PublicKey2 extends Struct {
       /**
        * Create a new PublicKey object
        * @param value ed25519 public key as buffer or base-58 encoded string
@@ -61363,9 +61363,9 @@ var require_index_cjs = __commonJS({
         return isOnCurve(pubkey.toBytes());
       }
     };
-    _PublicKey = PublicKey2;
-    PublicKey2.default = new _PublicKey("11111111111111111111111111111111");
-    SOLANA_SCHEMA.set(PublicKey2, {
+    _PublicKey = PublicKey3;
+    PublicKey3.default = new _PublicKey("11111111111111111111111111111111");
+    SOLANA_SCHEMA.set(PublicKey3, {
       kind: "struct",
       fields: [["_bn", "u256"]]
     });
@@ -61397,7 +61397,7 @@ var require_index_cjs = __commonJS({
        * The public key for this account
        */
       get publicKey() {
-        return new PublicKey2(this._publicKey);
+        return new PublicKey3(this._publicKey);
       }
       /**
        * The **unencrypted** secret key for this account. The first 32 bytes
@@ -61408,7 +61408,7 @@ var require_index_cjs = __commonJS({
         return buffer.Buffer.concat([this._secretKey, this._publicKey], 64);
       }
     };
-    var BPF_LOADER_DEPRECATED_PROGRAM_ID = new PublicKey2("BPFLoader1111111111111111111111111111111111");
+    var BPF_LOADER_DEPRECATED_PROGRAM_ID = new PublicKey3("BPFLoader1111111111111111111111111111111111");
     var PACKET_DATA_SIZE = 1280 - 40 - 8;
     var VERSION_PREFIX_MASK = 127;
     var SIGNATURE_LENGTH_IN_BYTES = 64;
@@ -61639,7 +61639,7 @@ var require_index_cjs = __commonJS({
           const [payerAddress] = writableSigners[0];
           assert(payerAddress === this.payer.toBase58(), "Expected first writable signer key to be the fee payer");
         }
-        const staticAccountKeys = [...writableSigners.map(([address]) => new PublicKey2(address)), ...readonlySigners.map(([address]) => new PublicKey2(address)), ...writableNonSigners.map(([address]) => new PublicKey2(address)), ...readonlyNonSigners.map(([address]) => new PublicKey2(address))];
+        const staticAccountKeys = [...writableSigners.map(([address]) => new PublicKey3(address)), ...readonlySigners.map(([address]) => new PublicKey3(address)), ...writableNonSigners.map(([address]) => new PublicKey3(address)), ...readonlyNonSigners.map(([address]) => new PublicKey3(address))];
         return [header, staticAccountKeys];
       }
       extractTableLookup(lookupTable) {
@@ -61663,7 +61663,7 @@ var require_index_cjs = __commonJS({
         const drainedKeys = new Array();
         for (const [address, keyMeta] of this.keyMetaMap.entries()) {
           if (keyMetaFilter(keyMeta)) {
-            const key = new PublicKey2(address);
+            const key = new PublicKey3(address);
             const lookupTableIndex = lookupTableEntries.findIndex((entry) => entry.equals(key));
             if (lookupTableIndex >= 0) {
               assert(lookupTableIndex < 256, "Max lookup table index exceeded");
@@ -61698,7 +61698,7 @@ var require_index_cjs = __commonJS({
         this.instructions = void 0;
         this.indexToProgramIds = /* @__PURE__ */ new Map();
         this.header = args.header;
-        this.accountKeys = args.accountKeys.map((account) => new PublicKey2(account));
+        this.accountKeys = args.accountKeys.map((account) => new PublicKey3(account));
         this.recentBlockhash = args.recentBlockhash;
         this.instructions = args.instructions;
         this.instructions.forEach((ix) => this.indexToProgramIds.set(ix.programIdIndex, this.accountKeys[ix.programIdIndex]));
@@ -61824,7 +61824,7 @@ var require_index_cjs = __commonJS({
         let accountKeys = [];
         for (let i = 0; i < accountCount; i++) {
           const account = guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH);
-          accountKeys.push(new PublicKey2(buffer.Buffer.from(account)));
+          accountKeys.push(new PublicKey3(buffer.Buffer.from(account)));
         }
         const recentBlockhash = guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH);
         const instructionCount = decodeLength(byteArray);
@@ -62048,7 +62048,7 @@ var require_index_cjs = __commonJS({
         const staticAccountKeys = [];
         const staticAccountKeysLength = decodeLength(byteArray);
         for (let i = 0; i < staticAccountKeysLength; i++) {
-          staticAccountKeys.push(new PublicKey2(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH)));
+          staticAccountKeys.push(new PublicKey3(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH)));
         }
         const recentBlockhash = bs58__default.default.encode(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
         const instructionCount = decodeLength(byteArray);
@@ -62068,7 +62068,7 @@ var require_index_cjs = __commonJS({
         const addressTableLookupsCount = decodeLength(byteArray);
         const addressTableLookups = [];
         for (let i = 0; i < addressTableLookupsCount; i++) {
-          const accountKey = new PublicKey2(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
+          const accountKey = new PublicKey3(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
           const writableIndexesLength = decodeLength(byteArray);
           const writableIndexes = guardedSplice(byteArray, 0, writableIndexesLength);
           const readonlyIndexesLength = decodeLength(byteArray);
@@ -62117,7 +62117,7 @@ var require_index_cjs = __commonJS({
       return TransactionStatus2;
     })({});
     var DEFAULT_SIGNATURE = buffer.Buffer.alloc(SIGNATURE_LENGTH_IN_BYTES).fill(0);
-    var TransactionInstruction2 = class {
+    var TransactionInstruction3 = class {
       constructor(opts) {
         this.keys = void 0;
         this.programId = void 0;
@@ -62147,7 +62147,7 @@ var require_index_cjs = __commonJS({
         };
       }
     };
-    var Transaction2 = class _Transaction {
+    var Transaction3 = class _Transaction {
       /**
        * The first (payer) Transaction signature
        *
@@ -62249,7 +62249,7 @@ var require_index_cjs = __commonJS({
           } else if ("data" in item && "programId" in item && "keys" in item) {
             this.instructions.push(item);
           } else {
-            this.instructions.push(new TransactionInstruction2(item));
+            this.instructions.push(new TransactionInstruction3(item));
           }
         });
         return this;
@@ -62308,7 +62308,7 @@ var require_index_cjs = __commonJS({
         });
         programIds.forEach((programId) => {
           accountMetas.push({
-            pubkey: new PublicKey2(programId),
+            pubkey: new PublicKey3(programId),
             isSigner: false,
             isWritable: false
           });
@@ -62742,7 +62742,7 @@ Missing signature for public key${sigErrors.missing.length === 1 ? "" : "(s)"} [
               isWritable: message.isAccountWritable(account)
             };
           });
-          transaction.instructions.push(new TransactionInstruction2({
+          transaction.instructions.push(new TransactionInstruction3({
             keys,
             programId: message.accountKeys[instruction.programIdIndex],
             data: bs58__default.default.decode(instruction.data)
@@ -62810,7 +62810,7 @@ Missing signature for public key${sigErrors.missing.length === 1 ? "" : "(s)"} [
           if (programId === void 0) {
             throw new Error(`Failed to find program id for program id index ${compiledIx.programIdIndex}`);
           }
-          instructions.push(new TransactionInstruction2({
+          instructions.push(new TransactionInstruction3({
             programId,
             data: toBuffer(compiledIx.data),
             keys
@@ -62901,15 +62901,15 @@ Missing signature for public key${sigErrors.missing.length === 1 ? "" : "(s)"} [
     var DEFAULT_TICKS_PER_SLOT = 64;
     var NUM_SLOTS_PER_SECOND = NUM_TICKS_PER_SECOND / DEFAULT_TICKS_PER_SLOT;
     var MS_PER_SLOT = 1e3 / NUM_SLOTS_PER_SECOND;
-    var SYSVAR_CLOCK_PUBKEY = new PublicKey2("SysvarC1ock11111111111111111111111111111111");
-    var SYSVAR_EPOCH_SCHEDULE_PUBKEY = new PublicKey2("SysvarEpochSchedu1e111111111111111111111111");
-    var SYSVAR_INSTRUCTIONS_PUBKEY = new PublicKey2("Sysvar1nstructions1111111111111111111111111");
-    var SYSVAR_RECENT_BLOCKHASHES_PUBKEY = new PublicKey2("SysvarRecentB1ockHashes11111111111111111111");
-    var SYSVAR_RENT_PUBKEY = new PublicKey2("SysvarRent111111111111111111111111111111111");
-    var SYSVAR_REWARDS_PUBKEY = new PublicKey2("SysvarRewards111111111111111111111111111111");
-    var SYSVAR_SLOT_HASHES_PUBKEY = new PublicKey2("SysvarS1otHashes111111111111111111111111111");
-    var SYSVAR_SLOT_HISTORY_PUBKEY = new PublicKey2("SysvarS1otHistory11111111111111111111111111");
-    var SYSVAR_STAKE_HISTORY_PUBKEY = new PublicKey2("SysvarStakeHistory1111111111111111111111111");
+    var SYSVAR_CLOCK_PUBKEY = new PublicKey3("SysvarC1ock11111111111111111111111111111111");
+    var SYSVAR_EPOCH_SCHEDULE_PUBKEY = new PublicKey3("SysvarEpochSchedu1e111111111111111111111111");
+    var SYSVAR_INSTRUCTIONS_PUBKEY = new PublicKey3("Sysvar1nstructions1111111111111111111111111");
+    var SYSVAR_RECENT_BLOCKHASHES_PUBKEY = new PublicKey3("SysvarRecentB1ockHashes11111111111111111111");
+    var SYSVAR_RENT_PUBKEY = new PublicKey3("SysvarRent111111111111111111111111111111111");
+    var SYSVAR_REWARDS_PUBKEY = new PublicKey3("SysvarRewards111111111111111111111111111111");
+    var SYSVAR_SLOT_HASHES_PUBKEY = new PublicKey3("SysvarS1otHashes111111111111111111111111111");
+    var SYSVAR_SLOT_HISTORY_PUBKEY = new PublicKey3("SysvarS1otHistory11111111111111111111111111");
+    var SYSVAR_STAKE_HISTORY_PUBKEY = new PublicKey3("SysvarStakeHistory1111111111111111111111111");
     var SendTransactionError = class extends Error {
       constructor({
         action,
@@ -63100,8 +63100,8 @@ Message: ${transactionMessage}.
       static fromAccountData(buffer2) {
         const nonceAccount = NonceAccountLayout.decode(toBuffer(buffer2), 0);
         return new _NonceAccount({
-          authorizedPubkey: new PublicKey2(nonceAccount.authorizedPubkey),
-          nonce: new PublicKey2(nonceAccount.nonce).toString(),
+          authorizedPubkey: new PublicKey3(nonceAccount.authorizedPubkey),
+          nonce: new PublicKey3(nonceAccount.nonce).toString(),
           feeCalculator: nonceAccount.feeCalculator
         });
       }
@@ -63163,7 +63163,7 @@ Message: ${transactionMessage}.
           newAccountPubkey: instruction.keys[1].pubkey,
           lamports,
           space,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -63198,7 +63198,7 @@ Message: ${transactionMessage}.
           toPubkey: instruction.keys[2].pubkey,
           lamports,
           seed,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -63229,10 +63229,10 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.AllocateWithSeed, instruction.data);
         return {
           accountPubkey: instruction.keys[0].pubkey,
-          basePubkey: new PublicKey2(base),
+          basePubkey: new PublicKey3(base),
           seed,
           space,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -63246,7 +63246,7 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.Assign, instruction.data);
         return {
           accountPubkey: instruction.keys[0].pubkey,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -63262,9 +63262,9 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.AssignWithSeed, instruction.data);
         return {
           accountPubkey: instruction.keys[0].pubkey,
-          basePubkey: new PublicKey2(base),
+          basePubkey: new PublicKey3(base),
           seed,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -63283,11 +63283,11 @@ Message: ${transactionMessage}.
         return {
           fromPubkey: instruction.keys[0].pubkey,
           newAccountPubkey: instruction.keys[1].pubkey,
-          basePubkey: new PublicKey2(base),
+          basePubkey: new PublicKey3(base),
           seed,
           lamports,
           space,
-          programId: new PublicKey2(programId)
+          programId: new PublicKey3(programId)
         };
       }
       /**
@@ -63301,7 +63301,7 @@ Message: ${transactionMessage}.
         } = decodeData$1(SYSTEM_INSTRUCTION_LAYOUTS.InitializeNonceAccount, instruction.data);
         return {
           noncePubkey: instruction.keys[0].pubkey,
-          authorizedPubkey: new PublicKey2(authorized2)
+          authorizedPubkey: new PublicKey3(authorized2)
         };
       }
       /**
@@ -63344,7 +63344,7 @@ Message: ${transactionMessage}.
         return {
           noncePubkey: instruction.keys[0].pubkey,
           authorizedPubkey: instruction.keys[1].pubkey,
-          newAuthorizedPubkey: new PublicKey2(authorized2)
+          newAuthorizedPubkey: new PublicKey3(authorized2)
         };
       }
       /**
@@ -63437,7 +63437,7 @@ Message: ${transactionMessage}.
           space: params.space,
           programId: toBuffer(params.programId.toBuffer())
         });
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys: [{
             pubkey: params.fromPubkey,
             isSigner: true,
@@ -63492,7 +63492,7 @@ Message: ${transactionMessage}.
             isWritable: true
           }];
         }
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys,
           programId: this.programId,
           data
@@ -63531,7 +63531,7 @@ Message: ${transactionMessage}.
             isWritable: true
           }];
         }
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys,
           programId: this.programId,
           data
@@ -63566,7 +63566,7 @@ Message: ${transactionMessage}.
             isWritable: false
           });
         }
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys,
           programId: this.programId,
           data
@@ -63576,7 +63576,7 @@ Message: ${transactionMessage}.
        * Generate a transaction that creates a new Nonce account
        */
       static createNonceAccount(params) {
-        const transaction = new Transaction2();
+        const transaction = new Transaction3();
         if ("basePubkey" in params && "seed" in params) {
           transaction.add(_SystemProgram.createAccountWithSeed({
             fromPubkey: params.fromPubkey,
@@ -63628,7 +63628,7 @@ Message: ${transactionMessage}.
           programId: this.programId,
           data
         };
-        return new TransactionInstruction2(instructionData);
+        return new TransactionInstruction3(instructionData);
       }
       /**
        * Generate an instruction to advance the nonce in a Nonce account
@@ -63653,7 +63653,7 @@ Message: ${transactionMessage}.
           programId: this.programId,
           data
         };
-        return new TransactionInstruction2(instructionData);
+        return new TransactionInstruction3(instructionData);
       }
       /**
        * Generate a transaction instruction that withdraws lamports from a Nonce account
@@ -63663,7 +63663,7 @@ Message: ${transactionMessage}.
         const data = encodeData(type, {
           lamports: params.lamports
         });
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys: [{
             pubkey: params.noncePubkey,
             isSigner: false,
@@ -63698,7 +63698,7 @@ Message: ${transactionMessage}.
         const data = encodeData(type, {
           authorized: toBuffer(params.newAuthorizedPubkey.toBuffer())
         });
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys: [{
             pubkey: params.noncePubkey,
             isSigner: false,
@@ -63746,14 +63746,14 @@ Message: ${transactionMessage}.
             isWritable: true
           }];
         }
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys,
           programId: this.programId,
           data
         });
       }
     };
-    SystemProgram.programId = new PublicKey2("11111111111111111111111111111111");
+    SystemProgram.programId = new PublicKey3("11111111111111111111111111111111");
     var CHUNK_SIZE = PACKET_DATA_SIZE - 300;
     var Loader = class _Loader {
       /**
@@ -63796,21 +63796,21 @@ Message: ${transactionMessage}.
               return false;
             }
             if (programInfo.data.length !== data.length) {
-              transaction = transaction || new Transaction2();
+              transaction = transaction || new Transaction3();
               transaction.add(SystemProgram.allocate({
                 accountPubkey: program.publicKey,
                 space: data.length
               }));
             }
             if (!programInfo.owner.equals(programId)) {
-              transaction = transaction || new Transaction2();
+              transaction = transaction || new Transaction3();
               transaction.add(SystemProgram.assign({
                 accountPubkey: program.publicKey,
                 programId
               }));
             }
             if (programInfo.lamports < balanceNeeded) {
-              transaction = transaction || new Transaction2();
+              transaction = transaction || new Transaction3();
               transaction.add(SystemProgram.transfer({
                 fromPubkey: payer.publicKey,
                 toPubkey: program.publicKey,
@@ -63818,7 +63818,7 @@ Message: ${transactionMessage}.
               }));
             }
           } else {
-            transaction = new Transaction2().add(SystemProgram.createAccount({
+            transaction = new Transaction3().add(SystemProgram.createAccount({
               fromPubkey: payer.publicKey,
               newAccountPubkey: program.publicKey,
               lamports: balanceNeeded > 0 ? balanceNeeded : 1,
@@ -63848,7 +63848,7 @@ Message: ${transactionMessage}.
             bytesLength: 0,
             bytesLengthPadding: 0
           }, data2);
-          const transaction = new Transaction2().add({
+          const transaction = new Transaction3().add({
             keys: [{
               pubkey: program.publicKey,
               isSigner: true,
@@ -63875,7 +63875,7 @@ Message: ${transactionMessage}.
             instruction: 1
             // Finalize instruction
           }, data2);
-          const transaction = new Transaction2().add({
+          const transaction = new Transaction3().add({
             keys: [{
               pubkey: program.publicKey,
               isSigner: true,
@@ -63920,7 +63920,7 @@ Message: ${transactionMessage}.
       }
     };
     Loader.chunkSize = CHUNK_SIZE;
-    var BPF_LOADER_PROGRAM_ID = new PublicKey2("BPFLoader2111111111111111111111111111111111");
+    var BPF_LOADER_PROGRAM_ID = new PublicKey3("BPFLoader2111111111111111111111111111111111");
     var BpfLoader = class {
       /**
        * Minimum number of signatures required to load a program not including
@@ -64716,8 +64716,8 @@ Message: ${transactionMessage}.
           deactivationSlot: meta.deactivationSlot,
           lastExtendedSlot: meta.lastExtendedSlot,
           lastExtendedSlotStartIndex: meta.lastExtendedStartIndex,
-          authority: meta.authority.length !== 0 ? new PublicKey2(meta.authority[0]) : void 0,
-          addresses: addresses.map((address) => new PublicKey2(address))
+          authority: meta.authority.length !== 0 ? new PublicKey3(meta.authority[0]) : void 0,
+          addresses: addresses.map((address) => new PublicKey3(address))
         };
       }
     };
@@ -64759,7 +64759,7 @@ Message: ${transactionMessage}.
       );
       return `${protocol}//${hostish}${websocketPort}${rest}`;
     }
-    var PublicKeyFromString = superstruct.coerce(superstruct.instance(PublicKey2), superstruct.string(), (value) => new PublicKey2(value));
+    var PublicKeyFromString = superstruct.coerce(superstruct.instance(PublicKey3), superstruct.string(), (value) => new PublicKey3(value));
     var RawAccountDataResult = superstruct.tuple([superstruct.string(), superstruct.literal("base64")]);
     var BufferFromRawAccountData = superstruct.coerce(superstruct.instance(buffer.Buffer), RawAccountDataResult, (value) => buffer.Buffer.from(value[0], "base64"));
     var BLOCKHASH_CACHE_TIMEOUT_MS = 30 * 1e3;
@@ -64844,7 +64844,7 @@ Message: ${transactionMessage}.
       if (version3 === 0) {
         return new MessageV0({
           header: response.header,
-          staticAccountKeys: response.accountKeys.map((accountKey) => new PublicKey2(accountKey)),
+          staticAccountKeys: response.accountKeys.map((accountKey) => new PublicKey3(accountKey)),
           recentBlockhash: response.recentBlockhash,
           compiledInstructions: response.instructions.map((ix) => ({
             programIdIndex: ix.programIdIndex,
@@ -65508,7 +65508,7 @@ Message: ${transactionMessage}.
     var COMMON_HTTP_HEADERS = {
       "solana-client": `js/${"1.0.0-maintenance"}`
     };
-    var Connection4 = class {
+    var Connection5 = class {
       /**
        * Establish a JSON RPC connection
        *
@@ -67034,7 +67034,7 @@ Message: ${transactionMessage}.
           }) => {
             return {
               meta,
-              transaction: Transaction2.populate(transaction.message, transaction.signatures)
+              transaction: Transaction3.populate(transaction.message, transaction.signatures)
             };
           })
         };
@@ -67109,7 +67109,7 @@ Message: ${transactionMessage}.
         const signatures = result.transaction.signatures;
         return {
           ...result,
-          transaction: Transaction2.populate(message, signatures)
+          transaction: Transaction3.populate(message, signatures)
         };
       }
       /**
@@ -67396,15 +67396,15 @@ Message: ${transactionMessage}.
           return res2.result;
         }
         let transaction;
-        if (transactionOrMessage instanceof Transaction2) {
+        if (transactionOrMessage instanceof Transaction3) {
           let originalTx = transactionOrMessage;
-          transaction = new Transaction2();
+          transaction = new Transaction3();
           transaction.feePayer = originalTx.feePayer;
           transaction.instructions = transactionOrMessage.instructions;
           transaction.nonceInfo = originalTx.nonceInfo;
           transaction.signatures = originalTx.signatures;
         } else {
-          transaction = Transaction2.populate(transactionOrMessage);
+          transaction = Transaction3.populate(transactionOrMessage);
           transaction._message = transaction._json = void 0;
         }
         if (configOrSigners !== void 0 && !Array.isArray(configOrSigners)) {
@@ -68209,7 +68209,7 @@ Message: ${transactionMessage}.
         await this._unsubscribeClientSubscription(clientSubscriptionId, "root change");
       }
     };
-    var Keypair2 = class _Keypair {
+    var Keypair3 = class _Keypair {
       /**
        * Create a new keypair instance.
        * Generate random keypair if no {@link Ed25519Keypair} is provided.
@@ -68284,7 +68284,7 @@ Message: ${transactionMessage}.
        * @returns {PublicKey} PublicKey
        */
       get publicKey() {
-        return new PublicKey2(this._keypair.publicKey);
+        return new PublicKey3(this._keypair.publicKey);
       }
       /**
        * The raw secret key for this keypair
@@ -68362,7 +68362,7 @@ Message: ${transactionMessage}.
           lookupTable: instruction.keys[0].pubkey,
           authority: instruction.keys[1].pubkey,
           payer: instruction.keys.length > 2 ? instruction.keys[2].pubkey : void 0,
-          addresses: addresses.map((buffer2) => new PublicKey2(buffer2))
+          addresses: addresses.map((buffer2) => new PublicKey3(buffer2))
         };
       }
       static decodeCloseLookupTable(instruction) {
@@ -68414,7 +68414,7 @@ Message: ${transactionMessage}.
       constructor() {
       }
       static createLookupTable(params) {
-        const [lookupTableAddress, bumpSeed] = PublicKey2.findProgramAddressSync([params.authority.toBuffer(), codecsNumbers.getU64Encoder().encode(params.recentSlot)], this.programId);
+        const [lookupTableAddress, bumpSeed] = PublicKey3.findProgramAddressSync([params.authority.toBuffer(), codecsNumbers.getU64Encoder().encode(params.recentSlot)], this.programId);
         const type = LOOKUP_TABLE_INSTRUCTION_LAYOUTS.CreateLookupTable;
         const data = encodeData(type, {
           recentSlot: BigInt(params.recentSlot),
@@ -68437,7 +68437,7 @@ Message: ${transactionMessage}.
           isSigner: false,
           isWritable: false
         }];
-        return [new TransactionInstruction2({
+        return [new TransactionInstruction3({
           programId: this.programId,
           keys,
           data
@@ -68455,7 +68455,7 @@ Message: ${transactionMessage}.
           isSigner: true,
           isWritable: false
         }];
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           programId: this.programId,
           keys,
           data
@@ -68486,7 +68486,7 @@ Message: ${transactionMessage}.
             isWritable: false
           });
         }
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           programId: this.programId,
           keys,
           data
@@ -68504,7 +68504,7 @@ Message: ${transactionMessage}.
           isSigner: true,
           isWritable: false
         }];
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           programId: this.programId,
           keys,
           data
@@ -68526,14 +68526,14 @@ Message: ${transactionMessage}.
           isSigner: false,
           isWritable: true
         }];
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           programId: this.programId,
           keys,
           data
         });
       }
     };
-    AddressLookupTableProgram.programId = new PublicKey2("AddressLookupTab1e1111111111111111111111111");
+    AddressLookupTableProgram.programId = new PublicKey3("AddressLookupTab1e1111111111111111111111111");
     var ComputeBudgetInstruction = class {
       /**
        * @internal
@@ -68651,7 +68651,7 @@ Message: ${transactionMessage}.
       static requestUnits(params) {
         const type = COMPUTE_BUDGET_INSTRUCTION_LAYOUTS.RequestUnits;
         const data = encodeData(type, params);
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys: [],
           programId: this.programId,
           data
@@ -68660,7 +68660,7 @@ Message: ${transactionMessage}.
       static requestHeapFrame(params) {
         const type = COMPUTE_BUDGET_INSTRUCTION_LAYOUTS.RequestHeapFrame;
         const data = encodeData(type, params);
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys: [],
           programId: this.programId,
           data
@@ -68669,7 +68669,7 @@ Message: ${transactionMessage}.
       static setComputeUnitLimit(params) {
         const type = COMPUTE_BUDGET_INSTRUCTION_LAYOUTS.SetComputeUnitLimit;
         const data = encodeData(type, params);
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys: [],
           programId: this.programId,
           data
@@ -68680,14 +68680,14 @@ Message: ${transactionMessage}.
         const data = encodeData(type, {
           microLamports: BigInt(params.microLamports)
         });
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys: [],
           programId: this.programId,
           data
         });
       }
     };
-    ComputeBudgetProgram.programId = new PublicKey2("ComputeBudget111111111111111111111111111111");
+    ComputeBudgetProgram.programId = new PublicKey3("ComputeBudget111111111111111111111111111111");
     var PRIVATE_KEY_BYTES$1 = 64;
     var PUBLIC_KEY_BYTES$1 = 32;
     var SIGNATURE_BYTES = 64;
@@ -68735,7 +68735,7 @@ Message: ${transactionMessage}.
         instructionData.fill(publicKey2, publicKeyOffset);
         instructionData.fill(signature2, signatureOffset);
         instructionData.fill(message, messageDataOffset);
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys: [],
           programId: _Ed25519Program.programId,
           data: instructionData
@@ -68753,7 +68753,7 @@ Message: ${transactionMessage}.
         } = params;
         assert(privateKey.length === PRIVATE_KEY_BYTES$1, `Private key must be ${PRIVATE_KEY_BYTES$1} bytes but received ${privateKey.length} bytes`);
         try {
-          const keypair = Keypair2.fromSecretKey(privateKey);
+          const keypair = Keypair3.fromSecretKey(privateKey);
           const publicKey2 = keypair.publicKey.toBytes();
           const signature2 = sign(message, keypair.secretKey);
           return this.createInstructionWithPublicKey({
@@ -68767,7 +68767,7 @@ Message: ${transactionMessage}.
         }
       }
     };
-    Ed25519Program.programId = new PublicKey2("Ed25519SigVerify111111111111111111111111111");
+    Ed25519Program.programId = new PublicKey3("Ed25519SigVerify111111111111111111111111111");
     var ecdsaSign = (msgHash, privKey) => {
       const signature2 = secp256k1.secp256k1.sign(msgHash, privKey);
       return [signature2.toCompactRawBytes(), signature2.recovery];
@@ -68863,7 +68863,7 @@ Message: ${transactionMessage}.
           recoveryId
         }, instructionData);
         instructionData.fill(toBuffer(message), SECP256K1_INSTRUCTION_LAYOUT.span);
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys: [],
           programId: _Secp256k1Program.programId,
           data: instructionData
@@ -68901,9 +68901,9 @@ Message: ${transactionMessage}.
         }
       }
     };
-    Secp256k1Program.programId = new PublicKey2("KeccakSecp256k11111111111111111111111111111");
+    Secp256k1Program.programId = new PublicKey3("KeccakSecp256k11111111111111111111111111111");
     var _Lockup;
-    var STAKE_CONFIG_ID = new PublicKey2("StakeConfig11111111111111111111111111111111");
+    var STAKE_CONFIG_ID = new PublicKey3("StakeConfig11111111111111111111111111111111");
     var Authorized = class {
       /**
        * Create a new Authorized object
@@ -68934,7 +68934,7 @@ Message: ${transactionMessage}.
        */
     };
     _Lockup = Lockup;
-    Lockup.default = new _Lockup(0, 0, PublicKey2.default);
+    Lockup.default = new _Lockup(0, 0, PublicKey3.default);
     var StakeInstruction = class {
       /**
        * @internal
@@ -68972,8 +68972,8 @@ Message: ${transactionMessage}.
         } = decodeData$1(STAKE_INSTRUCTION_LAYOUTS.Initialize, instruction.data);
         return {
           stakePubkey: instruction.keys[0].pubkey,
-          authorized: new Authorized(new PublicKey2(authorized2.staker), new PublicKey2(authorized2.withdrawer)),
-          lockup: new Lockup(lockup2.unixTimestamp, lockup2.epoch, new PublicKey2(lockup2.custodian))
+          authorized: new Authorized(new PublicKey3(authorized2.staker), new PublicKey3(authorized2.withdrawer)),
+          lockup: new Lockup(lockup2.unixTimestamp, lockup2.epoch, new PublicKey3(lockup2.custodian))
         };
       }
       /**
@@ -69002,7 +69002,7 @@ Message: ${transactionMessage}.
         const o = {
           stakePubkey: instruction.keys[0].pubkey,
           authorizedPubkey: instruction.keys[2].pubkey,
-          newAuthorizedPubkey: new PublicKey2(newAuthorized),
+          newAuthorizedPubkey: new PublicKey3(newAuthorized),
           stakeAuthorizationType: {
             index: stakeAuthorizationType
           }
@@ -69028,8 +69028,8 @@ Message: ${transactionMessage}.
           stakePubkey: instruction.keys[0].pubkey,
           authorityBase: instruction.keys[1].pubkey,
           authoritySeed,
-          authorityOwner: new PublicKey2(authorityOwner),
-          newAuthorizedPubkey: new PublicKey2(newAuthorized),
+          authorityOwner: new PublicKey3(authorityOwner),
+          newAuthorizedPubkey: new PublicKey3(newAuthorized),
           stakeAuthorizationType: {
             index: stakeAuthorizationType
           }
@@ -69203,14 +69203,14 @@ Message: ${transactionMessage}.
           programId: this.programId,
           data
         };
-        return new TransactionInstruction2(instructionData);
+        return new TransactionInstruction3(instructionData);
       }
       /**
        * Generate a Transaction that creates a new Stake account at
        *   an address generated with `from`, a seed, and the Stake programId
        */
       static createAccountWithSeed(params) {
-        const transaction = new Transaction2();
+        const transaction = new Transaction3();
         transaction.add(SystemProgram.createAccountWithSeed({
           fromPubkey: params.fromPubkey,
           newAccountPubkey: params.stakePubkey,
@@ -69235,7 +69235,7 @@ Message: ${transactionMessage}.
        * Generate a Transaction that creates a new Stake account
        */
       static createAccount(params) {
-        const transaction = new Transaction2();
+        const transaction = new Transaction3();
         transaction.add(SystemProgram.createAccount({
           fromPubkey: params.fromPubkey,
           newAccountPubkey: params.stakePubkey,
@@ -69267,7 +69267,7 @@ Message: ${transactionMessage}.
         } = params;
         const type = STAKE_INSTRUCTION_LAYOUTS.Delegate;
         const data = encodeData(type);
-        return new Transaction2().add({
+        return new Transaction3().add({
           keys: [{
             pubkey: stakePubkey,
             isSigner: false,
@@ -69334,7 +69334,7 @@ Message: ${transactionMessage}.
             isWritable: false
           });
         }
-        return new Transaction2().add({
+        return new Transaction3().add({
           keys,
           programId: this.programId,
           data
@@ -69381,7 +69381,7 @@ Message: ${transactionMessage}.
             isWritable: false
           });
         }
-        return new Transaction2().add({
+        return new Transaction3().add({
           keys,
           programId: this.programId,
           data
@@ -69401,7 +69401,7 @@ Message: ${transactionMessage}.
         const data = encodeData(type, {
           lamports
         });
-        return new TransactionInstruction2({
+        return new TransactionInstruction3({
           keys: [{
             pubkey: stakePubkey,
             isSigner: false,
@@ -69423,7 +69423,7 @@ Message: ${transactionMessage}.
        * Generate a Transaction that splits Stake tokens into another stake account
        */
       static split(params, rentExemptReserve) {
-        const transaction = new Transaction2();
+        const transaction = new Transaction3();
         transaction.add(SystemProgram.createAccount({
           fromPubkey: params.authorizedPubkey,
           newAccountPubkey: params.splitStakePubkey,
@@ -69446,7 +69446,7 @@ Message: ${transactionMessage}.
           seed,
           lamports
         } = params;
-        const transaction = new Transaction2();
+        const transaction = new Transaction3();
         transaction.add(SystemProgram.allocate({
           accountPubkey: splitStakePubkey,
           basePubkey,
@@ -69479,7 +69479,7 @@ Message: ${transactionMessage}.
         } = params;
         const type = STAKE_INSTRUCTION_LAYOUTS.Merge;
         const data = encodeData(type);
-        return new Transaction2().add({
+        return new Transaction3().add({
           keys: [{
             pubkey: stakePubkey,
             isSigner: false,
@@ -69548,7 +69548,7 @@ Message: ${transactionMessage}.
             isWritable: false
           });
         }
-        return new Transaction2().add({
+        return new Transaction3().add({
           keys,
           programId: this.programId,
           data
@@ -69564,7 +69564,7 @@ Message: ${transactionMessage}.
         } = params;
         const type = STAKE_INSTRUCTION_LAYOUTS.Deactivate;
         const data = encodeData(type);
-        return new Transaction2().add({
+        return new Transaction3().add({
           keys: [{
             pubkey: stakePubkey,
             isSigner: false,
@@ -69583,7 +69583,7 @@ Message: ${transactionMessage}.
         });
       }
     };
-    StakeProgram.programId = new PublicKey2("Stake11111111111111111111111111111111111111");
+    StakeProgram.programId = new PublicKey3("Stake11111111111111111111111111111111111111");
     StakeProgram.space = 200;
     var VoteInit = class {
       /** [0, 100] */
@@ -69635,7 +69635,7 @@ Message: ${transactionMessage}.
         return {
           votePubkey: instruction.keys[0].pubkey,
           nodePubkey: instruction.keys[3].pubkey,
-          voteInit: new VoteInit(new PublicKey2(voteInit2.nodePubkey), new PublicKey2(voteInit2.authorizedVoter), new PublicKey2(voteInit2.authorizedWithdrawer), voteInit2.commission)
+          voteInit: new VoteInit(new PublicKey3(voteInit2.nodePubkey), new PublicKey3(voteInit2.authorizedVoter), new PublicKey3(voteInit2.authorizedWithdrawer), voteInit2.commission)
         };
       }
       /**
@@ -69651,7 +69651,7 @@ Message: ${transactionMessage}.
         return {
           votePubkey: instruction.keys[0].pubkey,
           authorizedPubkey: instruction.keys[2].pubkey,
-          newAuthorizedPubkey: new PublicKey2(newAuthorized),
+          newAuthorizedPubkey: new PublicKey3(newAuthorized),
           voteAuthorizationType: {
             index: voteAuthorizationType
           }
@@ -69673,9 +69673,9 @@ Message: ${transactionMessage}.
         } = decodeData$1(VOTE_INSTRUCTION_LAYOUTS.AuthorizeWithSeed, instruction.data);
         return {
           currentAuthorityDerivedKeyBasePubkey: instruction.keys[2].pubkey,
-          currentAuthorityDerivedKeyOwnerPubkey: new PublicKey2(currentAuthorityDerivedKeyOwnerPubkey),
+          currentAuthorityDerivedKeyOwnerPubkey: new PublicKey3(currentAuthorityDerivedKeyOwnerPubkey),
           currentAuthorityDerivedKeySeed,
-          newAuthorizedPubkey: new PublicKey2(newAuthorized),
+          newAuthorizedPubkey: new PublicKey3(newAuthorized),
           voteAuthorizationType: {
             index: voteAuthorizationType
           },
@@ -69793,13 +69793,13 @@ Message: ${transactionMessage}.
           programId: this.programId,
           data
         };
-        return new TransactionInstruction2(instructionData);
+        return new TransactionInstruction3(instructionData);
       }
       /**
        * Generate a transaction that creates a new Vote account.
        */
       static createAccount(params) {
-        const transaction = new Transaction2();
+        const transaction = new Transaction3();
         transaction.add(SystemProgram.createAccount({
           fromPubkey: params.fromPubkey,
           newAccountPubkey: params.votePubkey,
@@ -69841,7 +69841,7 @@ Message: ${transactionMessage}.
           isSigner: true,
           isWritable: false
         }];
-        return new Transaction2().add({
+        return new Transaction3().add({
           keys,
           programId: this.programId,
           data
@@ -69882,7 +69882,7 @@ Message: ${transactionMessage}.
           isSigner: true,
           isWritable: false
         }];
-        return new Transaction2().add({
+        return new Transaction3().add({
           keys,
           programId: this.programId,
           data
@@ -69915,7 +69915,7 @@ Message: ${transactionMessage}.
           isSigner: true,
           isWritable: false
         }];
-        return new Transaction2().add({
+        return new Transaction3().add({
           keys,
           programId: this.programId,
           data
@@ -69959,16 +69959,16 @@ Message: ${transactionMessage}.
           isSigner: true,
           isWritable: false
         }];
-        return new Transaction2().add({
+        return new Transaction3().add({
           keys,
           programId: this.programId,
           data
         });
       }
     };
-    VoteProgram.programId = new PublicKey2("Vote111111111111111111111111111111111111111");
+    VoteProgram.programId = new PublicKey3("Vote111111111111111111111111111111111111111");
     VoteProgram.space = 3762;
-    var VALIDATOR_INFO_KEY = new PublicKey2("Va1idator1nfo111111111111111111111111111111");
+    var VALIDATOR_INFO_KEY = new PublicKey3("Va1idator1nfo111111111111111111111111111111");
     var InfoString = superstruct.type({
       name: superstruct.string(),
       website: superstruct.optional(superstruct.string()),
@@ -70002,7 +70002,7 @@ Message: ${transactionMessage}.
         if (configKeyCount !== 2) return null;
         const configKeys = [];
         for (let i = 0; i < 2; i++) {
-          const publicKey2 = new PublicKey2(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
+          const publicKey2 = new PublicKey3(guardedSplice(byteArray, 0, PUBLIC_KEY_LENGTH));
           const isSigner = guardedShift(byteArray) === 1;
           configKeys.push({
             publicKey: publicKey2,
@@ -70020,7 +70020,7 @@ Message: ${transactionMessage}.
         return null;
       }
     };
-    var VOTE_PROGRAM_ID = new PublicKey2("Vote111111111111111111111111111111111111111");
+    var VOTE_PROGRAM_ID = new PublicKey3("Vote111111111111111111111111111111111111111");
     var VoteAccountLayout = BufferLayout__namespace.struct([
       publicKey("nodePubkey"),
       publicKey("authorizedWithdrawer"),
@@ -70077,8 +70077,8 @@ Message: ${transactionMessage}.
           rootSlot = null;
         }
         return new _VoteAccount({
-          nodePubkey: new PublicKey2(va.nodePubkey),
-          authorizedWithdrawer: new PublicKey2(va.authorizedWithdrawer),
+          nodePubkey: new PublicKey3(va.nodePubkey),
+          authorizedWithdrawer: new PublicKey3(va.authorizedWithdrawer),
           commission: va.commission,
           votes: va.votes,
           rootSlot,
@@ -70095,7 +70095,7 @@ Message: ${transactionMessage}.
     }) {
       return {
         epoch,
-        authorizedVoter: new PublicKey2(authorizedVoter)
+        authorizedVoter: new PublicKey3(authorizedVoter)
       };
     }
     function parsePriorVoters({
@@ -70104,7 +70104,7 @@ Message: ${transactionMessage}.
       targetEpoch
     }) {
       return {
-        authorizedPubkey: new PublicKey2(authorizedPubkey),
+        authorizedPubkey: new PublicKey3(authorizedPubkey),
         epochOfLastAuthorizedSwitch,
         targetEpoch
       };
@@ -70188,12 +70188,12 @@ Message: ${transactionMessage}.
     exports.COMPUTE_BUDGET_INSTRUCTION_LAYOUTS = COMPUTE_BUDGET_INSTRUCTION_LAYOUTS;
     exports.ComputeBudgetInstruction = ComputeBudgetInstruction;
     exports.ComputeBudgetProgram = ComputeBudgetProgram;
-    exports.Connection = Connection4;
+    exports.Connection = Connection5;
     exports.Ed25519Program = Ed25519Program;
     exports.Enum = Enum;
     exports.EpochSchedule = EpochSchedule;
     exports.FeeCalculatorLayout = FeeCalculatorLayout;
-    exports.Keypair = Keypair2;
+    exports.Keypair = Keypair3;
     exports.LAMPORTS_PER_SOL = LAMPORTS_PER_SOL;
     exports.LOOKUP_TABLE_INSTRUCTION_LAYOUTS = LOOKUP_TABLE_INSTRUCTION_LAYOUTS;
     exports.Loader = Loader;
@@ -70206,7 +70206,7 @@ Message: ${transactionMessage}.
     exports.NonceAccount = NonceAccount;
     exports.PACKET_DATA_SIZE = PACKET_DATA_SIZE;
     exports.PUBLIC_KEY_LENGTH = PUBLIC_KEY_LENGTH;
-    exports.PublicKey = PublicKey2;
+    exports.PublicKey = PublicKey3;
     exports.SIGNATURE_LENGTH_IN_BYTES = SIGNATURE_LENGTH_IN_BYTES;
     exports.SOLANA_SCHEMA = SOLANA_SCHEMA;
     exports.STAKE_CONFIG_ID = STAKE_CONFIG_ID;
@@ -70231,11 +70231,11 @@ Message: ${transactionMessage}.
     exports.Struct = Struct;
     exports.SystemInstruction = SystemInstruction;
     exports.SystemProgram = SystemProgram;
-    exports.Transaction = Transaction2;
+    exports.Transaction = Transaction3;
     exports.TransactionExpiredBlockheightExceededError = TransactionExpiredBlockheightExceededError;
     exports.TransactionExpiredNonceInvalidError = TransactionExpiredNonceInvalidError;
     exports.TransactionExpiredTimeoutError = TransactionExpiredTimeoutError;
-    exports.TransactionInstruction = TransactionInstruction2;
+    exports.TransactionInstruction = TransactionInstruction3;
     exports.TransactionMessage = TransactionMessage;
     exports.TransactionStatus = TransactionStatus;
     exports.VALIDATOR_INFO_KEY = VALIDATOR_INFO_KEY;
@@ -83112,7 +83112,11 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
           }
           return done(null, user);
         } catch (err) {
-          return done(err);
+          logger.error(
+            { err, message: err.message, stack: err.stack },
+            "AUTH_GOOGLE: DB error \u2014 likely missing admin_users table (run drizzle-kit push)"
+          );
+          return done(null, false, { message: "server_error" });
         }
       }
     )
@@ -83126,7 +83130,11 @@ import_passport.default.deserializeUser(async (id, done) => {
     const [user] = await db.select().from(adminUsers).where(eq(adminUsers.id, id)).limit(1);
     done(null, user ?? null);
   } catch (err) {
-    done(err);
+    logger.error(
+      { err, message: err.message, userId: id },
+      "AUTH: deserializeUser DB error \u2014 treating session as invalid"
+    );
+    done(null, null);
   }
 });
 var router3 = (0, import_express3.Router)();
@@ -83254,6 +83262,46 @@ var auth_default = router3;
 
 // src/routes/admin.ts
 var import_express4 = __toESM(require_express2(), 1);
+var import_web3 = __toESM(require_index_cjs(), 1);
+var PROGRAM_ID_STR = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
+var CONFIG_PDA_STR = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
+var SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
+async function getDiscriminator2(name) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(`global:${name}`);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Buffer.from(hashBuffer).slice(0, 8);
+}
+async function devResetOnChain() {
+  const raw = process.env.ADMIN_KEYPAIR_JSON;
+  if (!raw) throw new Error("ADMIN_KEYPAIR_JSON env var not set");
+  const bytes = JSON.parse(raw);
+  if (!Array.isArray(bytes) || bytes.length !== 64)
+    throw new Error("ADMIN_KEYPAIR_JSON must be a JSON array of 64 numbers");
+  const keypair = import_web3.Keypair.fromSecretKey(new Uint8Array(bytes));
+  const connection = new import_web3.Connection(SOLANA_RPC, "confirmed");
+  const programId = new import_web3.PublicKey(PROGRAM_ID_STR);
+  const configPda = new import_web3.PublicKey(CONFIG_PDA_STR);
+  const discriminator = await getDiscriminator2("dev_reset");
+  const ix = new import_web3.TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: configPda, isSigner: false, isWritable: true },
+      { pubkey: keypair.publicKey, isSigner: true, isWritable: false }
+    ],
+    data: discriminator
+  });
+  const tx = new import_web3.Transaction();
+  tx.feePayer = keypair.publicKey;
+  tx.add(ix);
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+  tx.sign(keypair);
+  const sig = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false });
+  await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
+  return sig;
+}
 var REAUTH_WINDOW_MINUTES = 15;
 var SOLANA_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 var adminLimiter = rate_limit_default({
@@ -83454,6 +83502,29 @@ router4.post("/admin/presale/withdraw", requireRecentAuth(REAUTH_WINDOW_MINUTES)
     note: "This is a record-keeping action. Execute the actual withdrawal via your Solana/EVM wallet."
   });
 });
+router4.post("/admin/presale/dev-reset", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    if (!process.env.ADMIN_KEYPAIR_JSON) {
+      res.status(503).json({
+        success: false,
+        message: "ADMIN_KEYPAIR_JSON is not configured \u2014 cannot send Solana transaction from server."
+      });
+      return;
+    }
+    auditLog(req, "presale.dev_reset");
+    const sig = await devResetOnChain();
+    logger.info({ sig }, "DEV_RESET: on-chain presale counters cleared");
+    res.json({
+      success: true,
+      message: "On-chain reset complete \u2014 all counters zeroed, back to stage 0.",
+      signature: sig
+    });
+  } catch (err) {
+    const msg = err.message ?? "Unknown error";
+    logger.error({ err }, "DEV_RESET: on-chain transaction failed");
+    res.status(500).json({ success: false, message: `Reset failed: ${msg}` });
+  }
+});
 router4.get("/admin/referrals", async (req, res) => {
   try {
     const page = Math.max(1, Number(req.query.page ?? 1) || 1);
@@ -83526,6 +83597,75 @@ router4.get("/admin/users", async (_req, res) => {
     res.json(users);
   } catch {
     res.status(500).json({ error: "Failed to fetch admin users" });
+  }
+});
+router4.delete("/admin/reset/purchases", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const result = await db.delete(purchases).returning({ id: purchases.id });
+    auditLog(req, "reset.purchases", { deleted: result.length });
+    logger.warn({ count: result.length }, "DANGER_ZONE: purchases table cleared");
+    res.json({ success: true, deleted: result.length, message: `Deleted ${result.length} purchases` });
+  } catch (err) {
+    logger.error({ err }, "reset/purchases error");
+    res.status(500).json({ error: "Failed to clear purchases" });
+  }
+});
+router4.delete("/admin/reset/visits", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const [v, w] = await Promise.all([
+      db.delete(pageVisits).returning({ id: pageVisits.id }),
+      db.delete(walletConnections).returning({ id: walletConnections.id })
+    ]);
+    auditLog(req, "reset.visits", { visits: v.length, wallets: w.length });
+    logger.warn({ visits: v.length, wallets: w.length }, "DANGER_ZONE: visits + wallets cleared");
+    res.json({ success: true, deleted: v.length + w.length, message: `Deleted ${v.length} visits and ${w.length} wallet connections` });
+  } catch (err) {
+    logger.error({ err }, "reset/visits error");
+    res.status(500).json({ error: "Failed to clear visits" });
+  }
+});
+router4.delete("/admin/reset/referrals", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const [refs, codes] = await Promise.all([
+      db.delete(referrals).returning({ id: referrals.id }),
+      db.delete(referralCodes).returning({ id: referralCodes.id })
+    ]);
+    auditLog(req, "reset.referrals", { referrals: refs.length, codes: codes.length });
+    logger.warn({ referrals: refs.length, codes: codes.length }, "DANGER_ZONE: referrals + codes cleared");
+    res.json({ success: true, deleted: refs.length + codes.length, message: `Deleted ${refs.length} referrals and ${codes.length} referral codes` });
+  } catch (err) {
+    logger.error({ err }, "reset/referrals error");
+    res.status(500).json({ error: "Failed to clear referrals" });
+  }
+});
+router4.delete("/admin/reset/all", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const [p, v, w, refs, codes] = await Promise.all([
+      db.delete(purchases).returning({ id: purchases.id }),
+      db.delete(pageVisits).returning({ id: pageVisits.id }),
+      db.delete(walletConnections).returning({ id: walletConnections.id }),
+      db.delete(referrals).returning({ id: referrals.id }),
+      db.delete(referralCodes).returning({ id: referralCodes.id })
+    ]);
+    const total = p.length + v.length + w.length + refs.length + codes.length;
+    auditLog(req, "reset.ALL", {
+      purchases: p.length,
+      visits: v.length,
+      wallets: w.length,
+      referrals: refs.length,
+      codes: codes.length,
+      total
+    });
+    logger.warn({ total }, "DANGER_ZONE: ALL tables cleared");
+    res.json({
+      success: true,
+      deleted: total,
+      breakdown: { purchases: p.length, visits: v.length, wallets: w.length, referrals: refs.length, codes: codes.length },
+      message: `Cleared all data \u2014 ${total} records deleted`
+    });
+  } catch (err) {
+    logger.error({ err }, "reset/all error");
+    res.status(500).json({ error: "Failed to clear all data" });
   }
 });
 var admin_default = router4;
@@ -83668,11 +83808,11 @@ var sessions_default = router5;
 
 // src/routes/tracker.ts
 var import_express6 = __toESM(require_express2(), 1);
-var import_web3 = __toESM(require_index_cjs(), 1);
+var import_web32 = __toESM(require_index_cjs(), 1);
 var router6 = (0, import_express6.Router)();
 var SOLANA_NETWORK = (process.env.SOLANA_NETWORK ?? "devnet").toLowerCase();
 var IS_PROD3 = process.env.NODE_ENV === "production";
-var SOLANA_RPC = process.env.SOLANA_RPC_URL || process.env.SOLANA_RPC || "https://api.devnet.solana.com";
+var SOLANA_RPC2 = process.env.SOLANA_RPC_URL || process.env.SOLANA_RPC || "https://api.devnet.solana.com";
 var PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
 var CONFIG_PDA = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
 var REQUIRE_ONCHAIN_VERIFICATION = process.env.REQUIRE_ONCHAIN_VERIFICATION !== void 0 ? process.env.REQUIRE_ONCHAIN_VERIFICATION !== "false" : SOLANA_NETWORK === "mainnet";
@@ -83682,13 +83822,25 @@ var MISMATCH_WARN_PCT = 0.15;
 var MISMATCH_BLOCK_PCT = 0.5;
 var REWARD_RATE = 5;
 logger.info(
-  { SOLANA_NETWORK, SOLANA_RPC, PRESALE_PROGRAM_ID, CONFIG_PDA, USDT_MINT, REQUIRE_ONCHAIN_VERIFICATION },
+  { SOLANA_NETWORK, SOLANA_RPC: SOLANA_RPC2, PRESALE_PROGRAM_ID, CONFIG_PDA, USDT_MINT, REQUIRE_ONCHAIN_VERIFICATION },
   "[TRACKER] Network configuration loaded"
 );
 var _connection = null;
 function getConnection() {
-  if (!_connection) _connection = new import_web3.Connection(SOLANA_RPC, "confirmed");
+  if (!_connection) _connection = new import_web32.Connection(SOLANA_RPC2, "confirmed");
   return _connection;
+}
+var GET_TX_TIMEOUT_MS = 9e3;
+async function getTransactionWithTimeout(txHash) {
+  return Promise.race([
+    getConnection().getTransaction(txHash, {
+      commitment: "confirmed",
+      maxSupportedTransactionVersion: 0
+    }),
+    new Promise(
+      (_, reject) => setTimeout(() => reject(new Error("TX_TIMEOUT")), GET_TX_TIMEOUT_MS)
+    )
+  ]);
 }
 var _solPriceCache = { price: 0, fetchedAt: 0 };
 var SOL_PRICE_TTL_MS = 2 * 60 * 1e3;
@@ -83748,7 +83900,7 @@ async function fetchStageTokenPriceUsd(stageIndex) {
         method: "getAccountInfo",
         params: [CONFIG_PDA, { encoding: "base64" }]
       });
-      const rpcRes = await fetch(SOLANA_RPC, {
+      const rpcRes = await fetch(SOLANA_RPC2, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body,
@@ -83827,18 +83979,28 @@ async function verifyTransaction(txHash, expectedWallet, stageIndex, network) {
     txHash: txHash.slice(0, 16) + "\u2026",
     wallet: expectedWallet.slice(0, 8) + "\u2026",
     network: SOLANA_NETWORK,
-    rpc: SOLANA_RPC
+    rpc: SOLANA_RPC2
   };
   logger.info(logCtx, `[TX_VERIFY] Checking tx on ${SOLANA_NETWORK}`);
   try {
-    const MAX_ATTEMPTS = 5;
-    const RETRY_DELAY_MS = 3e3;
+    const MAX_ATTEMPTS = 3;
+    const RETRY_DELAY_MS = 2e3;
     let tx = null;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      tx = await getConnection().getTransaction(txHash, {
-        commitment: "confirmed",
-        maxSupportedTransactionVersion: 0
-      });
+      try {
+        tx = await getTransactionWithTimeout(txHash);
+      } catch (attemptErr) {
+        const msg = attemptErr.message;
+        logger.warn(
+          { ...logCtx, attempt, err: msg },
+          `[TX_VERIFY] getTransaction error on attempt ${attempt}/${MAX_ATTEMPTS}: ${msg}`
+        );
+        if (attempt === MAX_ATTEMPTS) {
+          return { valid: false, isTimeout: true, reason: `Transaction fetch timed out after ${MAX_ATTEMPTS} attempts` };
+        }
+        await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+        continue;
+      }
       if (tx) {
         if (attempt > 1) {
           logger.info({ ...logCtx, attempt }, `[TX_VERIFY] Transaction found on attempt ${attempt}`);
@@ -84005,7 +84167,8 @@ router6.post("/track/visit", visitLimiter, async (req, res) => {
       referrer: referrer ? String(referrer).slice(0, 200) : void 0
     });
     res.json({ success: true });
-  } catch {
+  } catch (err) {
+    logger.error({ err }, "[TRACK_VISIT] Failed to insert page visit \u2014 DB error");
     res.json({ success: false });
   }
 });
@@ -84028,7 +84191,8 @@ router6.post("/track/wallet", walletLimiter, async (req, res) => {
       ip: getIp(req)
     });
     res.json({ success: true });
-  } catch {
+  } catch (err) {
+    logger.error({ err }, "[TRACK_WALLET] Failed to insert wallet connection \u2014 DB error");
     res.json({ success: false });
   }
 });
@@ -84109,51 +84273,73 @@ router6.post("/track/purchase", purchaseLimiter, async (req, res) => {
       const stageIndex = typeof stage === "number" && stage >= 0 && stage <= 3 ? stage : 0;
       const verifyResult = await verifyTransaction(txHash, walletAddress, stageIndex, network);
       if (!verifyResult.valid) {
-        logger.warn(
-          {
-            txHash: txHash.slice(0, 16) + "\u2026",
-            wallet: walletAddress.slice(0, 8) + "\u2026",
-            reason: verifyResult.reason,
-            ip,
-            security: true,
-            alertType: verifyResult.isTimeout ? "TX_VERIFICATION_TIMEOUT" : "TX_VERIFICATION_FAILED"
-          },
-          "[PURCHASE] Rejected: transaction verification failed"
-        );
-        res.status(verifyResult.isTimeout ? 504 : 400).json({ success: false, error: "Transaction verification failed", reason: verifyResult.reason });
-        return;
-      }
-      const oc = verifyResult.onChain;
-      if (oc.estimatedTokens === null) {
-        logger.warn(
-          { txHash: txHash.slice(0, 16) + "\u2026", wallet: walletAddress.slice(0, 8) + "\u2026", ip, security: true, alertType: "TOKEN_PRICING_UNAVAILABLE" },
-          "[PURCHASE] Rejected: token pricing unavailable"
-        );
-        res.status(503).json({ success: false, error: "Token pricing unavailable. Please retry." });
-        return;
-      }
-      acceptedUsd = oc.estimatedUsd;
-      acceptedTokens = oc.estimatedTokens;
-      verificationSource = "ONCHAIN_VERIFIED";
-      logAmountComparison("amountUsd", safeClientUsd, acceptedUsd, txHash);
-      logAmountComparison("amountTokens", safeClientTokens, acceptedTokens, txHash);
-      const pctUsd = acceptedUsd > 0 ? Math.abs(safeClientUsd - acceptedUsd) / acceptedUsd : 0;
-      if (pctUsd > MISMATCH_BLOCK_PCT) {
-        logger.warn(
-          {
-            txHash: txHash.slice(0, 16) + "\u2026",
-            wallet: walletAddress.slice(0, 8) + "\u2026",
-            clientUsd: safeClientUsd,
-            serverUsd: acceptedUsd,
-            discrepancyPct: (pctUsd * 100).toFixed(1) + "%",
-            ip,
-            security: true,
-            alertType: "AMOUNT_MANIPULATION_BLOCKED"
-          },
-          "[PURCHASE] Rejected: amount manipulation detected"
-        );
-        res.status(400).json({ success: false, error: "Amount manipulation detected" });
-        return;
+        if (verifyResult.isTimeout) {
+          logger.warn(
+            {
+              txHash: txHash.slice(0, 16) + "\u2026",
+              wallet: walletAddress.slice(0, 8) + "\u2026",
+              reason: verifyResult.reason,
+              clientUsd: safeClientUsd,
+              clientTokens: safeClientTokens,
+              ip,
+              security: true,
+              alertType: "TX_VERIFICATION_TIMEOUT_FALLBACK"
+            },
+            "[PURCHASE] On-chain verification timed out \u2014 saving with client amounts for audit"
+          );
+          acceptedUsd = safeClientUsd;
+          acceptedTokens = safeClientTokens;
+          verificationSource = "TIMEOUT_UNVERIFIED";
+        } else {
+          logger.warn(
+            {
+              txHash: txHash.slice(0, 16) + "\u2026",
+              wallet: walletAddress.slice(0, 8) + "\u2026",
+              reason: verifyResult.reason,
+              ip,
+              security: true,
+              alertType: "TX_VERIFICATION_FAILED"
+            },
+            "[PURCHASE] Rejected: transaction verification failed"
+          );
+          res.status(400).json({ success: false, error: "Transaction verification failed", reason: verifyResult.reason });
+          return;
+        }
+      } else {
+        const oc = verifyResult.onChain;
+        if (oc.estimatedTokens === null) {
+          logger.warn(
+            { txHash: txHash.slice(0, 16) + "\u2026", wallet: walletAddress.slice(0, 8) + "\u2026", ip, alertType: "TOKEN_PRICING_UNAVAILABLE_FALLBACK" },
+            "[PURCHASE] Token pricing unavailable \u2014 saving with client amounts"
+          );
+          acceptedUsd = safeClientUsd;
+          acceptedTokens = safeClientTokens;
+          verificationSource = "ONCHAIN_VERIFIED_NO_PRICE";
+        } else {
+          acceptedUsd = oc.estimatedUsd;
+          acceptedTokens = oc.estimatedTokens;
+          verificationSource = "ONCHAIN_VERIFIED";
+          logAmountComparison("amountUsd", safeClientUsd, acceptedUsd, txHash);
+          logAmountComparison("amountTokens", safeClientTokens, acceptedTokens, txHash);
+          const pctUsd = acceptedUsd > 0 ? Math.abs(safeClientUsd - acceptedUsd) / acceptedUsd : 0;
+          if (pctUsd > MISMATCH_BLOCK_PCT) {
+            logger.warn(
+              {
+                txHash: txHash.slice(0, 16) + "\u2026",
+                wallet: walletAddress.slice(0, 8) + "\u2026",
+                clientUsd: safeClientUsd,
+                serverUsd: acceptedUsd,
+                discrepancyPct: (pctUsd * 100).toFixed(1) + "%",
+                ip,
+                security: true,
+                alertType: "AMOUNT_MANIPULATION_BLOCKED"
+              },
+              "[PURCHASE] Rejected: amount manipulation detected"
+            );
+            res.status(400).json({ success: false, error: "Amount manipulation detected" });
+            return;
+          }
+        }
       }
     }
     const safeWalletType = ALLOWED_WALLET_TYPES.has((walletType ?? "").toLowerCase()) ? (walletType ?? "unknown").toLowerCase() : "unknown";
@@ -84166,7 +84352,7 @@ router6.post("/track/purchase", purchaseLimiter, async (req, res) => {
       txHash,
       stage: typeof stage === "number" ? stage : null,
       referralCode: referralCode ? String(referralCode).trim().slice(0, 16) : null,
-      verificationStatus: verificationSource === "ONCHAIN_VERIFIED" ? "VERIFIED" : "UNVERIFIED",
+      verificationStatus: verificationSource === "ONCHAIN_VERIFIED" ? "VERIFIED" : verificationSource === "TIMEOUT_UNVERIFIED" ? "TIMEOUT_UNVERIFIED" : "UNVERIFIED",
       verificationSource,
       ip: ip ?? null
     }).returning({ id: purchases.id });
@@ -84629,12 +84815,18 @@ var referral_default = router7;
 // src/routes/rpc-proxy.ts
 var import_express8 = __toESM(require_express2(), 1);
 var router8 = (0, import_express8.Router)();
-var SOLANA_RPC2 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
+var SOLANA_RPC3 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 var IS_PROD4 = process.env.NODE_ENV === "production";
 var ALLOWED_ORIGINS_EXACT2 = [
   "https://pwifecoin.fun",
   "https://www.pwifecoin.fun",
-  ...IS_PROD4 ? [] : ["http://localhost:22793", "http://localhost:3000", "http://localhost:3001"],
+  ...IS_PROD4 ? [] : [
+    "http://localhost",
+    "http://localhost:80",
+    "http://localhost:22793",
+    "http://localhost:3000",
+    "http://localhost:3001"
+  ],
   ...process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []
 ];
 var VERCEL_PREVIEW_DOMAIN2 = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
@@ -84717,7 +84909,7 @@ router8.post("/rpc", rpcLimiter, async (req, res) => {
       await runLimiter(txLimiter, req, res);
       if (res.headersSent) return;
     }
-    const response = await fetch(SOLANA_RPC2, {
+    const response = await fetch(SOLANA_RPC3, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
@@ -84732,7 +84924,7 @@ var rpc_proxy_default = router8;
 
 // src/routes/sol-price-sync.ts
 var import_express9 = __toESM(require_express2(), 1);
-var import_web32 = __toESM(require_index_cjs(), 1);
+var import_web33 = __toESM(require_index_cjs(), 1);
 var router9 = (0, import_express9.Router)();
 var CRON_SECRET = process.env.CRON_SECRET ?? null;
 var IS_PROD5 = process.env.NODE_ENV === "production";
@@ -84752,10 +84944,10 @@ function isCronAuthorized(req) {
   const auth = req.headers["authorization"] ?? "";
   return auth === `Bearer ${CRON_SECRET}`;
 }
-var PROGRAM_ID = new import_web32.PublicKey("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
-var CONFIG_PDA2 = new import_web32.PublicKey("BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi");
-var SOLANA_RPC3 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
-async function getDiscriminator2(name) {
+var PROGRAM_ID = new import_web33.PublicKey("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
+var CONFIG_PDA2 = new import_web33.PublicKey("BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi");
+var SOLANA_RPC4 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
+async function getDiscriminator3(name) {
   const encoder = new TextEncoder();
   const data = encoder.encode(`global:${name}`);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
@@ -84778,13 +84970,13 @@ async function syncSolPriceOnChain(priceUsd) {
   const bytes = JSON.parse(raw);
   if (!Array.isArray(bytes) || bytes.length !== 64)
     throw new Error("ADMIN_KEYPAIR_JSON must be a JSON array of 64 numbers");
-  const keypair = import_web32.Keypair.fromSecretKey(new Uint8Array(bytes));
-  const connection = new import_web32.Connection(SOLANA_RPC3, "confirmed");
-  const discriminator = await getDiscriminator2("update_sol_price");
+  const keypair = import_web33.Keypair.fromSecretKey(new Uint8Array(bytes));
+  const connection = new import_web33.Connection(SOLANA_RPC4, "confirmed");
+  const discriminator = await getDiscriminator3("update_sol_price");
   const priceE6 = BigInt(Math.round(priceUsd * 1e6));
   const argsBuf = Buffer.alloc(8);
   argsBuf.writeBigUInt64LE(priceE6, 0);
-  const ix = new import_web32.TransactionInstruction({
+  const ix = new import_web33.TransactionInstruction({
     programId: PROGRAM_ID,
     keys: [
       { pubkey: CONFIG_PDA2, isSigner: false, isWritable: true },
@@ -84792,7 +84984,7 @@ async function syncSolPriceOnChain(priceUsd) {
     ],
     data: Buffer.concat([discriminator, argsBuf])
   });
-  const tx = new import_web32.Transaction();
+  const tx = new import_web33.Transaction();
   tx.feePayer = keypair.publicKey;
   tx.add(ix);
   const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
@@ -84850,7 +85042,7 @@ var chainLimiter = rate_limit_default({
   legacyHeaders: false,
   message: { error: "Too many requests" }
 });
-var SOLANA_RPC4 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
+var SOLANA_RPC5 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 var CONFIG_PDA3 = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
 var solPriceCache = { price: 0, fetchedAt: 0 };
 var chainStateCache = null;
@@ -84886,7 +85078,7 @@ async function fetchPresaleChainState() {
     method: "getAccountInfo",
     params: [CONFIG_PDA3, { encoding: "base64" }]
   });
-  const rpcRes = await fetch(SOLANA_RPC4, {
+  const rpcRes = await fetch(SOLANA_RPC5, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body,
@@ -84999,6 +85191,24 @@ router11.use(sol_price_sync_default);
 var routes_default = router11;
 
 // src/app.ts
+(async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS admin_users (
+        id         SERIAL PRIMARY KEY,
+        google_id  TEXT   UNIQUE NOT NULL,
+        email      TEXT   UNIQUE NOT NULL,
+        name       TEXT,
+        avatar     TEXT,
+        last_login TIMESTAMPTZ DEFAULT NOW(),
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    logger.info("STARTUP: admin_users table ready");
+  } catch (err) {
+    logger.error({ err }, "STARTUP: failed to ensure admin_users table");
+  }
+})();
 var pinoHttpMiddleware = import_pino_http.default;
 var ConnectPgSimple = (0, import_connect_pg_simple.default)(import_express_session.default);
 var IS_PROD7 = process.env.NODE_ENV === "production";
@@ -85006,17 +85216,22 @@ if (IS_PROD7 && !process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET environment variable is required in production");
 }
 var SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-production";
+var REPLIT_DEV_DOMAIN2 = process.env.REPLIT_DEV_DOMAIN ?? null;
+var REPLIT_DOMAINS = process.env.REPLIT_DOMAINS ?? null;
 var ALLOWED_ORIGINS_EXACT3 = [
   "https://pwifecoin.fun",
   "https://www.pwifecoin.fun",
   ...IS_PROD7 ? [] : ["http://localhost:22793", "http://localhost:3000"],
-  ...process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []
+  ...process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [],
+  ...REPLIT_DEV_DOMAIN2 ? [`https://${REPLIT_DEV_DOMAIN2}`] : []
 ];
 var VERCEL_PREVIEW_DOMAIN3 = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
 var isOriginAllowed3 = (origin) => {
   if (ALLOWED_ORIGINS_EXACT3.includes(origin)) return true;
   if (VERCEL_PREVIEW_DOMAIN3 && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN3}`)) return true;
   if (VERCEL_PREVIEW_DOMAIN3 && origin === `https://${VERCEL_PREVIEW_DOMAIN3}`) return true;
+  if (REPLIT_DEV_DOMAIN2 && origin.endsWith(`.${REPLIT_DEV_DOMAIN2}`)) return true;
+  if (REPLIT_DOMAINS && origin.endsWith(`.${REPLIT_DOMAINS}`)) return true;
   return false;
 };
 var REQUIRED_PROD_VARS = IS_PROD7 ? ["SESSION_SECRET"] : [];

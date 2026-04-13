@@ -99,7 +99,11 @@ passport.deserializeUser(async (id: number, done) => {
     const [user] = await db.select().from(adminUsers).where(eq(adminUsers.id, id)).limit(1);
     done(null, user ?? null);
   } catch (err) {
-    done(err);
+    logger.error(
+      { err, message: (err as Error).message, userId: id },
+      "AUTH: deserializeUser DB error — treating session as invalid",
+    );
+    done(null, null);
   }
 });
 
