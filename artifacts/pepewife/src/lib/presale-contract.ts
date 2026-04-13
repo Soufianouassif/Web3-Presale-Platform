@@ -634,20 +634,32 @@ export async function advanceStageWithKeypair(
 ): Promise<{ signature: string }> {
   const keypair       = Keypair.fromSecretKey(new Uint8Array(keypairBytes));
   const admin         = keypair.publicKey;
-  const discriminator = await getDiscriminator("advance_stage");
 
-  const ix = new TransactionInstruction({
+  const advanceDiscriminator = await getDiscriminator("advance_stage");
+  const resumeDiscriminator  = await getDiscriminator("resume");
+
+  const advanceIx = new TransactionInstruction({
     programId: PROGRAM_ID,
     keys: [
       { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
       { pubkey: admin,      isSigner: true,  isWritable: false },
     ],
-    data: discriminator,
+    data: advanceDiscriminator,
+  });
+
+  const resumeIx = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: admin,      isSigner: true,  isWritable: false },
+    ],
+    data: resumeDiscriminator,
   });
 
   const tx = new Transaction();
   tx.feePayer = admin;
-  tx.add(ix);
+  tx.add(advanceIx);
+  tx.add(resumeIx);
 
   const { blockhash, lastValidBlockHeight } =
     await connection.getLatestBlockhash("confirmed");
