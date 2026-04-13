@@ -13,10 +13,14 @@ if (!dbUrl) {
 }
 
 const needsSsl = process.env.NODE_ENV === "production" || dbUrl.includes("neon.tech");
+const rejectUnauthorized =
+  process.env.PG_SSL_REJECT_UNAUTHORIZED !== undefined
+    ? process.env.PG_SSL_REJECT_UNAUTHORIZED === "true"
+    : false;
 
 export const pool = new Pool({
   connectionString: dbUrl,
-  ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
+  ssl: needsSsl ? { rejectUnauthorized } : undefined,
 });
 export const db = drizzle(pool, { schema });
 

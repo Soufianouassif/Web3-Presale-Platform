@@ -3,12 +3,13 @@ import rateLimit from "express-rate-limit";
 import { Connection } from "@solana/web3.js";
 import { db, pool } from "@workspace/db";
 import { pageVisits, walletConnections, purchases, referralCodes, referrals } from "@workspace/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
 
 const router = Router();
 
 const SOLANA_NETWORK    = (process.env.SOLANA_NETWORK ?? "devnet").toLowerCase();
+const IS_PROD = process.env.NODE_ENV === "production";
 const SOLANA_RPC        = process.env.SOLANA_RPC_URL || process.env.SOLANA_RPC || "https://api.devnet.solana.com";
 const PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
 const CONFIG_PDA         = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
@@ -70,17 +71,32 @@ async function fetchSolPriceUsd(): Promise<number> {
     return _solPriceCache.price;
   }
 
-  // last resort fallback if cache is also empty
-  logger.warn(
-    { security: true, source: "FALLBACK_$150" },
-    "[SOL_PRICE] CoinGecko unreachable and cache empty — using $150 fallback",
-  );
-  return 150;
+  const chain = await fetchSolPriceUsdFromChain();
+  if (chain && chain > 0) {
+    logger.warn({ chainPrice: chain }, "[SOL_PRICE] Using on-chain cached price");
+    _solPriceCache = { price: chain, fetchedAt: now };
+    return chain;
+  }
+
+  throw new Error("SOL price unavailable");
 }
 
 // token price from on-chain presale config PDA (30s cache)
-let _chainStateCache: { tokensPerRawUsdtScaled: bigint[]; fetchedAt: number } | null = null;
+let _chainStateCache: { tokensPerRawUsdtScaled: bigint[]; solPriceUsdE6: bigint; fetchedAt: number } | null = null;
 const CHAIN_STATE_TTL_MS = 30_000;
+
+async function fetchSolPriceUsdFromChain(): Promise<number | null> {
+  const now = Date.now();
+  if (_chainStateCache && now - _chainStateCache.fetchedAt < CHAIN_STATE_TTL_MS) {
+    const price = Number(_chainStateCache.solPriceUsdE6) / 1_000_000;
+    return price > 0 ? price : null;
+  }
+  const ok = await fetchStageTokenPriceUsd(0);
+  if (ok === null) return null;
+  if (!_chainStateCache) return null;
+  const price = Number(_chainStateCache.solPriceUsdE6) / 1_000_000;
+  return price > 0 ? price : null;
+}
 
 async function fetchStageTokenPriceUsd(stageIndex: number): Promise<number | null> {
   const now = Date.now();
@@ -115,7 +131,8 @@ async function fetchStageTokenPriceUsd(stageIndex: number): Promise<number | nul
       readPk(); readPk(); readPk(); readPk();
       readU8(); readBool(); readBool();
       readI64(); readI64(); readI64();
-      readU64(); readU64(); readU64(); readU64(); readU64();
+      readU64(); readU64(); readU64(); readU64();
+      const solPriceUsdE6 = readU64();
 
       const tokensPerRawUsdtScaled: bigint[] = [];
       for (let i = 0; i < 4; i++) {
@@ -124,7 +141,7 @@ async function fetchStageTokenPriceUsd(stageIndex: number): Promise<number | nul
         readU64();
       }
 
-      _chainStateCache = { tokensPerRawUsdtScaled, fetchedAt: now };
+      _chainStateCache = { tokensPerRawUsdtScaled, solPriceUsdE6, fetchedAt: now };
       logger.info(
         { stageIndex, tokensPerRawUsdtScaled: tokensPerRawUsdtScaled.map(String), SOLANA_NETWORK },
         "[CHAIN_STATE] Presale config PDA fetched successfully",
@@ -500,77 +517,74 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
     let acceptedTokens: number;
     let verificationSource: string;
 
+    const allowUnverified = !IS_PROD && process.env.ALLOW_UNVERIFIED_PURCHASES === "true";
     if (!REQUIRE_ONCHAIN_VERIFICATION) {
-      // CI/test mode only — not for production
-      acceptedUsd    = safeClientUsd;
-      acceptedTokens = safeClientTokens;
-      verificationSource = "CLIENT_UNVERIFIED_CI_ONLY";
+      if (!allowUnverified) {
+        logger.warn(
+          { wallet: walletAddress.slice(0, 8) + "…", txHash: txHash.slice(0, 16) + "…", ip, security: true, alertType: "VERIFICATION_DISABLED" },
+          "[PURCHASE] Rejected: on-chain verification disabled",
+        );
+        res.status(503).json({ success: false, error: "On-chain verification is disabled" });
+        return;
+      }
 
-      logger.warn(
-        {
-          wallet: walletAddress.slice(0, 8) + "…",
-          txHash: txHash.slice(0, 16) + "…",
-          safeClientUsd,
-          safeClientTokens,
-          REQUIRE_ONCHAIN_VERIFICATION,
-          security: true,
-          alertType: "CI_UNVERIFIED_PURCHASE",
-        },
-        "[PURCHASE] ⚠ ONCHAIN VERIFICATION DISABLED — accepting client values (CI/test only)",
-      );
+      acceptedUsd = safeClientUsd;
+      acceptedTokens = safeClientTokens;
+      verificationSource = "CLIENT_UNVERIFIED_DEV_ONLY";
     } else {
       const stageIndex = typeof stage === "number" && stage >= 0 && stage <= 3 ? stage : 0;
       const verifyResult = await verifyTransaction(txHash, walletAddress, stageIndex, network);
 
       if (!verifyResult.valid) {
-        if (verifyResult.isTimeout) {
-          logger.warn(
-            { txHash: txHash.slice(0, 16) + "…", wallet: walletAddress.slice(0, 8) + "…", reason: verifyResult.reason, ip },
-            "[PURCHASE] Verification timeout — storing with timeout flag",
-          );
-          acceptedUsd    = safeClientUsd;
-          acceptedTokens = safeClientTokens;
-          verificationSource = "CLIENT_TIMEOUT_FALLBACK";
-        } else {
-          logger.warn(
-            {
-              txHash: txHash.slice(0, 16) + "…",
-              wallet: walletAddress.slice(0, 8) + "…",
-              reason: verifyResult.reason,
-              ip,
-              security: true,
-              alertType: "TX_VERIFICATION_FAILED",
-            },
-            "[PURCHASE] Rejected: transaction verification FAILED",
-          );
-          res.status(400).json({ error: `Transaction verification failed: ${verifyResult.reason}` }); return;
-        }
-      } else {
-        const oc = verifyResult.onChain!;
-        acceptedUsd    = oc.estimatedUsd;
-        acceptedTokens = oc.estimatedTokens ?? safeClientTokens;
-        verificationSource = "ONCHAIN_VERIFIED";
+        logger.warn(
+          {
+            txHash: txHash.slice(0, 16) + "…",
+            wallet: walletAddress.slice(0, 8) + "…",
+            reason: verifyResult.reason,
+            ip,
+            security: true,
+            alertType: verifyResult.isTimeout ? "TX_VERIFICATION_TIMEOUT" : "TX_VERIFICATION_FAILED",
+          },
+          "[PURCHASE] Rejected: transaction verification failed",
+        );
+        res.status(verifyResult.isTimeout ? 504 : 400).json({ success: false, error: "Transaction verification failed", reason: verifyResult.reason });
+        return;
+      }
 
-        logAmountComparison("amountUsd",    safeClientUsd,    acceptedUsd,    txHash);
-        logAmountComparison("amountTokens", safeClientTokens, acceptedTokens, txHash);
+      const oc = verifyResult.onChain!;
+      if (oc.estimatedTokens === null) {
+        logger.warn(
+          { txHash: txHash.slice(0, 16) + "…", wallet: walletAddress.slice(0, 8) + "…", ip, security: true, alertType: "TOKEN_PRICING_UNAVAILABLE" },
+          "[PURCHASE] Rejected: token pricing unavailable",
+        );
+        res.status(503).json({ success: false, error: "Token pricing unavailable. Please retry." });
+        return;
+      }
 
-        const pctUsd = acceptedUsd > 0 ? Math.abs(safeClientUsd - acceptedUsd) / acceptedUsd : 0;
-        if (pctUsd > MISMATCH_BLOCK_PCT) {
-          logger.warn(
-            {
-              txHash: txHash.slice(0, 16) + "…",
-              wallet: walletAddress.slice(0, 8) + "…",
-              clientUsd: safeClientUsd,
-              serverUsd: acceptedUsd,
-              discrepancyPct: (pctUsd * 100).toFixed(1) + "%",
-              ip,
-              security: true,
-              alertType: "AMOUNT_MANIPULATION_BLOCKED",
-            },
-            "[PURCHASE] Rejected: amount manipulation detected",
-          );
-          res.status(400).json({ error: "Amount manipulation detected" }); return;
-        }
+      acceptedUsd = oc.estimatedUsd;
+      acceptedTokens = oc.estimatedTokens;
+      verificationSource = "ONCHAIN_VERIFIED";
+
+      logAmountComparison("amountUsd",    safeClientUsd,    acceptedUsd,    txHash);
+      logAmountComparison("amountTokens", safeClientTokens, acceptedTokens, txHash);
+
+      const pctUsd = acceptedUsd > 0 ? Math.abs(safeClientUsd - acceptedUsd) / acceptedUsd : 0;
+      if (pctUsd > MISMATCH_BLOCK_PCT) {
+        logger.warn(
+          {
+            txHash: txHash.slice(0, 16) + "…",
+            wallet: walletAddress.slice(0, 8) + "…",
+            clientUsd: safeClientUsd,
+            serverUsd: acceptedUsd,
+            discrepancyPct: (pctUsd * 100).toFixed(1) + "%",
+            ip,
+            security: true,
+            alertType: "AMOUNT_MANIPULATION_BLOCKED",
+          },
+          "[PURCHASE] Rejected: amount manipulation detected",
+        );
+        res.status(400).json({ success: false, error: "Amount manipulation detected" });
+        return;
       }
     }
 
@@ -585,9 +599,10 @@ router.post("/track/purchase", purchaseLimiter, async (req: Request, res: Respon
       amountTokens:  String(acceptedTokens),
       txHash,
       stage:         typeof stage === "number" ? stage : null,
-      referralCode:  referralCode ? String(referralCode).slice(0, 16) : null,
+      referralCode:  referralCode ? String(referralCode).trim().slice(0, 16) : null,
+      verificationStatus: verificationSource === "ONCHAIN_VERIFIED" ? "VERIFIED" : "UNVERIFIED",
       verificationSource,
-      ip,
+      ip: ip ?? null,
     }).returning({ id: purchases.id });
 
     logger.info(
@@ -712,6 +727,94 @@ router.get("/track/recent", async (_req: Request, res: Response) => {
   } catch (err) {
     logger.error({ err }, "[RECENT] Failed to fetch recent purchases");
     res.status(500).json({ error: "Failed to fetch recent purchases" });
+  }
+});
+
+router.get("/my-purchases/:wallet", async (req: Request, res: Response) => {
+  try {
+    const wallet = String(req.params.wallet ?? "").trim();
+    if (!SOLANA_ADDRESS_RE.test(wallet)) {
+      res.status(400).json({ purchases: [] });
+      return;
+    }
+
+    const rows = await db
+      .select({
+        id: purchases.id,
+        network: purchases.network,
+        amountUsd: purchases.amountUsd,
+        amountTokens: purchases.amountTokens,
+        txHash: purchases.txHash,
+        stage: purchases.stage,
+        createdAt: purchases.createdAt,
+      })
+      .from(purchases)
+      .where(eq(purchases.walletAddress, wallet))
+      .orderBy(desc(purchases.createdAt))
+      .limit(200);
+
+    res.json({
+      purchases: rows.map((r) => ({
+        id: r.id,
+        network: r.network,
+        amountUsd: r.amountUsd,
+        amountTokens: r.amountTokens,
+        txHash: r.txHash ?? null,
+        stage: r.stage ?? 1,
+        createdAt: (r.createdAt ?? new Date(0)).toISOString(),
+      })),
+    });
+  } catch (err) {
+    logger.error({ err }, "[MY_PURCHASES] Failed to fetch purchases");
+    res.status(500).json({ purchases: [] });
+  }
+});
+
+router.get("/activity", async (req: Request, res: Response) => {
+  try {
+    const offset = Math.max(0, Number(req.query.offset ?? 0) || 0);
+    const limit = 25;
+
+    const [{ total }] = await db
+      .select({ total: sql<number>`count(*)` })
+      .from(purchases);
+
+    const rows = await db
+      .select({
+        id: purchases.id,
+        wallet: purchases.walletAddress,
+        network: purchases.network,
+        amountUsd: purchases.amountUsd,
+        amountTokens: purchases.amountTokens,
+        txHash: purchases.txHash,
+        stage: purchases.stage,
+        createdAt: purchases.createdAt,
+      })
+      .from(purchases)
+      .orderBy(desc(purchases.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    const totalNum = Number(total ?? 0);
+
+    res.json({
+      activity: rows.map((r) => ({
+        id: r.id,
+        wallet: r.wallet.slice(0, 4) + "…" + r.wallet.slice(-4),
+        network: r.network,
+        amountUsd: r.amountUsd,
+        amountTokens: r.amountTokens,
+        txHash: r.txHash ?? null,
+        stage: r.stage ?? 1,
+        createdAt: (r.createdAt ?? new Date(0)).toISOString(),
+      })),
+      total: totalNum,
+      offset,
+      hasMore: offset + rows.length < totalNum,
+    });
+  } catch (err) {
+    logger.error({ err }, "[ACTIVITY] Failed to fetch activity");
+    res.json({ activity: [], total: 0, offset: 0, hasMore: false });
   }
 });
 

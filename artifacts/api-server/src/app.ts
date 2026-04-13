@@ -142,7 +142,7 @@ app.use("/api", router);
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   const status = (err as { status?: number }).status ?? 500;
-  const message = err.message ?? "Internal Server Error";
+  const message = IS_PROD ? "Internal Server Error" : (err.message ?? "Internal Server Error");
   logger.error({ err }, "Unhandled error");
   res.status(status).json({ error: message, stack: IS_PROD ? undefined : err.stack });
 });

@@ -82837,8 +82837,22 @@ var SUSPICIOUS_REAUTH_MINUTES = 10;
 var MAX_IP_CHANGES_BEFORE_KILL = 5;
 var MAX_UA_CHANGES_BEFORE_KILL = 2;
 var MAX_IP_HISTORY_SIZE = 10;
+var IS_PROD9 = process.env.NODE_ENV === "production";
+var ALLOWED_ORIGINS_EXACT3 = [
+  "https://pwifecoin.fun",
+  "https://www.pwifecoin.fun",
+  ...IS_PROD9 ? [] : ["http://localhost:22793", "http://localhost:3000"],
+  ...process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []
+];
+var VERCEL_PREVIEW_DOMAIN3 = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
+function isOriginAllowed3(origin) {
+  if (ALLOWED_ORIGINS_EXACT3.includes(origin)) return true;
+  if (VERCEL_PREVIEW_DOMAIN3 && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN3}`)) return true;
+  if (VERCEL_PREVIEW_DOMAIN3 && origin === `https://${VERCEL_PREVIEW_DOMAIN3}`) return true;
+  return false;
+}
 function getClientIp(req) {
-  return req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? req.socket?.remoteAddress ?? "unknown";
+  return req.ip ?? req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ?? req.socket?.remoteAddress ?? "unknown";
 }
 function normalizeUa(req) {
   return (req.headers["user-agent"] ?? "unknown").slice(0, 300);
@@ -82941,6 +82955,15 @@ function analyzeSessionBinding(req, res, ip, ua) {
 function requireAdminAuth(req, res, next) {
   if (!req.path.startsWith("/admin")) {
     return next();
+  }
+  const isStateChanging = req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS";
+  if (isStateChanging) {
+    const origin = req.headers.origin;
+    if (!origin || typeof origin !== "string" || !isOriginAllowed3(origin)) {
+      logger.warn({ origin, path: req.path, ip: getClientIp(req) }, "ADMIN_ACCESS_DENIED: origin not allowed");
+      res.status(403).json({ error: "Forbidden", code: "ORIGIN_NOT_ALLOWED" });
+      return;
+    }
   }
   const ip = getClientIp(req);
   const ua = normalizeUa(req);
@@ -83051,6 +83074,9 @@ var authLimiter = rate_limit_default({
   legacyHeaders: false,
   message: { error: "Too many auth requests. Please try again later." }
 });
+if (IS_PROD && ADMIN_EMAILS.length === 0) {
+  throw new Error("ADMIN_EMAILS must be set in production");
+}
 if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
   import_passport.default.use(
     new import_passport_google_oauth20.Strategy(
@@ -83106,7 +83132,7 @@ router3.get("/auth/google", authLimiter, (req, res, next) => {
     return;
   }
   logger.info({ ip: getClientIp(req) }, "AUTH_GOOGLE: OAuth flow initiated");
-  import_passport.default.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
+  import_passport.default.authenticate("google", { scope: ["profile", "email"], state: true })(req, res, next);
 });
 router3.get(
   "/auth/google/callback",
@@ -83685,11 +83711,7 @@ async function fetchSolPriceUsd() {
     logger.warn({ cachedPrice: _solPriceCache.price }, "[SOL_PRICE] CoinGecko unreachable \u2014 using cached price");
     return _solPriceCache.price;
   }
-  logger.warn(
-    { security: true, source: "FALLBACK_$150" },
-    "[SOL_PRICE] CoinGecko unreachable and cache empty \u2014 using $150 fallback"
-  );
-  return 150;
+  throw new Error("SOL price unavailable");
 }
 var _chainStateCache = null;
 var CHAIN_STATE_TTL_MS = 3e4;
@@ -84053,52 +84075,47 @@ router6.post("/track/purchase", purchaseLimiter, async (req, res) => {
     let acceptedTokens;
     let verificationSource;
     if (!REQUIRE_ONCHAIN_VERIFICATION) {
+      const allowUnverified = process.env.NODE_ENV !== "production" && process.env.ALLOW_UNVERIFIED_PURCHASES === "true";
+      if (!allowUnverified) {
+        logger.warn(
+          { wallet: walletAddress.slice(0, 8) + "\u2026", txHash: txHash.slice(0, 16) + "\u2026", ip, security: true, alertType: "VERIFICATION_DISABLED" },
+          "[PURCHASE] Rejected: on-chain verification disabled"
+        );
+        res.status(503).json({ success: false, error: "On-chain verification is disabled" });
+        return;
+      }
       acceptedUsd = safeClientUsd;
       acceptedTokens = safeClientTokens;
-      verificationSource = "CLIENT_UNVERIFIED_CI_ONLY";
-      logger.warn(
-        {
-          wallet: walletAddress.slice(0, 8) + "\u2026",
-          txHash: txHash.slice(0, 16) + "\u2026",
-          safeClientUsd,
-          safeClientTokens,
-          REQUIRE_ONCHAIN_VERIFICATION,
-          security: true,
-          alertType: "CI_UNVERIFIED_PURCHASE"
-        },
-        "[PURCHASE] \u26A0 ONCHAIN VERIFICATION DISABLED \u2014 accepting client values (CI/test only)"
-      );
+      verificationSource = "CLIENT_UNVERIFIED_DEV_ONLY";
     } else {
       const stageIndex = typeof stage === "number" && stage >= 0 && stage <= 3 ? stage : 0;
       const verifyResult = await verifyTransaction(txHash, walletAddress, stageIndex, network);
       if (!verifyResult.valid) {
-        if (verifyResult.isTimeout) {
-          logger.warn(
-            { txHash: txHash.slice(0, 16) + "\u2026", wallet: walletAddress.slice(0, 8) + "\u2026", reason: verifyResult.reason, ip },
-            "[PURCHASE] Verification timeout \u2014 storing with timeout flag"
-          );
-          acceptedUsd = safeClientUsd;
-          acceptedTokens = safeClientTokens;
-          verificationSource = "CLIENT_TIMEOUT_FALLBACK";
-        } else {
-          logger.warn(
-            {
-              txHash: txHash.slice(0, 16) + "\u2026",
-              wallet: walletAddress.slice(0, 8) + "\u2026",
-              reason: verifyResult.reason,
-              ip,
-              security: true,
-              alertType: "TX_VERIFICATION_FAILED"
-            },
-            "[PURCHASE] Rejected: transaction verification FAILED"
-          );
-          res.status(400).json({ error: `Transaction verification failed: ${verifyResult.reason}` });
-          return;
-        }
+        logger.warn(
+          {
+            txHash: txHash.slice(0, 16) + "\u2026",
+            wallet: walletAddress.slice(0, 8) + "\u2026",
+            reason: verifyResult.reason,
+            ip,
+            security: true,
+            alertType: verifyResult.isTimeout ? "TX_VERIFICATION_TIMEOUT" : "TX_VERIFICATION_FAILED"
+          },
+          "[PURCHASE] Rejected: transaction verification failed"
+        );
+        res.status(verifyResult.isTimeout ? 504 : 400).json({ success: false, error: "Transaction verification failed", reason: verifyResult.reason });
+        return;
       } else {
         const oc = verifyResult.onChain;
         acceptedUsd = oc.estimatedUsd;
-        acceptedTokens = oc.estimatedTokens ?? safeClientTokens;
+        if (oc.estimatedTokens === null) {
+          logger.warn(
+            { txHash: txHash.slice(0, 16) + "\u2026", wallet: walletAddress.slice(0, 8) + "\u2026", ip, security: true, alertType: "TOKEN_PRICING_UNAVAILABLE" },
+            "[PURCHASE] Rejected: token pricing unavailable"
+          );
+          res.status(503).json({ success: false, error: "Token pricing unavailable. Please retry." });
+          return;
+        }
+        acceptedTokens = oc.estimatedTokens;
         verificationSource = "ONCHAIN_VERIFIED";
         logAmountComparison("amountUsd", safeClientUsd, acceptedUsd, txHash);
         logAmountComparison("amountTokens", safeClientTokens, acceptedTokens, txHash);
@@ -84117,7 +84134,7 @@ router6.post("/track/purchase", purchaseLimiter, async (req, res) => {
             },
             "[PURCHASE] Rejected: amount manipulation detected"
           );
-          res.status(400).json({ error: "Amount manipulation detected" });
+          res.status(400).json({ success: false, error: "Amount manipulation detected" });
           return;
         }
       }
@@ -84131,7 +84148,7 @@ router6.post("/track/purchase", purchaseLimiter, async (req, res) => {
       amountTokens: String(acceptedTokens),
       txHash,
       stage: typeof stage === "number" ? stage : null,
-      referralCode: referralCode ? String(referralCode).slice(0, 16) : null,
+      referralCode: referralCode ? String(referralCode).trim().slice(0, 16) : null,
       verificationSource,
       ip
     }).returning({ id: purchases.id });
@@ -84236,6 +84253,74 @@ router6.get("/track/recent", async (_req, res) => {
     res.status(500).json({ error: "Failed to fetch recent purchases" });
   }
 });
+router6.get("/my-purchases/:wallet", async (req, res) => {
+  try {
+    const wallet = String(req.params.wallet ?? "").trim();
+    if (!SOLANA_ADDRESS_RE2.test(wallet)) {
+      res.status(400).json({ purchases: [] });
+      return;
+    }
+    const rows = await db.select({
+      id: purchases.id,
+      network: purchases.network,
+      amountUsd: purchases.amountUsd,
+      amountTokens: purchases.amountTokens,
+      txHash: purchases.txHash,
+      stage: purchases.stage,
+      createdAt: purchases.createdAt
+    }).from(purchases).where(eq(purchases.walletAddress, wallet)).orderBy(desc(purchases.createdAt)).limit(200);
+    res.json({
+      purchases: rows.map((r) => ({
+        id: r.id,
+        network: r.network,
+        amountUsd: r.amountUsd,
+        amountTokens: r.amountTokens,
+        txHash: r.txHash ?? null,
+        stage: r.stage ?? 1,
+        createdAt: (r.createdAt ?? /* @__PURE__ */ new Date(0)).toISOString()
+      }))
+    });
+  } catch (err) {
+    logger.error({ err }, "[MY_PURCHASES] Failed to fetch purchases");
+    res.status(500).json({ purchases: [] });
+  }
+});
+router6.get("/activity", async (req, res) => {
+  try {
+    const offset = Math.max(0, Number(req.query.offset ?? 0) || 0);
+    const limit = 25;
+    const [{ total }] = await db.select({ total: sql`count(*)` }).from(purchases);
+    const rows = await db.select({
+      id: purchases.id,
+      wallet: purchases.walletAddress,
+      network: purchases.network,
+      amountUsd: purchases.amountUsd,
+      amountTokens: purchases.amountTokens,
+      txHash: purchases.txHash,
+      stage: purchases.stage,
+      createdAt: purchases.createdAt
+    }).from(purchases).orderBy(desc(purchases.createdAt)).limit(limit).offset(offset);
+    const totalNum = Number(total ?? 0);
+    res.json({
+      activity: rows.map((r) => ({
+        id: r.id,
+        wallet: r.wallet.slice(0, 4) + "\u2026" + r.wallet.slice(-4),
+        network: r.network,
+        amountUsd: r.amountUsd,
+        amountTokens: r.amountTokens,
+        txHash: r.txHash ?? null,
+        stage: r.stage ?? 1,
+        createdAt: (r.createdAt ?? /* @__PURE__ */ new Date(0)).toISOString()
+      })),
+      total: totalNum,
+      offset,
+      hasMore: offset + rows.length < totalNum
+    });
+  } catch (err) {
+    logger.error({ err }, "[ACTIVITY] Failed to fetch activity");
+    res.json({ activity: [], total: 0, offset: 0, hasMore: false });
+  }
+});
 var tracker_default = router6;
 
 // src/routes/referral.ts
@@ -84311,7 +84396,7 @@ router7.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
   }
 });
 router7.post("/referral/register", registerLimiter, async (req, res) => {
-  const { referrerCode, buyerWallet, purchaseId, amountUsd, amountTokens } = req.body;
+  const { referrerCode, buyerWallet, purchaseId } = req.body;
   if (!referrerCode || !buyerWallet) {
     res.status(400).json({ error: "referrerCode and buyerWallet are required" });
     return;
@@ -84326,11 +84411,16 @@ router7.post("/referral/register", registerLimiter, async (req, res) => {
     return;
   }
   logger.info(
-    { code, buyer: buyerWallet.slice(0, 8), purchaseId, amountUsd, amountTokens },
+    { code, buyer: buyerWallet.slice(0, 8), purchaseId },
     "[REF_REGISTER] Processing referral registration"
   );
   try {
-    const purchaseRow = await db.select({ id: purchases.id, walletAddress: purchases.walletAddress }).from(purchases).where(eq(purchases.id, purchaseId)).limit(1);
+    const purchaseRow = await db.select({
+      id: purchases.id,
+      walletAddress: purchases.walletAddress,
+      amountUsd: purchases.amountUsd,
+      amountTokens: purchases.amountTokens
+    }).from(purchases).where(eq(purchases.id, purchaseId)).limit(1);
     if (purchaseRow.length === 0) {
       logger.warn({ purchaseId, buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] Purchase not found in DB");
       res.status(400).json({ error: "Purchase not found" });
@@ -84360,8 +84450,10 @@ router7.post("/referral/register", registerLimiter, async (req, res) => {
       return;
     }
     const REWARD_RATE2 = 5;
-    const rewardTokens = amountTokens ? (amountTokens * REWARD_RATE2 / 100).toFixed(6) : "0";
-    const rewardUsd = amountUsd ? (amountUsd * REWARD_RATE2 / 100).toFixed(6) : "0";
+    const purchaseTokens = Math.max(0, Number(purchaseRow[0].amountTokens) || 0);
+    const purchaseUsd = Math.max(0, Number(purchaseRow[0].amountUsd) || 0);
+    const rewardTokens = purchaseTokens > 0 ? (purchaseTokens * REWARD_RATE2 / 100).toFixed(6) : "0";
+    const rewardUsd = purchaseUsd > 0 ? (purchaseUsd * REWARD_RATE2 / 100).toFixed(6) : "0";
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
@@ -84514,7 +84606,21 @@ var referral_default = router7;
 var import_express8 = __toESM(require_express2(), 1);
 var router8 = (0, import_express8.Router)();
 var SOLANA_RPC2 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
-var ALLOWED_METHODS = /* @__PURE__ */ new Set([
+var IS_PROD8 = process.env.NODE_ENV === "production";
+var ALLOWED_ORIGINS_EXACT2 = [
+  "https://pwifecoin.fun",
+  "https://www.pwifecoin.fun",
+  ...IS_PROD8 ? [] : ["http://localhost:22793", "http://localhost:3000"],
+  ...process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []
+];
+var VERCEL_PREVIEW_DOMAIN2 = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
+function isOriginAllowed2(origin) {
+  if (ALLOWED_ORIGINS_EXACT2.includes(origin)) return true;
+  if (VERCEL_PREVIEW_DOMAIN2 && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN2}`)) return true;
+  if (VERCEL_PREVIEW_DOMAIN2 && origin === `https://${VERCEL_PREVIEW_DOMAIN2}`) return true;
+  return false;
+}
+var READ_METHODS2 = /* @__PURE__ */ new Set([
   "getAccountInfo",
   "getBalance",
   "getLatestBlockhash",
@@ -84526,10 +84632,19 @@ var ALLOWED_METHODS = /* @__PURE__ */ new Set([
   "getTokenAccountsByOwner",
   "getTokenSupply",
   "getTransaction",
-  "getVersion",
-  "requestAirdrop",
+  "getVersion"
+]);
+var TX_METHODS2 = /* @__PURE__ */ new Set([
   "sendTransaction",
   "simulateTransaction"
+]);
+var DEV_ONLY_METHODS2 = /* @__PURE__ */ new Set([
+  "requestAirdrop"
+]);
+var ALLOWED_METHODS = /* @__PURE__ */ new Set([
+  ...READ_METHODS2,
+  ...TX_METHODS2,
+  ...!IS_PROD8 ? DEV_ONLY_METHODS2 : []
 ]);
 var rpcLimiter = rate_limit_default({
   windowMs: 60 * 1e3,
@@ -84538,18 +84653,42 @@ var rpcLimiter = rate_limit_default({
   legacyHeaders: false,
   message: { error: "Too many requests, please slow down." }
 });
+var txLimiter = rate_limit_default({
+  windowMs: 60 * 1e3,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many transaction requests, please slow down." }
+});
+function runLimiter2(limiter, req, res) {
+  return new Promise((resolve, reject) => {
+    limiter(req, res, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+}
 router8.get("/rpc", (_req, res) => {
   res.json({ status: "ok" });
 });
 router8.post("/rpc", rpcLimiter, async (req, res) => {
   try {
     const body = req.body;
+    const origin = req.headers.origin;
+    if (!origin || typeof origin !== "string" || !isOriginAllowed2(origin)) {
+      res.status(403).json({ error: "Origin not allowed" });
+      return;
+    }
     if (!body.method || !ALLOWED_METHODS.has(body.method)) {
       res.status(403).json({
         error: "Method not allowed",
         method: body.method ?? "(missing)"
       });
       return;
+    }
+    if (TX_METHODS2.has(body.method)) {
+      await runLimiter2(txLimiter, req, res);
+      if (res.headersSent) return;
     }
     const response = await fetch(SOLANA_RPC2, {
       method: "POST",
@@ -84559,7 +84698,7 @@ router8.post("/rpc", rpcLimiter, async (req, res) => {
     const data = await response.json();
     res.json(data);
   } catch (err) {
-    res.status(502).json({ error: "RPC proxy error", detail: String(err) });
+    res.status(502).json(IS_PROD8 ? { error: "RPC proxy error" } : { error: "RPC proxy error", detail: String(err) });
   }
 });
 var rpc_proxy_default = router8;
@@ -84939,7 +85078,7 @@ app.use(import_passport2.default.session());
 app.use("/api", routes_default);
 app.use((err, _req, res, _next) => {
   const status = err.status ?? 500;
-  const message = err.message ?? "Internal Server Error";
+  const message = IS_PROD4 ? "Internal Server Error" : err.message ?? "Internal Server Error";
   logger.error({ err }, "Unhandled error");
   res.status(status).json({ error: message, stack: IS_PROD4 ? void 0 : err.stack });
 });

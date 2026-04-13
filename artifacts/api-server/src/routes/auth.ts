@@ -32,6 +32,10 @@ const authLimiter = rateLimit({
   message:        { error: "Too many auth requests. Please try again later." },
 });
 
+if (IS_PROD && ADMIN_EMAILS.length === 0) {
+  throw new Error("ADMIN_EMAILS must be set in production");
+}
+
 if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
   passport.use(
     new GoogleStrategy(
@@ -101,7 +105,7 @@ router.get("/auth/google", authLimiter, (req, res, next) => {
     return;
   }
   logger.info({ ip: getClientIp(req) }, "AUTH_GOOGLE: OAuth flow initiated");
-  passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
+  passport.authenticate("google", { scope: ["profile", "email"], state: true })(req, res, next);
 });
 
 router.get(

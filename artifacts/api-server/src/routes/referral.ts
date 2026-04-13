@@ -100,13 +100,11 @@ router.get("/referral/code/:wallet", codeLimiter, async (req, res) => {
 
 // POST /api/referral/register
 router.post("/referral/register", registerLimiter, async (req, res) => {
-  const { referrerCode, buyerWallet, purchaseId, amountUsd, amountTokens } =
+  const { referrerCode, buyerWallet, purchaseId } =
     req.body as {
       referrerCode?: string;
       buyerWallet?: string;
       purchaseId?: number;
-      amountUsd?: number;
-      amountTokens?: number;
     };
 
   if (!referrerCode || !buyerWallet) {
@@ -127,13 +125,19 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
   }
 
   logger.info(
-    { code, buyer: buyerWallet.slice(0, 8), purchaseId, amountUsd, amountTokens },
+    { code, buyer: buyerWallet.slice(0, 8), purchaseId },
     "[REF_REGISTER] Processing referral registration",
   );
 
   try {
     const purchaseRow = await db
-      .select({ id: purchases.id, walletAddress: purchases.walletAddress })
+      .select({
+        id: purchases.id,
+        walletAddress: purchases.walletAddress,
+        amountUsd: purchases.amountUsd,
+        amountTokens: purchases.amountTokens,
+        verificationStatus: purchases.verificationStatus,
+      })
       .from(purchases)
       .where(eq(purchases.id, purchaseId))
       .limit(1);
@@ -147,6 +151,12 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
     if (purchaseRow[0].walletAddress.toLowerCase() !== buyerWallet.toLowerCase()) {
       logger.warn({ purchaseId, buyer: buyerWallet.slice(0, 8) }, "[REF_REGISTER] Purchase wallet mismatch");
       res.status(400).json({ error: "Purchase does not belong to this wallet" });
+      return;
+    }
+
+    if ((purchaseRow[0].verificationStatus ?? "VERIFIED") !== "VERIFIED") {
+      logger.warn({ purchaseId, buyer: buyerWallet.slice(0, 8), status: purchaseRow[0].verificationStatus }, "[REF_REGISTER] Purchase not verified");
+      res.status(409).json({ error: "Purchase is not verified" });
       return;
     }
 
@@ -183,12 +193,12 @@ router.post("/referral/register", registerLimiter, async (req, res) => {
     }
 
     const REWARD_RATE = 5.0;
-    const rewardTokens = amountTokens
-      ? ((amountTokens * REWARD_RATE) / 100).toFixed(6)
-      : "0";
-    const rewardUsd = amountUsd
-      ? ((amountUsd * REWARD_RATE) / 100).toFixed(6)
-      : "0";
+    const purchaseTokens = Math.max(0, Number(purchaseRow[0].amountTokens) || 0);
+    const purchaseUsd = Math.max(0, Number(purchaseRow[0].amountUsd) || 0);
+    const rewardTokens =
+      purchaseTokens > 0 ? ((purchaseTokens * REWARD_RATE) / 100).toFixed(6) : "0";
+    const rewardUsd =
+      purchaseUsd > 0 ? ((purchaseUsd * REWARD_RATE) / 100).toFixed(6) : "0";
 
     const client = await pool.connect();
     try {
