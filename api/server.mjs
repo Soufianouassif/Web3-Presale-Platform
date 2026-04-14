@@ -81765,14 +81765,14 @@ var referralsRelations = relations(referrals, ({ one }) => ({
 var { Pool: Pool3 } = esm_default;
 var dbUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL || "";
 if (!dbUrl) {
-  throw new Error(
-    "DATABASE_URL (or NEON_DATABASE_URL) must be set. Did you forget to provision a database?"
+  console.error(
+    "[DB] WARNING: DATABASE_URL (or NEON_DATABASE_URL) is not set. DB queries will fail. Set it in your environment variables."
   );
 }
 var needsSsl = process.env.NODE_ENV === "production" || dbUrl.includes("neon.tech");
 var rejectUnauthorized = process.env.PG_SSL_REJECT_UNAUTHORIZED !== void 0 ? process.env.PG_SSL_REJECT_UNAUTHORIZED === "true" : false;
 var pool = new Pool3({
-  connectionString: dbUrl,
+  connectionString: dbUrl || "postgresql://localhost/placeholder",
   ssl: needsSsl ? { rejectUnauthorized } : void 0
 });
 var db = drizzle(pool, { schema: schema_exports });
@@ -81800,6 +81800,18 @@ var router = (0, import_express.Router)();
 router.get("/healthz", (_req, res) => {
   const data = HealthCheckResponse.parse({ status: "ok" });
   res.json(data);
+});
+router.get("/env-check", (_req, res) => {
+  res.json({
+    NODE_ENV: process.env.NODE_ENV ?? "NOT SET",
+    DATABASE_URL: process.env.DATABASE_URL ? "SET \u2713" : "MISSING \u2717",
+    NEON_DATABASE_URL: process.env.NEON_DATABASE_URL ? "SET \u2713" : "MISSING \u2717",
+    SESSION_SECRET: process.env.SESSION_SECRET ? "SET \u2713" : "MISSING \u2717",
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ? "SET \u2713" : "MISSING \u2717",
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ? "SET \u2713" : "MISSING \u2717",
+    ADMIN_EMAILS: process.env.ADMIN_EMAILS ? "SET \u2713" : "MISSING \u2717",
+    ADMIN_KEYPAIR_JSON: process.env.ADMIN_KEYPAIR_JSON ? "SET \u2713" : "MISSING \u2717"
+  });
 });
 router.get("/db-ping", async (req, res) => {
   const secret = process.env.CRON_SECRET;

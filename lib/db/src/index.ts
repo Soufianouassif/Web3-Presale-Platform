@@ -7,8 +7,9 @@ const { Pool } = pg;
 const dbUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL || "";
 
 if (!dbUrl) {
-  throw new Error(
-    "DATABASE_URL (or NEON_DATABASE_URL) must be set. Did you forget to provision a database?",
+  console.error(
+    "[DB] WARNING: DATABASE_URL (or NEON_DATABASE_URL) is not set. " +
+    "DB queries will fail. Set it in your environment variables.",
   );
 }
 
@@ -19,7 +20,7 @@ const rejectUnauthorized =
     : false;
 
 export const pool = new Pool({
-  connectionString: dbUrl,
+  connectionString: dbUrl || "postgresql://localhost/placeholder",
   ssl: needsSsl ? { rejectUnauthorized } : undefined,
 });
 export const db = drizzle(pool, { schema });
