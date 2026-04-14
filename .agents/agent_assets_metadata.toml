@@ -186,6 +186,126 @@ uri = "file://artifacts/pepewife/public/pepewife-family.png"
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "fCtccEOQl7TMuzwT8bGdW"
+uri = "file://attached_assets/generated_images/roadmap_phase1_foundation.png"
+type = "image"
+title = "pepewife couple solana phase1"
+
+[[generated]]
+id = "wnchBxXCfbESMQiv6q6Tn"
+uri = "file://attached_assets/generated_images/roadmap_phase2_growth.png"
+type = "image"
+title = "pepewife couple solana phase2"
+
+[[generated]]
+id = "VnbAoKee-gQy3yrfhnHVU"
+uri = "file://attached_assets/generated_images/roadmap_phase3_launch.png"
+type = "image"
+title = "pepewife couple solana phase3"
+
+[[generated]]
+id = "tyo8hzkdYIUOjr_2couau"
+uri = "file://attached_assets/generated_images/roadmap_phase4_expansion.png"
+type = "image"
+title = "pepewife couple solana phase4"
+
+[[generated]]
+id = "AAP3jJXKGgPLZUitY9YLf"
+uri = "file://attached_assets/generated_images/roadmap_phase5_moon.png"
+type = "image"
+title = "pepewife couple solana phase5 moon"
+
+[[generated]]
+id = "P5_7Cd-ZCBzjFQNVFXOkZ"
+uri = "file://attached_assets/generated_images/style_a_phase1.png"
+type = "image"
+title = "style A kawaii phase1"
+
+[[generated]]
+id = "-coeWyb6B-Z6DnepC0_h8"
+uri = "file://attached_assets/generated_images/style_a_phase2.png"
+type = "image"
+title = "style A kawaii phase2"
+
+[[generated]]
+id = "poJw-LnL_wZc9FNLyheag"
+uri = "file://attached_assets/generated_images/style_a_phase3.png"
+type = "image"
+title = "style A kawaii phase3"
+
+[[generated]]
+id = "qkHYj4J1RgNIm_CatLJO-"
+uri = "file://attached_assets/generated_images/style_a_phase4.png"
+type = "image"
+title = "style A kawaii phase4"
+
+[[generated]]
+id = "DNg3M_ZXFOk9lLonwoQKS"
+uri = "file://attached_assets/generated_images/style_a_phase5.png"
+type = "image"
+title = "style A kawaii phase5"
+
+[[generated]]
+id = "Oz3O78KNG_EeUjnuSMbny"
+uri = "file://attached_assets/generated_images/style_b_phase1.png"
+type = "image"
+title = "style B comic phase1"
+
+[[generated]]
+id = "atDd-2owTlB4qBhgZzqZ4"
+uri = "file://attached_assets/generated_images/style_b_phase2.png"
+type = "image"
+title = "style B comic phase2"
+
+[[generated]]
+id = "CZT_lRr8FAafAmualZeRL"
+uri = "file://attached_assets/generated_images/style_b_phase3.png"
+type = "image"
+title = "style B comic phase3"
+
+[[generated]]
+id = "Ayq01Rbo0Gof0XCk5RU-u"
+uri = "file://attached_assets/generated_images/style_b_phase4.png"
+type = "image"
+title = "style B comic phase4"
+
+[[generated]]
+id = "5q1lGO4VDA_juaqYFeI9o"
+uri = "file://attached_assets/generated_images/style_b_phase5.png"
+type = "image"
+title = "style B comic phase5"
+
+[[generated]]
+id = "Y-4cqHqPlUGhzncmVrSfn"
+uri = "file://attached_assets/generated_images/style_c_phase1.png"
+type = "image"
+title = "style C pixel phase1"
+
+[[generated]]
+id = "9KCf-RBe9cd_Pymh1PrKS"
+uri = "file://attached_assets/generated_images/style_c_phase2.png"
+type = "image"
+title = "style C pixel phase2"
+
+[[generated]]
+id = "yl3hEOoy5tf571NuSo1cR"
+uri = "file://attached_assets/generated_images/style_c_phase3.png"
+type = "image"
+title = "style C pixel phase3"
+
+[[generated]]
+id = "Da6HY-RWrSz1l4qfxrYol"
+uri = "file://attached_assets/generated_images/style_c_phase4.png"
+type = "image"
+title = "style C pixel phase4"
+
+[[generated]]
+id = "QTcP7yYsQgb1dp8auanR2"
+uri = "file://attached_assets/generated_images/style_c_phase5.png"
+type = "image"
+title = "style C pixel phase5"
+
 [[outputs]]
 id = "enG-yn5f3oQ2SCQFxzrS0"
 uri = "file://PEPEWIFE-GUIDE.md"
@@ -197,3 +317,153 @@ id = "dBN3vbkc1ajG0P-ueXPiA"
 uri = "file://PROJECT_DOCS.md"
 type = "text"
 title = "توثيق مشروع PEPEWIFE — دليل شامل"
+
+[[outputs]]
+id = "XHutb66ZdM1nF0V0vyMVn"
+uri = "file://attached_assets/generated_images/roadmap_phase1_foundation.png"
+type = "image"
+title = "المرحلة 1 — Foundation 🏗️"
+
+[[outputs]]
+id = "hIJfrnp6wty2s0ZHmmw2a"
+uri = "file://attached_assets/generated_images/roadmap_phase2_growth.png"
+type = "image"
+title = "المرحلة 2 — Growth 📈"
+
+[[outputs]]
+id = "lZ96RbcRV5lvvglAnbxQD"
+uri = "file://attached_assets/generated_images/roadmap_phase3_launch.png"
+type = "image"
+title = "المرحلة 3 — Launch 🚀"
+
+[[outputs]]
+id = "k7CZ-b85LAr6DAwzG-BVb"
+uri = "file://attached_assets/generated_images/roadmap_phase4_expansion.png"
+type = "image"
+title = "المرحلة 4 — Expansion 🌍"
+
+[[outputs]]
+id = "-9yJp0nqZO5OXVoaNtbOy"
+uri = "file://attached_assets/generated_images/roadmap_phase5_moon.png"
+type = "image"
+title = "المرحلة 5 — Moon Mission 🌙"
+
+[[outputs]]
+id = "zgmTi8dsWHayIAve10WwC"
+uri = "file://artifacts/pepewife/public/roadmap-phase1.png"
+type = "image"
+title = "المرحلة 1 — Foundation 🏗️"
+
+[[outputs]]
+id = "MCKeDjilNBL_C1isHMGjI"
+uri = "file://artifacts/pepewife/public/roadmap-phase2.png"
+type = "image"
+title = "المرحلة 2 — Growth 📈"
+
+[[outputs]]
+id = "pLtfatP-zu2b8BBMFu_zu"
+uri = "file://artifacts/pepewife/public/roadmap-phase3.png"
+type = "image"
+title = "المرحلة 3 — Launch 🚀"
+
+[[outputs]]
+id = "fa6wtUHrYWha6qymXbWJ6"
+uri = "file://artifacts/pepewife/public/roadmap-phase4.png"
+type = "image"
+title = "المرحلة 4 — Expansion 🌍"
+
+[[outputs]]
+id = "nFhQb1hPLTePx9V5Le6Bm"
+uri = "file://artifacts/pepewife/public/roadmap-phase5.png"
+type = "image"
+title = "المرحلة 5 — Moon Mission 🌙"
+
+[[outputs]]
+id = "8GckdaerwWnQ_cQzHdEFq"
+uri = "file://attached_assets/generated_images/style_a_phase1.png"
+type = "image"
+title = "A1 — Foundation"
+
+[[outputs]]
+id = "PHB1x1uvQD4-F5PzbxXAA"
+uri = "file://attached_assets/generated_images/style_a_phase2.png"
+type = "image"
+title = "A2 — Growth"
+
+[[outputs]]
+id = "JVaqnlCnygsBbE-f-cpI1"
+uri = "file://attached_assets/generated_images/style_a_phase3.png"
+type = "image"
+title = "A3 — Launch"
+
+[[outputs]]
+id = "ufgzbhODxjKpU8vIMRGRZ"
+uri = "file://attached_assets/generated_images/style_a_phase4.png"
+type = "image"
+title = "A4 — Expansion"
+
+[[outputs]]
+id = "J870zzy3VkGakIJ5ugkDt"
+uri = "file://attached_assets/generated_images/style_a_phase5.png"
+type = "image"
+title = "A5 — Moon"
+
+[[outputs]]
+id = "Rse97Rw71tp4RNN46-PDb"
+uri = "file://attached_assets/generated_images/style_b_phase1.png"
+type = "image"
+title = "B1 — Foundation"
+
+[[outputs]]
+id = "VtTKnrwhg43y8Ve2a8zeL"
+uri = "file://attached_assets/generated_images/style_b_phase2.png"
+type = "image"
+title = "B2 — Growth"
+
+[[outputs]]
+id = "6IqHAxhKtMK4fQ2pJOIVw"
+uri = "file://attached_assets/generated_images/style_b_phase3.png"
+type = "image"
+title = "B3 — Launch"
+
+[[outputs]]
+id = "g200NlI7xf-fZCm41NK9Z"
+uri = "file://attached_assets/generated_images/style_b_phase4.png"
+type = "image"
+title = "B4 — Expansion"
+
+[[outputs]]
+id = "I19rVJneowIpPYEi7MMvT"
+uri = "file://attached_assets/generated_images/style_b_phase5.png"
+type = "image"
+title = "B5 — Moon"
+
+[[outputs]]
+id = "NC-nkwO4M8jtq5g2tfgnA"
+uri = "file://attached_assets/generated_images/style_c_phase1.png"
+type = "image"
+title = "C1 — Foundation"
+
+[[outputs]]
+id = "j-gg6oq4corOd_P70_SJQ"
+uri = "file://attached_assets/generated_images/style_c_phase2.png"
+type = "image"
+title = "C2 — Growth"
+
+[[outputs]]
+id = "kB75tw67mYQjbTsBXqVLy"
+uri = "file://attached_assets/generated_images/style_c_phase3.png"
+type = "image"
+title = "C3 — Launch"
+
+[[outputs]]
+id = "eEzoH_xgmU19738mmLIWP"
+uri = "file://attached_assets/generated_images/style_c_phase4.png"
+type = "image"
+title = "C4 — Expansion"
+
+[[outputs]]
+id = "FUapOEPuhKNxPs0PGuBKh"
+uri = "file://attached_assets/generated_images/style_c_phase5.png"
+type = "image"
+title = "C5 — Moon"
