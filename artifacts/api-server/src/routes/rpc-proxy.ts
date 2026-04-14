@@ -3,7 +3,8 @@ import rateLimit from "express-rate-limit";
 
 const router = Router();
 
-const SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
+const _rpcProxyRaw = process.env.SOLANA_RPC_URL ?? "";
+const SOLANA_RPC = (_rpcProxyRaw.startsWith("http://") || _rpcProxyRaw.startsWith("https://")) ? _rpcProxyRaw : "https://api.devnet.solana.com";
 const IS_PROD = process.env.NODE_ENV === "production";
 
 const ALLOWED_ORIGINS_EXACT: string[] = [

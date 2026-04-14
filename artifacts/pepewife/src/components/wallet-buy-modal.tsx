@@ -158,9 +158,9 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
   const currencyLabel = currency === "SOL" ? "SOL" : "USDT";
   const explorerUrl = signature ? buildExplorerUrl(signature) : "";
 
-  // Close on backdrop click only when not in the middle of signing / verifying
+  // Close on backdrop click only when not in the middle of signing / connecting
   const handleBackdrop = () => {
-    if (step === "signing" || step === "connecting" || step === "verifying") return;
+    if (step === "signing" || step === "connecting") return;
     onClose();
   };
 
@@ -180,7 +180,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
         <div className="zigzag-border" />
 
         {/* Close button */}
-        {step !== "signing" && step !== "connecting" && step !== "verifying" && (
+        {step !== "signing" && step !== "connecting" && (
           <button
             onClick={onClose}
             className="absolute top-4 end-4 z-10 w-8 h-8 rounded-full bg-[#1a1a2e] text-white flex items-center justify-center hover:bg-[#FF4D9D] transition-colors"
@@ -368,9 +368,9 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
           <div className="p-8 flex flex-col items-center gap-5 text-center">
             <Loader2 className="h-14 w-14 text-[#4CAF50] animate-spin" />
             <div>
-              <h3 className="font-display text-2xl text-[#1a1a2e] tracking-wider">Verifying on Devnet…</h3>
+              <h3 className="font-display text-2xl text-[#1a1a2e] tracking-wider">Transaction Confirmed ✅</h3>
               <p className="text-sm text-[#1a1a2e]/50 font-bold mt-1">
-                Transaction sent. Server is checking it on-chain.
+                Recording your purchase… This may take a few seconds.
               </p>
             </div>
             {signature && (
@@ -384,9 +384,15 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
                 {signature.slice(0, 16)}…{signature.slice(-8)}
               </a>
             )}
-            <div className="bg-[#E8F5E9] border-2 border-[#4CAF50]/30 rounded-xl p-3 w-full text-xs text-[#1a1a2e]/50 font-bold text-center">
-              🔍 Do not close — waiting for Devnet verification.
+            <div className="bg-[#E8F5E9] border-2 border-[#4CAF50]/30 rounded-xl p-3 w-full text-xs text-[#1a1a2e]/60 font-bold text-center">
+              🎉 Your $PWIFE tokens are secured on-chain. You can safely close this.
             </div>
+            <button
+              onClick={onClose}
+              className="w-full h-11 rounded-xl border-2 border-[#4CAF50] bg-[#E8F5E9] font-display text-base tracking-wider text-[#1a1a2e] hover:bg-[#4CAF50] hover:text-white transition-colors"
+            >
+              Go to Dashboard →
+            </button>
           </div>
         )}
 

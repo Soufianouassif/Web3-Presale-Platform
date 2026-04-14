@@ -164,7 +164,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer);
   }, []);
 
-  // Listen for wallet extension disconnect events
+  // Listen for wallet extension disconnect / accountChanged events
   useEffect(() => {
     if (!walletType || status !== "connected") return;
 
@@ -178,11 +178,37 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       setNetwork(null);
       clearWalletStorage();
     };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleAccountChanged = (newPublicKey: any) => {
+      if (newPublicKey) {
+        const newAddr = typeof newPublicKey.toString === "function"
+          ? newPublicKey.toString()
+          : String(newPublicKey);
+        setAddress(newAddr);
+        // update stored session with new address
+        const net = network ?? getWalletNetwork(walletType);
+        const stored: StoredWallet = {
+          walletType,
+          address: newAddr,
+          network: net!,
+          connectedAt: Date.now(),
+        };
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+      } else {
+        // wallet switched to a locked/no-account state
+        handleDisconnect();
+      }
+    };
+
     provider.on("disconnect", handleDisconnect);
+    try { provider.on("accountChanged", handleAccountChanged); } catch {}
+
     return () => {
       try { provider.off("disconnect", handleDisconnect); } catch {}
+      try { provider.off("accountChanged", handleAccountChanged); } catch {}
     };
-  }, [walletType, status]);
+  }, [walletType, status, network]);
 
   const connect = useCallback(async (type: WalletType): Promise<boolean> => {
     if (connectMutex.current) return false;
