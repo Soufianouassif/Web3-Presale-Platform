@@ -306,6 +306,42 @@ uri = "file://attached_assets/generated_images/style_c_phase5.png"
 type = "image"
 title = "style C pixel phase5"
 
+[[generated]]
+id = "vGh7pUrE7uvx2t8-9PT3X"
+uri = "file://attached_assets/generated_images/project_logo_v2.png"
+type = "image"
+title = "project logo v2"
+
+[[generated]]
+id = "E-B73h20XUBDUmz2TQNi5"
+uri = "file://attached_assets/generated_images/token_logo_v3.png"
+type = "image"
+title = "token logo v3"
+
+[[generated]]
+id = "vJQ1B6dU4Ym8KOyclocNi"
+uri = "file://attached_assets/generated_images/project_logo_v1.png"
+type = "image"
+title = "project logo v1"
+
+[[generated]]
+id = "t6_SuSfs55g5HobNzSPMG"
+uri = "file://attached_assets/generated_images/project_logo_v3.png"
+type = "image"
+title = "project logo v3"
+
+[[generated]]
+id = "t4fUl2jedj3qwbwU4JVOM"
+uri = "file://attached_assets/generated_images/token_logo_v1.png"
+type = "image"
+title = "token logo v1"
+
+[[generated]]
+id = "PLwCsW2S1UG0U4fkGmumF"
+uri = "file://attached_assets/generated_images/token_logo_v2.png"
+type = "image"
+title = "token logo v2"
+
 [[outputs]]
 id = "enG-yn5f3oQ2SCQFxzrS0"
 uri = "file://PEPEWIFE-GUIDE.md"
@@ -467,3 +503,39 @@ id = "FUapOEPuhKNxPs0PGuBKh"
 uri = "file://attached_assets/generated_images/style_c_phase5.png"
 type = "image"
 title = "C5 — Moon"
+
+[[outputs]]
+id = "f8DZaphgJV60rF15u4VWt"
+uri = "file://attached_assets/generated_images/project_logo_v1.png"
+type = "image"
+title = "شعار المشروع — نسخة 1"
+
+[[outputs]]
+id = "MIsQgqpyHYK71Ln2o40nC"
+uri = "file://attached_assets/generated_images/project_logo_v2.png"
+type = "image"
+title = "شعار المشروع — نسخة 2"
+
+[[outputs]]
+id = "gdk443pxZ5KQNLuTvrjWh"
+uri = "file://attached_assets/generated_images/project_logo_v3.png"
+type = "image"
+title = "شعار المشروع — نسخة 3"
+
+[[outputs]]
+id = "9ZeHMvlMmBP_Mu1n4AbN9"
+uri = "file://attached_assets/generated_images/token_logo_v1.png"
+type = "image"
+title = "شعار التوكن — نسخة 1"
+
+[[outputs]]
+id = "pDpnPUPCJH6C2q518bzFk"
+uri = "file://attached_assets/generated_images/token_logo_v2.png"
+type = "image"
+title = "شعار التوكن — نسخة 2"
+
+[[outputs]]
+id = "ach2gsRt6U0dxDyp4YQJz"
+uri = "file://attached_assets/generated_images/token_logo_v3.png"
+type = "image"
+title = "شعار التوكن — نسخة 3"
