@@ -63,4 +63,18 @@ router.get("/presale/config", async (_req, res) => {
   }
 });
 
+// ── Presale version — monotonic signal for frontend to detect resets ──────────
+router.get("/presale/version", async (_req, res) => {
+  try {
+    const [row] = await db
+      .select({ updatedAt: presaleConfig.updatedAt })
+      .from(presaleConfig)
+      .where(eq(presaleConfig.id, 1))
+      .limit(1);
+    res.json({ version: row?.updatedAt?.toISOString() ?? null });
+  } catch {
+    res.json({ version: null });
+  }
+});
+
 export default router;

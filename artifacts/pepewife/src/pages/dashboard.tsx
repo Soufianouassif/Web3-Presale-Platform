@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Menu, X, Twitter, Send, Wallet, Copy, Check, ChevronDown, Shield, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -200,6 +200,32 @@ export default function Dashboard() {
     return () => clearInterval(iv);
   }, [address]);
 
+  // ── Detect blockchain resets and refresh all data immediately ────────────────
+  const versionRef = useRef<string | null>(null);
+  useEffect(() => {
+    const checkVersion = async () => {
+      try {
+        const r = await fetch("/api/presale/version");
+        const d: { version: string | null } = await r.json();
+        if (d.version !== null) {
+          if (versionRef.current !== null && versionRef.current !== d.version) {
+            // Reset detected — force immediate full data refresh
+            fetchPresaleState().then(s => { if (s) setPresaleData(s); }).catch(() => {});
+            fetchPublicPresaleConfig().then(cfg => setSiteConfig(cfg));
+            if (address) {
+              setBuyerLoading(true);
+              fetchBuyerState(address).then(b => setBuyerState(b)).finally(() => setBuyerLoading(false));
+            }
+          }
+          versionRef.current = d.version;
+        }
+      } catch { /* ignore network errors */ }
+    };
+    checkVersion();
+    const iv = setInterval(checkVersion, 5_000);
+    return () => clearInterval(iv);
+  }, [address]);
+
   // ── Buy box constants & computations ────────────────────────────────────────
   const LIMITS = {
     SOL:      { min: 1,    max: 50 },
@@ -262,7 +288,7 @@ export default function Dashboard() {
     const soldUsd = sold * priceNum;
     return { stage: i + 1, price, tokens, sold, soldUsd, color: STAGE_COLORS[i] };
   });
-  const LISTING_PRICE = "$0.061327";
+  const LISTING_PRICE = "$0.00000007";
   const currentStage = presaleData ? presaleData.currentStage : 0;
   const totalSold = STAGE_DATA.reduce((a, s) => a + s.sold, 0);
   const totalTokens = STAGE_DATA.reduce((a, s) => a + s.tokens, 0);
@@ -542,13 +568,13 @@ export default function Dashboard() {
                       },
                       {
                         label: t.dashboard.claimableTokens,
-                        value: buyerLoading ? "…" : "0",
+                        value: buyerLoading ? "…" : fmt(Number(buyerState?.tokensBought ?? 0n)),
                         sub: "$PWIFE · " + t.dashboard.pendingTge,
                         color: "#FF4D9D", shadow: "#C2185B", bg: "bg-[#FCE4EC]",
                       },
                       {
                         label: t.dashboard.referralRewards,
-                        value: "0",
+                        value: refLoading ? "…" : fmt(Number(refStats?.totalRewardTokens ?? 0)),
                         sub: "$PWIFE",
                         color: "#FF4D9D", shadow: "#C2185B", bg: "bg-[#FCE4EC]",
                       },
@@ -566,8 +592,8 @@ export default function Dashboard() {
                       },
                       {
                         label: t.dashboard.bonusEarned,
-                        value: "0%",
-                        sub: "—",
+                        value: "—",
+                        sub: "🪂 Coming Soon",
                         color: "#4CAF50", shadow: "#2E7D32", bg: "bg-[#E8F5E9]",
                       },
                     ].map(card => (
@@ -625,11 +651,13 @@ export default function Dashboard() {
                         </div>
 
                         {/* Stage prices */}
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                           {[
-                            { l: t.presale.now,  v: STAGE_DATA[0].price, sub: "Stage 1", bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" },
-                            { l: t.presale.next, v: STAGE_DATA[1].price, sub: "Stage 2", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" },
-                            { l: t.presale.list, v: LISTING_PRICE,        sub: "CEX",    bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" },
+                            { l: t.presale.stage1, v: STAGE_DATA[0].price,                                                    sub: "Stage 1",                   bg: "bg-[#2196F3]/10", bc: "border-[#2196F3]", tc: "text-[#2196F3]" },
+                            { l: t.presale.now,    v: STAGE_DATA[currentStage].price,                                          sub: `Stage ${currentStage + 1}`, bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" },
+                            { l: t.presale.next,   v: currentStage < 3 ? STAGE_DATA[currentStage + 1].price : "—",             sub: currentStage < 3 ? `Stage ${currentStage + 2}` : "—",          bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" },
+                            { l: t.presale.stage4, v: STAGE_DATA[3].price,                                                     sub: "Stage 4",                   bg: "bg-[#9C27B0]/10", bc: "border-[#9C27B0]", tc: "text-[#9C27B0]" },
+                            { l: t.presale.list,   v: LISTING_PRICE,                                                           sub: "CEX",                       bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" },
                           ].map(p => (
                             <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-2.5 text-center`}>
                               <div className="text-[10px] font-display tracking-wider text-[#1a1a2e]/50">{p.l}</div>

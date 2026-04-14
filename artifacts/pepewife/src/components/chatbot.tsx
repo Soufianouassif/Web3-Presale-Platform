@@ -122,8 +122,8 @@ const QA_DB: QA[] = [
     key: "presale",
     patterns: ["presale","pre sale","pre-sale","بيع مسبق","prévente","prevente","stage","étape"],
     answer: l => ({
-      en: "🛒 **Presale — 4 Stages:**\n\n• Stage 1 → $0.00000001\n• Stage 2 → $0.00000002\n• Stage 3 → $0.00000003\n• Stage 4 → $0.00000004\n\n🎯 Listing Price: **$0.061327**\n\nPrice increases every stage — early buyers get the best deal! 💎",
-      ar: "🛒 **البيع المسبق — 4 مراحل:**\n\n• المرحلة 1 ← 0.00000001$\n• المرحلة 2 ← 0.00000002$\n• المرحلة 3 ← 0.00000003$\n• المرحلة 4 ← 0.00000004$\n\n🎯 سعر الإدراج: **0.061327$**\n\nالسعر يرتفع كل مرحلة — الدخول المبكر = أفضل سعر! 💎",
+      en: "🛒 **Presale — 4 Stages:**\n\n• Stage 1 → $0.00000001\n• Stage 2 → $0.00000002\n• Stage 3 → $0.00000003\n• Stage 4 → $0.00000004\n\n🎯 Listing Price: **$0.00000007**\n\nPrice increases every stage — early buyers get the best deal! 💎",
+      ar: "🛒 **البيع المسبق — 4 مراحل:**\n\n• المرحلة 1 ← 0.00000001$\n• المرحلة 2 ← 0.00000002$\n• المرحلة 3 ← 0.00000003$\n• المرحلة 4 ← 0.00000004$\n\n🎯 سعر الإدراج: **0.00000007$**\n\nالسعر يرتفع كل مرحلة — الدخول المبكر = أفضل سعر! 💎",
       fr: "🛒 **Prévente — 4 Étapes:**\n\n• Étape 1 → 0,00000001$\n• Étape 2 → 0,00000002$\n• Étape 3 → 0,00000003$\n• Étape 4 → 0,00000004$\n\n🎯 Prix de listing: **0,061327$**\n\nLe prix monte à chaque étape — entrer tôt = meilleur prix! 💎",
     }[l]),
     suggestions: ["price", "buy", "safe", "tokenomics"],
@@ -132,9 +132,9 @@ const QA_DB: QA[] = [
     key: "price",
     patterns: ["price","prix","سعر","كم سعر","how much","combien","listing","إدراج","ادراج"],
     answer: l => ({
-      en: "💰 **$PWIFE Price:**\n\n• Presale Stage 1: $0.00000001\n• Listing Target: $0.061327\n\nPotential ROI from Stage 1:\n🔥 5x → $0.00000005\n🔥 100x → $0.000001\n🚀 Listing → **6,132,700x**\n\nEarly ape = maximum gains!",
-      ar: "💰 **سعر $PWIFE:**\n\n• البيع المسبق المرحلة 1: 0.00000001$\n• هدف الإدراج: 0.061327$\n\nعائد محتمل من المرحلة الأولى:\n🔥 5x ← 0.00000005$\n🔥 100x ← 0.000001$\n🚀 الإدراج ← **6,132,700 مرة**\n\nالدخول المبكر = أقصى أرباح!",
-      fr: "💰 **Prix $PWIFE:**\n\n• Prévente Étape 1: 0,00000001$\n• Objectif listing: 0,061327$\n\nROI potentiel depuis l'étape 1:\n🔥 5x → 0,00000005$\n🔥 100x → 0,000001$\n🚀 Listing → **6 132 700x**\n\nEntrer tôt = gains maximum!",
+      en: "💰 **$PWIFE Price:**\n\n• Presale Stage 1: $0.00000001\n• Listing Target: $0.00000007\n\nPotential ROI from Stage 1:\n🔥 2x → $0.00000002\n🔥 4x → $0.00000004\n🚀 Listing → **7x** ($0.00000007)\n\nEarly ape = maximum gains!",
+      ar: "💰 **سعر $PWIFE:**\n\n• البيع المسبق المرحلة 1: 0.00000001$\n• هدف الإدراج: 0.00000007$\n\nعائد محتمل من المرحلة الأولى:\n🔥 2x ← 0.00000002$\n🔥 4x ← 0.00000004$\n🚀 الإدراج ← **7 مرات** (0.00000007$)\n\nالدخول المبكر = أقصى أرباح!",
+      fr: "💰 **Prix $PWIFE:**\n\n• Prévente Étape 1: 0,00000001$\n• Objectif listing: 0,00000007$\n\nROI potentiel depuis l'étape 1:\n🔥 2x → 0,00000002$\n🔥 4x → 0,00000004$\n🚀 Listing → **7x** (0,00000007$)\n\nEntrer tôt = gains maximum!",
     }[l]),
     suggestions: ["buy", "presale", "safe", "airdrop"],
   },

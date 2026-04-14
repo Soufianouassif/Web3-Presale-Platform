@@ -360,9 +360,27 @@ router.post("/admin/presale/dev-reset", requireRecentAuth(REAUTH_WINDOW_MINUTES)
     auditLog(req, "presale.dev_reset");
     const sig = await devResetOnChain();
     logger.info({ sig }, "DEV_RESET: on-chain presale counters cleared");
+
+    // Also wipe all DB data so frontend reflects the clean state
+    const [p, v, w, refs, codes] = await Promise.all([
+      db.delete(purchases).returning({ id: purchases.id }),
+      db.delete(pageVisits).returning({ id: pageVisits.id }),
+      db.delete(walletConnections).returning({ id: walletConnections.id }),
+      db.delete(referrals).returning({ id: referrals.id }),
+      db.delete(referralCodes).returning({ id: referralCodes.id }),
+    ]);
+    // Reset presaleConfig to stage 0 and update timestamp so frontend detects the reset
+    await db.insert(presaleConfig)
+      .values({ id: 1, currentStage: 0, totalRaisedUsd: "0", updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: presaleConfig.id,
+        set: { currentStage: 0, totalRaisedUsd: "0", updatedAt: new Date() },
+      });
+    logger.warn({ purchases: p.length, visits: v.length, wallets: w.length, referrals: refs.length, codes: codes.length }, "DEV_RESET: DB data cleared");
+
     res.json({
       success: true,
-      message: "On-chain reset complete — all counters zeroed, back to stage 0.",
+      message: `On-chain + DB reset complete — all counters zeroed, back to stage 0. Deleted: ${p.length} purchases, ${refs.length} referrals, ${codes.length} codes.`,
       signature: sig,
     });
   } catch (err) {
