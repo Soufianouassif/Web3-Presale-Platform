@@ -496,31 +496,31 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
-                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.totalRaised}</div>
-                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
-                      {hasAnyData ? fmtUSD(totalRaisedUSD) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
+                  <div className="bg-white rounded-2xl px-2 sm:px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e] min-w-0 overflow-hidden">
+                    <div className="text-[10px] sm:text-xs font-display text-gray-500 font-bold leading-tight truncate">{t.hero.totalRaised}</div>
+                    <div className="text-base sm:text-xl font-nums text-[#1a1a2e] tracking-wider leading-tight" dir="ltr">
+                      {hasAnyData ? fmtUSD(totalRaisedUSD) : <span className="text-sm text-gray-400 animate-pulse">...</span>}
                     </div>
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold" dir="ltr">USD • SOL ${solPrice.toFixed(0)}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-500 font-display font-bold leading-tight" dir="ltr">USD • SOL ${solPrice.toFixed(0)}</div>
                   </div>
-                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.tokensSold}</div>
-                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
-                      {hasAnyData ? fmt(effectiveTokensSold) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
+                  <div className="bg-white rounded-2xl px-2 sm:px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e] min-w-0 overflow-hidden">
+                    <div className="text-[10px] sm:text-xs font-display text-gray-500 font-bold leading-tight truncate">{t.hero.tokensSold}</div>
+                    <div className="text-base sm:text-xl font-nums text-[#1a1a2e] tracking-wider leading-tight" dir="ltr">
+                      {hasAnyData ? fmt(effectiveTokensSold) : <span className="text-sm text-gray-400 animate-pulse">...</span>}
                     </div>
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">{t.hero.tokens}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-500 font-display font-bold leading-tight">{t.hero.tokens}</div>
                   </div>
-                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.buyers}</div>
-                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
+                  <div className="bg-white rounded-2xl px-2 sm:px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e] min-w-0 overflow-hidden">
+                    <div className="text-[10px] sm:text-xs font-display text-gray-500 font-bold leading-tight truncate">{t.hero.buyers}</div>
+                    <div className="text-base sm:text-xl font-nums text-[#1a1a2e] tracking-wider leading-tight" dir="ltr">
                       {hasAnyData ? fmt(effectiveBuyers) : <span className="text-sm text-gray-400 animate-pulse">—</span>}
                     </div>
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">{t.hero.uniqueWallets}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-500 font-display font-bold leading-tight truncate">{t.hero.uniqueWallets}</div>
                   </div>
-                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.stagePrice.replace("{0}", String(currentStage + 1))}</div>
-                    <P v={STAGE_DATA[currentStage].price} className="text-base sm:text-lg font-nums text-[#1a1a2e] tracking-wider" />
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold" dir="ltr">per $PWIFE</div>
+                  <div className="bg-white rounded-2xl px-2 sm:px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e] min-w-0 overflow-hidden">
+                    <div className="text-[10px] sm:text-xs font-display text-gray-500 font-bold leading-tight truncate">{t.hero.stagePrice.replace("{0}", String(currentStage + 1))}</div>
+                    <P v={STAGE_DATA[currentStage].price} className="text-base sm:text-lg font-nums text-[#1a1a2e] tracking-wider leading-tight" />
+                    <div className="text-[10px] sm:text-xs text-gray-500 font-display font-bold leading-tight" dir="ltr">per $PWIFE</div>
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 pb-8 lg:pb-16">
