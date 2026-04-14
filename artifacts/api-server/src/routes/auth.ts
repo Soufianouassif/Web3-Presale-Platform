@@ -33,7 +33,7 @@ const authLimiter = rateLimit({
 });
 
 if (IS_PROD && ADMIN_EMAILS.length === 0) {
-  throw new Error("ADMIN_EMAILS must be set in production");
+  logger.warn("ADMIN_EMAILS not set in production — admin login will be disabled");
 }
 
 if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {

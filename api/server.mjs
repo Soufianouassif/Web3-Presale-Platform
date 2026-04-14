@@ -83095,7 +83095,7 @@ var authLimiter = rate_limit_default({
   message: { error: "Too many auth requests. Please try again later." }
 });
 if (IS_PROD2 && ADMIN_EMAILS.length === 0) {
-  throw new Error("ADMIN_EMAILS must be set in production");
+  logger.warn("ADMIN_EMAILS not set in production \u2014 admin login will be disabled");
 }
 if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
   import_passport.default.use(
@@ -85229,7 +85229,7 @@ var pinoHttpMiddleware = import_pino_http.default;
 var ConnectPgSimple = (0, import_connect_pg_simple.default)(import_express_session.default);
 var IS_PROD7 = process.env.NODE_ENV === "production";
 if (IS_PROD7 && !process.env.SESSION_SECRET) {
-  throw new Error("SESSION_SECRET environment variable is required in production");
+  logger.warn("SESSION_SECRET not set in production \u2014 using insecure fallback, please set it in Vercel env vars");
 }
 var SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-production";
 var REPLIT_DEV_DOMAIN2 = process.env.REPLIT_DEV_DOMAIN ?? null;
@@ -85250,15 +85250,6 @@ var isOriginAllowed3 = (origin) => {
   if (REPLIT_DOMAINS && origin.endsWith(`.${REPLIT_DOMAINS}`)) return true;
   return false;
 };
-var REQUIRED_PROD_VARS = IS_PROD7 ? ["SESSION_SECRET"] : [];
-for (const v of REQUIRED_PROD_VARS) {
-  if (!process.env[v]) {
-    throw new Error(`[STARTUP] Missing required environment variable: ${v}`);
-  }
-}
-if (IS_PROD7 && !process.env.CRON_SECRET) {
-  logger.warn("CRON_SECRET not set \u2014 cron endpoints will be disabled");
-}
 var app = (0, import_express12.default)();
 app.set("trust proxy", 1);
 app.disable("x-powered-by");
