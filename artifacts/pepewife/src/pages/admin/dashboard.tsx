@@ -769,6 +769,20 @@ export default function AdminDashboard() {
     return () => clearInterval(iv);
   }, []);
 
+  // ─── Danger Zone hooks (must be before any early return) ────────────────────
+  const [confirmModal, setConfirmModal] = useState<{
+    key: string;
+    title: string;
+    desc: string;
+    action: () => Promise<{ deleted: number; message: string }>;
+  } | null>(null);
+  const [confirmInput, setConfirmInput] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+
+  const [devResetModal, setDevResetModal]   = useState(false);
+  const [devResetInput, setDevResetInput]   = useState("");
+  const [devResetLoading, setDevResetLoading] = useState(false);
+
   // ── Generic action (calls backend then refreshes) ───────────────────────────
   const doAction = async (key: string, fn: () => Promise<{ success: boolean; message: string }>) => {
     setActionLoading(key);
@@ -1261,18 +1275,6 @@ export default function AdminDashboard() {
   );
 
   // ─── Danger Zone Section ────────────────────────────────────────────────────
-  const [confirmModal, setConfirmModal] = useState<{
-    key: string;
-    title: string;
-    desc: string;
-    action: () => Promise<{ deleted: number; message: string }>;
-  } | null>(null);
-  const [confirmInput, setConfirmInput] = useState("");
-  const [resetLoading, setResetLoading] = useState(false);
-
-  const [devResetModal, setDevResetModal]   = useState(false);
-  const [devResetInput, setDevResetInput]   = useState("");
-  const [devResetLoading, setDevResetLoading] = useState(false);
 
   async function runReset(action: () => Promise<{ deleted: number; message: string }>) {
     setResetLoading(true);

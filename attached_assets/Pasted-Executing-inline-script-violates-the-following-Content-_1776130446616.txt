@@ -1,0 +1,19 @@
+Executing inline script violates the following Content Security Policy directive 'script-src 'self' 'wasm-unsafe-eval''. Either the 'unsafe-inline' keyword, a hash ('sha256-lY6tOvNYQkpWcOKpb+2b1xQtKEc0mcQuntOHV8/nuAE='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.Understand this error
+injected.js:1 Backpack couldn't override `window.ethereum`.
+fms @ injected.js:1Understand this warning
+injected.js:1 ✅ Bitcoin provider initialized successfully
+index-DglxNLnH.js:9 Uncaught Error: Minified React error #310; visit https://react.dev/errors/310 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at ct (index-DglxNLnH.js:9:35434)
+    at Gi (index-DglxNLnH.js:9:36502)
+    at Object.useState (index-DglxNLnH.js:9:47973)
+    at Vt.h.useState (vendor-query-CA_2Jzsc.js:1:10668)
+    at ts (dashboard-Bo007nSr.js:2:42694)
+    at Po (index-DglxNLnH.js:9:34156)
+    at ec (index-DglxNLnH.js:9:62195)
+    at Wf (index-DglxNLnH.js:9:72699)
+    at xm (index-DglxNLnH.js:9:106715)
+    at Bg (index-DglxNLnH.js:9:105780)Understand this error
+dashboard:1 The resource https://www.pwifecoin.fun/logo.webp was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.Understand this warning
+dashboard:1 The resource https://www.pwifecoin.fun/pepewife-hero.webp was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.Understand this warning
+dashboard:1 The resource https://www.pwifecoin.fun/logo.webp was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.Understand this warning
+dashboard:1 The resource https://www.pwifecoin.fun/pepewife-hero.webp was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
