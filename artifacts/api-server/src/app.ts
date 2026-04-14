@@ -129,14 +129,20 @@ app.use(express.json({ limit: "64kb" }));
 app.use(express.urlencoded({ extended: true, limit: "64kb" }));
 app.use(cookieParser());
 
+const pgSessionStore = new ConnectPgSimple({
+  pool: pool,
+  tableName: "user_sessions",
+  createTableIfMissing: true,
+});
+
+pgSessionStore.on("error", (err: Error) => {
+  logger.error({ err, errMsg: err.message }, "SESSION_STORE: pg-session error");
+});
+
 app.use(
   session({
     name: "__pwife_sid",
-    store: new ConnectPgSimple({
-      pool: pool,
-      tableName: "user_sessions",
-      createTableIfMissing: true,
-    }),
+    store: pgSessionStore,
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,

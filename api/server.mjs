@@ -83187,8 +83187,8 @@ router3.get(
     if (user) {
       req.session.regenerate((err) => {
         if (err) {
-          logger.error({ err, ip }, "AUTH_GOOGLE: session regenerate failed");
-          res.redirect("/admin?error=session_error");
+          logger.error({ err, ip, errMsg: err.message, errStack: err.stack }, "AUTH_GOOGLE: session regenerate failed");
+          res.redirect(`/admin?error=session_error&detail=${encodeURIComponent(err.message ?? "regenerate_failed")}`);
           return;
         }
         const now = Date.now();
@@ -83207,8 +83207,8 @@ router3.get(
         req.session.requestCount = 0;
         req.session.save((saveErr) => {
           if (saveErr) {
-            logger.error({ saveErr, ip }, "AUTH_GOOGLE: session save failed");
-            res.redirect("/admin?error=session_error");
+            logger.error({ saveErr, ip, errMsg: saveErr.message, errStack: saveErr.stack }, "AUTH_GOOGLE: session save failed");
+            res.redirect(`/admin?error=session_error&detail=${encodeURIComponent(saveErr.message ?? "save_failed")}`);
             return;
           }
           logger.info(
@@ -85314,14 +85314,18 @@ app.use(
 app.use(import_express12.default.json({ limit: "64kb" }));
 app.use(import_express12.default.urlencoded({ extended: true, limit: "64kb" }));
 app.use((0, import_cookie_parser.default)());
+var pgSessionStore = new ConnectPgSimple({
+  pool,
+  tableName: "user_sessions",
+  createTableIfMissing: true
+});
+pgSessionStore.on("error", (err) => {
+  logger.error({ err, errMsg: err.message }, "SESSION_STORE: pg-session error");
+});
 app.use(
   (0, import_express_session.default)({
     name: "__pwife_sid",
-    store: new ConnectPgSimple({
-      pool,
-      tableName: "user_sessions",
-      createTableIfMissing: true
-    }),
+    store: pgSessionStore,
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,

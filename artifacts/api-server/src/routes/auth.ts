@@ -132,8 +132,8 @@ router.get(
     if (user) {
       req.session.regenerate((err) => {
         if (err) {
-          logger.error({ err, ip }, "AUTH_GOOGLE: session regenerate failed");
-          res.redirect("/admin?error=session_error");
+          logger.error({ err, ip, errMsg: (err as Error).message, errStack: (err as Error).stack }, "AUTH_GOOGLE: session regenerate failed");
+          res.redirect(`/admin?error=session_error&detail=${encodeURIComponent((err as Error).message ?? "regenerate_failed")}`);
           return;
         }
         const now = Date.now();
@@ -153,8 +153,8 @@ router.get(
 
         req.session.save((saveErr) => {
           if (saveErr) {
-            logger.error({ saveErr, ip }, "AUTH_GOOGLE: session save failed");
-            res.redirect("/admin?error=session_error");
+            logger.error({ saveErr, ip, errMsg: (saveErr as Error).message, errStack: (saveErr as Error).stack }, "AUTH_GOOGLE: session save failed");
+            res.redirect(`/admin?error=session_error&detail=${encodeURIComponent((saveErr as Error).message ?? "save_failed")}`);
             return;
           }
           logger.info(
