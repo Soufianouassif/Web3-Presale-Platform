@@ -16,7 +16,9 @@ import { logger } from "../lib/logger.js";
 // ── Solana constants (same as sol-price-sync) ────────────────────────────────
 const PROGRAM_ID_STR = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
 const CONFIG_PDA_STR = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
-const SOLANA_RPC     = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
+const DEVNET_RPC     = "https://api.devnet.solana.com";
+const _rpcRaw        = process.env.SOLANA_RPC_URL ?? "";
+const SOLANA_RPC     = (_rpcRaw.startsWith("http://") || _rpcRaw.startsWith("https://")) ? _rpcRaw : DEVNET_RPC;
 
 async function getDiscriminator(name: string): Promise<Buffer> {
   const encoder = new TextEncoder();
