@@ -32,6 +32,23 @@ import { pool } from "@workspace/db";
   } catch (err) {
     logger.error({ err }, "STARTUP: failed to ensure admin_users table");
   }
+
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS "user_sessions" (
+        "sid"    VARCHAR   NOT NULL COLLATE "default",
+        "sess"   JSON      NOT NULL,
+        "expire" TIMESTAMP(6) NOT NULL,
+        CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "user_sessions" ("expire")
+    `);
+    logger.info("STARTUP: user_sessions table ready");
+  } catch (err) {
+    logger.error({ err }, "STARTUP: failed to ensure user_sessions table");
+  }
 })();
 
 type PinoHttpFactory = (opts?: Record<string, unknown>) => RequestHandler;
@@ -132,7 +149,6 @@ app.use(cookieParser());
 const pgSessionStore = new ConnectPgSimple({
   pool: pool,
   tableName: "user_sessions",
-  createTableIfMissing: true,
 });
 
 pgSessionStore.on("error", (err: Error) => {

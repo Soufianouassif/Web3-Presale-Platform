@@ -85236,6 +85236,22 @@ var routes_default = router11;
   } catch (err) {
     logger.error({ err }, "STARTUP: failed to ensure admin_users table");
   }
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS "user_sessions" (
+        "sid"    VARCHAR   NOT NULL COLLATE "default",
+        "sess"   JSON      NOT NULL,
+        "expire" TIMESTAMP(6) NOT NULL,
+        CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "user_sessions" ("expire")
+    `);
+    logger.info("STARTUP: user_sessions table ready");
+  } catch (err) {
+    logger.error({ err }, "STARTUP: failed to ensure user_sessions table");
+  }
 })();
 var pinoHttpMiddleware = import_pino_http.default;
 var ConnectPgSimple = (0, import_connect_pg_simple.default)(import_express_session.default);
@@ -85316,8 +85332,7 @@ app.use(import_express12.default.urlencoded({ extended: true, limit: "64kb" }));
 app.use((0, import_cookie_parser.default)());
 var pgSessionStore = new ConnectPgSimple({
   pool,
-  tableName: "user_sessions",
-  createTableIfMissing: true
+  tableName: "user_sessions"
 });
 pgSessionStore.on("error", (err) => {
   logger.error({ err, errMsg: err.message }, "SESSION_STORE: pg-session error");

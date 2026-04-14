@@ -112,9 +112,10 @@ Use the singleton `logger` only for application-level logs outside of request co
 
 Express 5 is a relatively new version and you might forget some things such as:
 
-- Wildcard routes need names
-  - Express 4 used`app.get("*", ...)`
-  - In Express 5 you must do `app.get("/*splat", ...)`
+- Wildcard routes need names, and bare `*` is invalid syntax
+  - Express 4 used `app.get("*", ...)` — this **crashes** in Express 5
+  - In Express 5 you must do `app.get("/{*splat}", ...)` (braces + name required)
+  - `/{*splat}` matches all paths including root `/`; `/*splat` matches all paths except root
 - Optional params changed
   - Express 4 used `/todos/:id?`
   - Express 5 uses `/todos{/:id}`
