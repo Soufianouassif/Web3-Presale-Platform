@@ -1,5 +1,5 @@
 /**
- * PEPEWIFE Presale Contract — Browser Integration
+ * PEPA Presale Contract — Browser Integration
  *
  * Program ID : AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145  (Devnet)
  * Config PDA : 7tvmjEGj9k4QV7oVNeAD13CVxdjRPCNfYdtz1mXQ8sDs

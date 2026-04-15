@@ -427,8 +427,8 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen font-sans overflow-x-hidden" style={{ background: "linear-gradient(180deg, #FFFDE7 0%, #E8F5E9 30%, #FFF9C4 60%, #FCE4EC 100%)", backgroundAttachment: "fixed" }}>
       <SEOHead
-        title="Investor Dashboard – PEPEWIFE Presale"
-        description="Track your PEPEWIFE presale investment, referral rewards, and token allocation. View presale stages and claim your $PWIFE tokens."
+        title="Investor Dashboard – PEPA Presale"
+        description="Track your PEPA presale investment, referral rewards, and token allocation. View presale stages and claim your $PEPA tokens."
         path="/dashboard"
         noindex
       />
@@ -438,9 +438,9 @@ export default function Dashboard() {
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center gap-4 lg:gap-8">
               <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer wiggle-hover shrink-0" onClick={() => navigate("/")}>
-                <img src="/logo.webp" alt="PEPEWIFE" width="36" height="36" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
-                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
-                <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e] whitespace-nowrap" style={{ transform: "rotate(3deg)" }}>$PWIFE</span>
+                <img src="/logo.webp" alt="PEPA" width="36" height="36" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
+                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPA</span>
+                <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e] whitespace-nowrap" style={{ transform: "rotate(3deg)" }}>$PEPA</span>
               </div>
               <div className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-5">
                 <button onClick={() => navigate("/")} className="flex items-center gap-1 font-display text-base text-[#1a1a2e] hover:text-[#FF4D9D] transition-colors tracking-wide wiggle-hover whitespace-nowrap">
@@ -563,19 +563,19 @@ export default function Dashboard() {
                       {
                         label: t.dashboard.tokensPurchased,
                         value: buyerLoading ? "…" : fmt(userPwife),
-                        sub: "$PWIFE",
+                        sub: "$PEPA",
                         color: "#4CAF50", shadow: "#2E7D32", bg: "bg-[#E8F5E9]",
                       },
                       {
                         label: t.dashboard.claimableTokens,
                         value: buyerLoading ? "…" : fmt(Number(buyerState?.tokensBought ?? 0n)),
-                        sub: "$PWIFE · " + t.dashboard.pendingTge,
+                        sub: "$PEPA · " + t.dashboard.pendingTge,
                         color: "#FF4D9D", shadow: "#C2185B", bg: "bg-[#FCE4EC]",
                       },
                       {
                         label: t.dashboard.referralRewards,
                         value: refLoading ? "…" : fmt(Number(refStats?.totalRewardTokens ?? 0)),
-                        sub: "$PWIFE",
+                        sub: "$PEPA",
                         color: "#FF4D9D", shadow: "#C2185B", bg: "bg-[#FCE4EC]",
                       },
                       {
@@ -646,7 +646,7 @@ export default function Dashboard() {
                             ))}
                           </div>
                           <div className="text-center text-[10px] font-display text-[#1a1a2e]/40 tracking-wider">
-                            {fmt(effectiveTokensSold)} / {fmt(totalTokens)} $PWIFE
+                            {fmt(effectiveTokensSold)} / {fmt(totalTokens)} $PEPA
                           </div>
                         </div>
 
@@ -766,13 +766,13 @@ export default function Dashboard() {
                             <div className="flex justify-between items-center">
                               <span className="text-xs text-[#1a1a2e]/50 font-bold">{t.presale.youGet}</span>
                               <span className={`font-display text-lg tracking-wider ${tokensOut > 0 ? "text-[#4CAF50]" : "text-gray-300"}`}>
-                                ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} $PWIFE
+                                ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} $PEPA
                               </span>
                             </div>
                             {tokensOut > 0 && currency === "SOL" && (
                               <>
                                 <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
-                                  1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
+                                  1 SOL ≈ ${solPrice.toLocaleString()} · Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PEPA
                                 </p>
                                 <p className="text-[9px] text-[#FFD54F]/70 font-bold mt-0.5 text-end">
                                   ⚠ Estimate only — final token amount is calculated on-chain at execution time
@@ -781,7 +781,7 @@ export default function Dashboard() {
                             )}
                             {tokensOut > 0 && currency === "USDT_SPL" && (
                               <p className="text-[10px] text-[#1a1a2e]/30 font-bold mt-0.5 text-end">
-                                Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
+                                Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PEPA
                               </p>
                             )}
                           </div>
@@ -825,7 +825,7 @@ export default function Dashboard() {
                                   <span className="text-lg">{s.emoji}</span>
                                   <div>
                                     <div className="font-display text-sm tracking-wider" style={{ color: s.color }}>{t.dashboard.stage} {s.stage} — {s.name.toUpperCase()}</div>
-                                    <div className="text-xs text-[#1a1a2e]/40 font-bold">{s.tokens} $PWIFE • {s.total} {t.dashboard.raised}</div>
+                                    <div className="text-xs text-[#1a1a2e]/40 font-bold">{s.tokens} $PEPA • {s.total} {t.dashboard.raised}</div>
                                   </div>
                                 </div>
                                 <div className="text-end">
@@ -840,7 +840,7 @@ export default function Dashboard() {
                               </div>
                               <div className="flex justify-between mt-1">
                                 <span className="text-[10px] font-nums tracking-wider" style={{ color: s.color }}>{s.pct}% {t.dashboard.soldPercent}</span>
-                                <span className="text-[10px] text-[#1a1a2e]/30 font-nums">{s.tokens} $PWIFE</span>
+                                <span className="text-[10px] text-[#1a1a2e]/30 font-nums">{s.tokens} $PEPA</span>
                               </div>
                             </div>
                           ))}
@@ -856,7 +856,7 @@ export default function Dashboard() {
                               <div className="h-full rounded-full bg-gradient-to-r from-[#4CAF50] via-[#FF4D9D] to-[#4CAF50] transition-all duration-700" style={{ width: `${presaleFilled}%` }} />
                             </div>
                             <div className="flex justify-between mt-1">
-                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">{fmt(effectiveTokensSold)} / {fmt(totalTokens)} $PWIFE</span>
+                              <span className="text-[10px] font-display text-[#b8860b] tracking-wider">{fmt(effectiveTokensSold)} / {fmt(totalTokens)} $PEPA</span>
                               <span className="text-[10px] font-display text-[#b8860b] tracking-wider">{presaleFilled}%</span>
                             </div>
                           </div>
@@ -902,7 +902,7 @@ export default function Dashboard() {
                         ) : (
                           <>
                             <div className="text-3xl font-nums text-[#1a1a2e] tracking-wider">
-                              {fmt(userPwife)} <span className="text-base text-[#1a1a2e]/40">$PWIFE</span>
+                              {fmt(userPwife)} <span className="text-base text-[#1a1a2e]/40">$PEPA</span>
                             </div>
                             <div className="text-sm text-[#1a1a2e]/50 font-bold">
                               ≈ ${userTotalUSD.toFixed(2)} USD
@@ -966,11 +966,11 @@ export default function Dashboard() {
                         <div className="space-y-3">
                           <div className="bg-[#E8F5E9] border-2 border-[#4CAF50]/40 rounded-xl p-4">
                             <div className="flex justify-between items-center mb-2">
-                              <span className="font-display text-xs text-[#4CAF50] tracking-wide">$PWIFE {t.dashboard.tokensPurchased}</span>
+                              <span className="font-display text-xs text-[#4CAF50] tracking-wide">$PEPA {t.dashboard.tokensPurchased}</span>
                               <span className="font-display text-lg text-[#1a1a2e] tracking-wider">{fmt(userPwife)}</span>
                             </div>
                             <div className="text-[10px] text-[#1a1a2e]/40 font-bold">
-                              Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
+                              Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PEPA
                             </div>
                           </div>
                           {userSolPaid > 0 && (
@@ -1016,12 +1016,12 @@ export default function Dashboard() {
                         <div className="meme-card bg-[#E8F5E9] rounded-2xl p-4 border-[#4CAF50] shadow-[3px_3px_0px_#2E7D32]">
                           <div className="text-xs font-display text-[#4CAF50] tracking-wider mb-1">{t.dashboard.yourTokens}</div>
                           <div className="text-xl font-display text-[#1a1a2e] tracking-wider">{buyerLoading ? "…" : fmt(userPwife)}</div>
-                          <div className="text-xs text-[#1a1a2e]/40 font-bold">$PWIFE</div>
+                          <div className="text-xs text-[#1a1a2e]/40 font-bold">$PEPA</div>
                         </div>
                         <div className="meme-card bg-[#FCE4EC] rounded-2xl p-4 border-[#FF4D9D] shadow-[3px_3px_0px_#C2185B]">
                           <div className="text-xs font-display text-[#FF4D9D] tracking-wider mb-1">{t.dashboard.claimable}</div>
                           <div className="text-xl font-display text-[#1a1a2e] tracking-wider">0</div>
-                          <div className="text-xs text-[#1a1a2e]/40 font-bold">$PWIFE</div>
+                          <div className="text-xs text-[#1a1a2e]/40 font-bold">$PEPA</div>
                         </div>
                       </div>
                       <div className="meme-card bg-[#FFFDE7] rounded-2xl p-4 max-w-sm mx-auto mb-6 border-[#FFD54F] shadow-[3px_3px_0px_#F9A825]">
@@ -1082,12 +1082,12 @@ export default function Dashboard() {
                         <div className="bg-[#E8F5E9] border-2 border-[#4CAF50] rounded-2xl p-3">
                           <div className="text-[10px] font-display text-[#4CAF50] tracking-wider">{t.calculator.currentPrice}</div>
                           <div className="font-nums text-lg text-[#1a1a2e] tracking-wider" dir="ltr">{STAGE_DATA[currentStage].price}</div>
-                          <div className="text-[10px] text-[#1a1a2e]/40 font-display">Stage {currentStage + 1} / $PWIFE</div>
+                          <div className="text-[10px] text-[#1a1a2e]/40 font-display">Stage {currentStage + 1} / $PEPA</div>
                         </div>
                         <div className="bg-[#FCE4EC] border-2 border-[#FF4D9D] rounded-2xl p-3">
                           <div className="text-[10px] font-display text-[#FF4D9D] tracking-wider">{t.calculator.listingPrice}</div>
                           <div className="font-nums text-lg text-[#1a1a2e] tracking-wider" dir="ltr">{LISTING_PRICE}</div>
-                          <div className="text-[10px] text-[#1a1a2e]/40 font-display">CEX / $PWIFE</div>
+                          <div className="text-[10px] text-[#1a1a2e]/40 font-display">CEX / $PEPA</div>
                         </div>
                       </div>
                       {/* Tokens you get */}
@@ -1100,7 +1100,7 @@ export default function Dashboard() {
                               : calcTokensResult >= 1e6 ? (calcTokensResult / 1e6).toFixed(2) + "M"
                               : calcTokensResult.toLocaleString()}
                           </div>
-                          <div className="text-xs text-[#1a1a2e]/40 font-display tracking-wide">$PWIFE tokens</div>
+                          <div className="text-xs text-[#1a1a2e]/40 font-display tracking-wide">$PEPA tokens</div>
                         </div>
                       )}
                     </div>
@@ -1169,7 +1169,7 @@ export default function Dashboard() {
                         <div className="grid grid-cols-2 gap-3 mt-5 max-w-xs mx-auto">
                           <div className="bg-white/10 border border-white/20 rounded-xl p-3 text-center">
                             <div className="text-[10px] font-display text-white/40 tracking-wider mb-1">{t.dashboard.airdropPool}</div>
-                            <div className="font-display text-sm text-[#4CAF50] tracking-wide">15T $PWIFE</div>
+                            <div className="font-display text-sm text-[#4CAF50] tracking-wide">15T $PEPA</div>
                           </div>
                           <div className="bg-white/10 border border-white/20 rounded-xl p-3 text-center">
                             <div className="text-[10px] font-display text-white/40 tracking-wider mb-1">{t.dashboard.airdropStatus}</div>
@@ -1415,7 +1415,7 @@ export default function Dashboard() {
                               {r.referredWallet.slice(0, 4)}…{r.referredWallet.slice(-4)}
                             </span>
                             <span className={`text-xs font-display tracking-wide ${r.status === "paid" ? "text-[#4CAF50]" : "text-[#FF4D9D]"}`}>
-                              +{formatTokens(r.rewardTokens)} $PWIFE
+                              +{formatTokens(r.rewardTokens)} $PEPA
                             </span>
                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-display ${r.status === "paid" ? "bg-[#E8F5E9] text-[#4CAF50]" : "bg-[#FCE4EC] text-[#FF4D9D]"}`}>
                               {r.status}
@@ -1435,14 +1435,14 @@ export default function Dashboard() {
                             <div key={`ph-${i}`} className="flex items-center gap-2 rounded-xl px-3 py-2 border-2 bg-[#FFFDE7] border-[#FFD54F]/50">
                               <span className="text-lg">{x.r}</span>
                               <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">---</span>
-                              <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 $PWIFE</span>
+                              <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 $PEPA</span>
                             </div>
                           ))
                         : leaderboard.slice(0, 5).map((entry, i) => (
                             <div key={`lb-${i}`} className="flex items-center gap-2 rounded-xl px-3 py-2 border-2 bg-[#FFFDE7] border-[#FFD54F]/50">
                               <span className="text-lg">{["🥇", "🥈", "🥉", "4️⃣", "5️⃣"][i]}</span>
                               <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">{entry.walletAddress}</span>
-                              <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} $PWIFE</span>
+                              <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} $PEPA</span>
                             </div>
                           ))}
                     </div>
@@ -1523,7 +1523,7 @@ export default function Dashboard() {
                                   <div className="flex items-center gap-2 shrink-0">
                                     <div className="text-end">
                                       <div className="font-display text-sm text-[#FF4D9D] tracking-wider">${usd.toFixed(2)}</div>
-                                      <div className="text-[10px] text-[#4CAF50] font-nums font-bold">+{fmtTokens(tokens)} $PWIFE</div>
+                                      <div className="text-[10px] text-[#4CAF50] font-nums font-bold">+{fmtTokens(tokens)} $PEPA</div>
                                     </div>
                                     {tx.txHash && (
                                       <a
@@ -1583,7 +1583,7 @@ export default function Dashboard() {
                                     <span className="text-[10px] font-display text-[#4CAF50]">#{i + 1}</span>
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <div className="font-display text-xs text-[#FF4D9D] tracking-wider">+{fmtTok(tokens)} $PWIFE</div>
+                                    <div className="font-display text-xs text-[#FF4D9D] tracking-wider">+{fmtTok(tokens)} $PEPA</div>
                                     <div className="text-[10px] text-[#1a1a2e]/40 font-bold">${usd.toFixed(2)} · Stage {p.stage} · {date}</div>
                                     {p.txHash && (
                                       <div className="font-mono text-[9px] text-[#1a1a2e]/30 truncate mt-0.5">{p.txHash.slice(0, 16)}…{p.txHash.slice(-8)}</div>
@@ -1623,8 +1623,8 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-start">
             <div className="flex items-center gap-3">
-              <img src="/logo.webp" alt="PEPEWIFE" width="48" height="48" className="w-12 h-12 rounded-full border-3 border-white/30" />
-              <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPEWIFE</span>
+              <img src="/logo.webp" alt="PEPA" width="48" height="48" className="w-12 h-12 rounded-full border-3 border-white/30" />
+              <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPA</span>
             </div>
             <p className="text-white/40 text-sm font-bold">{t.footer.tagline}</p>
           </div>

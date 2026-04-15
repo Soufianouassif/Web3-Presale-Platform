@@ -1172,8 +1172,8 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Referrers"       value={stats?.referrals?.totalReferrers ?? 0}    sub="active shillers"    color="purple" />
         <StatCard title="Referrals"       value={stats?.referrals?.totalReferrals ?? 0}    sub="purchases referred" color="blue" />
-        <StatCard title="Pending Rewards" value={`${fmt(stats?.referrals?.pendingRewardTokens ?? 0)} $PWIFE`} sub="awaiting TGE" color="yellow" />
-        <StatCard title="Paid Rewards"    value={`${fmt(stats?.referrals?.paidRewardTokens ?? 0)} $PWIFE`}    sub="distributed"    color="green" />
+        <StatCard title="Pending Rewards" value={`${fmt(stats?.referrals?.pendingRewardTokens ?? 0)} $PEPA`} sub="awaiting TGE" color="yellow" />
+        <StatCard title="Paid Rewards"    value={`${fmt(stats?.referrals?.paidRewardTokens ?? 0)} $PEPA`}    sub="distributed"    color="green" />
       </div>
 
       {stats?.referrals && (
@@ -1201,7 +1201,7 @@ export default function AdminDashboard() {
                     <th className="text-left py-3 pr-4">Wallet</th>
                     <th className="text-left py-3 pr-4">Code</th>
                     <th className="text-right py-3 pr-4">Referrals</th>
-                    <th className="text-right py-3 pr-4">$PWIFE</th>
+                    <th className="text-right py-3 pr-4">$PEPA</th>
                     <th className="text-right py-3 pr-4">USD</th>
                     <th className="text-right py-3">Action</th>
                   </tr>
@@ -1506,7 +1506,7 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-2">
             <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#39ff14]/30 to-[#00d4ff]/30 border border-[#39ff14]/30 flex items-center justify-center text-xs font-bold text-[#39ff14]">⚡</span>
             <h1 className="text-sm font-bold">Admin Panel</h1>
-            <span className="text-xs px-2 py-0.5 bg-[#39ff14]/10 text-[#39ff14] rounded-full border border-[#39ff14]/20">PEPEWIFE</span>
+            <span className="text-xs px-2 py-0.5 bg-[#39ff14]/10 text-[#39ff14] rounded-full border border-[#39ff14]/20">PEPA</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <button onClick={fetchStats} className="text-gray-400 hover:text-white text-sm" title="Refresh">↻</button>

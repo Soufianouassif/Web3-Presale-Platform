@@ -397,8 +397,8 @@ export default function Home() {
   return (
     <div className="min-h-screen font-sans overflow-x-hidden">
       <SEOHead
-        title="PEPEWIFE ($PWIFE) – The Lady of Memes | Solana Meme Coin Presale"
-        description="Join the PEPEWIFE presale on Solana. Community-first meme token with staking, Tap-to-Earn, locked liquidity, and revoked mint authority. 100T total supply."
+        title="PEPA ($PEPA) – The Lady of Memes | Solana Meme Coin Presale"
+        description="Join the PEPA presale on Solana. Community-first meme token with staking, Tap-to-Earn, locked liquidity, and revoked mint authority. 100T total supply."
         path="/"
       />
 
@@ -407,9 +407,9 @@ export default function Home() {
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center gap-4 lg:gap-8">
               <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer wiggle-hover shrink-0" onClick={() => scrollTo('hero')}>
-                <img src="/logo.webp" alt="PEPEWIFE" width="36" height="36" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
-                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
-                <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e] whitespace-nowrap" style={{ transform: "rotate(3deg)" }}>$PWIFE</span>
+                <img src="/logo.webp" alt="PEPA" width="36" height="36" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
+                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPA</span>
+                <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e] whitespace-nowrap" style={{ transform: "rotate(3deg)" }}>$PEPA</span>
               </div>
               <div className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-5">
                 {navLinks.map(s => (
@@ -520,7 +520,7 @@ export default function Home() {
                   <div className="bg-white rounded-2xl px-2 sm:px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e] min-w-0 overflow-hidden">
                     <div className="text-[10px] sm:text-xs font-display text-gray-500 font-bold leading-tight truncate">{t.hero.stagePrice.replace("{0}", String(currentStage + 1))}</div>
                     <P v={STAGE_DATA[currentStage].price} className="text-base sm:text-lg font-nums text-[#1a1a2e] tracking-wider leading-tight" />
-                    <div className="text-[10px] sm:text-xs text-gray-500 font-display font-bold leading-tight" dir="ltr">per $PWIFE</div>
+                    <div className="text-[10px] sm:text-xs text-gray-500 font-display font-bold leading-tight" dir="ltr">per $PEPA</div>
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 pb-8 lg:pb-16">
@@ -622,7 +622,7 @@ export default function Home() {
                     ))}
                   </div>
                   <div className="text-center text-xs font-sans text-[#1a1a2e]/50 font-semibold">
-                    {fmt(effectiveTokensSold)} / {fmt(totalTokens)} $PWIFE
+                    {fmt(effectiveTokensSold)} / {fmt(totalTokens)} $PEPA
                   </div>
                 </div>
 
@@ -739,12 +739,12 @@ export default function Home() {
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                       <span className="text-xs text-[#1a1a2e]/50 font-bold">{t.presale.youGet}</span>
                       <span className={`font-nums text-xl sm:text-2xl tracking-wider font-bold ${tokensOut > 0 ? "text-[#4CAF50]" : "text-gray-300"}`}>
-                        ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} <span className="text-sm sm:text-base">$PWIFE</span>
+                        ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} <span className="text-sm sm:text-base">$PEPA</span>
                       </span>
                     </div>
                     {tokensOut > 0 && (
                       <p className="text-[10px] text-[#1a1a2e]/40 font-bold mt-1">
-                        {currency === "SOL" ? `1 SOL ≈ $${solPrice.toFixed(0)} · ` : ""}Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
+                        {currency === "SOL" ? `1 SOL ≈ $${solPrice.toFixed(0)} · ` : ""}Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PEPA
                       </p>
                     )}
                   </div>
@@ -827,7 +827,7 @@ export default function Home() {
                       },
                       {
                         l: t.presale.pending,
-                        v: refStats ? `${formatTokens(refStats.pendingTokens)} $PWIFE` : (address ? "…" : "0 $PWIFE"),
+                        v: refStats ? `${formatTokens(refStats.pendingTokens)} $PEPA` : (address ? "…" : "0 $PEPA"),
                         c: "text-[#FF4D9D]",
                         bg: "bg-[#FCE4EC]",
                         bc: "border-[#FF4D9D]",
@@ -858,14 +858,14 @@ export default function Home() {
                         <div key={`shiller-ph-${i}`} className="flex items-center gap-2 bg-[#FFFDE7] rounded-xl px-3 py-2 border-2 border-[#FFD54F]/50">
                           <span className="text-lg">{x.r}</span>
                           <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">---</span>
-                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 $PWIFE</span>
+                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 $PEPA</span>
                         </div>
                       ))
                     : leaderboard.slice(0, 3).map((entry, i) => (
                         <div key={`shiller-${i}`} className="flex items-center gap-2 bg-[#FFFDE7] rounded-xl px-3 py-2 border-2 border-[#FFD54F]/50">
                           <span className="text-lg">{["🥇", "🥈", "🥉"][i]}</span>
                           <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">{entry.walletAddress}</span>
-                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} $PWIFE</span>
+                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} $PEPA</span>
                         </div>
                       ))}
                 </div>
@@ -962,11 +962,11 @@ export default function Home() {
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
                     <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.symbol}</div>
-                    <div className="font-display text-[#FF4D9D] tracking-wider text-sm">$PWIFE</div>
+                    <div className="font-display text-[#FF4D9D] tracking-wider text-sm">$PEPA</div>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
                     <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.tokenName}</div>
-                    <div className="font-display text-[#FFD54F] tracking-wider text-sm">PEPEWIFE</div>
+                    <div className="font-display text-[#FFD54F] tracking-wider text-sm">PEPA</div>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
                     <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.totalSupply}</div>
@@ -1062,12 +1062,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className={`flex justify-center ${isRTL ? "md:order-last" : ""}`}>
-              <img src="/tokenomics-girl.webp" alt="PEPEWIFE tokenomics distribution chart showing 100 trillion PWIFE total supply" width="512" height="512" loading="lazy" className={`w-full max-w-lg object-contain drop-shadow-2xl ${isRTL ? "scale-x-[-1]" : ""}`} />
+              <img src="/tokenomics-girl.webp" alt="PEPA tokenomics distribution chart showing 100 trillion PEPA total supply" width="512" height="512" loading="lazy" className={`w-full max-w-lg object-contain drop-shadow-2xl ${isRTL ? "scale-x-[-1]" : ""}`} />
             </div>
             <div className={`space-y-6 ${isRTL ? "md:order-first text-start" : ""}`}>
               <div>
                 <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-3">{t.tokenomics.title}</h2>
-                <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.tokenomics.totalSupply} <span className="font-display text-2xl text-[#4CAF50]">100,000,000,000,000 $PWIFE (100T)</span> 🐸</p>
+                <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.tokenomics.totalSupply} <span className="font-display text-2xl text-[#4CAF50]">100,000,000,000,000 $PEPA (100T)</span> 🐸</p>
               </div>
               <div className="space-y-2">
                 {tokenomicsData.map((item, idx) => (
@@ -1075,7 +1075,7 @@ export default function Home() {
                     <div className="w-5 h-5 rounded-full shrink-0 border-2 border-[#1a1a2e]" style={{ backgroundColor: item.color }} />
                     <div className="flex-1">
                       <div className="font-display text-[#1a1a2e] text-sm tracking-wider">{item.name}</div>
-                      <div className="text-xs text-[#1a1a2e]/40 font-bold">{item.value}T $PWIFE</div>
+                      <div className="text-xs text-[#1a1a2e]/40 font-bold">{item.value}T $PEPA</div>
                     </div>
                     <div className="font-display text-2xl text-[#1a1a2e] tracking-wider">{item.value}%</div>
                   </div>
@@ -1103,7 +1103,7 @@ export default function Home() {
               { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: "/roadmap-phase5.png", color: "#FFD54F", meme: t.roadmap.phase5Meme },
             ].map((step, i) => (
               <div key={i} className={`meme-card flex flex-col md:flex-row items-center gap-6 p-6 rounded-3xl bg-white ${step.active ? `border-[#4CAF50] ${isRTL ? "shadow-[-6px_6px_0px_#2E7D32]" : "shadow-[6px_6px_0px_#2E7D32]"}` : ""}`}>
-                <img src={step.img} alt={`PEPEWIFE roadmap ${step.title}`} loading="lazy" className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
+                <img src={step.img} alt={`PEPA roadmap ${step.title}`} loading="lazy" className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
                 <div className="flex-1 text-center md:text-start">
                   <div className="flex items-center gap-2 justify-center md:justify-start mb-1">
                     <span className="sticker text-white text-xs" style={{ backgroundColor: step.color, transform: "rotate(-1deg)" }}>{step.phase}</span>
@@ -1159,8 +1159,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-start">
             <div className="flex items-center gap-3">
-              <img src="/logo.webp" alt="PEPEWIFE" width="48" height="48" className="w-12 h-12 rounded-full border-3 border-white/30" />
-              <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPEWIFE</span>
+              <img src="/logo.webp" alt="PEPA" width="48" height="48" className="w-12 h-12 rounded-full border-3 border-white/30" />
+              <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPA</span>
             </div>
             <p className="text-white/40 text-sm font-bold">{t.footer.tagline}</p>
           </div>

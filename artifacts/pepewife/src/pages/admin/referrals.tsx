@@ -160,7 +160,7 @@ export default function AdminReferrals() {
                     <th className="text-left px-6 py-4">ID</th>
                     <th className="text-left px-6 py-4">Referrer</th>
                     <th className="text-left px-6 py-4">Referred</th>
-                    <th className="text-right px-6 py-4">Reward $PWIFE</th>
+                    <th className="text-right px-6 py-4">Reward $PEPA</th>
                     <th className="text-right px-6 py-4">Reward USD</th>
                     <th className="text-center px-6 py-4">Status</th>
                     <th className="text-left px-6 py-4">Date</th>

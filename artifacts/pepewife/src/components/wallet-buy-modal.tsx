@@ -211,7 +211,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
                 <span className="text-xs font-display tracking-wider text-[#1a1a2e]/50">YOU GET</span>
                 <span className="font-display text-base text-[#4CAF50] tracking-wider">
                   {tokensEstimate > 0
-                    ? `~${tokensEstimate.toLocaleString()} $PWIFE`
+                    ? `~${tokensEstimate.toLocaleString()} $PEPA`
                     : "Calculating…"}
                 </span>
               </div>
@@ -304,7 +304,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
                 <span className="text-xs font-display tracking-wider text-[#1a1a2e]/50">YOU GET</span>
                 <span className="font-display text-lg text-[#4CAF50] tracking-wider">
                   {tokensEstimate > 0
-                    ? `~${tokensEstimate.toLocaleString()} $PWIFE`
+                    ? `~${tokensEstimate.toLocaleString()} $PEPA`
                     : "Calculating…"}
                 </span>
               </div>
@@ -385,7 +385,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
               </a>
             )}
             <div className="bg-[#E8F5E9] border-2 border-[#4CAF50]/30 rounded-xl p-3 w-full text-xs text-[#1a1a2e]/60 font-bold text-center">
-              🎉 Your $PWIFE tokens are secured on-chain. You can safely close this.
+              🎉 Your $PEPA tokens are secured on-chain. You can safely close this.
             </div>
             <button
               onClick={onClose}
@@ -408,7 +408,7 @@ export default function WalletBuyModal({ amount, currency, presaleData, tokensEs
                 You're in! 🐸
               </h3>
               <p className="text-sm text-[#1a1a2e]/50 font-bold mt-2">
-                On-chain verified. Your $PWIFE tokens are secured.
+                On-chain verified. Your $PEPA tokens are secured.
               </p>
             </div>
 
