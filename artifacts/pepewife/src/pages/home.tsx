@@ -474,7 +474,7 @@ export default function Home() {
             <div className="grid grid-cols-1 gap-0">
 
               {/* ─── المحتوى ─── */}
-              <div dir={dir} className="max-w-2xl">
+              <div dir={dir} className={`max-w-2xl${isRTL ? " ms-auto" : ""}`}>
                 <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-4 animate-pulse text-sm sm:text-base" style={{ transform: "rotate(-2deg)" }}>
                   {!siteConfig.isActive
                     ? t.hero.presaleSysPaused
@@ -542,7 +542,7 @@ export default function Home() {
 
       {/* ── FOMO Ticker ── */}
       <section className="py-5 pattern-dots" style={{ background: "linear-gradient(90deg, #FCE4EC, #FFF9C4, #FCE4EC)" }}>
-        <div className="ticker-wrap">
+        <div dir="ltr" className="ticker-wrap">
           <div className="ticker-content" style={{ gap: "3rem" }}>
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="flex shrink-0" style={{ gap: "3rem" }}>
@@ -882,7 +882,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 text-center mb-3">
           <p className="font-display text-sm text-[#1a1a2e] tracking-wider">🗞️ AS SEEN IN</p>
         </div>
-        <div className="ticker-wrap">
+        <div dir="ltr" className="ticker-wrap">
           <div className="ticker-content" style={{ gap: "3rem" }}>
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex shrink-0" style={{ gap: "3rem" }}>
@@ -1008,7 +1008,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 text-center mb-3">
           <p className="font-display text-sm text-[#1a1a2e] tracking-wider">{t.partners.title}</p>
         </div>
-        <div className="ticker-wrap">
+        <div dir="ltr" className="ticker-wrap">
           <div className="ticker-content" style={{ gap: "3rem" }}>
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex shrink-0" style={{ gap: "3rem" }}>

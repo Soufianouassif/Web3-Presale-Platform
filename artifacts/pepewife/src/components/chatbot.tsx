@@ -44,7 +44,7 @@ const TELEGRAM_URL = "https://t.me/pepewifecoin";
 const TWITTER_URL  = "https://x.com/pepewifecoin";
 
 const SUGGESTIONS: Record<TopicKey, Suggestion> = {
-  what:       { key: "what",       label: { en: "🐸 What is $PEPA?", ar: "🐸 ما هو $PEPA؟", fr: "🐸 C'est quoi $PEPA?" }, query: "what is pwife" },
+  what:       { key: "what",       label: { en: "🐸 What is $PEPA?", ar: "🐸 ما هو $PEPA؟", fr: "🐸 C'est quoi $PEPA?" }, query: "what is pepa" },
   presale:    { key: "presale",    label: { en: "🛒 Presale Stages", ar: "🛒 مراحل البيع", fr: "🛒 Étapes prévente" }, query: "presale" },
   price:      { key: "price",      label: { en: "💰 Price & ROI", ar: "💰 السعر والعائد", fr: "💰 Prix & ROI" }, query: "price" },
   buy:        { key: "buy",        label: { en: "🛍️ How to Buy", ar: "🛍️ كيف أشتري؟", fr: "🛍️ Comment acheter?" }, query: "how to buy" },

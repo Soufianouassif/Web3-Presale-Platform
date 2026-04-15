@@ -235,7 +235,7 @@ router.post("/auth/logout", authLimiter, (req, res) => {
     } else {
       logger.info({ userId, userEmail, ip }, "AUTH_LOGOUT: admin logged out");
     }
-    res.clearCookie("__pwife_sid", COOKIE_OPTS);
+    res.clearCookie("__pepa_sid", COOKIE_OPTS);
     res.json({ success: true });
   });
 });

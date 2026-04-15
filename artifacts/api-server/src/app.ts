@@ -157,7 +157,7 @@ pgSessionStore.on("error", (err: Error) => {
 
 app.use(
   session({
-    name: "__pwife_sid",
+    name: "__pepa_sid",
     store: pgSessionStore,
     secret: SESSION_SECRET,
     resave: false,

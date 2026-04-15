@@ -22,7 +22,7 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 artifacts-monorepo/
 ├── artifacts/              # Deployable applications
 │   └── api-server/         # Express API server
-│   └── pepewife/           # PEPEWIFE presale platform (React + Vite)
+│   └── pepewife/           # PEPA presale platform (React + Vite)
 ├── lib/                    # Shared libraries
 │   ├── api-spec/           # OpenAPI spec + Orval codegen config
 │   ├── api-client-react/   # Generated React Query hooks
@@ -98,7 +98,7 @@ Utility scripts package. Each script is a `.ts` file in `src/` with a correspond
 
 ### `artifacts/pepewife` (`@workspace/pepewife`)
 
-React + Vite single-page crypto presale platform for $PWIFE meme coin on Solana. Bold satirical cartoon meme aesthetic.
+React + Vite single-page crypto presale platform for $PEPA meme coin on Solana. Bold satirical cartoon meme aesthetic.
 
 - **Stack**: React 19, Vite, Tailwind CSS 4, Recharts, react-icons, lucide-react, shadcn/ui
 - **Design Style**: Cartoon meme aesthetic — thick black borders, offset box-shadows, zigzag rainbow dividers, dot-pattern backgrounds, speech bubbles, rotated stickers, degen/meme language
