@@ -86,7 +86,7 @@ export default function Whitepaper() {
     <nav className="space-y-0.5">
       <div className="px-3 py-2 mb-2">
         <div className="flex items-center gap-2">
-          <img src="/logo.webp" alt="PEPEWIFE" width="28" height="28" className="w-7 h-7 rounded-full border-2 border-[#1a1a2e]" />
+          <img src="/logo.webp" alt="PEPA" width="28" height="28" className="w-7 h-7 rounded-full border-2 border-[#1a1a2e]" />
           <span className="font-display text-sm text-[#1a1a2e]/50 tracking-widest uppercase">{t.footer.whitepaper.replace("📄 ", "")}</span>
         </div>
       </div>
@@ -114,8 +114,8 @@ export default function Whitepaper() {
   return (
     <div className="min-h-screen font-sans" style={{ background: "linear-gradient(180deg, #FFFDE7 0%, #E8F5E9 50%, #FFF9C4 100%)" }}>
       <SEOHead
-        title="PEPEWIFE Whitepaper – Tokenomics, Roadmap & Vision"
-        description="Read the official PEPEWIFE whitepaper. Learn about $PWIFE tokenomics, roadmap, security commitments, staking, Tap-to-Earn, and the Solana meme token vision."
+        title="PEPA Whitepaper – Tokenomics, Roadmap & Vision"
+        description="Read the official PEPA whitepaper. Learn about $PEPA tokenomics, roadmap, security commitments, staking, Tap-to-Earn, and the Solana meme token vision."
         path="/whitepaper"
       />
 
@@ -131,8 +131,8 @@ export default function Whitepaper() {
                 {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
               </button>
               <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer wiggle-hover shrink-0" onClick={() => navigate("/")}>
-                <img src="/logo.webp" alt="PEPEWIFE" width="36" height="36" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
-                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
+                <img src="/logo.webp" alt="PEPA" width="36" height="36" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
+                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPA</span>
                 <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e]">{t.footer.whitepaper.replace("📄 ", "")}</span>
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function Whitepaper() {
             <div className="relative overflow-hidden">
               <img
                 src="/whitepaper-cover.webp"
-                alt="PEPEWIFE Whitepaper"
+                alt="PEPA Whitepaper"
                 className="w-full h-[200px] sm:h-[280px] object-cover opacity-70"
               />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#1a1a2e]" />
@@ -207,7 +207,7 @@ export default function Whitepaper() {
                   <div className="mb-5 rounded-2xl overflow-hidden border-4 border-[#1a1a2e] shadow-lg">
                     <img
                       src={sectionImages[i].src}
-                      alt={`PEPEWIFE – ${sectionImages[i].alt}`}
+                      alt={`PEPA – ${sectionImages[i].alt}`}
                       loading="lazy"
                       className="w-full h-[180px] sm:h-[240px] object-cover"
                     />
@@ -258,8 +258,8 @@ export default function Whitepaper() {
             <div className="max-w-3xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
               <div className="text-center md:text-start">
                 <div className="flex items-center gap-3">
-                  <img src="/logo.webp" alt="PEPEWIFE" width="48" height="48" className="w-10 h-10 rounded-full border-2 border-white/30" />
-                  <span className="font-display text-2xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPEWIFE</span>
+                  <img src="/logo.webp" alt="PEPA" width="48" height="48" className="w-10 h-10 rounded-full border-2 border-white/30" />
+                  <span className="font-display text-2xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPA</span>
                 </div>
                 <p className="text-white/40 text-xs font-bold mt-1">{t.footer.tagline}</p>
               </div>

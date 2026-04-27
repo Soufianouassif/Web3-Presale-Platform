@@ -89,7 +89,7 @@ export default function TwitterFeed({ username }: TwitterFeedProps) {
             <div className="flex items-center gap-3 mb-3">
               <img src="/logo.webp" alt="PW" width="40" height="40" className="w-10 h-10 rounded-full border-2 border-[#1a1a2e]" />
               <div>
-                <div className="font-display text-[#1a1a2e] text-sm tracking-wider">PEPEWIFE 🐸</div>
+                <div className="font-display text-[#1a1a2e] text-sm tracking-wider">PEPA 🐸</div>
                 <div className="text-xs text-[#1a1a2e]/40 font-bold">@{username}</div>
               </div>
               <Twitter className="ms-auto text-[#4CAF50] h-5 w-5" />
@@ -97,7 +97,7 @@ export default function TwitterFeed({ username }: TwitterFeedProps) {
             <div className="rounded-xl overflow-hidden mb-3 border-2 border-[#1a1a2e]/10">
               <img
                 src={post.img}
-                alt={`PEPEWIFE meme post ${i + 1}`}
+                alt={`PEPA meme post ${i + 1}`}
                 className="w-full h-[200px] object-cover"
                 loading="lazy"
               />

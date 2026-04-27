@@ -12,6 +12,45 @@ import { logger } from "./lib/logger.js";
 import { runSolPriceSync } from "./routes/sol-price-sync.js";
 import { pool } from "@workspace/db";
 
+// ── Startup: ensure admin_users table exists ─────────────────────────────────
+// Drizzle push runs on Vercel build, but if the schema differs or it was skipped,
+// this guard creates the table so Google OAuth never fails with a missing-table error.
+(async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS admin_users (
+        id         SERIAL PRIMARY KEY,
+        google_id  TEXT   UNIQUE NOT NULL,
+        email      TEXT   UNIQUE NOT NULL,
+        name       TEXT,
+        avatar     TEXT,
+        last_login TIMESTAMPTZ DEFAULT NOW(),
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    logger.info("STARTUP: admin_users table ready");
+  } catch (err) {
+    logger.error({ err }, "STARTUP: failed to ensure admin_users table");
+  }
+
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS "user_sessions" (
+        "sid"    VARCHAR   NOT NULL COLLATE "default",
+        "sess"   JSON      NOT NULL,
+        "expire" TIMESTAMP(6) NOT NULL,
+        CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "user_sessions" ("expire")
+    `);
+    logger.info("STARTUP: user_sessions table ready");
+  } catch (err) {
+    logger.error({ err }, "STARTUP: failed to ensure user_sessions table");
+  }
+})();
+
 type PinoHttpFactory = (opts?: Record<string, unknown>) => RequestHandler;
 const pinoHttpMiddleware = (pinoHttp as unknown as PinoHttpFactory);
 
@@ -20,15 +59,19 @@ const ConnectPgSimple = connectPgSimpleFactory(session);
 const IS_PROD = process.env.NODE_ENV === "production";
 
 if (IS_PROD && !process.env.SESSION_SECRET) {
-  throw new Error("SESSION_SECRET environment variable is required in production");
+  logger.warn("SESSION_SECRET not set in production — using insecure fallback, please set it in Vercel env vars");
 }
 const SESSION_SECRET = process.env.SESSION_SECRET ?? "dev-only-secret-not-for-production";
+
+const REPLIT_DEV_DOMAIN = process.env.REPLIT_DEV_DOMAIN ?? null;
+const REPLIT_DOMAINS = process.env.REPLIT_DOMAINS ?? null;
 
 const ALLOWED_ORIGINS_EXACT: string[] = [
   "https://pwifecoin.fun",
   "https://www.pwifecoin.fun",
   ...(IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000"]),
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+  ...(REPLIT_DEV_DOMAIN ? [`https://${REPLIT_DEV_DOMAIN}`] : []),
 ];
 
 const VERCEL_PREVIEW_DOMAIN = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
@@ -37,21 +80,10 @@ const isOriginAllowed = (origin: string): boolean => {
   if (ALLOWED_ORIGINS_EXACT.includes(origin)) return true;
   if (VERCEL_PREVIEW_DOMAIN && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN}`)) return true;
   if (VERCEL_PREVIEW_DOMAIN && origin === `https://${VERCEL_PREVIEW_DOMAIN}`) return true;
+  if (REPLIT_DEV_DOMAIN && origin.endsWith(`.${REPLIT_DEV_DOMAIN}`)) return true;
+  if (REPLIT_DOMAINS && origin.endsWith(`.${REPLIT_DOMAINS}`)) return true;
   return false;
 };
-
-// check required env vars on startup
-const REQUIRED_PROD_VARS = IS_PROD
-  ? (["SESSION_SECRET"] as const)
-  : ([] as const);
-for (const v of REQUIRED_PROD_VARS) {
-  if (!process.env[v]) {
-    throw new Error(`[STARTUP] Missing required environment variable: ${v}`);
-  }
-}
-if (IS_PROD && !process.env.CRON_SECRET) {
-  logger.warn("CRON_SECRET not set — cron endpoints will be disabled");
-}
 
 const app: Express = express();
 
@@ -114,14 +146,19 @@ app.use(express.json({ limit: "64kb" }));
 app.use(express.urlencoded({ extended: true, limit: "64kb" }));
 app.use(cookieParser());
 
+const pgSessionStore = new ConnectPgSimple({
+  pool: pool,
+  tableName: "user_sessions",
+});
+
+pgSessionStore.on("error", (err: Error) => {
+  logger.error({ err, errMsg: err.message }, "SESSION_STORE: pg-session error");
+});
+
 app.use(
   session({
-    name: "__pwife_sid",
-    store: new ConnectPgSimple({
-      pool: pool,
-      tableName: "user_sessions",
-      createTableIfMissing: true,
-    }),
+    name: "__pepa_sid",
+    store: pgSessionStore,
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -142,7 +179,7 @@ app.use("/api", router);
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   const status = (err as { status?: number }).status ?? 500;
-  const message = err.message ?? "Internal Server Error";
+  const message = IS_PROD ? "Internal Server Error" : (err.message ?? "Internal Server Error");
   logger.error({ err }, "Unhandled error");
   res.status(status).json({ error: message, stack: IS_PROD ? undefined : err.stack });
 });

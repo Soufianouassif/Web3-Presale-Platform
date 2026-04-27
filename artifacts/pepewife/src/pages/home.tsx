@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Menu, X, Twitter, Send, Wallet, ArrowRight, Copy, Check, ChevronRight, ShieldCheck, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -47,6 +47,7 @@ export default function Home() {
   const [txSignature, setTxSignature] = useState<string | null>(null);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [calcAmount, setCalcAmount] = useState("");
+  const [dbStats, setDbStats] = useState<{ totalRaisedUsd: number; totalTokensSold: number; uniqueBuyers: number } | null>(null);
 
   // ── Referral state ────────────────────────────────────────────────────────
   const [myRefCode, setMyRefCode] = useState<string | null>(null);
@@ -58,16 +59,53 @@ export default function Home() {
   const isRTL = dir === "rtl";
   const { status, shortAddress, address } = useWallet();
 
+  const fetchDbStats = () => {
+    fetch("/api/track/stats")
+      .then(r => r.json())
+      .then((d: { total_raised_usd?: string; total_tokens_sold?: string; unique_buyers?: string }) => {
+        setDbStats({
+          totalRaisedUsd:   parseFloat(d.total_raised_usd   ?? "0") || 0,
+          totalTokensSold:  parseFloat(d.total_tokens_sold  ?? "0") || 0,
+          uniqueBuyers:     parseInt(d.unique_buyers         ?? "0") || 0,
+        });
+      })
+      .catch(() => {});
+  };
+
   useEffect(() => {
     tracker.visit("/");
     fetchPresaleState().then(d => { if (d) setPresaleData(d); });
     fetchPublicPresaleConfig().then(cfg => setSiteConfig(cfg));
+    fetchDbStats();
 
     // Auto-refresh presale state every 30 seconds
     const chainInterval = setInterval(() => {
       fetchPresaleState().then(d => { if (d) setPresaleData(d); });
+      fetchDbStats();
     }, 30_000);
     return () => clearInterval(chainInterval);
+  }, []);
+
+  // ── Detect blockchain resets and refresh UI immediately ───────────────────
+  const versionRef = useRef<string | null>(null);
+  useEffect(() => {
+    const checkVersion = async () => {
+      try {
+        const r = await fetch("/api/presale/version");
+        const d: { version: string | null } = await r.json();
+        if (d.version !== null) {
+          if (versionRef.current !== null && versionRef.current !== d.version) {
+            // Reset detected — force immediate data refresh
+            fetchPresaleState().then(data => { if (data) setPresaleData(data); });
+            fetchDbStats();
+          }
+          versionRef.current = d.version;
+        }
+      } catch { /* ignore network errors */ }
+    };
+    checkVersion();
+    const versionInterval = setInterval(checkVersion, 5_000);
+    return () => clearInterval(versionInterval);
   }, []);
 
   useEffect(() => {
@@ -189,15 +227,33 @@ export default function Home() {
       : fallbackPrice;
     return { stage: i + 1, price, tokens, sold, color: STAGE_COLORS[i] };
   });
-  const LISTING_PRICE = "$0.061327";
+  const LISTING_PRICE = "$0.00000007";
   const currentStage = presaleData ? presaleData.currentStage : 0;
   const totalSold = STAGE_DATA.reduce((a, s) => a + s.sold, 0);
   const totalTokens = STAGE_DATA.reduce((a, s) => a + s.tokens, 0);
-  const presaleFilled = Math.round((totalSold / totalTokens) * 100);
 
-  const totalRaisedUSD = presaleData
+  const blockchainRaisedUSD = presaleData
     ? (Number(presaleData.totalSolRaised) / 1e9) * solPrice + Number(presaleData.totalUsdtRaised) / 1e6
     : 0;
+  // إذا كانت البيانات الـ blockchain صفراً أو غير محملة، نستخدم بيانات DB كـ fallback
+  const totalRaisedUSD = blockchainRaisedUSD > 0 ? blockchainRaisedUSD : (dbStats?.totalRaisedUsd ?? 0);
+  // priority: per-stage sum → contract global field → DB fallback
+  const effectiveTokensSold =
+    totalSold > 0
+      ? totalSold
+      : presaleData?.totalTokensSold && Number(presaleData.totalTokensSold) > 0
+        ? Number(presaleData.totalTokensSold)
+        : (dbStats?.totalTokensSold ?? 0);
+  // for the progress bar: if per-stage data is missing but we have a total, fill stage 1
+  const effectiveStageData = totalSold === 0 && effectiveTokensSold > 0
+    ? STAGE_DATA.map((s, i) => i === 0 ? { ...s, sold: Math.min(effectiveTokensSold, s.tokens) } : s)
+    : STAGE_DATA;
+  const effectiveTotalSold = effectiveStageData.reduce((a, s) => a + s.sold, 0);
+  const presaleFilled = Math.round((effectiveTotalSold / totalTokens) * 100);
+  const effectiveBuyers = presaleData
+    ? Number(presaleData.buyersCount)
+    : (dbStats?.uniqueBuyers ?? 0);
+  const hasAnyData = presaleData !== null || dbStats !== null;
 
   const stagePrice = parseFloat(STAGE_DATA[currentStage].price.replace(/\$/g, ""));
   const calcAmountNum = parseFloat(calcAmount);
@@ -282,48 +338,43 @@ export default function Home() {
 
     console.log("[BuySuccess] Computed: usdAmt=", usdAmt, "tokensEst=", tokensEst, "solPrice=", effectiveSolPrice, "pricePerToken=", pricePerToken, "network=", networkField);
 
-    // Retry tracking up to 4 times with 3s delay — devnet RPC propagation is slow
+    // ── Return success immediately — tracking runs in background ──────────
+    // The on-chain tx is already confirmed by Solana. Tracking is a DB record only.
+    // If tracking fails we don't block the user; admin can reconcile from blockchain.
+    const trackPayload = {
+      walletAddress: address ?? "",
+      network: networkField,
+      amountUsd: usdAmt,
+      amountTokens: tokensEst,
+      txHash: sig,
+      stage,
+      referralCode: refCode ?? undefined,
+    };
+
+    // Background tracking — up to 4 retries, 3s apart, without blocking the UI
     const MAX_TRACK_ATTEMPTS = 4;
     const TRACK_DELAY_MS = 3_000;
-    let result: Awaited<ReturnType<typeof tracker.purchase>> = { success: false, error: "Not attempted" };
-    for (let attempt = 1; attempt <= MAX_TRACK_ATTEMPTS; attempt++) {
-      result = await tracker.purchase({
-        walletAddress: address ?? "",
-        network: networkField,
-        amountUsd: usdAmt,
-        amountTokens: tokensEst,
-        txHash: sig,
-        stage,
-        referralCode: refCode ?? undefined,
-      });
-      if (result.success) break;
-      console.warn(`[BuySuccess] Tracking attempt ${attempt}/${MAX_TRACK_ATTEMPTS} failed:`, result.error);
-      if (attempt < MAX_TRACK_ATTEMPTS) await new Promise(r => setTimeout(r, TRACK_DELAY_MS));
-    }
-
-    if (result.success) {
-      console.log("[BuySuccess] ✓ Tracked successfully, purchaseId=", result.purchaseId);
-      if (refCode) {
-        console.log("[BuySuccess] Clearing referral code from localStorage");
-        clearStoredReferralCode();
+    (async () => {
+      for (let attempt = 1; attempt <= MAX_TRACK_ATTEMPTS; attempt++) {
+        const result = await tracker.purchase(trackPayload);
+        if (result.success) {
+          console.log("[BuySuccess] ✓ Tracked successfully (bg), purchaseId=", result.purchaseId);
+          if (refCode) clearStoredReferralCode();
+          return;
+        }
+        console.warn(`[BuySuccess] Tracking attempt ${attempt}/${MAX_TRACK_ATTEMPTS} failed (bg):`, result.error);
+        if (attempt < MAX_TRACK_ATTEMPTS) await new Promise(r => setTimeout(r, TRACK_DELAY_MS));
       }
-      // Navigate to dashboard after a short delay
-      setTimeout(() => {
-        setShowBuyModal(false);
-        navigate("/dashboard");
-      }, 2500);
-      return { verified: true };
-    } else {
-      // Tracking failed — but the on-chain transaction DID succeed (Solana program accepted it).
-      // This is a backend timing issue, not a real purchase failure.
-      // Show success to the user; admin can reconcile from the blockchain.
-      console.warn("[BuySuccess] ⚠ On-chain tx confirmed but backend tracking failed:", result.error, result.reason, "| txHash:", sig.slice(0, 20));
-      setTimeout(() => {
-        setShowBuyModal(false);
-        navigate("/dashboard");
-      }, 3000);
-      return { verified: true };
-    }
+      console.warn("[BuySuccess] ⚠ All background tracking attempts failed for txHash:", sig.slice(0, 20));
+    })();
+
+    // Navigate to dashboard after a short delay (don't wait for tracking)
+    setTimeout(() => {
+      setShowBuyModal(false);
+      navigate("/dashboard");
+    }, 2000);
+
+    return { verified: true };
   };
 
   // ── APE IN handler — open the wallet/buy modal ─────────────────────
@@ -346,8 +397,8 @@ export default function Home() {
   return (
     <div className="min-h-screen font-sans overflow-x-hidden">
       <SEOHead
-        title="PEPEWIFE ($PWIFE) – The Lady of Memes | Solana Meme Coin Presale"
-        description="Join the PEPEWIFE presale on Solana. Community-first meme token with staking, Tap-to-Earn, locked liquidity, and revoked mint authority. 100T total supply."
+        title="PEPA ($PEPA) – The Lady of Memes | Solana Meme Coin Presale"
+        description="Join the PEPA presale on Solana. Community-first meme token with staking, Tap-to-Earn, locked liquidity, and revoked mint authority. 100T total supply."
         path="/"
       />
 
@@ -356,9 +407,9 @@ export default function Home() {
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center gap-4 lg:gap-8">
               <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer wiggle-hover shrink-0" onClick={() => scrollTo('hero')}>
-                <img src="/logo.webp" alt="PEPEWIFE" width="36" height="36" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
-                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPEWIFE</span>
-                <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e] whitespace-nowrap" style={{ transform: "rotate(3deg)" }}>$PWIFE</span>
+                <img src="/logo.webp" alt="PEPA" width="36" height="36" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#1a1a2e] shrink-0" />
+                <span className="font-display text-xl sm:text-2xl text-[#1a1a2e] tracking-wide whitespace-nowrap" style={{ textShadow: isRTL ? "-2px 2px 0px #FFD54F" : "2px 2px 0px #FFD54F" }}>PEPA</span>
+                <span className="hidden sm:inline-block bg-[#FF4D9D] text-white text-[10px] font-display px-2 py-0.5 rounded-full border-2 border-[#1a1a2e] whitespace-nowrap" style={{ transform: "rotate(3deg)" }}>$PEPA</span>
               </div>
               <div className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-5">
                 {navLinks.map(s => (
@@ -423,7 +474,7 @@ export default function Home() {
             <div className="grid grid-cols-1 gap-0">
 
               {/* ─── المحتوى ─── */}
-              <div dir={dir} className="max-w-2xl">
+              <div dir={dir} className={`max-w-2xl${isRTL ? " ms-auto" : ""}`}>
                 <div className="sticker bg-[#FFD54F] text-[#1a1a2e] mb-4 animate-pulse text-sm sm:text-base" style={{ transform: "rotate(-2deg)" }}>
                   {!siteConfig.isActive
                     ? t.hero.presaleSysPaused
@@ -445,31 +496,31 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
-                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.totalRaised}</div>
-                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
-                      {presaleData ? fmtUSD(totalRaisedUSD) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
+                  <div className="bg-white rounded-2xl px-2 sm:px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e] min-w-0 overflow-hidden">
+                    <div className="text-[10px] sm:text-xs font-display text-gray-500 font-bold leading-tight truncate">{t.hero.totalRaised}</div>
+                    <div className="text-base sm:text-xl font-nums text-[#1a1a2e] tracking-wider leading-tight" dir="ltr">
+                      {hasAnyData ? fmtUSD(totalRaisedUSD) : <span className="text-sm text-gray-400 animate-pulse">...</span>}
                     </div>
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold" dir="ltr">USD • SOL ${solPrice.toFixed(0)}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-500 font-display font-bold leading-tight" dir="ltr">USD • SOL ${solPrice.toFixed(0)}</div>
                   </div>
-                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.tokensSold}</div>
-                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
-                      {presaleData ? fmt(totalSold) : <span className="text-sm text-gray-400 animate-pulse">Loading...</span>}
+                  <div className="bg-white rounded-2xl px-2 sm:px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e] min-w-0 overflow-hidden">
+                    <div className="text-[10px] sm:text-xs font-display text-gray-500 font-bold leading-tight truncate">{t.hero.tokensSold}</div>
+                    <div className="text-base sm:text-xl font-nums text-[#1a1a2e] tracking-wider leading-tight" dir="ltr">
+                      {hasAnyData ? fmt(effectiveTokensSold) : <span className="text-sm text-gray-400 animate-pulse">...</span>}
                     </div>
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">{t.hero.tokens}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-500 font-display font-bold leading-tight">{t.hero.tokens}</div>
                   </div>
-                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.buyers}</div>
-                    <div className="text-lg sm:text-xl font-nums text-[#1a1a2e] tracking-wider" dir="ltr">
-                      {presaleData ? fmt(Number(presaleData.buyersCount)) : <span className="text-sm text-gray-400 animate-pulse">—</span>}
+                  <div className="bg-white rounded-2xl px-2 sm:px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e] min-w-0 overflow-hidden">
+                    <div className="text-[10px] sm:text-xs font-display text-gray-500 font-bold leading-tight truncate">{t.hero.buyers}</div>
+                    <div className="text-base sm:text-xl font-nums text-[#1a1a2e] tracking-wider leading-tight" dir="ltr">
+                      {hasAnyData ? fmt(effectiveBuyers) : <span className="text-sm text-gray-400 animate-pulse">—</span>}
                     </div>
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold">{t.hero.uniqueWallets}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-500 font-display font-bold leading-tight truncate">{t.hero.uniqueWallets}</div>
                   </div>
-                  <div className="bg-white rounded-2xl px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e]">
-                    <div className="text-xs font-display text-gray-500 tracking-wide font-bold">{t.hero.stagePrice.replace("{0}", String(currentStage + 1))}</div>
-                    <P v={STAGE_DATA[currentStage].price} className="text-base sm:text-lg font-nums text-[#1a1a2e] tracking-wider" />
-                    <div className="text-xs text-gray-500 font-display tracking-wide font-bold" dir="ltr">per $PWIFE</div>
+                  <div className="bg-white rounded-2xl px-2 sm:px-3 py-2 border-2 border-[#1a1a2e] shadow-[4px_4px_0px_#1a1a2e] min-w-0 overflow-hidden">
+                    <div className="text-[10px] sm:text-xs font-display text-gray-500 font-bold leading-tight truncate">{t.hero.stagePrice.replace("{0}", String(currentStage + 1))}</div>
+                    <P v={STAGE_DATA[currentStage].price} className="text-base sm:text-lg font-nums text-[#1a1a2e] tracking-wider leading-tight" />
+                    <div className="text-[10px] sm:text-xs text-gray-500 font-display font-bold leading-tight" dir="ltr">per $PEPA</div>
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 pb-8 lg:pb-16">
@@ -491,7 +542,7 @@ export default function Home() {
 
       {/* ── FOMO Ticker ── */}
       <section className="py-5 pattern-dots" style={{ background: "linear-gradient(90deg, #FCE4EC, #FFF9C4, #FCE4EC)" }}>
-        <div className="ticker-wrap">
+        <div dir="ltr" className="ticker-wrap">
           <div className="ticker-content" style={{ gap: "3rem" }}>
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="flex shrink-0" style={{ gap: "3rem" }}>
@@ -538,17 +589,17 @@ export default function Home() {
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm font-bold">
                     <span className="text-[#4CAF50] font-display tracking-wide">
-                      🐸 {presaleData
-                        ? (totalSold >= 1_000_000_000
-                            ? (totalSold / 1_000_000_000).toFixed(2) + "B"
-                            : fmt(totalSold))
+                      🐸 {hasAnyData
+                        ? (effectiveTokensSold >= 1_000_000_000
+                            ? (effectiveTokensSold / 1_000_000_000).toFixed(2) + "B"
+                            : fmt(effectiveTokensSold))
                         : "…"} {t.presale.sold}
                     </span>
                     <span className="text-sm text-[#1a1a2e]/70 font-nums tracking-wide font-bold">{presaleFilled}% — Stage {currentStage + 1}/4</span>
                   </div>
                   {/* شريط المراحل الأربع */}
                   <div dir="ltr" className="flex gap-1 h-5 rounded-full overflow-hidden border-2 border-[#1a1a2e]">
-                    {STAGE_DATA.map((s, i) => {
+                    {effectiveStageData.map((s, i) => {
                       const pct = Math.min(100, Math.round((s.sold / s.tokens) * 100));
                       return (
                         <div key={i} className="relative flex-1 bg-gray-100">
@@ -571,15 +622,17 @@ export default function Home() {
                     ))}
                   </div>
                   <div className="text-center text-xs font-sans text-[#1a1a2e]/50 font-semibold">
-                    {fmt(totalSold)} / {fmt(totalTokens)} $PWIFE
+                    {fmt(effectiveTokensSold)} / {fmt(totalTokens)} $PEPA
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                   {[
-                    { l: t.presale.now,  v: STAGE_DATA[0].price,  sub: "Stage 1", bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" },
-                    { l: t.presale.next, v: STAGE_DATA[1].price,  sub: "Stage 2", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" },
-                    { l: t.presale.list, v: LISTING_PRICE,         sub: "CEX",     bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" },
+                    { l: t.presale.stage1, v: STAGE_DATA[0].price,                                               sub: "Stage 1",                                bg: "bg-[#2196F3]/10", bc: "border-[#2196F3]", tc: "text-[#2196F3]" },
+                    { l: t.presale.now,    v: STAGE_DATA[currentStage].price,                                     sub: `Stage ${currentStage + 1}`,              bg: "bg-[#4CAF50]/10", bc: "border-[#4CAF50]", tc: "text-[#4CAF50]" },
+                    { l: t.presale.next,   v: currentStage < 3 ? STAGE_DATA[currentStage + 1].price : "—",        sub: currentStage < 3 ? `Stage ${currentStage + 2}` : "—", bg: "bg-[#FF4D9D]/10", bc: "border-[#FF4D9D]", tc: "text-[#FF4D9D]" },
+                    { l: t.presale.stage4, v: STAGE_DATA[3].price,                                                sub: "Stage 4",                                bg: "bg-[#9C27B0]/10", bc: "border-[#9C27B0]", tc: "text-[#9C27B0]" },
+                    { l: t.presale.list,   v: LISTING_PRICE,                                                      sub: "CEX",                                    bg: "bg-[#FFD54F]/20", bc: "border-[#FFD54F]", tc: "text-[#b8860b]" },
                   ].map(p => (
                     <div key={p.l} className={`${p.bg} border-2 ${p.bc} rounded-xl p-3 text-center`}>
                       <div className="text-xs font-sans text-[#1a1a2e]/60 font-semibold">{p.l}</div>
@@ -686,12 +739,12 @@ export default function Home() {
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                       <span className="text-xs text-[#1a1a2e]/50 font-bold">{t.presale.youGet}</span>
                       <span className={`font-nums text-xl sm:text-2xl tracking-wider font-bold ${tokensOut > 0 ? "text-[#4CAF50]" : "text-gray-300"}`}>
-                        ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} <span className="text-sm sm:text-base">$PWIFE</span>
+                        ~ {tokensOut > 0 ? fmt(tokensOut) : "0"} <span className="text-sm sm:text-base">$PEPA</span>
                       </span>
                     </div>
                     {tokensOut > 0 && (
                       <p className="text-[10px] text-[#1a1a2e]/40 font-bold mt-1">
-                        {currency === "SOL" ? `1 SOL ≈ $${solPrice.toFixed(0)} · ` : ""}Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PWIFE
+                        {currency === "SOL" ? `1 SOL ≈ $${solPrice.toFixed(0)} · ` : ""}Stage {currentStage + 1} · {STAGE_DATA[currentStage].price}/$PEPA
                       </p>
                     )}
                   </div>
@@ -774,7 +827,7 @@ export default function Home() {
                       },
                       {
                         l: t.presale.pending,
-                        v: refStats ? `${formatTokens(refStats.pendingTokens)} $PWIFE` : (address ? "…" : "0 $PWIFE"),
+                        v: refStats ? `${formatTokens(refStats.pendingTokens)} $PEPA` : (address ? "…" : "0 $PEPA"),
                         c: "text-[#FF4D9D]",
                         bg: "bg-[#FCE4EC]",
                         bc: "border-[#FF4D9D]",
@@ -805,14 +858,14 @@ export default function Home() {
                         <div key={`shiller-ph-${i}`} className="flex items-center gap-2 bg-[#FFFDE7] rounded-xl px-3 py-2 border-2 border-[#FFD54F]/50">
                           <span className="text-lg">{x.r}</span>
                           <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">---</span>
-                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 $PWIFE</span>
+                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">0 $PEPA</span>
                         </div>
                       ))
                     : leaderboard.slice(0, 3).map((entry, i) => (
                         <div key={`shiller-${i}`} className="flex items-center gap-2 bg-[#FFFDE7] rounded-xl px-3 py-2 border-2 border-[#FFD54F]/50">
                           <span className="text-lg">{["🥇", "🥈", "🥉"][i]}</span>
                           <span className="font-mono text-xs text-[#1a1a2e]/50 flex-1">{entry.walletAddress}</span>
-                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} $PWIFE</span>
+                          <span className="text-xs font-display text-[#4CAF50] tracking-wide">{formatTokens(entry.totalRewardTokens)} $PEPA</span>
                         </div>
                       ))}
                 </div>
@@ -829,7 +882,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 text-center mb-3">
           <p className="font-display text-sm text-[#1a1a2e] tracking-wider">🗞️ AS SEEN IN</p>
         </div>
-        <div className="ticker-wrap">
+        <div dir="ltr" className="ticker-wrap">
           <div className="ticker-content" style={{ gap: "3rem" }}>
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex shrink-0" style={{ gap: "3rem" }}>
@@ -909,11 +962,11 @@ export default function Home() {
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
                     <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.symbol}</div>
-                    <div className="font-display text-[#FF4D9D] tracking-wider text-sm">$PWIFE</div>
+                    <div className="font-display text-[#FF4D9D] tracking-wider text-sm">$PEPA</div>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
                     <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.tokenName}</div>
-                    <div className="font-display text-[#FFD54F] tracking-wider text-sm">PEPEWIFE</div>
+                    <div className="font-display text-[#FFD54F] tracking-wider text-sm">PEPA</div>
                   </div>
                   <div className="bg-white/5 rounded-xl p-3 border border-white/10 text-center">
                     <div className="text-xs text-white/50 font-sans font-semibold uppercase">{t.security.totalSupply}</div>
@@ -955,7 +1008,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 text-center mb-3">
           <p className="font-display text-sm text-[#1a1a2e] tracking-wider">{t.partners.title}</p>
         </div>
-        <div className="ticker-wrap">
+        <div dir="ltr" className="ticker-wrap">
           <div className="ticker-content" style={{ gap: "3rem" }}>
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex shrink-0" style={{ gap: "3rem" }}>
@@ -1009,12 +1062,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className={`flex justify-center ${isRTL ? "md:order-last" : ""}`}>
-              <img src="/tokenomics-girl.webp" alt="PEPEWIFE tokenomics distribution chart showing 100 trillion PWIFE total supply" width="512" height="512" loading="lazy" className={`w-full max-w-lg object-contain drop-shadow-2xl ${isRTL ? "scale-x-[-1]" : ""}`} />
+              <img src="/tokenomics-girl.webp" alt="PEPA tokenomics distribution chart showing 100 trillion PEPA total supply" width="512" height="512" loading="lazy" className={`w-full max-w-lg object-contain drop-shadow-2xl ${isRTL ? "scale-x-[-1]" : ""}`} />
             </div>
             <div className={`space-y-6 ${isRTL ? "md:order-first text-start" : ""}`}>
               <div>
                 <h2 className="text-5xl md:text-6xl font-display text-[#1a1a2e] comic-shadow tracking-wider mb-3">{t.tokenomics.title}</h2>
-                <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.tokenomics.totalSupply} <span className="font-display text-2xl text-[#4CAF50]">100,000,000,000,000 $PWIFE (100T)</span> 🐸</p>
+                <p className="text-lg text-[#1a1a2e]/60 font-bold">{t.tokenomics.totalSupply} <span className="font-display text-2xl text-[#4CAF50]">100,000,000,000,000 $PEPA (100T)</span> 🐸</p>
               </div>
               <div className="space-y-2">
                 {tokenomicsData.map((item, idx) => (
@@ -1022,7 +1075,7 @@ export default function Home() {
                     <div className="w-5 h-5 rounded-full shrink-0 border-2 border-[#1a1a2e]" style={{ backgroundColor: item.color }} />
                     <div className="flex-1">
                       <div className="font-display text-[#1a1a2e] text-sm tracking-wider">{item.name}</div>
-                      <div className="text-xs text-[#1a1a2e]/40 font-bold">{item.value}T $PWIFE</div>
+                      <div className="text-xs text-[#1a1a2e]/40 font-bold">{item.value}T $PEPA</div>
                     </div>
                     <div className="font-display text-2xl text-[#1a1a2e] tracking-wider">{item.value}%</div>
                   </div>
@@ -1043,14 +1096,14 @@ export default function Home() {
           </div>
           <div className="space-y-6">
             {[
-              { phase: t.roadmap.phase1, title: t.roadmap.phase1Title, desc: t.roadmap.phase1Desc, active: true,  img: "/roadmap-phase1.webp", color: "#4CAF50", meme: t.roadmap.phase1Meme },
-              { phase: t.roadmap.phase2, title: t.roadmap.phase2Title, desc: t.roadmap.phase2Desc, active: false, img: "/roadmap-phase2.webp", color: "#FF4D9D", meme: t.roadmap.phase2Meme },
-              { phase: t.roadmap.phase3, title: t.roadmap.phase3Title, desc: t.roadmap.phase3Desc, active: false, img: "/roadmap-phase3.webp", color: "#4CAF50", meme: t.roadmap.phase3Meme },
-              { phase: t.roadmap.phase4, title: t.roadmap.phase4Title, desc: t.roadmap.phase4Desc, active: false, img: "/roadmap-phase4.webp", color: "#FF4D9D", meme: t.roadmap.phase4Meme },
-              { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: "/roadmap-phase4.webp", color: "#FFD54F", meme: t.roadmap.phase5Meme },
+              { phase: t.roadmap.phase1, title: t.roadmap.phase1Title, desc: t.roadmap.phase1Desc, active: true,  img: "/roadmap-phase1.png", color: "#4CAF50", meme: t.roadmap.phase1Meme },
+              { phase: t.roadmap.phase2, title: t.roadmap.phase2Title, desc: t.roadmap.phase2Desc, active: false, img: "/roadmap-phase2.png", color: "#FF4D9D", meme: t.roadmap.phase2Meme },
+              { phase: t.roadmap.phase3, title: t.roadmap.phase3Title, desc: t.roadmap.phase3Desc, active: false, img: "/roadmap-phase3.png", color: "#4CAF50", meme: t.roadmap.phase3Meme },
+              { phase: t.roadmap.phase4, title: t.roadmap.phase4Title, desc: t.roadmap.phase4Desc, active: false, img: "/roadmap-phase4.png", color: "#FF4D9D", meme: t.roadmap.phase4Meme },
+              { phase: t.roadmap.phase5, title: t.roadmap.phase5Title, desc: t.roadmap.phase5Desc, active: false, img: "/roadmap-phase5.png", color: "#FFD54F", meme: t.roadmap.phase5Meme },
             ].map((step, i) => (
               <div key={i} className={`meme-card flex flex-col md:flex-row items-center gap-6 p-6 rounded-3xl bg-white ${step.active ? `border-[#4CAF50] ${isRTL ? "shadow-[-6px_6px_0px_#2E7D32]" : "shadow-[6px_6px_0px_#2E7D32]"}` : ""}`}>
-                <img src={step.img} alt={`PEPEWIFE roadmap ${step.title}`} loading="lazy" className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
+                <img src={step.img} alt={`PEPA roadmap ${step.title}`} loading="lazy" className={`w-28 h-28 object-contain shrink-0 drop-shadow-lg ${isRTL ? "md:order-last" : ""}`} />
                 <div className="flex-1 text-center md:text-start">
                   <div className="flex items-center gap-2 justify-center md:justify-start mb-1">
                     <span className="sticker text-white text-xs" style={{ backgroundColor: step.color, transform: "rotate(-1deg)" }}>{step.phase}</span>
@@ -1106,8 +1159,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-start">
             <div className="flex items-center gap-3">
-              <img src="/logo.webp" alt="PEPEWIFE" width="48" height="48" className="w-12 h-12 rounded-full border-3 border-white/30" />
-              <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPEWIFE</span>
+              <img src="/logo.webp" alt="PEPA" width="48" height="48" className="w-12 h-12 rounded-full border-3 border-white/30" />
+              <span className="font-display text-3xl text-white tracking-wider" style={{ textShadow: isRTL ? "-2px 2px 0px #FF4D9D" : "2px 2px 0px #FF4D9D" }}>PEPA</span>
             </div>
             <p className="text-white/40 text-sm font-bold">{t.footer.tagline}</p>
           </div>

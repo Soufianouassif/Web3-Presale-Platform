@@ -44,7 +44,7 @@ const TELEGRAM_URL = "https://t.me/pepewifecoin";
 const TWITTER_URL  = "https://x.com/pepewifecoin";
 
 const SUGGESTIONS: Record<TopicKey, Suggestion> = {
-  what:       { key: "what",       label: { en: "🐸 What is $PWIFE?", ar: "🐸 ما هو $PWIFE؟", fr: "🐸 C'est quoi $PWIFE?" }, query: "what is pwife" },
+  what:       { key: "what",       label: { en: "🐸 What is $PEPA?", ar: "🐸 ما هو $PEPA؟", fr: "🐸 C'est quoi $PEPA?" }, query: "what is pepa" },
   presale:    { key: "presale",    label: { en: "🛒 Presale Stages", ar: "🛒 مراحل البيع", fr: "🛒 Étapes prévente" }, query: "presale" },
   price:      { key: "price",      label: { en: "💰 Price & ROI", ar: "💰 السعر والعائد", fr: "💰 Prix & ROI" }, query: "price" },
   buy:        { key: "buy",        label: { en: "🛍️ How to Buy", ar: "🛍️ كيف أشتري؟", fr: "🛍️ Comment acheter?" }, query: "how to buy" },
@@ -65,10 +65,10 @@ const WELCOME_SUGGESTIONS: TopicKey[] = ["presale", "price", "buy", "safe", "tok
 
 const UI = {
   en: {
-    title: "PWIFE Assistant 🐸",
+    title: "PEPA Assistant 🐸",
     online: "Online • Ask me anything",
     placeholder: "Type your question...",
-    welcome: "Hey fren! 👋 I'm the PEPEWIFE assistant.\n\nAsk me anything about $PWIFE, or pick a topic below 👇",
+    welcome: "Hey fren! 👋 I'm the PEPA assistant.\n\nAsk me anything about $PEPA, or pick a topic below 👇",
     noMatch: "Hmm, I'm not sure about that one 🤔\nHere's what I can help you with:",
     supportBtn: "💬 Live Support",
     twitterBtn: "🐦 Twitter / X",
@@ -76,10 +76,10 @@ const UI = {
     humanBtn: "💬 Start Live Chat",
   },
   ar: {
-    title: "مساعد $PWIFE 🐸",
+    title: "مساعد $PEPA 🐸",
     online: "متصل • اسألني أي شيء",
     placeholder: "اكتب سؤالك...",
-    welcome: "مرحباً! 👋 أنا مساعد PEPEWIFE.\n\nاسألني عن أي شيء أو اختر موضوعاً 👇",
+    welcome: "مرحباً! 👋 أنا مساعد PEPA.\n\nاسألني عن أي شيء أو اختر موضوعاً 👇",
     noMatch: "عذراً، لم أفهم سؤالك 🤔\nإليك ما يمكنني مساعدتك به:",
     supportBtn: "💬 دعم مباشر",
     twitterBtn: "🐦 تويتر / X",
@@ -87,10 +87,10 @@ const UI = {
     humanBtn: "💬 بدء محادثة مباشرة",
   },
   fr: {
-    title: "Assistant $PWIFE 🐸",
+    title: "Assistant $PEPA 🐸",
     online: "En ligne • Posez-moi tout",
     placeholder: "Tapez votre question...",
-    welcome: "Salut! 👋 Je suis l'assistant PEPEWIFE.\n\nDemandez-moi n'importe quoi ou choisissez un sujet 👇",
+    welcome: "Salut! 👋 Je suis l'assistant PEPA.\n\nDemandez-moi n'importe quoi ou choisissez un sujet 👇",
     noMatch: "Hmm, je ne suis pas sûr de ça 🤔\nVoici ce dont je peux vous aider:",
     supportBtn: "💬 Support live",
     twitterBtn: "🐦 Twitter / X",
@@ -112,9 +112,9 @@ const QA_DB: QA[] = [
     key: "what",
     patterns: ["what is pepewife","what is pwife","what is $pwife","ما هو","ما هي","c'est quoi","qu'est-ce","pepewife","pwife"],
     answer: l => ({
-      en: "🐸 **PEPEWIFE ($PWIFE)** is a community-driven meme token on Solana — combining fun culture with real Web3 utility:\n\n• Tap-to-Earn App\n• Staking rewards\n• 4-stage structured presale\n• 100 Trillion total supply\n• Liquidity locked, mint revoked ✅",
-      ar: "🐸 **PEPEWIFE ($PWIFE)** هو توكن ميم مجتمعي على Solana — يجمع بين الثقافة والمتعة وأدوات Web3 الحقيقية:\n\n• تطبيق Tap-to-Earn\n• مكافآت الستاكينج\n• بيع مسبق من 4 مراحل\n• إجمالي العرض 100 تريليون\n• السيولة مقفلة، صلاحية الإصدار ملغاة ✅",
-      fr: "🐸 **PEPEWIFE ($PWIFE)** est un token mème communautaire sur Solana — combinant culture fun et utilité Web3 réelle:\n\n• Application Tap-to-Earn\n• Récompenses staking\n• Prévente structurée en 4 étapes\n• 100 000 milliards de tokens\n• Liquidité verrouillée, frappe révoquée ✅",
+      en: "🐸 **PEPA ($PEPA)** is a community-driven meme token on Solana — combining fun culture with real Web3 utility:\n\n• Tap-to-Earn App\n• Staking rewards\n• 4-stage structured presale\n• 100 Trillion total supply\n• Liquidity locked, mint revoked ✅",
+      ar: "🐸 **PEPA ($PEPA)** هو توكن ميم مجتمعي على Solana — يجمع بين الثقافة والمتعة وأدوات Web3 الحقيقية:\n\n• تطبيق Tap-to-Earn\n• مكافآت الستاكينج\n• بيع مسبق من 4 مراحل\n• إجمالي العرض 100 تريليون\n• السيولة مقفلة، صلاحية الإصدار ملغاة ✅",
+      fr: "🐸 **PEPA ($PEPA)** est un token mème communautaire sur Solana — combinant culture fun et utilité Web3 réelle:\n\n• Application Tap-to-Earn\n• Récompenses staking\n• Prévente structurée en 4 étapes\n• 100 000 milliards de tokens\n• Liquidité verrouillée, frappe révoquée ✅",
     }[l]),
     suggestions: ["presale", "price", "buy", "tokenomics", "safe"],
   },
@@ -122,8 +122,8 @@ const QA_DB: QA[] = [
     key: "presale",
     patterns: ["presale","pre sale","pre-sale","بيع مسبق","prévente","prevente","stage","étape"],
     answer: l => ({
-      en: "🛒 **Presale — 4 Stages:**\n\n• Stage 1 → $0.00000001\n• Stage 2 → $0.00000002\n• Stage 3 → $0.00000003\n• Stage 4 → $0.00000004\n\n🎯 Listing Price: **$0.061327**\n\nPrice increases every stage — early buyers get the best deal! 💎",
-      ar: "🛒 **البيع المسبق — 4 مراحل:**\n\n• المرحلة 1 ← 0.00000001$\n• المرحلة 2 ← 0.00000002$\n• المرحلة 3 ← 0.00000003$\n• المرحلة 4 ← 0.00000004$\n\n🎯 سعر الإدراج: **0.061327$**\n\nالسعر يرتفع كل مرحلة — الدخول المبكر = أفضل سعر! 💎",
+      en: "🛒 **Presale — 4 Stages:**\n\n• Stage 1 → $0.00000001\n• Stage 2 → $0.00000002\n• Stage 3 → $0.00000003\n• Stage 4 → $0.00000004\n\n🎯 Listing Price: **$0.00000007**\n\nPrice increases every stage — early buyers get the best deal! 💎",
+      ar: "🛒 **البيع المسبق — 4 مراحل:**\n\n• المرحلة 1 ← 0.00000001$\n• المرحلة 2 ← 0.00000002$\n• المرحلة 3 ← 0.00000003$\n• المرحلة 4 ← 0.00000004$\n\n🎯 سعر الإدراج: **0.00000007$**\n\nالسعر يرتفع كل مرحلة — الدخول المبكر = أفضل سعر! 💎",
       fr: "🛒 **Prévente — 4 Étapes:**\n\n• Étape 1 → 0,00000001$\n• Étape 2 → 0,00000002$\n• Étape 3 → 0,00000003$\n• Étape 4 → 0,00000004$\n\n🎯 Prix de listing: **0,061327$**\n\nLe prix monte à chaque étape — entrer tôt = meilleur prix! 💎",
     }[l]),
     suggestions: ["price", "buy", "safe", "tokenomics"],
@@ -132,9 +132,9 @@ const QA_DB: QA[] = [
     key: "price",
     patterns: ["price","prix","سعر","كم سعر","how much","combien","listing","إدراج","ادراج"],
     answer: l => ({
-      en: "💰 **$PWIFE Price:**\n\n• Presale Stage 1: $0.00000001\n• Listing Target: $0.061327\n\nPotential ROI from Stage 1:\n🔥 5x → $0.00000005\n🔥 100x → $0.000001\n🚀 Listing → **6,132,700x**\n\nEarly ape = maximum gains!",
-      ar: "💰 **سعر $PWIFE:**\n\n• البيع المسبق المرحلة 1: 0.00000001$\n• هدف الإدراج: 0.061327$\n\nعائد محتمل من المرحلة الأولى:\n🔥 5x ← 0.00000005$\n🔥 100x ← 0.000001$\n🚀 الإدراج ← **6,132,700 مرة**\n\nالدخول المبكر = أقصى أرباح!",
-      fr: "💰 **Prix $PWIFE:**\n\n• Prévente Étape 1: 0,00000001$\n• Objectif listing: 0,061327$\n\nROI potentiel depuis l'étape 1:\n🔥 5x → 0,00000005$\n🔥 100x → 0,000001$\n🚀 Listing → **6 132 700x**\n\nEntrer tôt = gains maximum!",
+      en: "💰 **$PEPA Price:**\n\n• Presale Stage 1: $0.00000001\n• Listing Target: $0.00000007\n\nPotential ROI from Stage 1:\n🔥 2x → $0.00000002\n🔥 4x → $0.00000004\n🚀 Listing → **7x** ($0.00000007)\n\nEarly ape = maximum gains!",
+      ar: "💰 **سعر $PEPA:**\n\n• البيع المسبق المرحلة 1: 0.00000001$\n• هدف الإدراج: 0.00000007$\n\nعائد محتمل من المرحلة الأولى:\n🔥 2x ← 0.00000002$\n🔥 4x ← 0.00000004$\n🚀 الإدراج ← **7 مرات** (0.00000007$)\n\nالدخول المبكر = أقصى أرباح!",
+      fr: "💰 **Prix $PEPA:**\n\n• Prévente Étape 1: 0,00000001$\n• Objectif listing: 0,00000007$\n\nROI potentiel depuis l'étape 1:\n🔥 2x → 0,00000002$\n🔥 4x → 0,00000004$\n🚀 Listing → **7x** (0,00000007$)\n\nEntrer tôt = gains maximum!",
     }[l]),
     suggestions: ["buy", "presale", "safe", "airdrop"],
   },
@@ -142,9 +142,9 @@ const QA_DB: QA[] = [
     key: "buy",
     patterns: ["how to buy","how buy","كيف اشتري","كيف الشراء","comment acheter","acheter","buy","شراء","اشتري"],
     answer: l => ({
-      en: "🛍️ **How to Buy $PWIFE:**\n\n1️⃣ Install **Phantom** or Solflare wallet\n2️⃣ Add **SOL** or USDT\n3️⃣ Visit **pwifecoin.fun**\n4️⃣ Connect your wallet\n5️⃣ Enter amount → **APE IN** 🐸\n6️⃣ Confirm transaction\n\nTokens are claimable after presale ends! 🎉",
-      ar: "🛍️ **كيفية شراء $PWIFE:**\n\n1️⃣ ثبّت محفظة **Phantom** أو Solflare\n2️⃣ أضف **SOL** أو USDT\n3️⃣ زر موقع **pwifecoin.fun**\n4️⃣ اربط محفظتك\n5️⃣ أدخل المبلغ ← **APE IN** 🐸\n6️⃣ اقبل المعاملة\n\nيمكن استلام التوكنز بعد انتهاء البيع المسبق! 🎉",
-      fr: "🛍️ **Comment Acheter $PWIFE:**\n\n1️⃣ Installez **Phantom** ou Solflare\n2️⃣ Ajoutez **SOL** ou USDT\n3️⃣ Visitez **pwifecoin.fun**\n4️⃣ Connectez votre wallet\n5️⃣ Entrez montant → **APE IN** 🐸\n6️⃣ Confirmez la transaction\n\nTokens réclamables après la fin de la prévente! 🎉",
+      en: "🛍️ **How to Buy $PEPA:**\n\n1️⃣ Install **Phantom** or Solflare wallet\n2️⃣ Add **SOL** or USDT\n3️⃣ Visit **pwifecoin.fun**\n4️⃣ Connect your wallet\n5️⃣ Enter amount → **APE IN** 🐸\n6️⃣ Confirm transaction\n\nTokens are claimable after presale ends! 🎉",
+      ar: "🛍️ **كيفية شراء $PEPA:**\n\n1️⃣ ثبّت محفظة **Phantom** أو Solflare\n2️⃣ أضف **SOL** أو USDT\n3️⃣ زر موقع **pwifecoin.fun**\n4️⃣ اربط محفظتك\n5️⃣ أدخل المبلغ ← **APE IN** 🐸\n6️⃣ اقبل المعاملة\n\nيمكن استلام التوكنز بعد انتهاء البيع المسبق! 🎉",
+      fr: "🛍️ **Comment Acheter $PEPA:**\n\n1️⃣ Installez **Phantom** ou Solflare\n2️⃣ Ajoutez **SOL** ou USDT\n3️⃣ Visitez **pwifecoin.fun**\n4️⃣ Connectez votre wallet\n5️⃣ Entrez montant → **APE IN** 🐸\n6️⃣ Confirmez la transaction\n\nTokens réclamables après la fin de la prévente! 🎉",
     }[l]),
     suggestions: ["wallet", "presale", "price", "safe"],
   },
@@ -152,9 +152,9 @@ const QA_DB: QA[] = [
     key: "tokenomics",
     patterns: ["tokenomics","توكنوميكس","supply","عرض","distribution","توزيع","total supply","إجمالي"],
     answer: l => ({
-      en: "📊 **$PWIFE Tokenomics:**\n\nTotal: **100 Trillion** tokens\n\n• 🛒 Presale: 40% (40T)\n• 💧 Liquidity: 25% (25T)\n• 🪂 Airdrop & Rewards: 15% (15T)\n• 🌱 Ecosystem: 10% (10T)\n• 👥 Team (vested 12m): 10% (10T)\n\n✅ Mint revoked | ✅ Liquidity locked 12 months",
-      ar: "📊 **توكنوميكس $PWIFE:**\n\nالإجمالي: **100 تريليون** توكن\n\n• 🛒 البيع المسبق: 40% (40T)\n• 💧 السيولة: 25% (25T)\n• 🪂 الإيردروب والمكافآت: 15% (15T)\n• 🌱 النظام البيئي: 10% (10T)\n• 👥 الفريق (مقيد 12 شهراً): 10% (10T)\n\n✅ صلاحية الإصدار ملغاة | ✅ السيولة مقفلة 12 شهراً",
-      fr: "📊 **Tokenomics $PWIFE:**\n\nTotal: **100 Billions** de tokens\n\n• 🛒 Prévente: 40% (40B)\n• 💧 Liquidité: 25% (25B)\n• 🪂 Airdrop & Récompenses: 15% (15B)\n• 🌱 Écosystème: 10% (10B)\n• 👥 Équipe (bloqué 12m): 10% (10B)\n\n✅ Frappe révoquée | ✅ Liquidité verrouillée 12 mois",
+      en: "📊 **$PEPA Tokenomics:**\n\nTotal: **100 Trillion** tokens\n\n• 🛒 Presale: 40% (40T)\n• 💧 Liquidity: 25% (25T)\n• 🪂 Airdrop & Rewards: 15% (15T)\n• 🌱 Ecosystem: 10% (10T)\n• 👥 Team (vested 12m): 10% (10T)\n\n✅ Mint revoked | ✅ Liquidity locked 12 months",
+      ar: "📊 **توكنوميكس $PEPA:**\n\nالإجمالي: **100 تريليون** توكن\n\n• 🛒 البيع المسبق: 40% (40T)\n• 💧 السيولة: 25% (25T)\n• 🪂 الإيردروب والمكافآت: 15% (15T)\n• 🌱 النظام البيئي: 10% (10T)\n• 👥 الفريق (مقيد 12 شهراً): 10% (10T)\n\n✅ صلاحية الإصدار ملغاة | ✅ السيولة مقفلة 12 شهراً",
+      fr: "📊 **Tokenomics $PEPA:**\n\nTotal: **100 Billions** de tokens\n\n• 🛒 Prévente: 40% (40B)\n• 💧 Liquidité: 25% (25B)\n• 🪂 Airdrop & Récompenses: 15% (15B)\n• 🌱 Écosystème: 10% (10B)\n• 👥 Équipe (bloqué 12m): 10% (10B)\n\n✅ Frappe révoquée | ✅ Liquidité verrouillée 12 mois",
     }[l]),
     suggestions: ["safe", "presale", "airdrop", "staking"],
   },
@@ -162,9 +162,9 @@ const QA_DB: QA[] = [
     key: "roadmap",
     patterns: ["roadmap","خارطة","خطة","plan","road map","روادماب","phase","فيز","مرحلة"],
     answer: l => ({
-      en: "🗺️ **$PWIFE Roadmap:**\n\n🔹 **Phase 1** (Q2 2026)\nWebsite · Community · Whitepaper · Presale\n\n🔹 **Phase 2** (Q2-Q3 2026)\nMarketing · Airdrop · Staking · Tap-to-Earn beta\n\n🔹 **Phase 3** (Q3 2026)\nSolana token launch · DEX liquidity · Trading\n\n🔹 **Phase 4** (Q4 2026)\nCEX listings · Influencer collabs · Global push\n\n🔹 **Phase 5** (2027+)\nExpanded ecosystem · Full Tap-to-Earn · DAO",
-      ar: "🗺️ **روادماب $PWIFE:**\n\n🔹 **المرحلة 1** (Q2 2026)\nالموقع · المجتمع · الوايت بيبر · البيع المسبق\n\n🔹 **المرحلة 2** (Q2-Q3 2026)\nتسويق · إيردروب · ستاكينج · بيتا Tap-to-Earn\n\n🔹 **المرحلة 3** (Q3 2026)\nإطلاق التوكن على Solana · سيولة DEX · التداول\n\n🔹 **المرحلة 4** (Q4 2026)\nإدراج CEX · مؤثرون · انتشار عالمي\n\n🔹 **المرحلة 5** (2027+)\nنظام بيئي موسع · Tap-to-Earn كامل · DAO",
-      fr: "🗺️ **Roadmap $PWIFE:**\n\n🔹 **Phase 1** (Q2 2026)\nSite · Communauté · Whitepaper · Prévente\n\n🔹 **Phase 2** (Q2-Q3 2026)\nMarketing · Airdrop · Staking · Tap-to-Earn bêta\n\n🔹 **Phase 3** (Q3 2026)\nLancement token Solana · Liquidité DEX · Trading\n\n🔹 **Phase 4** (Q4 2026)\nListings CEX · Influenceurs · Expansion mondiale\n\n🔹 **Phase 5** (2027+)\nÉcosystème étendu · Tap-to-Earn complet · DAO",
+      en: "🗺️ **$PEPA Roadmap:**\n\n🔹 **Phase 1** (Q2 2026)\nWebsite · Community · Whitepaper · Presale\n\n🔹 **Phase 2** (Q2-Q3 2026)\nMarketing · Airdrop · Staking · Tap-to-Earn beta\n\n🔹 **Phase 3** (Q3 2026)\nSolana token launch · DEX liquidity · Trading\n\n🔹 **Phase 4** (Q4 2026)\nCEX listings · Influencer collabs · Global push\n\n🔹 **Phase 5** (2027+)\nExpanded ecosystem · Full Tap-to-Earn · DAO",
+      ar: "🗺️ **روادماب $PEPA:**\n\n🔹 **المرحلة 1** (Q2 2026)\nالموقع · المجتمع · الوايت بيبر · البيع المسبق\n\n🔹 **المرحلة 2** (Q2-Q3 2026)\nتسويق · إيردروب · ستاكينج · بيتا Tap-to-Earn\n\n🔹 **المرحلة 3** (Q3 2026)\nإطلاق التوكن على Solana · سيولة DEX · التداول\n\n🔹 **المرحلة 4** (Q4 2026)\nإدراج CEX · مؤثرون · انتشار عالمي\n\n🔹 **المرحلة 5** (2027+)\nنظام بيئي موسع · Tap-to-Earn كامل · DAO",
+      fr: "🗺️ **Roadmap $PEPA:**\n\n🔹 **Phase 1** (Q2 2026)\nSite · Communauté · Whitepaper · Prévente\n\n🔹 **Phase 2** (Q2-Q3 2026)\nMarketing · Airdrop · Staking · Tap-to-Earn bêta\n\n🔹 **Phase 3** (Q3 2026)\nLancement token Solana · Liquidité DEX · Trading\n\n🔹 **Phase 4** (Q4 2026)\nListings CEX · Influenceurs · Expansion mondiale\n\n🔹 **Phase 5** (2027+)\nÉcosystème étendu · Tap-to-Earn complet · DAO",
     }[l]),
     suggestions: ["presale", "staking", "tap", "social"],
   },
@@ -172,9 +172,9 @@ const QA_DB: QA[] = [
     key: "safe",
     patterns: ["safe","secure","rug","scam","legit","أمان","مأمون","شرعي","موثوق","sécurisé","sûr","fiable","liquidity lock","mint","revoked"],
     answer: l => ({
-      en: "🔒 **Is $PWIFE Safe? Yes! Here's why:**\n\n✅ Liquidity locked 12 months — no rug pull\n✅ Mint authority revoked — no new tokens ever\n✅ Freeze authority disabled — tokens can't be frozen\n✅ Team tokens vested 12 months — no early dump\n✅ Solana smart contract — fully on-chain & verifiable\n\nTransparency proofs published at launch!",
-      ar: "🔒 **هل $PWIFE آمن؟ نعم! إليك السبب:**\n\n✅ السيولة مقفلة 12 شهراً — لا يمكن السحب\n✅ صلاحية الإصدار ملغاة — لا توكنات جديدة أبداً\n✅ صلاحية التجميد معطلة — لا يمكن تجميد توكناتك\n✅ توكنات الفريق مقيدة 12 شهراً — لا بيع مبكر\n✅ عقد ذكي على Solana — شفاف وقابل للتحقق\n\nإثباتات الشفافية تُنشر عند الإطلاق!",
-      fr: "🔒 **$PWIFE est-il sûr? Oui! Voici pourquoi:**\n\n✅ Liquidité verrouillée 12 mois — pas de rug pull\n✅ Autorité de frappe révoquée — jamais de nouveaux tokens\n✅ Autorité de gel désactivée — tokens non gelables\n✅ Tokens équipe bloqués 12 mois — pas de dump précoce\n✅ Contrat Solana — transparent et vérifiable\n\nPreuves de transparence publiées au lancement!",
+      en: "🔒 **Is $PEPA Safe? Yes! Here's why:**\n\n✅ Liquidity locked 12 months — no rug pull\n✅ Mint authority revoked — no new tokens ever\n✅ Freeze authority disabled — tokens can't be frozen\n✅ Team tokens vested 12 months — no early dump\n✅ Solana smart contract — fully on-chain & verifiable\n\nTransparency proofs published at launch!",
+      ar: "🔒 **هل $PEPA آمن؟ نعم! إليك السبب:**\n\n✅ السيولة مقفلة 12 شهراً — لا يمكن السحب\n✅ صلاحية الإصدار ملغاة — لا توكنات جديدة أبداً\n✅ صلاحية التجميد معطلة — لا يمكن تجميد توكناتك\n✅ توكنات الفريق مقيدة 12 شهراً — لا بيع مبكر\n✅ عقد ذكي على Solana — شفاف وقابل للتحقق\n\nإثباتات الشفافية تُنشر عند الإطلاق!",
+      fr: "🔒 **$PEPA est-il sûr? Oui! Voici pourquoi:**\n\n✅ Liquidité verrouillée 12 mois — pas de rug pull\n✅ Autorité de frappe révoquée — jamais de nouveaux tokens\n✅ Autorité de gel désactivée — tokens non gelables\n✅ Tokens équipe bloqués 12 mois — pas de dump précoce\n✅ Contrat Solana — transparent et vérifiable\n\nPreuves de transparence publiées au lancement!",
     }[l]),
     suggestions: ["tokenomics", "whitepaper", "presale", "human"],
   },
@@ -182,9 +182,9 @@ const QA_DB: QA[] = [
     key: "staking",
     patterns: ["staking","ستاكينج","stake","rewards","مكافآت","récompenses","apy","yield"],
     answer: l => ({
-      en: "⚡ **$PWIFE Staking — Coming Phase 2!**\n\nThe staking system launches Q2-Q3 2026:\n\n• Reward long-term holders 💰\n• Reduce circulating supply\n• Structured APY program\n• Automatic reward distribution\n\nFollow us to be first for APY announcements! 🔔",
-      ar: "⚡ **ستاكينج $PWIFE — قريباً المرحلة 2!**\n\nnظام الستاكينج يُطلق Q2-Q3 2026:\n\n• مكافأة الحاملين على المدى الطويل 💰\n• تقليل العرض المتداول\n• برنامج APY منظم\n• توزيع مكافآت تلقائي\n\nتابعنا لتكون أول من يعرف عن APY! 🔔",
-      fr: "⚡ **Staking $PWIFE — Bientôt Phase 2!**\n\nLe système de staking lance Q2-Q3 2026:\n\n• Récompenser les détenteurs long terme 💰\n• Réduire l'offre en circulation\n• Programme APY structuré\n• Distribution automatique des récompenses\n\nSuivez-nous pour être premier pour les annonces APY! 🔔",
+      en: "⚡ **$PEPA Staking — Coming Phase 2!**\n\nThe staking system launches Q2-Q3 2026:\n\n• Reward long-term holders 💰\n• Reduce circulating supply\n• Structured APY program\n• Automatic reward distribution\n\nFollow us to be first for APY announcements! 🔔",
+      ar: "⚡ **ستاكينج $PEPA — قريباً المرحلة 2!**\n\nnظام الستاكينج يُطلق Q2-Q3 2026:\n\n• مكافأة الحاملين على المدى الطويل 💰\n• تقليل العرض المتداول\n• برنامج APY منظم\n• توزيع مكافآت تلقائي\n\nتابعنا لتكون أول من يعرف عن APY! 🔔",
+      fr: "⚡ **Staking $PEPA — Bientôt Phase 2!**\n\nLe système de staking lance Q2-Q3 2026:\n\n• Récompenser les détenteurs long terme 💰\n• Réduire l'offre en circulation\n• Programme APY structuré\n• Distribution automatique des récompenses\n\nSuivez-nous pour être premier pour les annonces APY! 🔔",
     }[l]),
     suggestions: ["airdrop", "tokenomics", "roadmap", "social"],
   },
@@ -192,9 +192,9 @@ const QA_DB: QA[] = [
     key: "airdrop",
     patterns: ["airdrop","إيردروب","drop","free tokens","توكنات مجانية","tokens gratuits","claim","كليم","استلام"],
     answer: l => ({
-      en: "🪂 **$PWIFE Airdrop — 15 Trillion allocated!**\n\n**How to qualify:**\n✅ Follow @pepewifecoin on Twitter\n✅ Join the Telegram community\n✅ Buy tokens during presale\n✅ Refer friends with your link\n\nThe more tasks = the bigger your multiplier!\n\nCheck Dashboard → Airdrop tab for your score 🎯",
-      ar: "🪂 **إيردروب $PWIFE — 15 تريليون مخصص!**\n\n**كيف تتأهل:**\n✅ اتبع @pepewifecoin على تويتر\n✅ انضم لمجتمع تيليغرام\n✅ اشتر في البيع المسبق\n✅ أحل أصدقاء برابطك الخاص\n\nكلما أكملت مهام أكثر = مضاعف أكبر!\n\nراجع الداشبورد ← تبويب الإيردروب لنقاطك 🎯",
-      fr: "🪂 **Airdrop $PWIFE — 15 Billions alloués!**\n\n**Comment se qualifier:**\n✅ Suivez @pepewifecoin sur Twitter\n✅ Rejoignez la communauté Telegram\n✅ Achetez lors de la prévente\n✅ Parrainez des amis avec votre lien\n\nPlus de tâches = multiplicateur plus grand!\n\nVérifiez Dashboard → onglet Airdrop pour votre score 🎯",
+      en: "🪂 **$PEPA Airdrop — 15 Trillion allocated!**\n\n**How to qualify:**\n✅ Follow @pepewifecoin on Twitter\n✅ Join the Telegram community\n✅ Buy tokens during presale\n✅ Refer friends with your link\n\nThe more tasks = the bigger your multiplier!\n\nCheck Dashboard → Airdrop tab for your score 🎯",
+      ar: "🪂 **إيردروب $PEPA — 15 تريليون مخصص!**\n\n**كيف تتأهل:**\n✅ اتبع @pepewifecoin على تويتر\n✅ انضم لمجتمع تيليغرام\n✅ اشتر في البيع المسبق\n✅ أحل أصدقاء برابطك الخاص\n\nكلما أكملت مهام أكثر = مضاعف أكبر!\n\nراجع الداشبورد ← تبويب الإيردروب لنقاطك 🎯",
+      fr: "🪂 **Airdrop $PEPA — 15 Billions alloués!**\n\n**Comment se qualifier:**\n✅ Suivez @pepewifecoin sur Twitter\n✅ Rejoignez la communauté Telegram\n✅ Achetez lors de la prévente\n✅ Parrainez des amis avec votre lien\n\nPlus de tâches = multiplicateur plus grand!\n\nVérifiez Dashboard → onglet Airdrop pour votre score 🎯",
     }[l]),
     suggestions: ["referral", "staking", "tokenomics", "social"],
   },
@@ -202,9 +202,9 @@ const QA_DB: QA[] = [
     key: "referral",
     patterns: ["referral","refer","إحالة","أحل","parrainage","parrainer","bonus","code","كود"],
     answer: l => ({
-      en: "🤝 **Referral Program — Earn Free Tokens!**\n\n1. Connect your wallet\n2. Dashboard → Referrals tab\n3. Copy your unique link\n4. Share with friends\n5. Earn $PWIFE when they buy!\n\nNo limit on referrals — the more you refer, the more you earn! 💰",
-      ar: "🤝 **برنامج الإحالة — اكسب توكنات مجاناً!**\n\n1. اربط محفظتك\n2. الداشبورد ← تبويب الإحالات\n3. انسخ رابطك الفريد\n4. شاركه مع أصدقائك\n5. اكسب $PWIFE عند شرائهم!\n\nلا حد للإحالات — كلما أحلت أكثر كسبت أكثر! 💰",
-      fr: "🤝 **Programme de Parrainage — Gagnez des tokens!**\n\n1. Connectez votre wallet\n2. Dashboard → onglet Référencement\n3. Copiez votre lien unique\n4. Partagez avec vos amis\n5. Gagnez $PWIFE quand ils achètent!\n\nPas de limite — plus vous parrainez, plus vous gagnez! 💰",
+      en: "🤝 **Referral Program — Earn Free Tokens!**\n\n1. Connect your wallet\n2. Dashboard → Referrals tab\n3. Copy your unique link\n4. Share with friends\n5. Earn $PEPA when they buy!\n\nNo limit on referrals — the more you refer, the more you earn! 💰",
+      ar: "🤝 **برنامج الإحالة — اكسب توكنات مجاناً!**\n\n1. اربط محفظتك\n2. الداشبورد ← تبويب الإحالات\n3. انسخ رابطك الفريد\n4. شاركه مع أصدقائك\n5. اكسب $PEPA عند شرائهم!\n\nلا حد للإحالات — كلما أحلت أكثر كسبت أكثر! 💰",
+      fr: "🤝 **Programme de Parrainage — Gagnez des tokens!**\n\n1. Connectez votre wallet\n2. Dashboard → onglet Référencement\n3. Copiez votre lien unique\n4. Partagez avec vos amis\n5. Gagnez $PEPA quand ils achètent!\n\nPas de limite — plus vous parrainez, plus vous gagnez! 💰",
     }[l]),
     suggestions: ["airdrop", "buy", "social", "human"],
   },
@@ -222,9 +222,9 @@ const QA_DB: QA[] = [
     key: "tap",
     patterns: ["tap to earn","tap-to-earn","تطبيق","application","app","earn","tap"],
     answer: l => ({
-      en: "📱 **Tap-to-Earn App — Coming Phase 2!**\n\nPEPEWIFE is building a mobile app where you earn $PWIFE by:\n\n• Tapping daily\n• Completing missions\n• Participating in events\n• Holding & staking tokens\n\nBeta launches Q2-Q3 2026 — join Telegram for early access! 🎮",
-      ar: "📱 **تطبيق Tap-to-Earn — قريباً المرحلة 2!**\n\nPEPEWIFE تبني تطبيقاً موبايل حيث تكسب $PWIFE بـ:\n\n• النقر اليومي\n• إتمام المهام\n• المشاركة في الأحداث\n• الاحتفاظ والستاكينج\n\nالبيتا تُطلق Q2-Q3 2026 — انضم لتيليغرام للوصول المبكر! 🎮",
-      fr: "📱 **Application Tap-to-Earn — Bientôt Phase 2!**\n\nPEPEWIFE développe une app mobile où vous gagnez $PWIFE en:\n\n• Tapotant quotidiennement\n• Complétant des missions\n• Participant aux événements\n• Détenant et stakant des tokens\n\nBêta lance Q2-Q3 2026 — rejoignez Telegram pour l'accès anticipé! 🎮",
+      en: "📱 **Tap-to-Earn App — Coming Phase 2!**\n\nPEPA is building a mobile app where you earn $PEPA by:\n\n• Tapping daily\n• Completing missions\n• Participating in events\n• Holding & staking tokens\n\nBeta launches Q2-Q3 2026 — join Telegram for early access! 🎮",
+      ar: "📱 **تطبيق Tap-to-Earn — قريباً المرحلة 2!**\n\nPEPA تبني تطبيقاً موبايل حيث تكسب $PEPA بـ:\n\n• النقر اليومي\n• إتمام المهام\n• المشاركة في الأحداث\n• الاحتفاظ والستاكينج\n\nالبيتا تُطلق Q2-Q3 2026 — انضم لتيليغرام للوصول المبكر! 🎮",
+      fr: "📱 **Application Tap-to-Earn — Bientôt Phase 2!**\n\nPEPA développe une app mobile où vous gagnez $PEPA en:\n\n• Tapotant quotidiennement\n• Complétant des missions\n• Participant aux événements\n• Détenant et stakant des tokens\n\nBêta lance Q2-Q3 2026 — rejoignez Telegram pour l'accès anticipé! 🎮",
     }[l]),
     suggestions: ["staking", "airdrop", "roadmap", "social"],
   },
@@ -232,9 +232,9 @@ const QA_DB: QA[] = [
     key: "whitepaper",
     patterns: ["whitepaper","white paper","وايت بيبر","وثيقة","documentation","docs"],
     answer: l => ({
-      en: "📄 **PEPEWIFE Whitepaper:**\nThe full whitepaper covers everything — vision, tokenomics, roadmap, security model, and utility. Read it to understand the full picture!",
-      ar: "📄 **وايت بيبر PEPEWIFE:**\nالوايت بيبر الكامل يغطي كل شيء — الرؤية، التوكنوميكس، الروادماب، نموذج الأمان والأدوات. اقرأه لتفهم الصورة الكاملة!",
-      fr: "📄 **Whitepaper PEPEWIFE:**\nLe whitepaper complet couvre tout — vision, tokenomics, roadmap, modèle de sécurité et utilité. Lisez-le pour comprendre la vue d'ensemble!",
+      en: "📄 **PEPA Whitepaper:**\nThe full whitepaper covers everything — vision, tokenomics, roadmap, security model, and utility. Read it to understand the full picture!",
+      ar: "📄 **وايت بيبر PEPA:**\nالوايت بيبر الكامل يغطي كل شيء — الرؤية، التوكنوميكس، الروادماب، نموذج الأمان والأدوات. اقرأه لتفهم الصورة الكاملة!",
+      fr: "📄 **Whitepaper PEPA:**\nLe whitepaper complet couvre tout — vision, tokenomics, roadmap, modèle de sécurité et utilité. Lisez-le pour comprendre la vue d'ensemble!",
     }[l]),
     actions: l => [{ label: l === "ar" ? "📄 اقرأ الوايت بيبر" : l === "fr" ? "📄 Lire le Whitepaper" : "📄 Read Whitepaper", href: "/whitepaper" }],
     suggestions: ["tokenomics", "roadmap", "safe", "human"],
@@ -243,9 +243,9 @@ const QA_DB: QA[] = [
     key: "social",
     patterns: ["social","telegram","twitter","community","مجتمع","communauté","تيليغرام","تويتر","discord"],
     answer: l => ({
-      en: "🌐 **Join the $PWIFE Community!**\nThousands of frens worldwide — be part of the movement! 🐸",
-      ar: "🌐 **انضم لمجتمع $PWIFE!**\nآلاف الأصدقاء حول العالم — كن جزءاً من الحركة! 🐸",
-      fr: "🌐 **Rejoignez la Communauté $PWIFE!**\nDes milliers de frens dans le monde — faites partie du mouvement! 🐸",
+      en: "🌐 **Join the $PEPA Community!**\nThousands of frens worldwide — be part of the movement! 🐸",
+      ar: "🌐 **انضم لمجتمع $PEPA!**\nآلاف الأصدقاء حول العالم — كن جزءاً من الحركة! 🐸",
+      fr: "🌐 **Rejoignez la Communauté $PEPA!**\nDes milliers de frens dans le monde — faites partie du mouvement! 🐸",
     }[l]),
     actions: () => [
       { label: "✈️ Telegram", href: TELEGRAM_URL },
@@ -432,7 +432,7 @@ export default function Chatbot() {
                 </button>
               ) : (
                 <>
-                  <img src="/logo.webp" alt="PWIFE" className="w-8 h-8 rounded-full border-2 border-[#1a1a2e]" />
+                  <img src="/logo.webp" alt="PEPA" className="w-8 h-8 rounded-full border-2 border-[#1a1a2e]" />
                   <div>
                     <div className="font-display text-sm font-bold text-[#1a1a2e] tracking-wide leading-none">{UI[lang].title}</div>
                     <div className="flex items-center gap-1 mt-0.5">

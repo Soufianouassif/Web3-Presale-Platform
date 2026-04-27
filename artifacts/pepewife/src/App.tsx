@@ -1,11 +1,11 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useState, useEffect, useRef } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/i18n/context";
-import { WalletProvider } from "@/contexts/wallet-context";
-import { ToastProvider } from "@/components/wallet-toast";
+import { WalletProvider, useWallet } from "@/contexts/wallet-context";
+import { ToastProvider, useToast, getWalletLabel } from "@/components/wallet-toast";
 import LoadingPage from "@/components/loading-page";
 import Chatbot from "@/components/chatbot";
 
@@ -25,6 +25,35 @@ const AdminReferrals = lazy(() => import("@/pages/admin/referrals"));
 const AdminSessions = lazy(() => import("@/pages/admin/sessions"));
 
 const queryClient = new QueryClient();
+
+// Monitors wallet account changes and shows a toast notification
+function WalletAccountMonitor() {
+  const { address, walletType, status } = useWallet();
+  const { showWalletError } = useToast();
+  const prevAddressRef = useRef<string | null>(null);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    // skip the initial mount — only react to subsequent changes
+    if (isFirstRender.current) {
+      prevAddressRef.current = address;
+      isFirstRender.current = false;
+      return;
+    }
+    if (
+      status === "connected" &&
+      prevAddressRef.current &&
+      address &&
+      prevAddressRef.current !== address
+    ) {
+      const label = walletType ? getWalletLabel(walletType) : undefined;
+      showWalletError("ACCOUNT_CHANGED", label);
+    }
+    prevAddressRef.current = address;
+  }, [address, walletType, status, showWalletError]);
+
+  return null;
+}
 
 function PageFallback() {
   return (
@@ -78,6 +107,7 @@ function App() {
       <LanguageProvider>
         <WalletProvider>
           <ToastProvider>
+            <WalletAccountMonitor />
             <TooltipProvider>
               <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
                 <AdminRouteGuard>

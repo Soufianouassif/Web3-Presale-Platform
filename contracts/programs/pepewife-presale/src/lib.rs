@@ -108,4 +108,13 @@ pub mod pepewife_presale {
     pub fn update_usdt_mint(ctx: Context<UpdateUsdtMint>) -> Result<()> {
         handle_update_usdt_mint(ctx)
     }
+
+    /// ⚠️ DEVNET / TESTING ONLY — Reset all presale counters to zero.
+    /// Resets: total_tokens_sold, total_sol_raised, total_usdt_raised,
+    ///         total_manual_tokens, buyers_count, current_stage, stages[*].tokens_sold.
+    /// Does NOT close the account or change prices/caps/timestamps.
+    /// Protected: only the `authority` keypair can call this.
+    pub fn dev_reset(ctx: Context<AdminOnly>) -> Result<()> {
+        handle_dev_reset(ctx)
+    }
 }

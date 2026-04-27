@@ -50,7 +50,7 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
             className="w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-[#1a1a2e] shadow-[5px_5px_0px_#1a1a2e] overflow-hidden bg-white"
             style={{ animation: "pulse 2s ease-in-out infinite" }}
           >
-            <img src="/logo.webp" alt="PEPEWIFE" width="400" height="400" className="w-full h-full object-cover" />
+            <img src="/logo.webp" alt="PEPA" width="400" height="400" className="w-full h-full object-cover" />
           </div>
           <div
             className="absolute -top-2 -right-2 sticker bg-[#4CAF50] text-white text-xs px-2 py-1"
@@ -61,10 +61,10 @@ export default function LoadingPage({ onComplete }: { onComplete: () => void }) 
         </div>
 
         <h1 className="text-4xl sm:text-5xl font-display text-[#1a1a2e] tracking-wider comic-shadow mb-2">
-          PEPEWIFE
+          PEPA
         </h1>
         <div className="sticker bg-[#FF4D9D] text-white text-sm px-4 py-1 mb-6" style={{ transform: "rotate(-1deg)" }}>
-          $PWIFE
+          $PEPA
         </div>
 
         <div className="w-64 sm:w-80 mb-4">

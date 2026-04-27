@@ -6,9 +6,26 @@ const SUSPICIOUS_REAUTH_MINUTES  = 10;
 const MAX_IP_CHANGES_BEFORE_KILL = 5;
 const MAX_UA_CHANGES_BEFORE_KILL = 2;
 const MAX_IP_HISTORY_SIZE        = 10;
+const IS_PROD = process.env.NODE_ENV === "production";
+
+const ALLOWED_ORIGINS_EXACT: string[] = [
+  "https://pwifecoin.fun",
+  "https://www.pwifecoin.fun",
+  ...(IS_PROD ? [] : ["http://localhost:22793", "http://localhost:3000"]),
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+];
+const VERCEL_PREVIEW_DOMAIN = process.env.VERCEL_PREVIEW_DOMAIN ?? null;
+
+function isOriginAllowed(origin: string): boolean {
+  if (ALLOWED_ORIGINS_EXACT.includes(origin)) return true;
+  if (VERCEL_PREVIEW_DOMAIN && origin.endsWith(`.${VERCEL_PREVIEW_DOMAIN}`)) return true;
+  if (VERCEL_PREVIEW_DOMAIN && origin === `https://${VERCEL_PREVIEW_DOMAIN}`) return true;
+  return false;
+}
 
 export function getClientIp(req: Request): string {
   return (
+    req.ip ??
     (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ??
     req.socket?.remoteAddress ??
     "unknown"
@@ -149,6 +166,20 @@ function analyzeSessionBinding(
 export function requireAdminAuth(req: Request, res: Response, next: NextFunction) {
   if (!req.path.startsWith("/admin")) {
     return next();
+  }
+
+  const isStateChanging =
+    req.method !== "GET" &&
+    req.method !== "HEAD" &&
+    req.method !== "OPTIONS";
+
+  if (isStateChanging) {
+    const origin = req.headers.origin;
+    if (!origin || typeof origin !== "string" || !isOriginAllowed(origin)) {
+      logger.warn({ origin, path: req.path, ip: getClientIp(req) }, "ADMIN_ACCESS_DENIED: origin not allowed");
+      res.status(403).json({ error: "Forbidden", code: "ORIGIN_NOT_ALLOWED" });
+      return;
+    }
   }
 
   const ip = getClientIp(req);

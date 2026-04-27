@@ -36,7 +36,8 @@ function isCronAuthorized(req: import("express").Request): boolean {
 
 const PROGRAM_ID = new PublicKey("CEJkgJRaMPuzm3CkHxRULfptCGFC8ahvmWnkiRPC8vDi");
 const CONFIG_PDA = new PublicKey("3mde35Qoft2R6jWSqvqmJCkLFbtacLnkZaKsXD6hPqC1");
-const SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
+const _solRpcRaw = process.env.SOLANA_RPC_URL ?? "";
+const SOLANA_RPC = (_solRpcRaw.startsWith("http://") || _solRpcRaw.startsWith("https://")) ? _solRpcRaw : "https://api.devnet.solana.com";
 
 async function getDiscriminator(name: string): Promise<Buffer> {
   const encoder = new TextEncoder();

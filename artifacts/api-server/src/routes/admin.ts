@@ -1,10 +1,69 @@
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from "@solana/web3.js";
 import { db } from "@workspace/db";
 import { pageVisits, walletConnections, purchases, presaleConfig, adminUsers, referralCodes, referrals } from "@workspace/db/schema";
 import { desc, sql, eq, count } from "drizzle-orm";
 import { requireAdminAuth, requireRecentAuth } from "../middleware/admin-auth.js";
 import { logger } from "../lib/logger.js";
+
+// ── Solana constants (same as sol-price-sync) ────────────────────────────────
+const PROGRAM_ID_STR = "CEJkgJRaMPuzm3CkHxRULfptCGFC8ahvmWnkiRPC8vDi";
+const CONFIG_PDA_STR = "3mde35Qoft2R6jWSqvqmJCkLFbtacLnkZaKsXD6hPqC1";
+const DEVNET_RPC     = "https://api.devnet.solana.com";
+const _rpcRaw        = process.env.SOLANA_RPC_URL ?? "";
+const SOLANA_RPC     = (_rpcRaw.startsWith("http://") || _rpcRaw.startsWith("https://")) ? _rpcRaw : DEVNET_RPC;
+
+async function getDiscriminator(name: string): Promise<Buffer> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(`global:${name}`);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Buffer.from(hashBuffer).slice(0, 8);
+}
+
+async function devResetOnChain(): Promise<string> {
+  const raw = process.env.ADMIN_KEYPAIR_JSON;
+  if (!raw) throw new Error("ADMIN_KEYPAIR_JSON env var not set");
+  const bytes: number[] = JSON.parse(raw);
+  if (!Array.isArray(bytes) || bytes.length !== 64)
+    throw new Error("ADMIN_KEYPAIR_JSON must be a JSON array of 64 numbers");
+
+  const keypair    = Keypair.fromSecretKey(new Uint8Array(bytes));
+  const connection = new Connection(SOLANA_RPC, "confirmed");
+  const programId  = new PublicKey(PROGRAM_ID_STR);
+  const configPda  = new PublicKey(CONFIG_PDA_STR);
+
+  const discriminator = await getDiscriminator("dev_reset");
+
+  const ix = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: configPda,         isSigner: false, isWritable: true  },
+      { pubkey: keypair.publicKey, isSigner: true,  isWritable: false },
+    ],
+    data: discriminator,
+  });
+
+  const tx = new Transaction();
+  tx.feePayer = keypair.publicKey;
+  tx.add(ix);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+  tx.sign(keypair);
+
+  const sig = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false });
+  await connection.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
+  return sig;
+}
 
 const REAUTH_WINDOW_MINUTES = 15;
 
@@ -289,6 +348,50 @@ router.post("/admin/presale/withdraw", requireRecentAuth(REAUTH_WINDOW_MINUTES),
   });
 });
 
+// ── DEV RESET — reset all on-chain counters to zero (devnet only) ─────────────
+router.post("/admin/presale/dev-reset", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    if (!process.env.ADMIN_KEYPAIR_JSON) {
+      res.status(503).json({
+        success: false,
+        message: "ADMIN_KEYPAIR_JSON is not configured — cannot send Solana transaction from server.",
+      });
+      return;
+    }
+
+    auditLog(req, "presale.dev_reset");
+    const sig = await devResetOnChain();
+    logger.info({ sig }, "DEV_RESET: on-chain presale counters cleared");
+
+    // Also wipe all DB data so frontend reflects the clean state
+    const [p, v, w, refs, codes] = await Promise.all([
+      db.delete(purchases).returning({ id: purchases.id }),
+      db.delete(pageVisits).returning({ id: pageVisits.id }),
+      db.delete(walletConnections).returning({ id: walletConnections.id }),
+      db.delete(referrals).returning({ id: referrals.id }),
+      db.delete(referralCodes).returning({ id: referralCodes.id }),
+    ]);
+    // Reset presaleConfig to stage 0 and update timestamp so frontend detects the reset
+    await db.insert(presaleConfig)
+      .values({ id: 1, currentStage: 0, totalRaisedUsd: "0", updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: presaleConfig.id,
+        set: { currentStage: 0, totalRaisedUsd: "0", updatedAt: new Date() },
+      });
+    logger.warn({ purchases: p.length, visits: v.length, wallets: w.length, referrals: refs.length, codes: codes.length }, "DEV_RESET: DB data cleared");
+
+    res.json({
+      success: true,
+      message: `On-chain + DB reset complete — all counters zeroed, back to stage 0. Deleted: ${p.length} purchases, ${refs.length} referrals, ${codes.length} codes.`,
+      signature: sig,
+    });
+  } catch (err) {
+    const msg = (err as Error).message ?? "Unknown error";
+    logger.error({ err }, "DEV_RESET: on-chain transaction failed");
+    res.status(500).json({ success: false, message: `Reset failed: ${msg}` });
+  }
+});
+
 router.get("/admin/referrals", async (req, res) => {
   try {
     const page = Math.max(1, Number(req.query.page ?? 1) || 1);
@@ -396,6 +499,77 @@ router.get("/admin/users", async (_req, res) => {
     res.json(users);
   } catch {
     res.status(500).json({ error: "Failed to fetch admin users" });
+  }
+});
+
+// ─── DANGER ZONE: Data Reset Routes ──────────────────────────────────────────
+
+router.delete("/admin/reset/purchases", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const result = await db.delete(purchases).returning({ id: purchases.id });
+    auditLog(req as import("express").Request, "reset.purchases", { deleted: result.length });
+    logger.warn({ count: result.length }, "DANGER_ZONE: purchases table cleared");
+    res.json({ success: true, deleted: result.length, message: `Deleted ${result.length} purchases` });
+  } catch (err) {
+    logger.error({ err }, "reset/purchases error");
+    res.status(500).json({ error: "Failed to clear purchases" });
+  }
+});
+
+router.delete("/admin/reset/visits", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const [v, w] = await Promise.all([
+      db.delete(pageVisits).returning({ id: pageVisits.id }),
+      db.delete(walletConnections).returning({ id: walletConnections.id }),
+    ]);
+    auditLog(req as import("express").Request, "reset.visits", { visits: v.length, wallets: w.length });
+    logger.warn({ visits: v.length, wallets: w.length }, "DANGER_ZONE: visits + wallets cleared");
+    res.json({ success: true, deleted: v.length + w.length, message: `Deleted ${v.length} visits and ${w.length} wallet connections` });
+  } catch (err) {
+    logger.error({ err }, "reset/visits error");
+    res.status(500).json({ error: "Failed to clear visits" });
+  }
+});
+
+router.delete("/admin/reset/referrals", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const [refs, codes] = await Promise.all([
+      db.delete(referrals).returning({ id: referrals.id }),
+      db.delete(referralCodes).returning({ id: referralCodes.id }),
+    ]);
+    auditLog(req as import("express").Request, "reset.referrals", { referrals: refs.length, codes: codes.length });
+    logger.warn({ referrals: refs.length, codes: codes.length }, "DANGER_ZONE: referrals + codes cleared");
+    res.json({ success: true, deleted: refs.length + codes.length, message: `Deleted ${refs.length} referrals and ${codes.length} referral codes` });
+  } catch (err) {
+    logger.error({ err }, "reset/referrals error");
+    res.status(500).json({ error: "Failed to clear referrals" });
+  }
+});
+
+router.delete("/admin/reset/all", requireRecentAuth(REAUTH_WINDOW_MINUTES), async (req, res) => {
+  try {
+    const [p, v, w, refs, codes] = await Promise.all([
+      db.delete(purchases).returning({ id: purchases.id }),
+      db.delete(pageVisits).returning({ id: pageVisits.id }),
+      db.delete(walletConnections).returning({ id: walletConnections.id }),
+      db.delete(referrals).returning({ id: referrals.id }),
+      db.delete(referralCodes).returning({ id: referralCodes.id }),
+    ]);
+    const total = p.length + v.length + w.length + refs.length + codes.length;
+    auditLog(req as import("express").Request, "reset.ALL", {
+      purchases: p.length, visits: v.length, wallets: w.length,
+      referrals: refs.length, codes: codes.length, total,
+    });
+    logger.warn({ total }, "DANGER_ZONE: ALL tables cleared");
+    res.json({
+      success: true,
+      deleted: total,
+      breakdown: { purchases: p.length, visits: v.length, wallets: w.length, referrals: refs.length, codes: codes.length },
+      message: `Cleared all data — ${total} records deleted`,
+    });
+  } catch (err) {
+    logger.error({ err }, "reset/all error");
+    res.status(500).json({ error: "Failed to clear all data" });
   }
 });
 

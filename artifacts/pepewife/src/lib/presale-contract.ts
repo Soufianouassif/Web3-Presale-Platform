@@ -1,8 +1,8 @@
 /**
- * PEPEWIFE Presale Contract — Browser Integration
+ * PEPA Presale Contract — Browser Integration
  *
- * Program ID : 4KpEeYVW8592GGpcNZLo7CinE1dnV9tJnKYc9JzpQSv7  (Devnet)
- * Config PDA : 7tvmjEGj9k4QV7oVNeAD13CVxdjRPCNfYdtz1mXQ8sDs
+ * Program ID : CEJkgJRaMPuzm3CkHxRULfptCGFC8ahvmWnkiRPC8vDi  (Devnet)
+ * Config PDA : 3mde35Qoft2R6jWSqvqmJCkLFbtacLnkZaKsXD6hPqC1
  *
  * Uses @solana/web3.js directly (no Anchor runtime needed).
  * Instruction data layout follows Anchor discriminator convention.
@@ -624,6 +624,93 @@ export async function advanceStage(
   const signed   = await provider.signTransaction(tx);
   onSigned?.();
   const signature = await sendAndConfirmTx(signed.serialize(), blockhash, lastValidBlockHeight);
+  return { signature };
+}
+
+/** الانتقال للمرحلة التالية — باستخدام ملف الـ Keypair */
+export async function advanceStageWithKeypair(
+  keypairBytes: number[],
+  onSigned?: () => void,
+): Promise<{ signature: string }> {
+  const keypair       = Keypair.fromSecretKey(new Uint8Array(keypairBytes));
+  const admin         = keypair.publicKey;
+
+  const advanceDiscriminator = await getDiscriminator("advance_stage");
+  const resumeDiscriminator  = await getDiscriminator("resume");
+
+  const advanceIx = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: admin,      isSigner: true,  isWritable: false },
+    ],
+    data: advanceDiscriminator,
+  });
+
+  const resumeIx = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: admin,      isSigner: true,  isWritable: false },
+    ],
+    data: resumeDiscriminator,
+  });
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(advanceIx);
+  tx.add(resumeIx);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+
+  tx.sign(keypair);
+  onSigned?.();
+
+  const signature = await sendAndConfirmTx(tx.serialize(), blockhash, lastValidBlockHeight);
+  return { signature };
+}
+
+// ─────────────────────────────────────────────────────────────
+//  ADMIN: DEV RESET  (dev_reset instruction)
+//  ⚠️  DEVNET ONLY — resets all counters to zero.
+//  Requires the authority keypair (never exposed to browser).
+//  Called from the admin backend via ADMIN_KEYPAIR_JSON.
+//  Accounts: config (mut, has_one=authority), authority (signer)
+// ─────────────────────────────────────────────────────────────
+
+export async function devResetWithKeypair(
+  keypairBytes: number[],
+  onSigned?: () => void,
+): Promise<{ signature: string }> {
+  const keypair       = Keypair.fromSecretKey(new Uint8Array(keypairBytes));
+  const admin         = keypair.publicKey;
+  const discriminator = await getDiscriminator("dev_reset");
+
+  const ix = new TransactionInstruction({
+    programId: PROGRAM_ID,
+    keys: [
+      { pubkey: CONFIG_PDA, isSigner: false, isWritable: true },
+      { pubkey: admin,      isSigner: true,  isWritable: false },
+    ],
+    data: discriminator,
+  });
+
+  const tx = new Transaction();
+  tx.feePayer = admin;
+  tx.add(ix);
+
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash("confirmed");
+  tx.recentBlockhash      = blockhash;
+  tx.lastValidBlockHeight = lastValidBlockHeight;
+
+  tx.sign(keypair);
+  onSigned?.();
+
+  const signature = await sendAndConfirmTx(tx.serialize(), blockhash, lastValidBlockHeight);
   return { signature };
 }
 

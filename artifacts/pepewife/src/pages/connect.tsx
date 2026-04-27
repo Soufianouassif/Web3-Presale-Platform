@@ -119,8 +119,8 @@ export default function ConnectPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#E8F5E9] via-[#FCE4EC] to-[#FFFDE7] relative overflow-hidden">
       <SEOHead
-        title="Connect Wallet – PEPEWIFE Presale"
-        description="Connect your wallet to participate in the PEPEWIFE presale. Supports Phantom, Solflare, MetaMask, OKX Wallet, and Trust Wallet."
+        title="Connect Wallet – PEPA Presale"
+        description="Connect your wallet to participate in the PEPA presale. Supports Phantom, Solflare, MetaMask, OKX Wallet, and Trust Wallet."
         path="/connect"
         noindex
       />
@@ -164,7 +164,7 @@ export default function ConnectPage() {
           )}
 
           <div className="text-center mb-8">
-            <img src="/logo.webp" alt="PEPEWIFE" width="64" height="64" className="w-16 h-16 mx-auto mb-4 rounded-full border-3 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e]" />
+            <img src="/logo.webp" alt="PEPA" width="64" height="64" className="w-16 h-16 mx-auto mb-4 rounded-full border-3 border-[#1a1a2e] shadow-[3px_3px_0px_#1a1a2e]" />
             <div className="sticker bg-[#4CAF50] text-white text-sm inline-block mb-3" style={{ transform: "rotate(-2deg)" }}>{t.connect.step1}</div>
             <h1 className="text-4xl sm:text-5xl font-display text-[#1a1a2e] tracking-wider comic-shadow">
               {status === "connected" ? t.connect.switchWallet : t.connect.title}

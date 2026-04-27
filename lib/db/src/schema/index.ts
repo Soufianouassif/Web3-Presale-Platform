@@ -29,7 +29,10 @@ export const purchases = pgTable("purchases", {
   amountTokens: decimal("amount_tokens", { precision: 18, scale: 6 }).notNull().default("0"),
   txHash: text("tx_hash"),
   stage: integer("stage").default(1),
+  referralCode: text("referral_code"),
   verificationStatus: text("verification_status").default("VERIFIED"),
+  verificationSource: text("verification_source"),
+  ip: text("ip"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
