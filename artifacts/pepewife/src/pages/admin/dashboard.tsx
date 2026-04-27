@@ -6,7 +6,8 @@ import {
   withdrawSol, withdrawSolWithKeypair, withdrawUsdt, updateSolPrice,
   pauseSaleWithKeypair, resumeSaleWithKeypair,
   advanceStage, endPresale,
-  connection, SOL_VAULT_PDA, VAULT_USDT_ATA,
+  connection, SOL_VAULT_PDA, VAULT_USDT_ATA, VAULT_AUTH_PDA,
+  PROGRAM_ID, CONFIG_PDA, SOLANA_ENDPOINT, IS_DEVNET,
   fetchPresaleState, stageTokenPriceUsd, buildExplorerUrl, type PresaleState,
 } from "@/lib/presale-contract";
 
@@ -195,6 +196,244 @@ function ChainPausePanel({
       <p className="text-xs text-gray-600 leading-relaxed">
         ✅ العقد يدعم هذه التعليمات مباشرةً (pause / resume).
       </p>
+    </div>
+  );
+}
+
+// ─── On-Chain Health Panel ──────────────────────────────────────────────────
+interface ChainHealth {
+  rpcOk: boolean;
+  rpcSlot: number | null;
+  programExecutable: boolean | null;
+  programLamports: number | null;
+  programOwner: string | null;
+  configExists: boolean | null;
+  configSize: number | null;
+  configOwner: string | null;
+  solVaultLamports: number | null;
+  vaultAuthLamports: number | null;
+  checkedAt: Date | null;
+  error: string | null;
+}
+
+const LAMPORTS_PER_SOL_NUM = 1_000_000_000;
+
+function fmtSol(lamports: number | null): string {
+  if (lamports === null) return "—";
+  return `${(lamports / LAMPORTS_PER_SOL_NUM).toFixed(4)} SOL`;
+}
+
+function shortAddr(addr: string, chars = 6): string {
+  if (!addr) return "";
+  if (addr.length <= chars * 2 + 3) return addr;
+  return `${addr.slice(0, chars)}…${addr.slice(-chars)}`;
+}
+
+function HealthRow({
+  label, ok, value, hint, addr,
+}: { label: string; ok: boolean | null; value?: string; hint?: string; addr?: string }) {
+  const dot = ok === null
+    ? "bg-gray-500"
+    : ok ? "bg-[#39ff14] animate-pulse" : "bg-red-500";
+  const valueColor = ok === null
+    ? "text-gray-500"
+    : ok ? "text-gray-200" : "text-red-400";
+  return (
+    <div className="flex items-start justify-between gap-3 py-2.5 border-b border-white/5 last:border-0">
+      <div className="flex items-start gap-2.5 min-w-0 flex-1">
+        <span className={`w-2 h-2 rounded-full flex-shrink-0 mt-1.5 ${dot}`} />
+        <div className="min-w-0">
+          <p className="text-xs text-gray-400 uppercase tracking-wider">{label}</p>
+          {addr && (
+            <p className="text-[10px] font-mono text-gray-600 mt-0.5 truncate">{shortAddr(addr, 8)}</p>
+          )}
+          {hint && <p className="text-[11px] text-gray-600 mt-0.5">{hint}</p>}
+        </div>
+      </div>
+      <div className={`text-sm font-mono font-semibold whitespace-nowrap ${valueColor}`}>
+        {value ?? (ok === null ? "—" : ok ? "OK" : "FAIL")}
+      </div>
+    </div>
+  );
+}
+
+function OnChainHealthPanel() {
+  const [health, setHealth] = useState<ChainHealth>({
+    rpcOk: false, rpcSlot: null,
+    programExecutable: null, programLamports: null, programOwner: null,
+    configExists: null, configSize: null, configOwner: null,
+    solVaultLamports: null, vaultAuthLamports: null,
+    checkedAt: null, error: null,
+  });
+  const [loading, setLoading] = useState(false);
+
+  const runHealthCheck = useCallback(async () => {
+    setLoading(true);
+    const next: ChainHealth = {
+      rpcOk: false, rpcSlot: null,
+      programExecutable: null, programLamports: null, programOwner: null,
+      configExists: null, configSize: null, configOwner: null,
+      solVaultLamports: null, vaultAuthLamports: null,
+      checkedAt: new Date(), error: null,
+    };
+
+    try {
+      // 1) RPC connectivity check
+      try {
+        next.rpcSlot = await connection.getSlot();
+        next.rpcOk = true;
+      } catch (err) {
+        next.error = `RPC unreachable: ${(err as Error).message}`;
+      }
+
+      if (!next.rpcOk) {
+        setHealth(next);
+        return;
+      }
+
+      // 2) Fetch all 4 accounts in parallel
+      const [programInfo, configInfo, solVaultInfo, vaultAuthInfo] = await Promise.all([
+        connection.getAccountInfo(PROGRAM_ID).catch(() => null),
+        connection.getAccountInfo(CONFIG_PDA).catch(() => null),
+        connection.getAccountInfo(SOL_VAULT_PDA).catch(() => null),
+        connection.getAccountInfo(VAULT_AUTH_PDA).catch(() => null),
+      ]);
+
+      next.programExecutable = programInfo?.executable ?? false;
+      next.programLamports = programInfo?.lamports ?? 0;
+      next.programOwner = programInfo?.owner.toBase58() ?? null;
+
+      next.configExists = configInfo !== null;
+      next.configSize = configInfo?.data.length ?? null;
+      next.configOwner = configInfo?.owner.toBase58() ?? null;
+
+      next.solVaultLamports = solVaultInfo?.lamports ?? 0;
+      next.vaultAuthLamports = vaultAuthInfo?.lamports ?? 0;
+    } catch (err) {
+      next.error = (err as Error).message;
+    } finally {
+      setHealth(next);
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { runHealthCheck(); }, [runHealthCheck]);
+
+  // Validate config is owned by our program
+  const configValid = health.configExists === true
+    && health.configOwner === PROGRAM_ID.toBase58();
+
+  // Overall health
+  const overallOk = health.rpcOk
+    && health.programExecutable === true
+    && configValid;
+
+  return (
+    <div className="space-y-4">
+      {/* Header status */}
+      <div className={`flex items-center gap-3 p-3 rounded-xl border ${
+        overallOk
+          ? "bg-[#39ff14]/10 border-[#39ff14]/30"
+          : health.checkedAt === null
+          ? "bg-gray-500/10 border-gray-500/30"
+          : "bg-red-500/10 border-red-500/30"
+      }`}>
+        <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+          overallOk ? "bg-[#39ff14] animate-pulse" : health.checkedAt === null ? "bg-gray-500" : "bg-red-500"
+        }`} />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold">
+            {overallOk ? "✅ كل شيء يعمل" : health.checkedAt === null ? "جاري الفحص…" : "⚠️ مشكلة في الاتصال بالعقد"}
+          </p>
+          <p className="text-[11px] text-gray-500">
+            {IS_DEVNET ? "Devnet" : "Mainnet"}
+            {health.checkedAt && ` · آخر فحص ${health.checkedAt.toLocaleTimeString()}`}
+          </p>
+        </div>
+        <button
+          onClick={runHealthCheck}
+          disabled={loading}
+          className="text-xs px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white disabled:opacity-40 flex items-center gap-1.5"
+        >
+          {loading && <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />}
+          {loading ? "..." : "🔄 إعادة الفحص"}
+        </button>
+      </div>
+
+      {/* Detailed checks */}
+      <div className="bg-black/30 rounded-xl px-4 py-1 border border-white/10">
+        <HealthRow
+          label="RPC Endpoint"
+          ok={health.rpcOk}
+          value={health.rpcOk ? `Slot ${health.rpcSlot?.toLocaleString()}` : "Unreachable"}
+          hint={SOLANA_ENDPOINT.replace(/^https?:\/\//, "")}
+        />
+        <HealthRow
+          label="Program Account"
+          ok={health.programExecutable}
+          value={
+            health.programExecutable === null ? undefined
+              : health.programExecutable ? "Executable ✓" : "Not executable"
+          }
+          addr={PROGRAM_ID.toBase58()}
+          hint={health.programLamports !== null ? `Balance: ${fmtSol(health.programLamports)}` : undefined}
+        />
+        <HealthRow
+          label="Config PDA (Initialized)"
+          ok={configValid}
+          value={
+            health.configExists === null ? undefined
+              : health.configExists === false ? "Not initialized"
+              : configValid ? `${health.configSize} bytes`
+              : "Wrong owner!"
+          }
+          addr={CONFIG_PDA.toBase58()}
+          hint={
+            health.configExists === false
+              ? "شغّل instruction الـ initialize على Playground"
+              : health.configOwner && !configValid
+              ? `Owner: ${shortAddr(health.configOwner, 8)}`
+              : undefined
+          }
+        />
+        <HealthRow
+          label="SOL Vault PDA"
+          ok={health.solVaultLamports !== null}
+          value={fmtSol(health.solVaultLamports)}
+          addr={SOL_VAULT_PDA.toBase58()}
+          hint="حساب SOL الخاص بالمشترين"
+        />
+        <HealthRow
+          label="Vault Authority"
+          ok={health.vaultAuthLamports !== null}
+          value={fmtSol(health.vaultAuthLamports)}
+          addr={VAULT_AUTH_PDA.toBase58()}
+          hint="مالك حساب USDT — يحتاج SOL لـ rent"
+        />
+      </div>
+
+      {health.error && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
+          <p className="text-xs text-red-300 font-mono break-all">{health.error}</p>
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-2 text-[11px]">
+        <a
+          href={`https://explorer.solana.com/address/${PROGRAM_ID.toBase58()}${IS_DEVNET ? "?cluster=devnet" : ""}`}
+          target="_blank" rel="noopener noreferrer"
+          className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-[#39ff14] transition-colors"
+        >
+          🔗 Program على Explorer
+        </a>
+        <a
+          href={`https://explorer.solana.com/address/${CONFIG_PDA.toBase58()}${IS_DEVNET ? "?cluster=devnet" : ""}`}
+          target="_blank" rel="noopener noreferrer"
+          className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-[#39ff14] transition-colors"
+        >
+          🔗 Config PDA على Explorer
+        </a>
+      </div>
     </div>
   );
 }
@@ -959,6 +1198,12 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* On-Chain Health */}
+      <SectionCard title="🩺 On-Chain Health — حالة العقد على البلوكتشين">
+        <p className="text-xs text-gray-500 mb-4">فحص مباشر للعقد الذكي: RPC، Program، Config PDA، والـ vaults</p>
+        <OnChainHealthPanel />
+      </SectionCard>
 
       {/* On-Chain Pause / Resume */}
       <div className="grid lg:grid-cols-2 gap-5">
