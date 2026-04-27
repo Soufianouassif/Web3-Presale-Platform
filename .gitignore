@@ -7,3 +7,12 @@ build/
 .env.local
 *.log
 coverage/
+
+# Local Replit state — runtime files, never commit
+.local/state/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+attached_assets/
