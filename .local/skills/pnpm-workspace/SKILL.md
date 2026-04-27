@@ -61,7 +61,7 @@ Codegen command:
 
 - `pnpm --filter @workspace/api-spec run codegen`
 
-This generates files such as React Query hooks and Zod schemas. It is strongly recommended that you use them. The server should use Zod schemas to validate inputs and outputs, and clients should use the available hooks.
+This generates files such as React Query hooks and Zod schemas. No follow-up `typecheck:libs` is needed. It is strongly recommended that you use them. The server should use Zod schemas to validate inputs and outputs, and clients should use the available hooks.
 
 ## Logging
 
@@ -127,6 +127,7 @@ See `references/openapi.md` for generated file paths and naming conventions. Do 
 
 ## Common pitfalls
 
+- **Do not run `pnpm dev` or `pnpm run dev` at the workspace root.** Replit apps run via workflows, not root-level pnpm dev. The root has no `dev` script by design, and individual artifacts need env vars (`PORT`, `BASE_PATH`) that the workflow config wires up. To run or verify an app, use `restart_workflow <slug>` or view the preview pane — do not shell out to `pnpm dev`.
 - Do not introduce an all-composite setup for leaf workspace packages. Declaration emit from apps causes type portability issues (TS2742) when multiple versions of `@types/*` packages exist across workspace packages.
 - Do not add leaf workspace packages to the root `tsconfig.json` references; that solution file is for buildable libs only.
 - Prefer root commands with `--filter` when targeting a specific package:

@@ -10,8 +10,8 @@ const router = Router();
 
 const SOLANA_NETWORK    = (process.env.SOLANA_NETWORK ?? "devnet").toLowerCase();
 const SOLANA_RPC        = process.env.SOLANA_RPC_URL || process.env.SOLANA_RPC || "https://api.devnet.solana.com";
-const PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
-const CONFIG_PDA         = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
+const PRESALE_PROGRAM_ID = "CEJkgJRaMPuzm3CkHxRULfptCGFC8ahvmWnkiRPC8vDi";
+const CONFIG_PDA         = "3mde35Qoft2R6jWSqvqmJCkLFbtacLnkZaKsXD6hPqC1";
 
 // skip on-chain verification on devnet by default (public RPC too slow for serverless timeouts)
 const REQUIRE_ONCHAIN_VERIFICATION = process.env.REQUIRE_ONCHAIN_VERIFICATION !== undefined

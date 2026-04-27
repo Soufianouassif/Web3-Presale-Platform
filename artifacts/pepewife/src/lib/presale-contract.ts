@@ -83,11 +83,11 @@ async function sendAndConfirmTx(
 // ─────────────────────────────────────────────────────────────
 
 export const PROGRAM_ID = new PublicKey(
-  "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145"
+  "CEJkgJRaMPuzm3CkHxRULfptCGFC8ahvmWnkiRPC8vDi"
 );
 
 export const CONFIG_PDA = new PublicKey(
-  "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi"
+  "3mde35Qoft2R6jWSqvqmJCkLFbtacLnkZaKsXD6hPqC1"
 );
 
 /** RPC endpoint — routes through the API proxy to avoid browser CORS.

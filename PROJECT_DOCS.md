@@ -179,7 +179,7 @@ WalletBuyModal يفتح
 
 ### عقد البريسيل — `pepewife-presale`
 
-**Program ID (Devnet):** `AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145`
+**Program ID (Devnet):** `CEJkgJRaMPuzm3CkHxRULfptCGFC8ahvmWnkiRPC8vDi`
 
 #### التعليمات (Instructions)
 

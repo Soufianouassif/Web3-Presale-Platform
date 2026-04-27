@@ -14,9 +14,12 @@ Set up Anthropic AI integration via Replit AI Integrations proxy. Keys are autom
 
 ## Supported Anthropic Models
 
-- claude-opus-4-6: Most capable, best for complex reasoning and coding tasks. Prefer claude-opus-4-6 over other Opus-series models.
-- claude-opus-4-5: Earlier Opus generation, prefer claude-opus-4-6.
-- claude-opus-4-1: Earlier Opus generation, prefer claude-opus-4-6.
+- claude-opus-4-7: Most capable, best for complex reasoning and coding tasks. Improved memory for cross-session continuity and high-res image support. Prefer claude-opus-4-7 over other Opus-series models.
+  - Note: temperature, top_p, and top_k parameters are deprecated on claude-opus-4-7. Setting any of these to a non-default value will return a 400 error. Omit these parameters entirely from requests.
+  - Note: Thinking content is omitted from responses by default. Thinking blocks still appear but their text field will be empty unless you set thinking display to "summarized". Extended thinking budgets (thinking type "enabled" with budget_tokens) are not supported and will return a 400 error -- use adaptive thinking instead.
+- claude-opus-4-6: Earlier Opus generation, prefer claude-opus-4-7.
+- claude-opus-4-5: Earlier Opus generation, prefer claude-opus-4-7.
+- claude-opus-4-1: Earlier Opus generation, prefer claude-opus-4-7.
 - claude-sonnet-4-6: Balanced performance and speed, recommended for most use cases. Prefer claude-sonnet-4-6 over claude-sonnet-4-5.
 - claude-sonnet-4-5: Earlier Sonnet generation, prefer claude-sonnet-4-6.
 - claude-haiku-4-5: Fastest and most compact, ideal for simple tasks

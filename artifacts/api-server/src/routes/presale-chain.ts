@@ -12,7 +12,7 @@ const chainLimiter = rateLimit({
 });
 
 const SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
-const CONFIG_PDA = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
+const CONFIG_PDA = "3mde35Qoft2R6jWSqvqmJCkLFbtacLnkZaKsXD6hPqC1";
 
 let solPriceCache: { price: number; fetchedAt: number } = { price: 0, fetchedAt: 0 };
 let chainStateCache: { data: unknown; fetchedAt: number } | null = null;

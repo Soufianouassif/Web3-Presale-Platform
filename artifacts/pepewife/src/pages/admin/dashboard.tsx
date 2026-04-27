@@ -938,7 +938,7 @@ export default function AdminDashboard() {
           {chainLoading ? (
             <><span className="w-6 h-6 border-2 border-[#9945FF]/50 border-t-[#9945FF] rounded-full animate-spin mx-auto block mb-2" /><p>Reading Solana blockchain…</p></>
           ) : (
-            <><p className="text-red-400">Cannot read on-chain data</p><p className="text-xs mt-1">Config PDA: BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi</p></>
+            <><p className="text-red-400">Cannot read on-chain data</p><p className="text-xs mt-1">Config PDA: 3mde35Qoft2R6jWSqvqmJCkLFbtacLnkZaKsXD6hPqC1</p></>
           )}
         </div>
       )}

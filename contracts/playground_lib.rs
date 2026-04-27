@@ -4,7 +4,7 @@ use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::Mint;
 
-declare_id!("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
+declare_id!("CEJkgJRaMPuzm3CkHxRULfptCGFC8ahvmWnkiRPC8vDi");
 
 // ═══════════════════════════════════════════════════════════
 //  ERRORS

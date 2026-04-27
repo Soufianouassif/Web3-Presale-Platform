@@ -16,8 +16,7 @@ Always follow these guidelines when building a mobile application using Expo:
 - Minimize the number of files. Collapse similar components into a single file.
 - If the app is complex and requires functionality that can't be done in a single request, it is okay to stub out the backend and implement the frontend first.
 - ALWAYS use native device capabilities (camera, location, contacts, etc.) when the app requires them. NEVER use fake/mock data when real device features are available and appropriate.
-- Client-Server Communication: The client (Expo app) interacts with the server (Express app) through a RESTful API. The server is responsible for data storage.
-- Server-side Logic: The server handles API requests, database interactions, authentication, and any other server-specific logic. It's built with Express and uses TypeScript.
+- Client-Server: the Expo client talks to an Express + TypeScript server via a RESTful API. The server handles data storage, API requests, auth, and any other server-specific logic.
 
 ## Routing
 
@@ -32,16 +31,14 @@ Example structure:
 
 ```text
 app/
-  _layout.tsx          # Root layout with providers
-  index.tsx            # Home route (/)
-  (tabs)/
-    _layout.tsx        # Tab layout
-    index.tsx          # First tab (/)
-    settings.tsx       # Settings tab (/settings)
-  profile/
-    _layout.tsx        # Profile stack layout
-    index.tsx          # /profile
-    [id].tsx           # /profile/:id
+  _layout.tsx              # Root layout with providers
+  index.tsx                # Home route (/)
+  (tabs)/_layout.tsx       # Tab layout
+  (tabs)/index.tsx         # First tab (/)
+  (tabs)/settings.tsx      # Settings tab (/settings)
+  profile/_layout.tsx      # Profile stack layout
+  profile/index.tsx        # /profile
+  profile/[id].tsx         # /profile/:id
 ```
 
 For dynamic parameters: `const { id } = useLocalSearchParams()` from "expo-router"
@@ -81,9 +78,9 @@ If this Expo artifact is part of a multi-artifact project (e.g., alongside a rea
   - Use the shared QueryClient/fetch setup that ships with the monorepo rather than creating app-local networking infrastructure.
   - The generated hooks return data typed as `T` directly.
   - For mutations or requests that do not yet exist in the generated client, update the OpenAPI spec and regenerate rather than bypassing the shared API client package.
-  - Do not hardcode domain URLs or hostnames in frontend code. The deployment domain is injected at build time and varies between development, preview, and production environments. Use `process.env.EXPO_PUBLIC_DOMAIN` for domain configuration. Routes like `/api` or `/{service}` are routed to the appropriate artifact/services as needed by the environment.
-  - In the root layout file (`app/_layout.tsx`), call ``setBaseUrl(`https://${process.env.EXPO_PUBLIC_DOMAIN}`)`` from `@workspace/api-client-react` at the top level (outside any component). Expo bundles run outside the web proxy and need absolute URLs to reach the API server.
-  - When the app requires authenticated API calls, use `setAuthTokenGetter` from `@workspace/api-client-react` to supply a bearer token getter. The getter is called before every request and should return the token string or `null`.
+  - Do not hardcode domain URLs or hostnames. The deployment domain is injected at build time and varies between development, preview, and production. Use `process.env.EXPO_PUBLIC_DOMAIN`. Routes like `/api` or `/{service}` are routed to the appropriate artifact/service as needed.
+  - In `app/_layout.tsx`, call ``setBaseUrl(`https://${process.env.EXPO_PUBLIC_DOMAIN}`)`` from `@workspace/api-client-react` at the top level (outside any component). Expo bundles run outside the web proxy and need absolute URLs to reach the API server.
+  - For authenticated API calls, use `setAuthTokenGetter` from `@workspace/api-client-react` to supply a bearer token getter. The getter is called before every request and should return the token string or `null`.
 
 ## App Icon
 
@@ -95,7 +92,7 @@ Generate a custom app icon for the app. Read the mobile-ui skill's app-icon.md r
 - Check the configured workflows list for exact workflow names.
 - Use the `restart_workflow` tool to restart workflows — not shell commands.
 - The Expo dev server has Hot Module Reloading. Only restart the mobile workflow when you change dependencies or hit a Metro error, not for normal code changes. Restarting unnecessarily wastes time.
-- Backend workflows only requires restart when backend changes were made since it can be a time consuming operation.
+- Backend workflows only require restart when backend changes were made since it can be a time-consuming operation.
 - After presenting the artifact, call `suggestDeploy()` so the user knows their app is ready to publish.
 
 ## React Native Pitfalls
@@ -129,27 +126,18 @@ Avoid these common mistakes:
    - Body text: 14-16pt, Headers: 20-28pt
    - Always test that text fits on a 375pt wide screen (iPhone SE)
 
-- Empty State Design:
-   - Use simple text-based empty states, not placeholder images
-   - An icon + descriptive text is sufficient
+- Empty State Design: Use simple text-based empty states (icon + descriptive text), not placeholder images.
 
 - Expo Router Header Configuration:
    - Do not set headerShown dynamically inside screen components — it causes remounts on every re-render
-   - BAD: Setting options dynamically inside screen components
-   - GOOD: Configure all header options in _layout.tsx where screens are registered
+   - Configure all header options in _layout.tsx where screens are registered
    - Individual screens should only set dynamic content (headerLeft/headerRight buttons), not headerShown
 
 - Safe Area / Top Padding:
-   - Do not use hardcoded top padding (24px, 40px, etc.) — it will be wrong on different devices
-   - Use useSafeAreaInsets() from react-native-safe-area-context
-   - Example: Use useSafeAreaInsets() hook and apply insets.top to paddingTop
-   - This handles iPhone notch, Dynamic Island, and Android status bars automatically
-   - Absolutely positioned headers: When a header is positioned absolutely over scrollable content:
-     - Header uses: top: insets.top (positions header below notch/Dynamic Island)
-     - Content below needs: paddingTop: insets.top + headerContentHeight
-     - BAD: paddingTop: 100 (fixed value fails on devices with different insets)
-     - GOOD: paddingTop: insets.top + 70 (where 70 = header's internal height)
-     - The header height varies by device because insets vary (47px on older iPhones, 59px+ on Dynamic Island)
+   - Do not use hardcoded top padding (24px, 40px, etc.) — it will be wrong on different devices. Use `useSafeAreaInsets()` from react-native-safe-area-context and apply `insets.top` to `paddingTop`. This handles iPhone notch, Dynamic Island, and Android status bars automatically.
+   - Absolutely positioned headers: when a header is positioned absolutely over scrollable content:
+     - Header uses: `top: insets.top` (positions header below notch/Dynamic Island)
+     - Content below needs: `paddingTop: insets.top + headerContentHeight` (e.g. `insets.top + 70` where 70 = header's internal height). Do NOT use a fixed value like `paddingTop: 100` — it fails on devices with different insets (47px on older iPhones, 59px+ on Dynamic Island).
 
 - Streaming API Responses (OpenAI, etc.):
    - For streaming, read the mobile-ui skill's expo-fetch.md reference
@@ -164,20 +152,12 @@ Avoid these common mistakes:
     - keyboardVerticalOffset: `0` for transparent/no header, `headerHeight` for opaque header
     - Use useSafeAreaInsets() for bottom padding on the input container to avoid home indicator overlap
     - Do not nest KeyboardAvoidingViews — only one should wrap your content
-    - For chat UIs: Use inverted FlatList (see the chat apps guidance below) — no additional scroll logic needed
-      - Do not try to implement auto-scroll with scrollToEnd() — it has timing bugs
-      - Inverted FlatList handles this automatically — newest message always visible
+    - For chat UIs: Use inverted FlatList (see below) — no additional scroll logic needed. Do not try to implement auto-scroll with scrollToEnd() — it has timing bugs. Inverted FlatList handles this automatically.
 
 - Chat Apps — state and FlatList patterns:
     - For chat app implementation patterns (stale closures, inverted FlatList, streaming), read the mobile-ui skill's expo-fetch.md reference
     - Key rules: Use inverted FlatList (not scrollToEnd), capture state before async operations, use ListHeaderComponent for typing indicator
-    - FlatList Boolean Props — type coercion:
-      - FlatList props like scrollEnabled, showsVerticalScrollIndicator expect boolean values
-      - Using expressions like `someString || anotherValue` can pass a string instead of boolean
-      - This causes: TypeError: expected dynamic type 'boolean', but had type 'string'
-      - Coerce to boolean with !! when using string variables in boolean contexts
-      - BAD: `const showFooter = isSending || streamingContent;` (streamingContent is string)
-      - GOOD: `const showFooter = isSending || !!streamingContent;` (!! converts to boolean)
+    - FlatList Boolean Props — type coercion: props like `scrollEnabled` and `showsVerticalScrollIndicator` expect booleans. Using `someString || anotherValue` can pass a string and cause `TypeError: expected dynamic type 'boolean', but had type 'string'`. Coerce with `!!`:
       - BAD: `scrollEnabled={data || someString}`
       - GOOD: `scrollEnabled={!!data || !!someString}`
 
@@ -186,13 +166,13 @@ Avoid these common mistakes:
     - RevenueCat works on the web out of the box without any additional configuration.
 
 - Custom ErrorBoundary component:
-    - Use reloadAppAsync function from expo in tandem with the ErrorBoundary component to restart the app when the app crashes. `import { reloadAppAsync } from 'expo'`. Do not use reloadAsync from "expo-updates" for this purpose.
+    - Use `reloadAppAsync` from `expo` with the ErrorBoundary component to restart the app when it crashes: `import { reloadAppAsync } from 'expo'`. Do not use `reloadAsync` from `expo-updates` for this purpose.
     - The ErrorBoundary is a minimal class component (required by React's error boundary API) with a functional ErrorFallback component for the UI. The consuming component should remain functional.
-    - Do not add local state to the ErrorFallback component because it only renders if the app crashes. It should be used as is, unless the user requests it. (Note: dev-mode-only state guarded by `__DEV__` is acceptable for debugging features.)
-    - The ErrorFallback component uses useColors() and useSafeAreaInsets for theming and positioning. The ErrorBoundary wrapper uses React's class component error boundary API (getDerivedStateFromError, componentDidCatch).
+    - Do not add local state to the ErrorFallback component — it only renders if the app crashes. Use as-is unless the user requests otherwise. (Dev-mode-only state guarded by `__DEV__` is acceptable for debugging.)
+    - The ErrorFallback uses `useColors()` and `useSafeAreaInsets` for theming and positioning. The ErrorBoundary wrapper uses React's class component error boundary API (`getDerivedStateFromError`, `componentDidCatch`).
 
 - react-native-maps:
-    - Pin version to exactly 1.18.0 in package.json (e.g., `"react-native-maps": "1.18.0"`) — this is the only version compatible with Expo Go currently. Other versions will cause crashes or compatibility issues.
+    - Pin version to exactly 1.18.0 in package.json — this is the only version compatible with Expo Go currently. Other versions cause crashes.
     - Do not add react-native-maps to the plugins array in app.json — it will crash the app.
 
 - Over use of text:
@@ -214,12 +194,7 @@ When to use SafeAreaView:
 3. Removed header: Add SafeAreaView inside a View with background color (not just white space)
 4. Pages inside stacks: Don't add SafeAreaView if parent _layout.tsx has header enabled
 
-Games and absolute positioning:
-
-- Account for safe area insets in positioning calculations
-- Use useSafeAreaInsets() hook to get inset values
-- Apply insets to positioning calculations in game physics
-- Avoid using SafeAreaView in game screens - factor insets into game loop instead
+Games and absolute positioning: account for safe area insets in positioning calculations using `useSafeAreaInsets()`. Apply insets in game physics. Avoid `SafeAreaView` in game screens — factor insets into the game loop instead.
 
 ## Font Loading and SplashScreen
 
@@ -247,10 +222,10 @@ Web-only insets for web edge cases (always implement for every app):
 
 - Apply on web only (Platform.OS === "web")
 - Always add at least a 67px top inset to top-level header content for the status bar. Additional vertical padding will likely still be required.
-- Always add a 34px bottom insets
+- Always add a 34px bottom inset
   - If using a bottom tab bar, instead modify the tab bar height to be 84px (50px + 34px). Do not add paddingBottom to the tab bar.
 - Do not add these insets on iOS/Android; native safe areas already handle them
-- Before finishing any screen, verify that web platform insets handling is implemented and are correct.
+- Before finishing any screen, verify that web platform insets handling is implemented and correct.
 
 ## Web Compatibility
 
@@ -283,8 +258,7 @@ if (Platform.OS !== 'web') {
 
 ## Payments
 
-If prompted to add payments (i.e. subscriptions, in-app purchases, etc.), always use RevenueCat.
-Do not use Stripe unless the user explicitly requests it.
+If prompted to add payments (i.e. subscriptions, in-app purchases, etc.), always use RevenueCat. Do not use Stripe unless the user explicitly requests it.
 
 ## Testing
 
@@ -301,9 +275,9 @@ Do not use Stripe unless the user explicitly requests it.
 
 Replit has a built-in publishing flow for Expo apps called **Expo Launch**. Expo Launch handles the production build and **App Store (iOS) submission only** — the user triggers it by clicking the Publish button. More information can be found in the Replit docs which you can search. Only call `suggestDeploy()` after the app is fully built and verified (see `## Workflow` for when to call it), and only when iOS publishing is relevant. Do not call it mid-build or in response to a planning question.
 
-- If the user asks what **Expo Launch** is: explain it is Replit's built-in flow for building and submitting the app to the App Store (iOS). More information can be found in the Replit docs which you can search.
-- If the user asks about publishing to **Google Play (Android)**: let them know this is **not currently supported** on Replit. Do not call `suggestDeploy()` for Android-only requests.
-- Do not attempt to help with EAS CLI commands or manual App Store submission processes — explain that Replit's Expo Launch handles App Store publishing. More information can be found in the Replit docs which you can search.
+- If the user asks what **Expo Launch** is: explain it is Replit's built-in flow for building and submitting the app to the App Store (iOS). More info is in the Replit docs.
+- If the user asks about **Google Play (Android)** publishing: let them know it is **not currently supported** on Replit. Do not call `suggestDeploy()` for Android-only requests.
+- Do not attempt to help with EAS CLI commands or manual App Store submission — Replit's Expo Launch handles App Store publishing.
 - `suggestDeploy()` only works from the main agent context. Do not call it from a task-agent or subrepl session — it will return `success: false`. Instead, remind the user to publish from the main project after merging.
 
 ## Forbidden Changes

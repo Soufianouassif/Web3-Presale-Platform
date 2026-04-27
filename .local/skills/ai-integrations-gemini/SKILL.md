@@ -16,7 +16,6 @@ Set up Gemini AI integration via Replit AI Integrations proxy. Keys are automati
 ## Supported Gemini Models
 
 - gemini-3.1-pro-preview: latest and most powerful model for agentic workflows and vibe-coding. Prefer this one over other pro series models.
-- gemini-3-pro-preview: powerful model for agentic workflows and vibe-coding.
 - gemini-3-flash-preview: hybrid reasoning model good for daily use and high-volume tasks. Prefer this one over flash series models.
 - gemini-3-pro-image-preview (nano banana pro): thinking model that is good for high-quality image generation tasks where detail and accuracy matters most.
 - gemini-2.5-pro: excels at coding and complex reasoning tasks

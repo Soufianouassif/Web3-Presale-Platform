@@ -34,8 +34,8 @@ function isCronAuthorized(req: import("express").Request): boolean {
   return auth === `Bearer ${CRON_SECRET}`;
 }
 
-const PROGRAM_ID = new PublicKey("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
-const CONFIG_PDA = new PublicKey("BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi");
+const PROGRAM_ID = new PublicKey("CEJkgJRaMPuzm3CkHxRULfptCGFC8ahvmWnkiRPC8vDi");
+const CONFIG_PDA = new PublicKey("3mde35Qoft2R6jWSqvqmJCkLFbtacLnkZaKsXD6hPqC1");
 const SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 
 async function getDiscriminator(name: string): Promise<Buffer> {

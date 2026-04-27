@@ -83642,8 +83642,8 @@ var import_web3 = __toESM(require_index_cjs(), 1);
 var router6 = (0, import_express6.Router)();
 var SOLANA_NETWORK = (process.env.SOLANA_NETWORK ?? "devnet").toLowerCase();
 var SOLANA_RPC = process.env.SOLANA_RPC_URL || process.env.SOLANA_RPC || "https://api.devnet.solana.com";
-var PRESALE_PROGRAM_ID = "AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145";
-var CONFIG_PDA = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
+var PRESALE_PROGRAM_ID = "CEJkgJRaMPuzm3CkHxRULfptCGFC8ahvmWnkiRPC8vDi";
+var CONFIG_PDA = "3mde35Qoft2R6jWSqvqmJCkLFbtacLnkZaKsXD6hPqC1";
 var REQUIRE_ONCHAIN_VERIFICATION = process.env.REQUIRE_ONCHAIN_VERIFICATION !== void 0 ? process.env.REQUIRE_ONCHAIN_VERIFICATION !== "false" : SOLANA_NETWORK === "mainnet";
 var USDT_MINT = SOLANA_NETWORK === "mainnet" ? process.env.USDT_MINT ?? "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB" : process.env.USDT_MINT_DEVNET ?? "8PieQJ43S4PpVWQaBZp4TaHFZGoAA9FsDzYbPftVfo6X";
 var USDT_DECIMALS = 6;
@@ -84586,8 +84586,8 @@ function isCronAuthorized(req) {
   const auth = req.headers["authorization"] ?? "";
   return auth === `Bearer ${CRON_SECRET}`;
 }
-var PROGRAM_ID = new import_web32.PublicKey("AUvWWYPitvKFRBYNQqQGnPD1EaNbNpXSvT4ZFpssH145");
-var CONFIG_PDA2 = new import_web32.PublicKey("BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi");
+var PROGRAM_ID = new import_web32.PublicKey("CEJkgJRaMPuzm3CkHxRULfptCGFC8ahvmWnkiRPC8vDi");
+var CONFIG_PDA2 = new import_web32.PublicKey("3mde35Qoft2R6jWSqvqmJCkLFbtacLnkZaKsXD6hPqC1");
 var SOLANA_RPC3 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 async function getDiscriminator2(name) {
   const encoder = new TextEncoder();
@@ -84685,7 +84685,7 @@ var chainLimiter = rate_limit_default({
   message: { error: "Too many requests" }
 });
 var SOLANA_RPC4 = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
-var CONFIG_PDA3 = "BnHWhbNVB3cjCq7UA1KvBoW8JGe44yspCBSXPTDocuMi";
+var CONFIG_PDA3 = "3mde35Qoft2R6jWSqvqmJCkLFbtacLnkZaKsXD6hPqC1";
 var solPriceCache = { price: 0, fetchedAt: 0 };
 var chainStateCache = null;
 var PRICE_TTL_MS = 60 * 1e3;
