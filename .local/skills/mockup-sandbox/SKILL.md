@@ -58,7 +58,18 @@ Once you know what to build, you can proceed and make reasonable decisions about
 
 ### Step 1: Set up the mockup sandbox
 
-The mockup sandbox artifact is pre-installed — do **not** call `createArtifact`. Start its dev server **before** creating any components or placing iframes on the canvas:
+Create the mockup sandbox using `createArtifact` (see {{skill("artifacts")}} for full details):
+
+```javascript
+const result = await createArtifact({
+    artifactType: "mockup-sandbox",
+    slug: "mockup-sandbox",
+    previewPath: "/__mockup/",
+    title: "Mockup Sandbox"
+});
+```
+
+Then start its dev server **before** creating any components or placing iframes on the canvas:
 
 ```javascript
 await restartWorkflow({ workflowName: "artifacts/mockup-sandbox: Component Preview Server" });
@@ -278,7 +289,7 @@ Missing fonts fail silently — no console error, no build failure, just a fallb
 The `packager_install_tool` only works for the main project. To add packages to the mockup sandbox:
 
 1. Edit `artifacts/mockup-sandbox/package.json` directly and add the dependency
-2. Run `pnpm install` from the project root so the workspace resolves the new dependency
+2. Run `npm install` from the `artifacts/mockup-sandbox/` directory
 3. Restart the "artifacts/mockup-sandbox: Component Preview Server" workflow to pick up the change
 
 ## shadcn/ui Components

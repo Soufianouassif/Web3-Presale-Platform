@@ -16,6 +16,7 @@ const ALLOWED_ORIGINS_EXACT: string[] = [
     "http://localhost:22793",
     "http://localhost:3000",
     "http://localhost:3001",
+    "http://localhost:5000",
   ]),
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ];

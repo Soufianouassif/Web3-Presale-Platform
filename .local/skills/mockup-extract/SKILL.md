@@ -5,7 +5,7 @@ description: "Use when the user wants to pull an existing component from their m
 
 # Mockup Extract Skill
 
-Pull an existing component from the main app into the `artifacts/mockup-sandbox/` sandbox so it can be previewed on the canvas and used as a starting point for design iteration.
+Pull an existing component from the main app into the `mockup/` sandbox so it can be previewed on the canvas and used as a starting point for design iteration.
 
 ## When to Use
 
@@ -24,7 +24,7 @@ If you need to parallelize extraction (e.g., extract multiple components at once
 
 ## Prerequisites
 
-The mockup sandbox must be set up first. If `artifacts/mockup-sandbox/` doesn't exist, activate the {{skill("mockup-sandbox")}} skill to set it up before proceeding.
+The mockup sandbox must be set up first. If `mockup/` doesn't exist, activate the {{skill("mockup-sandbox")}} skill to set it up before proceeding.
 
 ## Do Not Iframe the Main App Directly
 
@@ -35,7 +35,7 @@ When the user asks to "show my component on the canvas" or "redesign my navbar,"
 - Clicking links or buttons inside the iframe navigates away from the component
 - Editing the main app code changes the iframe live, making it impossible to compare before/after
 
-Instead, always extract the component into the `artifacts/mockup-sandbox/` sandbox and embed the sandbox's `/preview/` URL.
+Instead, always extract the component into the `mockup/` sandbox and embed the sandbox's `/preview/` URL.
 
 ## Process
 
@@ -50,7 +50,7 @@ Read the target component and trace every import. Classify each dependency:
 | Category | When | Action |
 |---|---|---|
 | **Inline** | Small sub-components, simple hooks, utility functions (<50 lines) | Copy the code directly into the mockup file |
-| **Copy** | Larger shared components, complex hooks, asset files | Copy into `artifacts/mockup-sandbox/src/` with updated import paths |
+| **Copy** | Larger shared components, complex hooks, asset files | Copy into `mockup/src/` with updated import paths |
 | **Stub** | Context providers, API calls, routing, auth, global state | Replace with static mock data or no-op wrappers |
 
 Walk the full import chain -- a component may import a hook that imports a context that imports an API client. Trace until you reach leaf dependencies or hit a stub boundary.
@@ -68,24 +68,24 @@ For dependencies that can't transfer cleanly:
 
 `@/` resolves to different roots in the main app vs the sandbox:
 
-- Main app: `@/` → `src/` (within the app's package directory)
-- Sandbox: `@/` → `artifacts/mockup-sandbox/src/`
+- Main app: `@/` → `client/src/`
+- Sandbox: `@/` → `mockup/src/`
 
-Every `@/` import must point to a file that exists under `artifacts/mockup-sandbox/src/`. If the imported file doesn't exist in the sandbox, either copy it there or inline it. `@/components/ui/*` imports work without changes (shadcn/ui is pre-installed).
+Every `@/` import must point to a file that exists under `mockup/src/`. If the imported file doesn't exist in the sandbox, either copy it there or inline it. `@/components/ui/*` imports work without changes (shadcn/ui is pre-installed).
 
 ### Step 5: Create `_group.css` and the mockup component
 
 The main app's global styles are invisible to Step 2's import trace — they live in `index.html` `<link>` tags and global CSS, not in any `import` statement. Collect them into a group-level stylesheet that every component in this group will explicitly import.
 
-Create `artifacts/mockup-sandbox/src/components/mockups/{group}/_group.css` with everything the app applies globally:
+Create `mockup/src/components/mockups/{group}/_group.css` with everything the app applies globally:
 
-- **CSS variables** — copy the `:root` and `.dark` blocks from the main app's `src/index.css` so semantic classes like `bg-background` and `text-foreground` resolve to the app's values, not the sandbox defaults.
-- **External font links** — read the main app's `index.html` for `<link href="https://fonts.googleapis.com/...">` (or Adobe Fonts, etc.) and convert each to `@import url("...");` at the top of `_group.css`.
+- **CSS variables** — copy the `:root` and `.dark` blocks from the main app's `client/src/index.css` so semantic classes like `bg-background` and `text-foreground` resolve to the app's values, not the sandbox defaults.
+- **External font links** — read the main app's `client/index.html` for `<link href="https://fonts.googleapis.com/...">` (or Adobe Fonts, etc.) and convert each to `@import url("...");` at the top of `_group.css`.
 - **`@font-face` declarations** — if the main app self-hosts fonts, copy the `@font-face` blocks and the font files they reference.
 
-Do **not** edit the sandbox's global `index.css` — that leaks this app's tokens into every unrelated mockup group. Do **not** add font `<link>` tags to `artifacts/mockup-sandbox/index.html` — that file is shared across all mockup groups, so app-specific fonts would load for every unrelated preview. The sandbox already pre-loads a large common font bundle there; put any additional app-specific fonts in `_group.css` via `@import` to keep them scoped to this extraction.
+Do **not** edit the sandbox's global `index.css` — that leaks this app's tokens into every unrelated mockup group. Do **not** add font `<link>` tags to `mockup/index.html` — that file is shared across all mockup groups, so app-specific fonts would load for every unrelated preview. The sandbox already pre-loads a large common font bundle there; put any additional app-specific fonts in `_group.css` via `@import` to keep them scoped to this extraction.
 
-Then create `artifacts/mockup-sandbox/src/components/mockups/{group}/Current.tsx`:
+Then create `mockup/src/components/mockups/{group}/Current.tsx`:
 
 ```tsx
 import './_group.css';
@@ -101,23 +101,23 @@ Use a descriptive group name (e.g., `navbar-redesign/`). Export a single compone
 
 ### Step 6: Type-check, embed, and create variants
 
-Type-check with `cd artifacts/mockup-sandbox && npm run typecheck`. Embed on the canvas using the sandbox `/preview/` URL (see {{skill("mockup-sandbox")}} for iframe creation). Label it "Current", then create new variant files alongside it.
+Type-check with `cd mockup && npm run check`. Embed on the canvas using the sandbox `/preview/` URL (see {{skill("mockup-sandbox")}} for iframe creation). Label it "Current", then create new variant files alongside it.
 
 ## Guidelines
 
 - **Prefer inlining over copying.** Fewer files = easier iteration. Inline anything under ~50 lines.
 - **Keep mock data realistic.** Visual fidelity depends on it.
-- **Don't import from the main app.** Every import must resolve within `artifacts/mockup-sandbox/src/`.
+- **Don't import from the main app.** Every import must resolve within `mockup/src/`.
 - **Preserve the visual output exactly.** The extracted component should look identical to the original.
-- **Copy assets first.** Images and icons must exist in `artifacts/mockup-sandbox/` before the component references them.
+- **Copy assets first.** Images and icons must exist in `mockup/` before the component references them.
 
 ## Common Mistakes
 
-- **Leaving `@/` imports pointing to main app files.** Every `@/` path must resolve under `artifacts/mockup-sandbox/src/`.
+- **Leaving `@/` imports pointing to main app files.** Every `@/` path must resolve under `mockup/src/`.
 - **Forgetting nested dependencies.** Trace the full import chain — component → hook → context → API client.
 - **Not stubbing side effects.** API calls, analytics, and router navigations will crash in the sandbox.
 - **Copying too much.** Extract only what the target component needs.
 - **Editing the global `index.css` instead of creating `_group.css`.** The extraction's tokens leak into every other mockup group in the sandbox.
 - **Forgetting `import './_group.css'` in the component file.** Without it the component renders with sandbox defaults, not the app's tokens. No error — it just looks wrong.
-- **Adding font `<link>` tags to `artifacts/mockup-sandbox/index.html`.** That file is shared across all mockup groups — app-specific fonts leak into every unrelated preview. Put fonts in `_group.css` via `@import` instead to keep them scoped to this group.
+- **Adding font `<link>` tags to `mockup/index.html`.** That file is shared across all mockup groups — app-specific fonts leak into every unrelated preview. Put fonts in `_group.css` via `@import` instead to keep them scoped to this group.
 - **Assuming fonts loaded because nothing errored.** Missing fonts fall back silently — no console error, no build failure. The component still renders, just with the wrong stroke weight, character width, and spacing. Verify typography visually against the original; "it didn't crash" is not "it looks right."

@@ -5,7 +5,7 @@ description: "Use when the user approves a mockup on the canvas and wants it int
 
 # Mockup Graduate Skill
 
-Move an approved mockup from the mockup sandbox (`artifacts/mockup-sandbox`) into the main app. Transform the self-contained prototype into production code that matches the app's conventions.
+Move an approved mockup from the mockup sandbox (`mockup`) into the main app. Transform the self-contained prototype into production code that matches the app's conventions.
 
 ## When to Use
 
@@ -45,15 +45,15 @@ Map each part of the mockup to the main app's equivalent:
 | Inline sub-components | Existing shared components where they exist |
 | Direct `className` styling | App's styling approach (may be the same) |
 | `@/components/ui/*` (sandbox shadcn) | App's UI component library (may differ) |
-| Static images from `artifacts/mockup-sandbox/` | App's asset directory or CDN |
+| Static images from `mockup/` | App's asset directory or CDN |
 
 ### Step 4: Install missing dependencies
 
-Compare the mockup's imports against the target app's `package.json`. In a pnpm workspace each package declares its own dependencies, so install into the target app's package directly (e.g., `pnpm --filter @workspace/<target-slug> add <package>`). Do **not** use `packager_install_tool` — it installs to the repo root, which leaves the target package's `package.json` unchanged. Add font links to the target app's `index.html` if needed.
+Compare the mockup's imports against the main app's `package.json`. Install anything missing using the `packager_install_tool`. Add font links to `index.html` if needed.
 
 ### Step 5: Transform and place the component
 
-Create the production component in the main app. Replace mock data with real data fetching, wire up navigation, connect to app state, and adapt UI components to the app's library. Copy any assets from `artifacts/mockup-sandbox/` to the main app's asset directory.
+Create the production component in the main app. Replace mock data with real data fetching, wire up navigation, connect to app state, and adapt UI components to the app's library. Copy any assets from `mockup/` to the main app's asset directory.
 
 ### Step 6: Update routing and verify
 

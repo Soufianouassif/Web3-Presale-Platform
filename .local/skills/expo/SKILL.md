@@ -72,27 +72,24 @@ Use react-native's `StyleSheet` for styling. Reference colors from `constants/co
 If this Expo artifact is part of a multi-artifact project (e.g., alongside a react-vite web app), read `design_and_aesthetics.md` before writing component code — it covers how to sync colors, fonts, and radius from the sibling artifact so both share the same visual identity.
 
 ## Networking
-- Use the generated React Query hooks from `@workspace/api-client-react` for server data.
-  - For any API change, update `lib/api-spec/openapi.yaml` first, then run `pnpm --filter @workspace/api-spec run codegen`, then use the generated hooks.
-  - Do not write app-local React Query hooks, manual `useQuery` wrappers, or custom fetch layers for endpoints that already exist in `@workspace/api-client-react`.
-  - Use the shared QueryClient/fetch setup that ships with the monorepo rather than creating app-local networking infrastructure.
-  - The generated hooks return data typed as `T` directly.
-  - For mutations or requests that do not yet exist in the generated client, update the OpenAPI spec and regenerate rather than bypassing the shared API client package.
-  - Do not hardcode domain URLs or hostnames. The deployment domain is injected at build time and varies between development, preview, and production. Use `process.env.EXPO_PUBLIC_DOMAIN`. Routes like `/api` or `/{service}` are routed to the appropriate artifact/service as needed.
-  - In `app/_layout.tsx`, call ``setBaseUrl(`https://${process.env.EXPO_PUBLIC_DOMAIN}`)`` from `@workspace/api-client-react` at the top level (outside any component). Expo bundles run outside the web proxy and need absolute URLs to reach the API server.
-  - For authenticated API calls, use `setAuthTokenGetter` from `@workspace/api-client-react` to supply a bearer token getter. The getter is called before every request and should return the token string or `null`.
+- Use `@/lib/query-client` for all data fetching.
+  - Queries should not define their own queryFn — the default fetcher in `@/lib/query-client` is already configured. This only applies when the app's QueryClient is imported from `@/lib/query-client`; if the project still uses a bare `new QueryClient()`, migrate it first.
+  - Mutations should use `apiRequest` from `@/lib/query-client` and invalidate cache by queryKey after.
+  - Use array query keys for hierarchical data: `queryKey: ['/api/recipes', id]`
+- API URLs: Use `getApiUrl()` from `@/lib/query-client`. Construct URLs with `new URL(path, getApiUrl())`.
+- Do not hardcode domain URLs or hostnames. Use `process.env.EXPO_PUBLIC_DOMAIN` for domain config or `getApiUrl()` for API requests.
+- Do not create a new QueryClient() — use `@/lib/query-client` instead.
 
 ## App Icon
 
 Generate a custom app icon for the app. Read the mobile-ui skill's app-icon.md reference for guidelines.
 
 ## Workflow
-- The Expo dev server is accessed via $REPLIT_EXPO_DEV_DOMAIN, not through the shared proxy at localhost:80.
-- Ports are assigned dynamically. Do not hardcode port numbers.
-- Check the configured workflows list for exact workflow names.
-- Use the `restart_workflow` tool to restart workflows — not shell commands.
-- The Expo dev server has Hot Module Reloading. Only restart the mobile workflow when you change dependencies or hit a Metro error, not for normal code changes. Restarting unnecessarily wastes time.
-- Backend workflows only require restart when backend changes were made since it can be a time-consuming operation.
+- The Expo App runs on port 8081. All web_application_feedback should go through port 8081 as that is where the user's app runs.
+- The Express backend runs on port 5000. It serves APIs and a static landing page in server/templates/landing-page.html. Do NOT use port 5000 for web_application_feedback — it only serves the API and a landing page.
+- There are two workflows for this stack:
+  - `Start Backend`: Restarts (or starts) the Express server. Use `await restartWorkflow({ workflowName: "Start Backend" })` after backend changes. Do not restart this workflow for frontend-only changes — restarting takes time and degrades UX.
+  - `Start Frontend`: Restarts (or starts) the Expo dev server. HMR handles most code changes automatically. Do not restart unless you updated dependencies or fixed an error.
 - After presenting the artifact, call `suggestDeploy()` so the user knows their app is ready to publish.
 
 ## React Native Pitfalls
@@ -281,6 +278,7 @@ Replit has a built-in publishing flow for Expo apps called **Expo Launch**. Expo
 - `suggestDeploy()` only works from the main agent context. Do not call it from a task-agent or subrepl session — it will return `success: false`. Instead, remind the user to publish from the main project after merging.
 
 ## Forbidden Changes
+- NEVER edit package.json directly. See package management skill for instructions on installing packages.
 - NEVER change bundle identifiers after initial setup unless user explicitly requests it.
 - NEVER downgrade the version of React Native or Expo that is declared in package.json.
 - NEVER run `npx expo start` or `npx expo` directly in a shell. Use the `restart_workflow` tool instead — running expo directly will miss environment variables (like `PORT`) injected into the workflow.

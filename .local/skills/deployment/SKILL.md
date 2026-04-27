@@ -38,9 +38,41 @@ This skill has additional reference documents for specific deployment scenarios.
 
 ## Available Functions
 
-### verifyAndReplaceArtifactToml({ tempFilePath, artifactTomlPath })
+### deployConfig(deploymentTarget, run, build, publicDir)
 
-Validate and replace an artifact's `artifact.toml` through a temp file (from the `artifacts` skill). To update deployment settings, copy the current `artifact.toml` to a temp file (e.g. `artifact.edit.toml`), edit the temp file, then call this callback with absolute paths. Do not edit `artifact.toml` directly. See the `artifacts` skill for full documentation, parameters, and usage rules.
+Configure how the project should be deployed to production.
+
+**Parameters:**
+
+- `deploymentTarget` (str, required): "autoscale", "vm", "scheduled", or "static"
+- `run` (list[str], optional): Production run command. First entry is binary/script, rest are arguments
+- `build` (list[str], optional): Build/compile command before deployment
+- `publicDir` (str, required for "static"): Directory containing static files
+
+**Returns:** Dict with `success`, `message`, and configuration details
+
+**Example:**
+
+```javascript
+// Configure a Python web app
+const result = await deployConfig({
+    deploymentTarget: "autoscale",
+    run: ["gunicorn", "--bind=0.0.0.0:5000", "--reuse-port", "main:app"]
+});
+
+// Configure a static site
+const result2 = await deployConfig({
+    deploymentTarget: "static",
+    build: ["npm", "run", "build"],
+    publicDir: "dist"
+});
+
+// Configure an always-running bot
+const result3 = await deployConfig({
+    deploymentTarget: "vm",
+    run: ["python", "bot.py"]
+});
+```
 
 ### suggestDeploy()
 
@@ -63,6 +95,13 @@ Use for stateless websites and APIs that don't need persistent server memory.
 - **State:** Use databases for persistent state (not server memory)
 - **Cost:** Most cost-effective for variable traffic
 
+```javascript
+await deployConfig({
+    deploymentTarget: "autoscale",
+    run: ["gunicorn", "--bind=0.0.0.0:5000", "app:app"]
+});
+```
+
 ### vm (Always Running)
 
 Use for applications that need persistent server-side state or long-running processes.
@@ -70,6 +109,13 @@ Use for applications that need persistent server-side state or long-running proc
 - **Best for:** Discord/Telegram bots, WebSocket servers, web scrapers, background workers
 - **Behavior:** Always running, maintains state in server memory
 - **State:** Can use in-memory databases, local files, or external databases
+
+```javascript
+await deployConfig({
+    deploymentTarget: "vm",
+    run: ["python", "bot.py"]
+});
+```
 
 ### scheduled
 
@@ -79,6 +125,13 @@ Use for cron-like jobs that run on a schedule.
 - **Behavior:** Runs on configured schedule, not continuously
 - **Note:** Do NOT use for websites or APIs
 
+```javascript
+await deployConfig({
+    deploymentTarget: "scheduled",
+    run: ["python", "daily_report.py"]
+});
+```
+
 ### static
 
 Use for client-side websites with no backend server.
@@ -87,18 +140,46 @@ Use for client-side websites with no backend server.
 - **Behavior:** Serves static files directly, no server-side processing
 - **Note:** The `run` command is ignored; must specify `publicDir`
 
-## Deployment Configuration in Pnpm workspace
+```javascript
+await deployConfig({
+    deploymentTarget: "static",
+    build: ["npm", "run", "build"],
+    publicDir: "dist"
+});
+```
 
-In a PNPM workspace, deployment configuration lives in each artifact's `.replit-artifact/artifact.toml` file, **not** in `.replit`. The `.replit` file's `deployment.run` is ignored and each artifact's `artifact.toml` controls run/build commands. `.replit`'s `deployment.build` acts only as a pre-build hook that runs at the repo root before artifact-specific builds.
+## Run Command Examples
 
-Each artifact's `[services.production]` section controls:
+Use production-ready servers, not development servers:
 
-- `run` — the production run command
-- `build` — the production build command
-- `serve` — whether to serve as `static` or run a process
-- `publicDir` — directory containing static files (for static serve mode)
+```toml
+# Python with Gunicorn
+run=["gunicorn", "--bind=0.0.0.0:5000", "--reuse-port", "main:app"]
 
-To update these settings, use `verifyAndReplaceArtifactToml` from the `artifacts` skill.
+# Python with Streamlit
+run=["streamlit", "run", "main.py"]
+
+# Node.js
+run=["node", "server.js"]
+
+# Multiple processes with bash
+run=["bash", "-c", "gunicorn --reuse-port -w 4 -b 0.0.0.0:8000 app:app & npm run dev"]
+```
+
+## Build Command Examples
+
+Only use build commands when compilation is needed:
+
+```toml
+# TypeScript/bundler
+build=["npm", "run", "build"]
+
+# Multiple build steps
+build=["bash", "-c", "make assets && make compile"]
+
+# Rust
+build=["cargo", "build", "--release"]
+```
 
 ## Publishing Geography
 
@@ -134,13 +215,16 @@ Do **not** tell users that Replit only supports US-based infrastructure — mult
 1. **User-initiated publishing**: The user must click the Publish button to actually deploy
 2. **Automatic handling**: Publishing handles building, hosting, TLS, and health checks automatically
 3. **Domain**: Published apps are available at a `.replit.app` domain or custom domain if configured
-4. **Production config lives in `artifact.toml`**: Each artifact's deployment settings are in its `.replit-artifact/artifact.toml` file, not in `.replit`. Always check `artifact.toml` when configuring deployment.
+4. **Production config lives in `.replit`**: Deployment settings (run command, build command, deployment target) are in the `.replit` file's `[deployment]` section.
 
 ## Example Workflow
 
 ```javascript
-// 1. To update deployment settings, use verifyAndReplaceArtifactToml
-// from the artifacts skill (temp-file workflow)
+// 1. Configure deployment settings for a web app
+await deployConfig({
+    deploymentTarget: "autoscale",
+    run: ["gunicorn", "--bind=0.0.0.0:5000", "app:app"]
+});
 
 // 2. After verifying the app works, suggest publishing to the user
 await suggestDeploy();
